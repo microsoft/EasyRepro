@@ -106,8 +106,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages\WebDriverIEDriver64.2.45.0.0\tools\IEDriverServer-license.txt" />
-    <Content Include="packages\WebDriverIEDriver64.2.45.0.0\tools\IEDriverServer.exe" />
+    <Folder Include="packages\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
