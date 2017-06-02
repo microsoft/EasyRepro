@@ -4,7 +4,7 @@ using Microsoft.Dynamics365.UIAutomation.Api;
 using System.Security;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 
-namespace Microsoft.Dynamics365.UIAutomation.UnitTests.Sample
+namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
     public class CreateCase

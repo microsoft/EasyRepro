@@ -4,7 +4,7 @@ using System.Security;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.Dynamics365.UIAutomation.Api;
 
-namespace Microsoft.Dynamics365.UIAutomation.UnitTests.Sample
+namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
     public class UpdateCase
