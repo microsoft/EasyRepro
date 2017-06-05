@@ -34,7 +34,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.ThinkTime(2000);
                 xrmBrowser.Related.OpenGridRow(0);
                 xrmBrowser.ThinkTime(2000);
-                xrmBrowser.CommandBar.ClickCommand("New");
+                xrmBrowser.CommandBar.ClickCommand("NEW");
                 xrmBrowser.ThinkTime(2000);
 
 
