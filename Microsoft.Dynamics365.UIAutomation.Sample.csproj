@@ -47,13 +47,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Dynamics365.UIAutomation.Api, Version=8.1.1706.101, Culture=neutral, PublicKeyToken=f300afd708cefcd3, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.Dynamics365.UIAutomation.Api, Version=8.2.1706.101, Culture=neutral, PublicKeyToken=f300afd708cefcd3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Builds\EasyRepro\v8.2.1705.3103\Microsoft.Dynamics365.UIAutomation.Api.dll</HintPath>
+      <HintPath>bin\Debug\Microsoft.Dynamics365.UIAutomation.Api.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dynamics365.UIAutomation.Browser, Version=8.1.1706.101, Culture=neutral, PublicKeyToken=f300afd708cefcd3, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.Dynamics365.UIAutomation.Browser, Version=8.2.1706.101, Culture=neutral, PublicKeyToken=f300afd708cefcd3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Builds\EasyRepro\v8.2.1705.3103\Microsoft.Dynamics365.UIAutomation.Browser.dll</HintPath>
+      <HintPath>bin\Debug\Microsoft.Dynamics365.UIAutomation.Browser.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
