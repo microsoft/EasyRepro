@@ -34,14 +34,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.ThinkTime(2000);
                 xrmBrowser.Related.OpenGridRow(0);
                 xrmBrowser.ThinkTime(2000);
-                xrmBrowser.CommandBar.ClickCommand("ADD NEW CASE");
+                xrmBrowser.Related.ClickCommand("ADD NEW CASE");
                 xrmBrowser.ThinkTime(2000);
 
 
-                xrmBrowser.Entity.SetValue("title", "Test API Case");
-                xrmBrowser.Entity.SelectLookup("customerid", 0);
+                xrmBrowser.QuickCreate.SetValue("title", "Test API Case");
 
-                xrmBrowser.CommandBar.ClickCommand("Save & Close");
+                xrmBrowser.QuickCreate.Save();
                 xrmBrowser.ThinkTime(10000);
 
             }
