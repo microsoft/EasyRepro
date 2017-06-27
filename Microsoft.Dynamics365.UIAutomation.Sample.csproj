@@ -83,6 +83,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ADFSLogin.cs" />
     <Compile Include="Dashboard.cs" />
     <Compile Include="CloseOpportunity.cs" />
     <Compile Include="CreateAccount.cs" />
@@ -90,11 +91,13 @@
     <Compile Include="CreateContact.cs" />
     <Compile Include="CreateLead.cs" />
     <Compile Include="CreateOpportunity.cs" />
+    <Compile Include="DuplicateDetection.cs" />
     <Compile Include="OpenAccount.cs" />
     <Compile Include="OpenCase.cs" />
     <Compile Include="OpenContact.cs" />
     <Compile Include="OpenLead.cs" />
     <Compile Include="OpenOpportunity.cs" />
+    <Compile Include="QuickCreate.cs" />
     <Compile Include="Telemetry.cs" />
     <Compile Include="UpdateAccount.cs" />
     <Compile Include="UpdateCase.cs" />
