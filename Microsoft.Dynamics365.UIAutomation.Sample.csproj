@@ -67,6 +67,12 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="WebDriver">
+      <HintPath>..\Rangers-EasyRepro\bin\Debug\WebDriver.dll</HintPath>
+    </Reference>
+    <Reference Include="WebDriver.Support">
+      <HintPath>..\Rangers-EasyRepro\bin\Debug\WebDriver.Support.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -98,6 +104,7 @@
     <Compile Include="OpenLead.cs" />
     <Compile Include="OpenOpportunity.cs" />
     <Compile Include="QuickCreate.cs" />
+    <Compile Include="Reports.cs" />
     <Compile Include="Telemetry.cs" />
     <Compile Include="UpdateAccount.cs" />
     <Compile Include="UpdateCase.cs" />
