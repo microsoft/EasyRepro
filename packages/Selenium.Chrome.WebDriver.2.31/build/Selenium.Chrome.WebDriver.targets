@@ -1,0 +1,9 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">  
+  <Target Name="CopyChromeDriverToBin" BeforeTargets="AfterBuild">
+    <PropertyGroup>
+      <ChromeDriverSrcPath>$(MSBuildThisFileDirectory)..\driver\chromedriver.exe</ChromeDriverSrcPath>
+      <ChromeDriverTargetPath Condition=" '$(ChromeDriverTargetPath)' == '' ">$(TargetDir)</ChromeDriverTargetPath>
+    </PropertyGroup>
+    <Copy SourceFiles="$(ChromeDriverSrcPath)" DestinationFiles="$(ChromeDriverTargetPath)chromedriver.exe" SkipUnchangedFiles="true"></Copy>
+  </Target>
+</Project>
