@@ -10,7 +10,7 @@ Microsoft Visual Studio 2015, Microsoft Visual Studio 2017
 
 ### CRM Versions
 Easy Repro supports below CRM Versions	
-- Microsoft Dynamics® CRM Online 2016 Update (8.1.1.1003) (DB 8.1.1.1003)
+- Microsoft DynamicsÂ® CRM Online 2016 Update (8.1.1.1003) (DB 8.1.1.1003)
 - Microsoft Dynamics 365 Version 1612 (8.2.1.185) (DB 8.2.1.185) online
 
 #### Selenium Webdriver & Support
@@ -19,8 +19,8 @@ Selenium is a set of different software tools each with a different approach to 
 
 | File Name         | Version | Release date   |
 | ------------------|---------|----------------|
-| Selenium.WebDriver| v3.4.0  | April 21, 2017 |
-| Selenium.Support  | v3.4.0  | April 21, 2017 |
+| Selenium.WebDriver| v3.5.1  | April 21, 2017 |
+| Selenium.Support  | v3.5.1  | April 21, 2017 |
 
 ## Coverage #
 ### CRM Functionality Covered
@@ -51,30 +51,29 @@ Selenium is a set of different software tools each with a different approach to 
 Although we don't have specific commands to cover the above funcationality, we have generic commands that will allow you to still interact with those features. 
 
 ## Known Issues #
-- Edge Browser is currently not support due to know bug that is planned for future release.
+- Edge Browser is currently not supported due to known bug that is planned for future release.
 - Firefox has sometimes been inconsistent with testing results.  The click command is inconsistent. This is a known issue and has been reported to that team that manages that driver. 
 - WebDriver.dll and WebDriver.Support.dll are not signed when installed from NUGET.  The Selenium drivers need to be downloaded from a seperate location and can't be installed from the NUGET package.  Selenium is aware of this and don't plan to release the signed versions via NUGET
 - IE Driver has a 32-bit version and a 64-bit version. If you're using the 32-bit version on 64-bit windows with 64-bit IE then the driver will not work as intended.  Use the appropriate version of IE Driver with the specific version of IE. 
 
 ## Setup #
 #### Install Instructions:
-Download the Selenium WebDriver and Support from the below link
-[Download Selenium WebDriver and Support](http://selenium-release.storage.googleapis.com/3.4/selenium-dotnet-strongnamed-3.4.0.zip)
-Add References ,WebDriver.dll and WebDriver.Support.dll  to Microsoft.Dynamics365.UIAutomation.UnitTests.Sample project
+The Sample project should have NUGET packages added and you just need to build the solution and restore the packages.  For the specific browser drivers, you can add them using NUGET. The default driver is Chrome and the NUGET package is already installed on the Sample project.   
 
-**Do Not use Nuget Package Manager for installing Selenium Webdriver and Selenium Support**
 
 #### Supported Browser WebDriver
  The application supports following browser:
   
 | Browser    | WebDriver           | Version           | Release date      |
 | -----------|-------------------- |-----------------  | --------------    |
-| Chrome     | ChromeDriver        |v.2.29.0.0         |  April 4, 2017    |
+| Chrome     | ChromeDriver        |v.2.31.0.0         |  April 4, 2017    |
 | Firefox    | GeckoDriver         |v.0.16.1           |  April 27, 2017   |
 | IE         | IEDriver            |v.3.4              |  April 22, 2017   |
 | Edge       | MicrosoftWebDriver  |v.10.0.15063.0     |  April 18, 2017   |
 
-#### Download and install instructions
+#### Browser Driver Download and install instructions
+If you want to download the drivers manually you can go to the specific driver download links and put them in the bin folder of your project. 
+
 #### Chrome:
 Download the Chrome Web driver from the below link
 [Download chrome driver](https://sites.google.com/a/chromium.org/chromedriver/downloads)
