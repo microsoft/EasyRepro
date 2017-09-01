@@ -39,6 +39,7 @@ Selenium is a set of different software tools each with a different approach to 
 - Performance Center
 - Quick Create
 - Run Workflows
+- Run Reports
 
 ### CRM Functionality Not Covered
 - Settings Area  (Administration)
@@ -53,13 +54,11 @@ Although we don't have specific commands to cover the above funcationality, we h
 ## Known Issues #
 - Edge Browser is currently not supported due to known bug that is planned for future release.
 - Firefox has sometimes been inconsistent with testing results.  The click command is inconsistent. This is a known issue and has been reported to that team that manages that driver. 
-- WebDriver.dll and WebDriver.Support.dll are not signed when installed from NUGET.  The Selenium drivers need to be downloaded from a seperate location and can't be installed from the NUGET package.  Selenium is aware of this and don't plan to release the signed versions via NUGET
 - IE Driver has a 32-bit version and a 64-bit version. If you're using the 32-bit version on 64-bit windows with 64-bit IE then the driver will not work as intended.  Use the appropriate version of IE Driver with the specific version of IE. 
 
 ## Setup #
 #### Install Instructions:
 The Sample project should have NUGET packages added and you just need to build the solution and restore the packages.  For the specific browser drivers, you can add them using NUGET. The default driver is Chrome and the NUGET package is already installed on the Sample project.   
-
 
 #### Supported Browser WebDriver
  The application supports following browser:
@@ -83,16 +82,7 @@ Download the IE Web driver from the below link
 #### FireFox:
 The Firefox web driver can be installed through Nuget package manager.
 - In Visual studio ,Go to Tools -> NuGet Package Manager -> Manage Nuget Packages for the solution
-- Click on browse
-- Type GeckoDriver.Win64 
-- Click on Install
 ***FileName*** : Selenium.WebDriver.GeckoDriver.Win64
-It can be also installed through Package Manger Console
-***Package Manger console*** : Install-Package Selenium.WebDriver.GeckoDriver.Win64
-**packages.config**
-The below package id will be added to the packages.config
- <package id="Selenium.WebDriver.GeckoDriver.Win64" version="0.16.1" targetFramework="net461" />
 #### Edge:
 Click on the below link to download Edge driver
 [Download Edge driver](https://www.microsoft.com/en-us/download/details.aspx?id=48212)
-
