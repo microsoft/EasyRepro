@@ -100,5 +100,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 "portal.office.com"
             };
         }
+
     }
 }
