@@ -141,10 +141,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Notes_ActivityAddTask", "id(\"activityLabelinlineactivitybar4212\")"},
             { "Notes_Done"                 , "id(\"doneSpacer\")"},
             { "Notes_VoiceMail"                 , "id(\"PhoneCallQuickformleftvoiceCheckBoxContol\")"},
-                       
+
+                      
             //Login           
-            { "Login_UserId", "id(\"cred_userid_inputtext\")"},
-            { "Login_Password", "id(\"cred_password_inputtext\")"},
+            { "Login_UserId", "id(\"i0116\")"},
+            { "Login_Password", "id(\"i0118\")"},
+            { "Login_OldUserId", "id(\"cred_userid_inputtext\")"},
+            { "Login_OldPassword", "id(\"cred_password_inputtext\")"},
             { "Login_SignIn", "id(\"cred_sign_in_button\")"},
             { "Login_CrmMainPage", "id(\"crmTopBar\")"},
 
@@ -537,6 +540,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             public static string UserId = "Login_UserId";
             public static string Password = "Login_Password";
+            public static string OldSignInUserId = "Login_OldUserId";
+            public static string OldSignInPassword = "Login_OldPassword";
             public static string SignIn = "Login_SignIn";
             public static string CrmMainPage = "Login_CrmMainPage";
 

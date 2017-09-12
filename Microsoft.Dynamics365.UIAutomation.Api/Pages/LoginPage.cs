@@ -59,12 +59,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute("Login", this.Login, uri, this.Browser.Options.Credentials.Username, this.Browser.Options.Credentials.Password, default(Action<LoginRedirectEventArgs>));
         }
-
+        /// <summary>
+        /// Login Page
+        /// </summary>
+        /// <param name="uri">The Uri</param>
+        /// <param name="username">The Username to login to CRM application</param>
+        /// <param name="password">The Password to login to CRM application</param>
+        /// <example>xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);</example>
         public BrowserCommandResult<LoginResult> Login(Uri uri, SecureString username, SecureString password)
         {
             return this.Execute("Login", this.Login, uri, username, password, default(Action<LoginRedirectEventArgs>));
         }
 
+        /// <summary>
+        /// Login Page
+        /// </summary>
+        /// <param name="uri">The Uri</param>
+        /// <param name="username">The Username to login to CRM application</param>
+        /// <param name="password">The Password to login to CRM application</param>
+        /// <param name="redirectAction">The RedirectAction</param>
+        /// <example>xrmBrowser.LoginPage.Login(_xrmUri, _username, _password, ADFSLogin);</example>
         public BrowserCommandResult<LoginResult> Login(Uri uri, SecureString username, SecureString password, Action<LoginRedirectEventArgs> redirectAction)
         {
             return this.Execute("Login", this.Login, uri, username, password, redirectAction);
@@ -74,7 +88,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             var redirect = false;
             bool online = !(this.OnlineDomains != null && !this.OnlineDomains.Any(d => uri.Host.EndsWith(d)));
-            
+            bool redirectToNewPassword = false;
             driver.Navigate().GoToUrl(uri);
 
             if (online)
@@ -82,11 +96,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (driver.IsVisible(By.Id("use_another_account_link")))
                     driver.ClickWhenAvailable(By.Id("use_another_account_link"));
 
-                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]),
-                    $"The Office 365 sign in page did not return the expected result and the user '{username}' could not be signed in.");
+                if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.UserId])))
+                {
+                    driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]),
+                        $"The Office 365 sign in page did not return the expected result and the user '{username}' could not be signed in.");
 
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(username.ToUnsecureString());
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Tab);
+                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(username.ToUnsecureString());
+                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Tab);
+                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Enter);
+                    redirectToNewPassword = true;
+                    Thread.Sleep(2000);
+
+                }
+                else
+                {
+                    driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.OldSignInUserId]),
+                        $"The Office 365 sign in page did not return the expected result and the user '{username}' could not be signed in.");
+
+                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.OldSignInUserId])).SendKeys(username.ToUnsecureString());
+                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.OldSignInUserId])).SendKeys(Keys.Tab);
+                }
 
                 //If expecting redirect then wait for redirect to trigger
                 if (redirectAction != null)
@@ -100,9 +129,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 }
                 else
                 {
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).SendKeys(password.ToUnsecureString());
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).SendKeys(Keys.Tab);
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).Submit();
+                    if (redirectToNewPassword)
+                    {
+                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).SendKeys(password.ToUnsecureString());
+                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).SendKeys(Keys.Tab);
+                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).Submit();
+                    }
+                    else
+                    {
+                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.OldSignInPassword])).SendKeys(password.ToUnsecureString());
+                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.OldSignInPassword])).SendKeys(Keys.Tab);
+                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.OldSignInPassword])).Submit();
+                    }
 
                     driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
                         , new TimeSpan(0, 0, 60),
