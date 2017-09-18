@@ -53,7 +53,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 internal const string CheckIfScriptExistsScript = @"return typeof Recorder === 'undefined'? 'false' : 'true';";
                 internal const string CheckIfEventCollectionExistsScript = @"return typeof document.eventCollection  === 'undefined'? 'false' : 'true';";
                 internal const string RemoveEventsScript = @"if (typeof Recorder !== undefined) { Recorder.removeEvents({0}); }";
-
+               
                 /// <summary>
                 /// The default scan interval.
                 /// </summary>
@@ -96,8 +96,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             {
                 ".crm.dynamics.com", ".crm2.dynamics.com", ".crm3.dynamics.com",
                 ".crm4.dynamics.com", "crm5.dynamics.com", "crm6.dynamics.com", "crm7.dynamics.com",
-                ".crm8.dynamics.com", ".crm9.dynamics.com", ".crm10.dynamics.com", "portal.office.com"
+                ".crm8.dynamics.com", ".crm9.dynamics.com", ".crm10.dynamics.com", ".crm11.dynamics.com",
+                "portal.office.com"
             };
         }
+
     }
 }

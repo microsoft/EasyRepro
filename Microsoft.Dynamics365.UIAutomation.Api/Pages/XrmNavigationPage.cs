@@ -48,7 +48,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 var dictionary = new Dictionary<string, IWebElement>();
 
-                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.HomeTab]));
+                var topItem = driver.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.TopLevelItem])).FirstOrDefault();
+                topItem?.FindElement(By.Name(Elements.Name[Reference.Navigation.HomeTab])).Click();
 
                 Thread.Sleep(1000);
 
@@ -421,8 +422,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var dictionary = new Dictionary<string, IWebElement>();
 
                 driver.WaitUntilVisible(By.Id(area.GetAttribute("Id")));
-
-                driver.ClickWhenAvailable(By.Id("SFA"));
 
                 area.Click();
 

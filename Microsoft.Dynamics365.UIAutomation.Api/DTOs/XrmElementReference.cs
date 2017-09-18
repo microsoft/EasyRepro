@@ -50,7 +50,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Frame_QuickCreateFrame"       , "id(\"globalquickcreate_container_NavBarGloablQuickCreate\")"},
 
             //Navigation
-            { "Nav_HomeTab"       , "id(\"TabSFA\")"},
             { "Nav_ActionGroup"       , "id(\"actionGroupControl\")"},
             { "Nav_SubActionGroup"       , "id(\"actionGroupControl\")"},
             { "Nav_SubActionGroupContainer"       , "id(\"detailActionGroupControl\")"},
@@ -147,8 +146,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Notes_ActivityAddTaskDueTime"    ,"id(\"selectTable_Date\")"},
                       
             //Login           
-            { "Login_UserId", "id(\"cred_userid_inputtext\")"},
-            { "Login_Password", "id(\"cred_password_inputtext\")"},
+            { "Login_UserId", "id(\"i0116\")"},
+            { "Login_Password", "id(\"i0118\")"},
+            { "Login_OldUserId", "id(\"cred_userid_inputtext\")"},
+            { "Login_OldPassword", "id(\"cred_password_inputtext\")"},
             { "Login_SignIn", "id(\"cred_sign_in_button\")"},
             { "Login_CrmMainPage", "id(\"crmTopBar\")"},
 
@@ -229,6 +230,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Nav_TabButtonLinkClass"       , "navTabButtonLink"},
             { "Nav_ActionGroupContainerClass"       , "navActionGroupContainer"},
             { "Nav_RowLabelClass"       , "nav-rowLabel"},
+            { "Nav_TopLevelItemClass"       , "navBarTopLevelItem"},
                       
             //Dialogs
             { "Dialog_SwitchProcessTitleClass"       , "ms-crm-ProcessSwitcher-ProcessTitle"},
@@ -269,7 +271,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         public static Dictionary<string, string> Name = new Dictionary<string, string>()
         {
-                    { "Dialog_ReportHeader", "crmDialog" }
+            { "Dialog_ReportHeader", "crmDialog" },
+            //Navigation
+            { "Nav_HomeTab", "TabHome" },
         };
     }
 
@@ -372,6 +376,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public static class Navigation
         {
             public static string HomeTab = "Nav_HomeTab";
+            public static string TopLevelItem = "Nav_TopLevelItemClass";
             public static string ActionGroup = "Nav_ActionGroup";
             public static string ActionButtonContainer = "Nav_ActionButtonContainerClass";
             public static string SubActionGroup = "Nav_SubActionGroup";
@@ -544,6 +549,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             public static string UserId = "Login_UserId";
             public static string Password = "Login_Password";
+            public static string OldSignInUserId = "Login_OldUserId";
+            public static string OldSignInPassword = "Login_OldPassword";
             public static string SignIn = "Login_SignIn";
             public static string CrmMainPage = "Login_CrmMainPage";
 
