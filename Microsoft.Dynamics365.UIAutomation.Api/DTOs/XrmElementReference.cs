@@ -50,7 +50,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Frame_QuickCreateFrame"       , "id(\"globalquickcreate_container_NavBarGloablQuickCreate\")"},
 
             //Navigation
-            { "Nav_HomeTab"       , "id(\"TabSFA\")"},
             { "Nav_ActionGroup"       , "id(\"actionGroupControl\")"},
             { "Nav_SubActionGroup"       , "id(\"actionGroupControl\")"},
             { "Nav_SubActionGroupContainer"       , "id(\"detailActionGroupControl\")"},
@@ -231,6 +230,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Nav_TabButtonLinkClass"       , "navTabButtonLink"},
             { "Nav_ActionGroupContainerClass"       , "navActionGroupContainer"},
             { "Nav_RowLabelClass"       , "nav-rowLabel"},
+            { "Nav_TopLevelItemClass"       , "navBarTopLevelItem"},
                       
             //Dialogs
             { "Dialog_SwitchProcessTitleClass"       , "ms-crm-ProcessSwitcher-ProcessTitle"},
@@ -271,7 +271,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         public static Dictionary<string, string> Name = new Dictionary<string, string>()
         {
-            { "Dialog_ReportHeader", "crmDialog" }
+            { "Dialog_ReportHeader", "crmDialog" },
+            //Navigation
+            { "Nav_HomeTab", "TabHome" },
         };
     }
 
@@ -374,6 +376,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public static class Navigation
         {
             public static string HomeTab = "Nav_HomeTab";
+            public static string TopLevelItem = "Nav_TopLevelItemClass";
             public static string ActionGroup = "Nav_ActionGroup";
             public static string ActionButtonContainer = "Nav_ActionButtonContainerClass";
             public static string SubActionGroup = "Nav_SubActionGroup";
