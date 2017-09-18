@@ -410,8 +410,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 driver.WaitUntilVisible(By.Id(area.GetAttribute("Id")));
 
-                driver.ClickWhenAvailable(By.Id("SFA"));
-
                 area.Click();
 
                 Thread.Sleep(1000);
