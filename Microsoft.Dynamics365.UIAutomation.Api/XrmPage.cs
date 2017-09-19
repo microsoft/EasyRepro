@@ -194,8 +194,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (driver.HasElement(By.Id(option.Name)))
                 {
                     var input = driver.ClickWhenAvailable(By.Id(option.Name));
+                    var select = input;
 
-                    var select = input.FindElement(By.TagName("select"));
+                    if (input.TagName != "select")
+                        select = input.FindElement(By.TagName("select"));
+
                     var options = select.FindElements(By.TagName("option"));
 
                     foreach (var op in options)
@@ -278,7 +281,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     var dialogItems = OpenDialog(dialog).Value;
 
-                    if(control.Value != null)
+                    if (control.Value != null)
                     {
                         if (!dialogItems.Keys.Contains(control.Value))
                             throw new InvalidOperationException($"List does not have {control.Value}.");
@@ -506,8 +509,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             //wait for the content panel to render
 
             Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)),
-                                              new TimeSpan(0, 0, 2),
-                                              d => { Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
+                new TimeSpan(0, 0, 2),
+                d => { Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
 
             return true;
 
