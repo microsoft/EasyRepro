@@ -175,6 +175,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             //Reports
             { "Report_Close", "id(\"btnCancel\")"},
             { "Report_RunReport", "id(\"btnRun\")"},
+            
+            //Mobile
+            { "Mobile_Page", "id(\"Content\")"},
+
+            //Processes
+            { "Process_Open", "id(\"_MBopenObj4703\")/span/a"},
+            { "Process_Name", "id(\"txtWorkflowName\")"},
+            { "Process_BlankWorkflow", "id(\"blankWorkflow\")"},
+            { "Process_ButtonCreate", "id(\"_MBCreate\")"},
+            { "Process_Activate", "id(\"_MBdoActioncrmGrid4703activate\")/span/a"},
+            { "Process_Deactivate", "id(\"_MBdoActioncrmGrid4703deactivate\")/span/a"},
+            { "Process_Delete", "id(\"_MBdoActioncrmGrid4703delete\")/span/a"},
+            { "Process_Begin", "id(\"butBegin\")"},
         };
 
         public static Dictionary<string, string> ElementId = new Dictionary<string, string>()
@@ -217,6 +230,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Notes_ActivityTaskDescriptionId"      , "quickCreateActivity4212controlId_description_i"},
             { "Notes_ActivityTaskScheduledEndId"      , "quickCreateActivity4212controlId_scheduledend_iDateInput"},
             { "Notes_ActivityTaskPriorityId"      , "quickCreateActivity4212controlId_prioritycode_i"},
+
+            //Process
+            { "Process_Category", "WorkflowCategory"},
+            { "Process_Entity", "PrimaryEntity"},
         };
 
         public static Dictionary<string, string> CssClass = new Dictionary<string, string>()
@@ -550,6 +567,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             public static string Close = "Report_Close";
             public static string RunReport = "Report_RunReport";
+        }
+
+        public static class Mobile
+        {
+            public static string Page = "Mobile_Page";
+        }
+        public static class Process
+        {
+            public static string Open = "Process_Open";
+            public static string Name = "Process_Name";
+            public static string Category = "Process_Category";
+            public static string Entity = "Process_Entity";
+            public static string BlankWorkflow = "Process_BlankWorkflow";
+            public static string Create = "Process_ButtonCreate";
+            public static string Activate = "Process_Activate";
+            public static string Deactivate = "Process_Deactivate";
+            public static string Delete = "Process_Delete";
+            public static string Begin = "Process_Begin";
         }
     }
 }

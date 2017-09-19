@@ -27,20 +27,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         public XrmBrowser(BrowserOptions options) : base(options)
         {
-            
+
         }
 
         #endregion Constructor(s)
 
         #region Login
 
-        public LoginPage LoginPage
-        {
-            get
-            {
-                return this.GetPage<LoginPage>();
-            }
-        }
+        public LoginPage LoginPage => this.GetPage<LoginPage>();
 
         public void GoToXrmUri(Uri xrmUri)
         {
@@ -52,207 +46,117 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         #region Navigation
 
-        public XrmNavigationPage Navigation
-        {
-            get
-            {
-                return this.GetPage<XrmNavigationPage>();
-            }
-        }
+        public XrmNavigationPage Navigation => this.GetPage<XrmNavigationPage>();
 
         #endregion Navigation
 
         #region CommandBar
 
-        public XrmCommandBarPage CommandBar
-        {
-            get
-            {
-                return this.GetPage<XrmCommandBarPage>();
-            }
-        }
+        public XrmCommandBarPage CommandBar => this.GetPage<XrmCommandBarPage>();
 
         #endregion CommandBar
 
         #region Performance Markers
 
-        public XrmPerformanceCenterPage PerformanceCenter
-        {
-            get
-            {
-                return this.GetPage<XrmPerformanceCenterPage>();
-            }
-        }
+        public XrmPerformanceCenterPage PerformanceCenter => this.GetPage<XrmPerformanceCenterPage>();
 
         #endregion Performance Markers
 
         #region Views
 
-        public XrmGridPage Grid
-        {
-            get
-            {
-                return this.GetPage<XrmGridPage>();
-            }
-        }
+        public XrmGridPage Grid => this.GetPage<XrmGridPage>();
 
         #endregion Views
 
         #region DashBoards
 
-        public XrmDashboardPage Dashboard
-        {
-            get
-            {
-                return this.GetPage<XrmDashboardPage>();
-            }
-        }
+        public XrmDashboardPage Dashboard => this.GetPage<XrmDashboardPage>();
 
         #endregion DashBoards
 
         #region Forms
 
-        public XrmEntityPage Entity
-        {
-            get
-            {
-                return this.GetPage<XrmEntityPage>();
-            }
-        }
+        public XrmEntityPage Entity => this.GetPage<XrmEntityPage>();
 
         #endregion Forms
 
         #region Related
 
-        public XrmRelatedGridPage Related
-        {
-            get
-            {
-                return this.GetPage<XrmRelatedGridPage>();
-            }
-        }
+        public XrmRelatedGridPage Related => this.GetPage<XrmRelatedGridPage>();
 
         #endregion Related
 
         #region QuickCreate
 
-        public XrmQuickCreatePage QuickCreate
-        {
-            get
-            {
-                return this.GetPage<XrmQuickCreatePage>();
-            }
-        }
+        public XrmQuickCreatePage QuickCreate => this.GetPage<XrmQuickCreatePage>();
 
         #endregion QuickCreate
 
         #region LookupPage
 
-        public XrmLookupPage Lookup
-        {
-            get
-            {
-                return this.GetPage<XrmLookupPage>();
-            }
-        }
+        public XrmLookupPage Lookup => this.GetPage<XrmLookupPage>();
 
         #endregion LookupPage
 
         #region Guided Help
 
-        public XrmGuidedHelpPage GuidedHelp
-        {
-            get
-            {
-                return this.GetPage<XrmGuidedHelpPage>();
-            }
-        }
+        public XrmGuidedHelpPage GuidedHelp => this.GetPage<XrmGuidedHelpPage>();
 
         #endregion Guided Help
 
         #region Notifications
 
-        public XrmNotficationPage Notifications
-        {
-            get
-            {
-                return this.GetPage<XrmNotficationPage>();
-            }
-        }
+        public XrmNotficationPage Notifications => this.GetPage<XrmNotficationPage>();
 
         #endregion Notifications
 
         #region Business Process Flow
 
-        public XrmBusinessProcessFlow BusinessProcessFlow
-        {
-            get
-            {
-                return this.GetPage<XrmBusinessProcessFlow>();
-            }
-        }
+        public XrmBusinessProcessFlow BusinessProcessFlow => this.GetPage<XrmBusinessProcessFlow>();
 
         #endregion Business Process Flow
 
         #region Dialog
 
-        public XrmDialogPage Dialogs
-        {
-            get
-            {
-                return this.GetPage<XrmDialogPage>();
-            }
-        }
+        public XrmDialogPage Dialogs => this.GetPage<XrmDialogPage>();
 
         #endregion Dialog
 
         #region GlobalSearch
 
-        public XrmGlobalSearchPage GlobalSearch
-        {
-            get
-            {
-                return this.GetPage<XrmGlobalSearchPage>();
-            }
-        }
+        public XrmGlobalSearchPage GlobalSearch => this.GetPage<XrmGlobalSearchPage>();
 
         #endregion GlobalSearch
 
         #region Document
 
-        public XrmDocumentPage Document
-        {
-            get
-            {
-                return this.GetPage<XrmDocumentPage>();
-            }
-        }
+        public XrmDocumentPage Document => this.GetPage<XrmDocumentPage>();
 
         #endregion Document
 
-        #region Document
+        #region ActivityFeed
 
-        public XrmActivityFeedPage ActivityFeed
-        {
-            get
-            {
-                return this.GetPage<XrmActivityFeedPage>();
-            }
-        }
+        public XrmActivityFeedPage ActivityFeed => this.GetPage<XrmActivityFeedPage>();
 
-        #endregion Document
+        #endregion ActivityFeed
 
         #region Report
 
-        public XrmReportPage Report
-        {
-            get
-            {
-                return this.GetPage<XrmReportPage>();
-            }
-        }
+        public XrmReportPage Report => this.GetPage<XrmReportPage>();
 
         #endregion Report
+
+        #region Mobile
+
+        public XrmMobilePage Mobile => this.GetPage<XrmMobilePage>();
+
+        #endregion Mobile
+
+        #region Mobile
+
+        public XrmProcessesPage Processes => this.GetPage<XrmProcessesPage>();
+
+        #endregion Mobile
 
     }
 

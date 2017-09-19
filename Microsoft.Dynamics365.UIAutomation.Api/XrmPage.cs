@@ -195,8 +195,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (driver.HasElement(By.Id(option.Name)))
                 {
                     var input = driver.ClickWhenAvailable(By.Id(option.Name));
+                    var select = input;
 
-                    var select = input.FindElement(By.TagName("select"));
+                    if (input.TagName != "select")
+                        select = input.FindElement(By.TagName("select"));
+
                     var options = select.FindElements(By.TagName("option"));
 
                     foreach (var op in options)
