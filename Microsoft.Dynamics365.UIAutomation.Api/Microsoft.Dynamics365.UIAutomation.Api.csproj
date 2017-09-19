@@ -85,10 +85,12 @@
     <Compile Include="Pages\XrmGridPage.cs" />
     <Compile Include="Pages\XrmGuidedHelpPage.cs" />
     <Compile Include="Pages\XrmLookupPage.cs" />
+    <Compile Include="Pages\XrmMobilePage.cs" />
     <Compile Include="Pages\XrmNavigationPage.cs" />
     <Compile Include="Pages\XrmBusinessProcessFlow.cs" />
     <Compile Include="Pages\XrmNotficationPage.cs" />
     <Compile Include="Pages\XrmPerformanceCenterPage.cs" />
+    <Compile Include="Pages\XrmProcessesPage.cs" />
     <Compile Include="Pages\XrmQuickCreatePage.cs" />
     <Compile Include="Pages\XrmDocumentPage.cs" />
     <Compile Include="Pages\XrmActivityFeedPage.cs" />
