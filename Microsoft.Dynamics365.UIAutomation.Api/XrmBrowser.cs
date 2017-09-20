@@ -152,11 +152,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         #endregion Mobile
 
-        #region Mobile
+        #region Processes
 
         public XrmProcessesPage Processes => this.GetPage<XrmProcessesPage>();
 
-        #endregion Mobile
+        #endregion Processes
+
+        #region Administration
+
+        public XrmAdministrationPage Administration => this.GetPage<XrmAdministrationPage>();
+
+        #endregion Administration
+
+        #region Office365
+
+        public Office365Page Office365 => this.GetPage<Office365Page>();
+
+        #endregion Office365
 
     }
 
