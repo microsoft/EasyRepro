@@ -95,6 +95,7 @@
     <Compile Include="CreateContact.cs" />
     <Compile Include="CreateLead.cs" />
     <Compile Include="CreateOpportunity.cs" />
+    <Compile Include="DOCValidationTests\CreateUser.cs" />
     <Compile Include="DOCValidationTests\CreateWorkflow.cs" />
     <Compile Include="DOCValidationTests\OpenMobile.cs" />
     <Compile Include="DOCValidationTests\ValidationVersion.cs" />

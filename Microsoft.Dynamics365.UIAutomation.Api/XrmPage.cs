@@ -573,6 +573,57 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return true;
         }
 
+        /// <summary>
+        /// Switches to Wizard frame in the CRM application.
+        /// </summary>
+        public bool SwitchToWizardFrame()
+        {
+
+            return this.Execute("Switch to Wizard Frame", driver => SwitchToWizard());
+
+        }
+
+        internal bool SwitchToWizard()
+        {
+            SwitchToDialog();
+
+            Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.WizardFrame]));
+
+            Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.WizardFrameId]);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Switches to Wizard frame in the CRM application.
+        /// </summary>
+        public bool SwitchToPopupWindow()
+        {
+
+            return this.Execute("Switch to Pop Up Window", driver => SwitchToPopup());
+
+        }
+
+        internal bool SwitchToPopup()
+        {
+            Browser.Driver.LastWindow().SwitchTo().ActiveElement();
+
+            return true;
+        }
+
+        public bool SwitchToViewFrame()
+        {
+            return this.Execute("Switch to View frame", driver => SwitchToView());
+        }
+
+        internal bool SwitchToView()
+        {
+            Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.ViewFrameId]);
+
+            return true;
+        }
+
+
         internal BrowserCommandOptions GetOptions(string commandName)
         {
             return new BrowserCommandOptions(Constants.DefaultTraceSource,
