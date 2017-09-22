@@ -30,6 +30,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.DOCValidationTests
                 xrmBrowser.Driver.LastWindow();
 
                 var rows = xrmBrowser.Grid.GetGridItems().Value;
+                xrmBrowser.Grid.Sort("Created On");
 
                 xrmBrowser.Grid.SelectRecord(rows.Count-1);   //Select the newly created record
                 xrmBrowser.Processes.Activate();
