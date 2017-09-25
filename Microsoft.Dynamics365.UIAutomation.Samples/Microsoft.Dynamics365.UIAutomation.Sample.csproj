@@ -103,6 +103,7 @@
     <Compile Include="QuickCreate.cs" />
     <Compile Include="Reports.cs" />
     <Compile Include="Telemetry.cs" />
+    <Compile Include="SelectLookUp.cs" />
     <Compile Include="UpdateAccount.cs" />
     <Compile Include="UpdateCase.cs" />
     <Compile Include="UpdateContact.cs" />
