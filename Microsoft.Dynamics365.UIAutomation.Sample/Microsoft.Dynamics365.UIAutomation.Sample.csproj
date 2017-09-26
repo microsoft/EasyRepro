@@ -107,6 +107,7 @@
     <Compile Include="OpenOpportunity.cs" />
     <Compile Include="QuickCreate.cs" />
     <Compile Include="Reports.cs" />
+    <Compile Include="SelectLookUp.cs" />
     <Compile Include="Telemetry.cs" />
     <Compile Include="UpdateAccount.cs" />
     <Compile Include="UpdateCase.cs" />
