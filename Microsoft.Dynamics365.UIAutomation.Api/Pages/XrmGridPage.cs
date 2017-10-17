@@ -25,6 +25,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             : base(browser)
         {
             SwitchToContent();
+
+            browser.Driver.WaitUntilVisible(By.Id(Elements.ElementId[Reference.Frames.ViewFrameId]),
+                new TimeSpan(0, 0, 1),
+                x => { SwitchToView(); });
         }
 
         /// <summary>

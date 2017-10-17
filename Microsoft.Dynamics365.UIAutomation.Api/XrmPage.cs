@@ -194,8 +194,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (driver.HasElement(By.Id(option.Name)))
                 {
                     var input = driver.ClickWhenAvailable(By.Id(option.Name));
+                    var select = input;
 
-                    var select = input.FindElement(By.TagName("select"));
+                    if (input.TagName != "select")
+                        select = input.FindElement(By.TagName("select"));
+
                     var options = select.FindElements(By.TagName("option"));
 
                     foreach (var op in options)
@@ -278,7 +281,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     var dialogItems = OpenDialog(dialog).Value;
 
-                    if(control.Value != null)
+                    if (control.Value != null)
                     {
                         if (!dialogItems.Keys.Contains(control.Value))
                             throw new InvalidOperationException($"List does not have {control.Value}.");
@@ -506,8 +509,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             //wait for the content panel to render
 
             Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)),
-                                              new TimeSpan(0, 0, 2),
-                                              d => { Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
+                new TimeSpan(0, 0, 2),
+                d => { Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
 
             return true;
 
@@ -569,6 +572,57 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return true;
         }
+
+        /// <summary>
+        /// Switches to Wizard frame in the CRM application.
+        /// </summary>
+        public bool SwitchToWizardFrame()
+        {
+
+            return this.Execute("Switch to Wizard Frame", driver => SwitchToWizard());
+
+        }
+
+        internal bool SwitchToWizard()
+        {
+            SwitchToDialog();
+
+            Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.WizardFrame]));
+
+            Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.WizardFrameId]);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Switches to Wizard frame in the CRM application.
+        /// </summary>
+        public bool SwitchToPopupWindow()
+        {
+
+            return this.Execute("Switch to Pop Up Window", driver => SwitchToPopup());
+
+        }
+
+        internal bool SwitchToPopup()
+        {
+            Browser.Driver.LastWindow().SwitchTo().ActiveElement();
+
+            return true;
+        }
+
+        public bool SwitchToViewFrame()
+        {
+            return this.Execute("Switch to View frame", driver => SwitchToView());
+        }
+
+        internal bool SwitchToView()
+        {
+            Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.ViewFrameId]);
+
+            return true;
+        }
+
 
         internal BrowserCommandOptions GetOptions(string commandName)
         {

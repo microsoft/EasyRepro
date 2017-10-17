@@ -216,5 +216,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 return true;
             });
         }
+
+        public BrowserCommandResult<bool> AddUser(int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Add User Dialog"), driver =>
+            {
+                SwitchToWizard();
+
+                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Dialogs.AddUser.Header]),
+                    new TimeSpan(0, 0, 10),
+                    "The Add User dialog is not available.");
+
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Dialogs.AddUser.Add]));
+
+                return true;
+            });
+        }
     }
 }
