@@ -234,7 +234,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     foreach (var field in control.Fields)
                     {
-                        compcntrl.FindElement(By.Id(Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
+                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
 
                         var result = compcntrl.FindElements(By.TagName("input"))
                             .ToList()
@@ -397,10 +397,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 {
                     var compcntrl =
                         driver.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut]));
-
+                     
                     foreach (var field in control.Fields)
                     {
-                        compcntrl.FindElement(By.Id(Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
+                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
 
                         var result = compcntrl.FindElements(By.TagName("input"))
                             .ToList()

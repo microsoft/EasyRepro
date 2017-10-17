@@ -189,7 +189,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             //SetValue
             { "SetValue_ConfirmId"       , "_compositionLinkControl_flyoutLoadingArea-confirm"},
             { "SetValue_FlyOutId"       , "_compositionLinkControl_flyoutLoadingArea_flyOut"},
-            { "SetValue_CompositionLinkControlId"       , "fullname_compositionLinkControl_"},
+            { "SetValue_CompositionLinkControlId"       , "_compositionLinkControl_"},
                                 
             //Dialogs
             { "Dialog_ActualRevenue"       , "actualrevenue_id"},
