@@ -44,12 +44,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         public BrowserCommandResult<LoginResult> Login(SecureString username, SecureString password)
         {
-            return this.Execute("Login", this.Login, new Uri(Constants.DefaultLoginUri), username, password, default(Action<LoginRedirectEventArgs>));
+            return this.Execute(GetOptions("Login"), this.Login, new Uri(Constants.DefaultLoginUri), username, password, default(Action<LoginRedirectEventArgs>));
         }
 
         public BrowserCommandResult<LoginResult> Login(SecureString username, SecureString password, Action<LoginRedirectEventArgs> redirectAction)
         {
-            return this.Execute("Login", this.Login, new Uri(Constants.DefaultLoginUri), username, password, redirectAction);
+            return this.Execute(GetOptions("Login"), this.Login, new Uri(Constants.DefaultLoginUri), username, password, redirectAction);
         }
 
         public BrowserCommandResult<LoginResult> Login(Uri uri)
@@ -57,7 +57,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             if (this.Browser.Options.Credentials.IsDefault)
                 throw new InvalidOperationException("The default login method cannot be invoked without first setting credentials on the Browser object.");
 
-            return this.Execute("Login", this.Login, uri, this.Browser.Options.Credentials.Username, this.Browser.Options.Credentials.Password, default(Action<LoginRedirectEventArgs>));
+            return this.Execute(GetOptions("Login"), this.Login, uri, this.Browser.Options.Credentials.Username, this.Browser.Options.Credentials.Password, default(Action<LoginRedirectEventArgs>));
         }
         /// <summary>
         /// Login Page
@@ -68,7 +68,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);</example>
         public BrowserCommandResult<LoginResult> Login(Uri uri, SecureString username, SecureString password)
         {
-            return this.Execute("Login", this.Login, uri, username, password, default(Action<LoginRedirectEventArgs>));
+            return this.Execute(GetOptions("Login"), this.Login, uri, username, password, default(Action<LoginRedirectEventArgs>));
         }
 
         /// <summary>
@@ -106,7 +106,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Enter);
                     redirectToNewPassword = true;
                     Thread.Sleep(2000);
-
                 }
                 else
                 {
@@ -134,6 +133,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).SendKeys(password.ToUnsecureString());
                         driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).SendKeys(Keys.Tab);
                         driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).Submit();
+
+                        if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])))
+                        {
+                                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])); 
+                                driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])).Submit();
+
+                        }
                     }
                     else
                     {

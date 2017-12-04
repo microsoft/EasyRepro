@@ -27,7 +27,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         public XrmBrowser(BrowserOptions options) : base(options)
         {
-
+            
         }
 
         #endregion Constructor(s)

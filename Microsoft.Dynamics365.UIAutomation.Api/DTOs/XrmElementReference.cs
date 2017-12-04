@@ -141,7 +141,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Notes_ActivityAddTask", "id(\"activityLabelinlineactivitybar4212\")"},
             { "Notes_Done"                 , "id(\"doneSpacer\")"},
             { "Notes_VoiceMail"                 , "id(\"PhoneCallQuickformleftvoiceCheckBoxContol\")"},
-
                       
             //Login           
             { "Login_UserId", "id(\"i0116\")"},
@@ -150,6 +149,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Login_OldPassword", "id(\"cred_password_inputtext\")"},
             { "Login_SignIn", "id(\"cred_sign_in_button\")"},
             { "Login_CrmMainPage", "id(\"crmTopBar\")"},
+            { "Login_StaySignedIn", "id(\"idSIButton9\")"},
 
             //Notification           
             { "Notification_AppMessageBar", "id(\"crmAppMessageBar\")"},
