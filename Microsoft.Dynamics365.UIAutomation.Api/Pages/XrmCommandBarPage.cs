@@ -49,7 +49,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 else
                     ribbon = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.RibbonManager]));
 
-                var items = ribbon.FindElements(By.TagName("span"));
+                var items = ribbon.FindElements(By.TagName("li"));
 
                 return items;//.Where(item => item.Text.Length > 0).ToDictionary(item => item.Text, item => item.GetAttribute("id"));
             });
@@ -67,13 +67,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions("Click Command"), driver => 
+            return this.Execute(GetOptions("Click Command"), driver =>
             {
                 if (moreCommands)
                     driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.MoreCommands]));
 
                 var buttons = GetCommands(moreCommands).Value;
-                var button = buttons.FirstOrDefault(x => x.Text.ToLowerString() == name.ToLowerString());
+                var button = buttons.FirstOrDefault(x => x.Text.Split('\r')[0].ToLowerString() == name.ToLowerString());
 
                 if (string.IsNullOrEmpty(subName))
                 {
@@ -86,22 +86,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
                     }
                 }
-                    
+
                 else
                 {
 
                     button.FindElement(By.ClassName(Elements.CssClass[Reference.CommandBar.FlyoutAnchorArrow])).Click();
 
-                    var subButtons = driver.FindElements(By.ClassName("ms-crm-Menu-Label"));
+                    var flyoutId = button.GetAttribute("id").Replace("|", "_").Replace(".", "_") + "Menu";
+                    var subButtons = driver.FindElement(By.Id(flyoutId)).FindElements(By.ClassName("ms-crm-CommandBar-Menu"));
                     var item = subButtons.FirstOrDefault(x => x.Text.ToLowerString() == subName.ToLowerString());
                     if(item == null) { throw new InvalidOperationException($"The sub menu item '{subName}' is not found."); }
 
                     item.Click();
                 }
-                
+
                 driver.WaitForPageToLoad();
                  return true;
             });
-        }      
+        }
     }
 }

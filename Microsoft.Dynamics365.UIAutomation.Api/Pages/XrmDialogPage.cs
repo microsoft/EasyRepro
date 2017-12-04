@@ -67,6 +67,59 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
+        public BrowserCommandResult<bool> AddConnection(string description, string roleName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            var bcr = this.Execute(GetOptions("Add Connection"), driver =>
+            {
+
+                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Dialogs.AddConnectionHeader]),
+                                          new TimeSpan(0, 0, 10),
+                                          "The Add Connection dialog is not available.");
+
+                SwitchToContent();
+
+                this.SetValue(Elements.ElementId[Reference.Dialogs.AddConnection.DescriptionId], description);
+
+                if (roleName != null || roleName != "")
+                {
+                    // Wait till role lookup button is available 
+                    driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Dialogs.AddConnection.RoleLookupButton]));
+
+                    // wait till role table is available
+                    driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Dialogs.AddConnection.RoleLookupTable]));
+
+                    try
+                    {
+                       driver.FindElement(By.XPath("//span[contains(text(),'" + roleName + "')]")).Click();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("Exception Message: " + ex.Message + "Role name not found in lookup table.");
+                    }
+                }
+
+                SwitchToDefault();
+
+                //Save and Close
+                var savebtn = driver.HasElement(By.XPath(Elements.Xpath[Reference.Dialogs.AddConnection.Save]));
+                try
+                {
+                    driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Dialogs.AddConnection.Save]));
+                }
+                catch { }
+                
+
+                //Go back to main window
+                driver.LastWindow();
+
+                return true;
+            });
+
+            return bcr;
+        }
+
         /// <summary>
         /// Assigns the record to a User or Team
         /// </summary>
@@ -230,9 +283,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     "The Add User dialog is not available.");
 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Dialogs.AddUser.Add]));
-
+                
                 return true;
             });
         }
+
     }
 }

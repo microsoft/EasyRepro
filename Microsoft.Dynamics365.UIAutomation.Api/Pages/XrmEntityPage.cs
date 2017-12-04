@@ -255,8 +255,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     if (dialogItems.Count < index)
                         throw new InvalidOperationException($"List does not have {index + 1} items.");
 
-                    var dialogItem = dialogItems.Values.ToList()[index];
-                    dialogItem.Click();
+                    var dialogItem = dialogItems[index];
+                    dialogItem.Element.Click();
                 }
                 else
                     throw new InvalidOperationException($"Field: {field} Does not exist");
@@ -289,11 +289,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     var dialogItems = OpenDialog(dialog).Value;
 
-                    if (!dialogItems.Keys.Contains(value))
+                    if (!dialogItems.Exists(x => x.Title == value))
                         throw new InvalidOperationException($"List does not have {value}.");
 
-                    var dialogItem = dialogItems[value];
-                    dialogItem.Click();
+                    var dialogItem = dialogItems.Where(x => x.Title == value).First();
+                    dialogItem.Element.Click();
                 }
                 else
                     throw new InvalidOperationException($"Field: {field} Does not exist");
@@ -325,9 +325,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     var dialogItems = OpenDialog(dialog).Value;
 
-                    var dialogItem = dialogItems.Values.Last();
-
-                    dialogItem?.Click();
+                    if (dialogItems.Any())
+                    {
+                        var dialogItem = dialogItems.Last();
+                        dialogItem.Element.Click();
+                    }
                 }
                 else
                     throw new InvalidOperationException($"Field: {field} Does not exist");
@@ -340,9 +342,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Opens the dialog
         /// </summary>
         /// <param name="dialog"></param>
-        private BrowserCommandResult<Dictionary<string, IWebElement>> OpenDialog(IWebElement dialog)
+        private BrowserCommandResult<List<XrmListItem>> OpenDialog(IWebElement dialog)
         {
-            var dictionary = new Dictionary<string, IWebElement>();
+            var list = new List<XrmListItem>();
             var dialogItems = dialog.FindElements(By.TagName("li"));
 
             foreach (var dialogItem in dialogItems)
@@ -355,12 +357,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         var title = links[1].GetAttribute("title");
 
-                        dictionary.Add(title, links[1]);
+                        list.Add(new XrmListItem() {
+                            Title = title,
+                            Element = links[1] });
                     }
                 }
             }
 
-            return dictionary;
+            return list;
         }
 
         /// <summary>
@@ -441,11 +445,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     var dialogItems = OpenDialog(dialog).Value;
 
-                    if (!dialogItems.Keys.Contains(value))
+                    if (!dialogItems.Exists(x => x.Title == value))
                         throw new InvalidOperationException($"List does not have {value}.");
 
-                    var dialogItem = dialogItems[value];
-                    dialogItem.Click();
+                    var dialogItem = dialogItems.Where(x => x.Title == value).First();
+                    dialogItem.Element.Click();
                 }
 
                 return true;
@@ -476,8 +480,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     if (dialogItems.Count < index)
                         throw new InvalidOperationException($"List does not have {index + 1} items.");
 
-                    var dialogItem = dialogItems.Values.ToList()[index];
-                    dialogItem.Click();
+                    var dialogItem = dialogItems[index];
+                    dialogItem.Element.Click();
                 }
 
                 return true;
@@ -508,7 +512,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     var dialogItems = OpenDialog(dialog).Value;
 
-                    var dialogItem = dialogItems.Values.Last();
+                    var dialogItem = dialogItems.Last();
                     
                     if (this.Browser.Options.BrowserType == BrowserType.Firefox)
                     {
@@ -517,7 +521,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         driver.ExecuteScript($"document.getElementById('{id}').childNodes[1].click();");
                     }
                     else
-                        dialogItem?.Click();
+                        dialogItem.Element.Click();
                 }
 
                 return true;

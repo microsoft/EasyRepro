@@ -435,6 +435,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 foreach (var subItem in subItems)
                 {
+                    if(!string.IsNullOrEmpty(subItem.Text))
                     dictionary.Add(subItem.Text.ToLowerString(), subItem);
                 }
 

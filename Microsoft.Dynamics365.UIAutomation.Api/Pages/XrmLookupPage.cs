@@ -127,14 +127,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="searchCriteria"></param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        public BrowserCommandResult<bool> Search(string searchCriteria, bool clear = false, int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> Search(string searchCriteria, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
 
             return this.Execute(GetOptions("Search"), driver =>
             {
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria])).Clear();
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria])).SendKeys(searchCriteria, clear);
+                driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria])).SendKeys(searchCriteria);
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Grid.FindCriteriaImg]));
 
                 return true;

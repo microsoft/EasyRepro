@@ -102,7 +102,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public BrowserCommandResult<bool> SetValue(string field, string value)
         {
             //return this.Execute($"Set Value: {field}", SetValue, field, value);
-            return this.Execute(GetOptions($"Set Value: {field}"), driver =>
+            var returnval = this.Execute(GetOptions($"Set Value: {field}"), driver =>
             {
                 if (driver.HasElement(By.Id(field)))
                 {
@@ -116,16 +116,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         js.ExecuteScript("arguments[0].setAttribute('style', 'pointer-events: none; cursor: default')", element);
                     }
                     fieldElement.Click();
+
+                    try
+                    { 
                     //Check to see if focus is on field already
                     if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
                         fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
                     else
                         fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
+                    }
+                    catch (NoSuchElementException) { }
 
                     if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
                     {
                         fieldElement.FindElement(By.TagName("textarea")).Clear();
                         fieldElement.FindElement(By.TagName("textarea")).SendKeys(value);
+                    }
+                    else if(fieldElement.TagName =="textarea")
+                    {
+                        fieldElement.Clear();
+                        fieldElement.SendKeys(value);
                     }
                     else
                     {
@@ -138,6 +148,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 return true;
             });
+            return returnval;
         }
 
         /// <summary>
@@ -506,19 +517,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 index = frameIndex.ToString();
 
             Browser.Driver.SwitchTo().DefaultContent();
+            
+            // Check to see if dialog is InlineDialog or popup
+            var inlineDialog = Browser.Driver.HasElement(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)));
+            if (inlineDialog)
+            {
             //wait for the content panel to render
-
             Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)),
                 new TimeSpan(0, 0, 2),
                 d => { Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
-
+            }
+            else
+            {
+                SwitchToPopup();
+            }
             return true;
-
         }
+
         /// <summary>
         /// Switches to Quick Find frame in the CRM application.
         /// </summary>
-
         public bool SwitchToQuickCreateFrame()
         {
             return this.Execute("Switch to Quick Create Frame", driver => SwitchToQuickCreate());
