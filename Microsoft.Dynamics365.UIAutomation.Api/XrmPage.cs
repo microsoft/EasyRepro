@@ -5,6 +5,7 @@ using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 
@@ -102,7 +103,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public BrowserCommandResult<bool> SetValue(string field, string value)
         {
             //return this.Execute($"Set Value: {field}", SetValue, field, value);
-            return this.Execute(GetOptions($"Set Value: {field}"), driver =>
+            var returnval = this.Execute(GetOptions($"Set Value: {field}"), driver =>
             {
                 if (driver.HasElement(By.Id(field)))
                 {
@@ -116,21 +117,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         js.ExecuteScript("arguments[0].setAttribute('style', 'pointer-events: none; cursor: default')", element);
                     }
                     fieldElement.Click();
-                    //Check to see if focus is on field already
-                    if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
-                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
-                    else
-                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
+
+                    try
+                    { 
+                        //Check to see if focus is on field already
+                        if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
+                            fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
+                        else
+                            fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
+                    }
+                    catch (NoSuchElementException) { }
 
                     if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
                     {
                         fieldElement.FindElement(By.TagName("textarea")).Clear();
                         fieldElement.FindElement(By.TagName("textarea")).SendKeys(value);
                     }
+                    else if(fieldElement.TagName =="textarea")
+                    {
+                        fieldElement.Clear();
+                        fieldElement.SendKeys(value);
+                    }
                     else
                     {
-                        fieldElement.FindElement(By.TagName("input")).Clear();
-                        fieldElement.FindElement(By.TagName("input")).SendKeys(value);
+                        //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
+                        //driver.ExecuteScript("Xrm.Page.getAttribute('" + field + "').setValue('')");
+                        fieldElement.FindElement(By.TagName("input")).SendKeys(value, true);
                     }
                 }
                 else
@@ -138,6 +150,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 return true;
             });
+            return returnval;
         }
 
         /// <summary>
@@ -243,7 +256,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                             .ToList()
                             .FirstOrDefault(i => i.GetAttribute("id").Contains(field.Id));
 
-                        result?.Clear();
+                        //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
+                        driver.ExecuteScript("document.getElementById('" + result?.GetAttribute("id") + "').value = ''");
                         result?.SendKeys(field.Value);
                     }
 
@@ -281,7 +295,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     var dialogItems = OpenDialog(dialog).Value;
 
-                    if (control.Value != null)
+                    if(control.Value != null)
                     {
                         if (!dialogItems.Keys.Contains(control.Value))
                             throw new InvalidOperationException($"List does not have {control.Value}.");
@@ -400,10 +414,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 {
                     var compcntrl =
                         driver.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut]));
-                     
+
                     foreach (var field in control.Fields)
                     {
-                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
+                        compcntrl.FindElement(By.Id(Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
 
                         var result = compcntrl.FindElements(By.TagName("input"))
                             .ToList()
@@ -506,19 +520,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 index = frameIndex.ToString();
 
             Browser.Driver.SwitchTo().DefaultContent();
-            //wait for the content panel to render
-
-            Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)),
-                new TimeSpan(0, 0, 2),
-                d => { Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
-
+            
+            // Check to see if dialog is InlineDialog or popup
+            var inlineDialog = Browser.Driver.HasElement(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)));
+            if (inlineDialog)
+            {
+                //wait for the content panel to render
+                Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)),
+                                                  new TimeSpan(0, 0, 2),
+                                                  d => { Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
+            }
+            else
+            {
+                SwitchToPopup();
+            }
             return true;
-
         }
+
         /// <summary>
         /// Switches to Quick Find frame in the CRM application.
         /// </summary>
-
         public bool SwitchToQuickCreateFrame()
         {
             return this.Execute("Switch to Quick Create Frame", driver => SwitchToQuickCreate());
@@ -663,6 +684,74 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return dictionary;
         }
 
+        /// <summary>
+        /// Gets the Commands
+        /// </summary>
+        /// <param name="moreCommands">The MoreCommands</param>
+        /// <example></example>
+        private BrowserCommandResult<ReadOnlyCollection<IWebElement>> GetCommands(bool moreCommands = false)
+        {
+            return this.Execute(GetOptions("Get Command Bar Buttons"), driver =>
+            {
+                IWebElement ribbon = null;
+                if (moreCommands)
+                    ribbon = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.List]));
+                else
+                    ribbon = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.RibbonManager]));
+
+                var items = ribbon.FindElements(By.TagName("li"));
+
+                return items;//.Where(item => item.Text.Length > 0).ToDictionary(item => item.Text, item => item.GetAttribute("id"));
+            });
+        }
+
+        /// <summary>
+        /// Clicks the  Command Button on the menu
+        /// </summary>
+        /// <param name="name">The Name of the command</param>
+        /// <param name="subName">The SubName</param>
+        /// <param name="moreCommands">The MoreCommands</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.CommandBar.ClickCommand("New");</example>
+        internal bool ClickCommandButton(string name, string subName = "", bool moreCommands = false, int thinkTime = Constants.DefaultThinkTime)
+        {
+            var driver = Browser.Driver;
+                
+            if (moreCommands)
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.MoreCommands]));
+
+            var buttons = GetCommands(moreCommands).Value;
+            var button = buttons.FirstOrDefault(x => x.Text.Split('\r')[0].ToLowerString() == name.ToLowerString());
+
+            if (string.IsNullOrEmpty(subName))
+            {
+                if (button != null)
+                {
+                    button.Click();
+                }
+                else
+                {
+                    throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
+                }
+            }
+
+            else
+            {
+
+                button.FindElement(By.ClassName(Elements.CssClass[Reference.CommandBar.FlyoutAnchorArrow])).Click();
+
+                var flyoutId = button.GetAttribute("id").Replace("|", "_").Replace(".", "_") + "Menu";
+                var subButtons = driver.FindElement(By.Id(flyoutId)).FindElements(By.ClassName("ms-crm-CommandBar-Menu"));
+                var item = subButtons.FirstOrDefault(x => x.Text.ToLowerString() == subName.ToLowerString());
+                if (item == null) { throw new InvalidOperationException($"The sub menu item '{subName}' is not found."); }
+
+                item.Click();
+            }
+
+            driver.WaitForPageToLoad();
+            return true;
+           
+        }
 
     }
 }

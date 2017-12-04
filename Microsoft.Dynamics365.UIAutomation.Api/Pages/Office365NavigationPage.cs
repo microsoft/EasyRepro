@@ -14,6 +14,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public Office365NavigationPage(InteractiveBrowser browser)
             : base(browser)
         {
+            SwitchToDefaultContent();
         }
 
         private static BrowserCommandOptions NavigationRetryOptions
@@ -31,9 +32,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             }
         }
 
-        public BrowserCommandResult<Dictionary<string, Uri>> OpenWaffleMenu()
+        public BrowserCommandResult<bool> OpenO365App(string appName)
         {
-            return this.Execute(NavigationRetryOptions, driver =>
+            var menu = this.Execute(NavigationRetryOptions, driver =>
             {
                 var dictionary = new Dictionary<string, Uri>();
 
@@ -52,8 +53,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                 }
 
-                return dictionary;
+                Uri appUri;
+                if (dictionary.TryGetValue(appName, out appUri))
+                {
+                    driver.Navigate().GoToUrl(appUri);
+                    return true;
+                }
+                else
+                {
+                    throw new Exception("App Name not found in O365 Menu.");
+                }
             });
+
+            return menu;
         }
+
+
     }
 }

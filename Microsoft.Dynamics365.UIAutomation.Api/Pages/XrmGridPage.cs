@@ -27,8 +27,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             SwitchToContent();
 
             browser.Driver.WaitUntilVisible(By.Id(Elements.ElementId[Reference.Frames.ViewFrameId]),
-                new TimeSpan(0, 0, 1),
-                x => { SwitchToView(); });
+                                            new TimeSpan(0, 0, 1),
+                                            x=> { SwitchToView(); });
         }
 
         /// <summary>
@@ -289,8 +289,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions("Search"), driver =>
             {
+                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria]));
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria])).SendKeys(searchCriteria);
-                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Grid.FindCriteriaImg]));
+                driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria])).SendKeys(Keys.Enter);
 
                 return true;
             });

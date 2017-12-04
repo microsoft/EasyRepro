@@ -53,7 +53,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 internal const string CheckIfScriptExistsScript = @"return typeof Recorder === 'undefined'? 'false' : 'true';";
                 internal const string CheckIfEventCollectionExistsScript = @"return typeof document.eventCollection  === 'undefined'? 'false' : 'true';";
                 internal const string RemoveEventsScript = @"if (typeof Recorder !== undefined) { Recorder.removeEvents({0}); }";
-               
+
                 /// <summary>
                 /// The default scan interval.
                 /// </summary>

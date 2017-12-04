@@ -29,7 +29,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             Action,
             BusinessProcessFlow,
-            Dialog, 
+            Dialog,
             Workflow
         }
         public BrowserCommandResult<bool> CreateProcess(string name, ProcessType type, string entity, int thinkTime = Constants.DefaultThinkTime)
@@ -45,13 +45,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Process.Name]))
                       .SendKeys(name);
 
-                SetValue(new OptionSet() {Name = Elements.ElementId[Reference.Process.Category], Value = type.ToString()});
-                SetValue(new OptionSet() {Name = Elements.ElementId[Reference.Process.Entity], Value = entity });
+                SetValue(new OptionSet() { Name = Elements.ElementId[Reference.Process.Category], Value = type.ToString() });
+                SetValue(new OptionSet() { Name = Elements.ElementId[Reference.Process.Entity], Value = entity });
 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Process.BlankWorkflow]));
 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Process.Create]));
-               
+
                 return true;
             });
         }
@@ -67,7 +67,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 SwitchToDialogFrame();
 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Process.Begin]));
-                
+
                 return true;
             });
         }

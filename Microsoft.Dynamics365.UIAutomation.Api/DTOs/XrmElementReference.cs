@@ -38,6 +38,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Dialog_ViewRecords"       , "id(\"reportView\")"},
             { "Dialog_AddUserHeader"       , "id(\"addUserDescription\")"},
             { "Dialog_AddUser"       , "id(\"buttonNext\")"},
+            { "Dialog_AddConnectionHeader", "id(\"EntityTemplateTab.connection.NoRelationship.Form.Mscrm.Form.connection.MainTab-title\")" },
+            { "Dialog_AddConnectionSave", "id(\"connection|NoRelationship|Form|Mscrm.Form.connection.SaveAndClose-Large\")" },
+            { "Dialog_RoleLookupButton",  "id(\"record2roleid\")" },
+            { "Dialog_RoleLookupTable",   "id(\"record2roleid_IMenu\")" },
 
             //GuidedHelp
             { "GuidedHelp_MarsOverlay"       , "id(\"marsOverlay\")"},
@@ -90,7 +94,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Grid_FirstPage"       , "id(\"fastRewind\")"},
             { "Grid_NextPage"       , "id(\"_nextPageImg\")"},
             { "Grid_PreviousPage"   , "id(\"_prevPageImg\")" },
-            { "Grid_FindCriteriaImg"       , "id(\"crmGrid_findCriteriaImg\")"},
+            { "Grid_FindCriteriaImg"       , "id(\"crmGrid_findCriteriaButton\")"},
             { "Grid_FindCriteria"       , "id(\"crmGrid_findCriteria\")"},
             { "Grid_GridBodyTable"   , "id(\"gridBodyTable\")" },
             { "Grid_DefaultViewIcon"   , "id(\"defaultViewIcon\")" },
@@ -99,7 +103,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Grid_ViewSelectorContainer"   , "id(\"viewSelectorContainer\")" },
             { "Grid_FirstRow", "id(\"gridBodyTable\")/tbody/tr[1]"},
 
-                               
             //Entity
             { "Entity_Form"       , "id(\"tab0\")"},
             { "Entity_Close"       , "id(\"closeButton\")"},
@@ -155,17 +158,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Login_OldPassword", "id(\"cred_password_inputtext\")"},
             { "Login_SignIn", "id(\"cred_sign_in_button\")"},
             { "Login_CrmMainPage", "id(\"crmTopBar\")"},
+            { "Login_StaySignedIn", "id(\"idSIButton9\")"},
 
             //Notification           
             { "Notification_AppMessageBar", "id(\"crmAppMessageBar\")"},
             { "Notification_Close", "id(\"crmAppMessageBarCloseButton\")"},
 
             //Office365Navigation           
-            { "Office365Navigation_NavMenu", "id(\"O365_MainLink_NavMenu\")"},
+            { "Office365Navigation_NavMenu", "id(\"TabAppSwitcherNode\")"},
 
             //QuickCreate           
             { "QuickCreate_Cancel", "id(\"globalquickcreate_cancel_button_NavBarGloablQuickCreate\")"},
-            { "QuickCreate_Save", "id(\"globalquickcreate_save_button_NavBarGloablQuickCreate\")"},  
+            { "QuickCreate_Save", "id(\"globalquickcreate_save_button_NavBarGloablQuickCreate\")"},
+            { "QuickCreate_EnittyContainer", "id(\"actionGroupControl\")"},
+            
             
             //LookUp
             { "LookUp_SelObjects", "id(\"selObjects\")"},
@@ -176,7 +182,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "LookUp_Add", "id(\"btnAdd\")"},
             { "LookUp_Begin", "id(\"butBegin\")"},
 
-            
             //Reports
             { "Report_Close", "id(\"btnCancel\")"},
             { "Report_RunReport", "id(\"btnRun\")"},
@@ -202,8 +207,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "O365_UserName", "id(\"username\")"},
             { "O365_License", "id(\"productsinfo\")/div[4]/div[1]/div/div[1]/div[2]/label"},
             { "O365_Add", "id(\"AddUserSubmit\")"},
-
-        };
+    };
 
         public static Dictionary<string, string> ElementId = new Dictionary<string, string>()
         {
@@ -224,6 +228,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Dialog_CloseDate"       , "closedate_id"},
             { "Dialog_Description"       , "description_id"},
             { "Dialog_UserOrTeamLookupId"       , "systemuserview_id"},
+
+            //Add Connection
+            { "Dialog_ConnectionDescription"  , "description"},
 
             //Entity
             { "Entity_TabId"       , "[NAME]_TAB_header_image_div"},
@@ -253,7 +260,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Process_Category", "WorkflowCategory"},
             { "Process_Entity", "PrimaryEntity"},
 
-        };
+    };
 
         public static Dictionary<string, string> CssClass = new Dictionary<string, string>()
         {
@@ -267,6 +274,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                       
             //Dialogs
             { "Dialog_SwitchProcessTitleClass"       , "ms-crm-ProcessSwitcher-ProcessTitle"},
+            { "Dialog_SelectedRadioButton"       , "ms-crm-ProcessSwitcher-Process-Selected"},
 
             //SetValue
             { "SetValue_LookupRenderClass"       , "Lookup_RenderButton_td"},
@@ -281,7 +289,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             //Grid
             { "Grid_ViewContainerClass"     , "ms-crm-VS-Menu"},
-            { "Grid_OpenChartClass"       , "ms-crm-ImageStrip-navLeft"},
+            { "Grid_OpenChartClass"       , "ms-crm-ImageStrip-navLeft_VisualRefresh"},
             { "Grid_CloseChartClass"       , "ms-crm-PaneChevron"},
             { "Grid_SortColumnClass"       , "ms-crm-List-Sortable"},
             { "Grid_DataColumnClass"       , "ms-crm-List-DataColumn"},
@@ -328,6 +336,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string DeleteHeader = "Dialog_DeleteHeader";
             public static string WorkflowHeader = "Dialog_WorkflowHeader";
             public static string ProcessFlowHeader = "Dialog_ProcessFlowHeader";
+            public static string AddConnectionHeader = "Dialog_AddConnectionHeader";
 
             public static class CloseOpportunity
             {
@@ -335,6 +344,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 public static string CloseDateId = "Dialog_CloseDate";
                 public static string DescriptionId = "Dialog_Description";
                 public static string Ok = "Dialog_CloseOpportunityOk";
+            }
+
+            public static class AddConnection
+            {
+                public static string DescriptionId = "Dialog_ConnectionDescription";
+                public static string Save = "Dialog_AddConnectionSave";
+                public static string RoleLookupButton = "Dialog_RoleLookupButton";
+                public static string RoleLookupTable = "Dialog_RoleLookupTable";
             }
             public static class Assign
             {
@@ -348,6 +365,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static class SwitchProcess
             {
                 public static string Process = "Dialog_SwitchProcessTitleClass";
+                public static string SelectedRadioButton = "Dialog_SelectedRadioButton";
             }
             public static class DuplicateDetection
             {
@@ -392,6 +410,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             public static string Cancel = "QuickCreate_Cancel";
             public static string Save = "QuickCreate_Save";
+            public static string EntityContainer = "QuickCreate_EnittyContainer";
         }
         public static class Office365Navigation
         {
@@ -595,7 +614,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string OldSignInPassword = "Login_OldPassword";
             public static string SignIn = "Login_SignIn";
             public static string CrmMainPage = "Login_CrmMainPage";
-
+            public static string StaySignedIn = "Login_StaySignedIn";
         }
         public static class Report
         {

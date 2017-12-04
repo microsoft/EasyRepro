@@ -27,7 +27,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         public XrmBrowser(BrowserOptions options) : base(options)
         {
-
+            
         }
 
         #endregion Constructor(s)
@@ -168,8 +168,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         public Office365Page Office365 => this.GetPage<Office365Page>();
 
-        #endregion Office365
+        public Office365NavigationPage Office365Navigation => this.GetPage<Office365NavigationPage>();
 
+        #endregion Office365
     }
 
 

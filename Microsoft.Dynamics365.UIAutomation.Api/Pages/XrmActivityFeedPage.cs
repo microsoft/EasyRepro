@@ -253,8 +253,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.Pages
 
                     var fieldElement = driver.ClickWhenAvailable(By.Id(field));
 
-                    fieldElement.FindElement(By.TagName("input")).Clear();
-                    fieldElement.FindElement(By.TagName("input")).SendKeys(value);
+                    fieldElement.Click();
+                    fieldElement.FindElement(By.TagName("input")).SendKeys(value, true);
                 }
                 else
                     throw new InvalidOperationException($"Field: {field} Does not exist");

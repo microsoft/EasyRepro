@@ -358,26 +358,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Gets the Commands
-        /// </summary>
-        /// <param name="moreCommands">The moreCommands</param>
-        private BrowserCommandResult<ReadOnlyCollection<IWebElement>> GetCommands(bool moreCommands = false)
-        {
-            return this.Execute(GetOptions("Get Command Bar Buttons"), driver =>
-            {
-                IWebElement ribbon = null;
-                if (moreCommands)
-                    ribbon = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.List]));
-                else
-                    ribbon = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.RibbonManager]));
-
-                var items = ribbon.FindElements(By.TagName("li"));
-
-                return items;//.Where(item => item.Text.Length > 0).ToDictionary(item => item.Text, item => item.GetAttribute("id"));
-            });
-        }
-
-        /// <summary>
         /// Clicks the  Command
         /// </summary>
         /// <param name="name">The name</param>
@@ -389,27 +369,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions("ClickCommand"), driver =>
+            return this.Execute(GetOptions("Click Command"), driver =>
             {
-                if (moreCommands)
-                    driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.MoreCommands]));
-
-                var buttons = GetCommands(moreCommands).Value;
-                var button = buttons.FirstOrDefault(x => x.Text.ToLowerString() == name.ToLowerString());
-
-                if (button == null) { throw new Exception($"Command Button with name: {name} does not exist."); }
-
-                if (string.IsNullOrEmpty(subName))
-                    button.Click();
-                else
-                {
-                    button.FindElement(By.ClassName(Elements.CssClass[Reference.CommandBar.FlyoutAnchorArrow])).Click();
-
-                    var flyoutId = button.GetAttribute("id").Replace("|", "_").Replace(".", "_") + "Menu";
-                    var subButtons = driver.FindElement(By.Id(flyoutId)).FindElements(By.TagName("li"));
-                    subButtons.Where(x => x.Text.ToLower() == subName.ToLower()).FirstOrDefault()?.Click();
-                }
-
+                ClickCommandButton(name, subName, moreCommands, thinkTime);
                 return true;
             });
         }

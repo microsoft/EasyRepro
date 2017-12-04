@@ -51,6 +51,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var topItem = driver.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.TopLevelItem])).FirstOrDefault();
                 topItem?.FindElement(By.Name(Elements.Name[Reference.Navigation.HomeTab])).Click();
 
+              //  driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.HomeTab]));
+
                 Thread.Sleep(1000);
 
                 var element = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ActionGroup]));
@@ -200,8 +202,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return this.Execute(GetOptions($"Open Quick Create"), driver =>
             {
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.GlobalCreate]));
-                var area = driver.FindElement(By.ClassName("navActionGroupContainer"));
-                var items = area.FindElements(By.ClassName("nav-rowLabel"));
+
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.QuickCreate.EntityContainer]), new TimeSpan(0,0,2));
+
+                var area = driver.FindElement(By.XPath(Elements.Xpath[Reference.QuickCreate.EntityContainer]));
+                var items = area.FindElements(By.TagName("a"));
+
                 var item = items.FirstOrDefault(x => x.Text == entity);
 
                 if(item == null)
@@ -435,6 +441,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 foreach (var subItem in subItems)
                 {
+                    if(!string.IsNullOrEmpty(subItem.Text))
                     dictionary.Add(subItem.Text.ToLowerString(), subItem);
                 }
 

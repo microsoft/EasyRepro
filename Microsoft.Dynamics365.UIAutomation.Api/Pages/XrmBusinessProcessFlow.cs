@@ -23,8 +23,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             SwitchToContent();
         }
-
-        private readonly string _previousStageCssSelector = ".layer0.selectedStage";
+        
         /// <summary>
         /// Moves to the Next stage in the Business Process Flow.
         /// </summary>
@@ -39,8 +38,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.NextStage])))
                     throw new Exception("Business Process Flow Next Stage Element does not exist");
 
-                if(driver.FindElement(By.Id("stageAdvanceActionContainer")).GetAttribute("tabindex") == "-1")
-                    throw new Exception("Business Process Flow Next Stage Element does not exist");
+                if(driver.FindElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.NextStage])).GetAttribute("class").Contains("disabled"))
+                    throw new Exception("Business Process Flow Next Stage Element is not enabled");
 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.NextStage]));
 
@@ -61,8 +60,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.PreviousStage])))
                     throw new Exception("Business Process Flow Previous Stage Element does not exist");
-                if (driver.HasElement(By.CssSelector(_previousStageCssSelector)))
-                    throw new Exception("Business Process Flow Previous Stage Element does not exist");
+
+                if (driver.FindElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.PreviousStage])).GetAttribute("class").Contains("disabled"))
+                    throw new Exception("Business Process Flow Previous Stage Element is not enabled");
 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.PreviousStage]));
 
@@ -82,7 +82,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return this.Execute("Hide", driver =>
             {
                 if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.Hide])))
-                    throw new Exception("Business Process Flow Next Stage Element does not exist");
+                    throw new Exception("Business Process Flow Hide Element does not exist");
 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.Hide]));
 
@@ -126,6 +126,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.SetActive])))
                     throw new Exception("Business Process Flow Set Active Element does not exist");
 
+                if (driver.FindElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.SetActive])).GetAttribute("class").Contains("hidden"))
+                    throw new Exception("The Business Process is already Active");
+                
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.SetActive]));
 
                 return true;
@@ -145,25 +148,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return this.Execute(GetOptions("Delete"), driver =>
             {
                 driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Dialogs.ProcessFlowHeader]),
-                                          new TimeSpan(0, 0, 10),
-                                          "The Select Business Process Flow dialog is not available.");
+                    new TimeSpan(0, 0, 10),
+                    "The Select Business Process Flow dialog is not available.");
 
-                var processes = driver.FindElements(By.ClassName(Elements.CssClass[Reference.Dialogs.SwitchProcess.Process]));
-                IWebElement element = null;
-
-                foreach (var process in processes)
+                if (driver.FindElement(By.ClassName(Elements.CssClass[Reference.Dialogs.SwitchProcess.SelectedRadioButton])).Text.Split('\r')[0] != name)
                 {
-                    if (process.Text == name)
-                        element = process;
+                    var processes = driver.FindElements(By.ClassName(Elements.CssClass[Reference.Dialogs.SwitchProcess.Process]));
+                    IWebElement element = null;
+
+                    foreach (var process in processes)
+                    {
+                        if (process.Text == name)
+                        {
+                            element = process;
+                            break;
+                        }
+                    }
+
+                    if (element != null)
+                        element.Click();
+                    else
+                        throw new InvalidOperationException($"The Business Process with name: '{name}' does not exist");
+
+                    driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.Ok]));
                 }
-
-                if (element != null)
-                    element.Click();
                 else
-                    throw new InvalidOperationException($"The Business Process with name: '{name}' does not exist");
-
-                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.Ok]));
-
+                {
+                    throw new InvalidOperationException($"The Business Process with name: '{name}' is already selected");
+                }
                 return true;
             });
         }
