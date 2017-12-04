@@ -26,14 +26,14 @@ Global
 		{DFE2C141-F1AA-4D4B-8DF8-0FB93023CF45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFE2C141-F1AA-4D4B-8DF8-0FB93023CF45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFE2C141-F1AA-4D4B-8DF8-0FB93023CF45}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DFE2C141-F1AA-4D4B-8DF8-0FB93023CF45}.UnitTest|Any CPU.ActiveCfg = UnitTest|Any CPU
-		{DFE2C141-F1AA-4D4B-8DF8-0FB93023CF45}.UnitTest|Any CPU.Build.0 = UnitTest|Any CPU
+		{DFE2C141-F1AA-4D4B-8DF8-0FB93023CF45}.UnitTest|Any CPU.ActiveCfg = Release|Any CPU
+		{DFE2C141-F1AA-4D4B-8DF8-0FB93023CF45}.UnitTest|Any CPU.Build.0 = Release|Any CPU
 		{C9748803-F3CB-4531-B313-BC24D4D0BF0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C9748803-F3CB-4531-B313-BC24D4D0BF0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9748803-F3CB-4531-B313-BC24D4D0BF0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9748803-F3CB-4531-B313-BC24D4D0BF0C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C9748803-F3CB-4531-B313-BC24D4D0BF0C}.UnitTest|Any CPU.ActiveCfg = UnitTest|Any CPU
-		{C9748803-F3CB-4531-B313-BC24D4D0BF0C}.UnitTest|Any CPU.Build.0 = UnitTest|Any CPU
+		{C9748803-F3CB-4531-B313-BC24D4D0BF0C}.UnitTest|Any CPU.ActiveCfg = Release|Any CPU
+		{C9748803-F3CB-4531-B313-BC24D4D0BF0C}.UnitTest|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

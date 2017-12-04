@@ -561,7 +561,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string OldSignInPassword = "Login_OldPassword";
             public static string SignIn = "Login_SignIn";
             public static string CrmMainPage = "Login_CrmMainPage";
-
+            public static string StaySignedIn = "Login_StaySignedIn";
         }
         public static class Report
         {
