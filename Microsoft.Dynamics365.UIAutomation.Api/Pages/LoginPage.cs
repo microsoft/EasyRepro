@@ -131,9 +131,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 {
                     if (redirectToNewPassword)
                     {
+                        try
+                        {
+                            IWebElement signInlnk = driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.SignInDiffUser]));
+                            new WebDriverWait(driver, TimeSpan.FromMilliseconds(5000)).Until(ExpectedConditions.ElementToBeClickable(signInlnk));
+                            signInlnk.Click();
+
+                        }
+                        catch (StaleElementReferenceException e)
+                        {
+                        }
+
+                        Thread.Sleep(2000);
                         driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).SendKeys(password.ToUnsecureString());
                         driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).SendKeys(Keys.Tab);
                         driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).Submit();
+
+                        if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])))
+                        {
+                            driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]));
+                            driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])).Submit();
+                        }
                     }
                     else
                     {
