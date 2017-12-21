@@ -42,6 +42,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Dialog_AddConnectionSave", "id(\"connection|NoRelationship|Form|Mscrm.Form.connection.SaveAndClose-Large\")" },
             { "Dialog_RoleLookupButton",  "id(\"record2roleid\")" },
             { "Dialog_RoleLookupTable",   "id(\"record2roleid_IMenu\")" },
+            { "Dialog_WarningFooter" , "//*[@id=\"crmDialogFooter\"]" },
+            { "Dialog_WarningCloseButton", "//*[@id=\"butBegin\"]" },
 
             //GuidedHelp
             { "GuidedHelp_MarsOverlay"       , "id(\"marsOverlay\")"},
@@ -335,6 +337,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string WorkflowHeader = "Dialog_WorkflowHeader";
             public static string ProcessFlowHeader = "Dialog_ProcessFlowHeader";
             public static string AddConnectionHeader = "Dialog_AddConnectionHeader";
+            public static string WarningFooter = "Dialog_WarningFooter";
+            public static string WarningCloseButton = "Dialog_WarningCloseButton";
 
             public static class CloseOpportunity
             {
