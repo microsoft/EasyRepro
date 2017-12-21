@@ -36,10 +36,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     driver = new FirefoxDriver(ffService);
                     driver.Manage().Timeouts().ImplicitWait = new TimeSpan(0, 0, 5);
                     break;
-                case BrowserType.PhantomJs:
-                    driver = new PhantomJSDriver(options.DriversPath);
-
-                    break;
                 case BrowserType.Edge:
                     var edgeService = EdgeDriverService.CreateDefaultService();
                     edgeService.HideCommandPromptWindow = options.HideDiagnosticWindow;
