@@ -36,12 +36,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             //return this.Execute($"Set Value: {field}", SetValue, field, check);
             return this.Execute(GetOptions($"Set Value: {field}"), driver =>
             {
-                if (driver.HasElement(By.Id("int_" + field)))
+                if (driver.HasElement(By.Id(field)))
                 {
-                    var input = driver.FindElement(By.Id("int_" + field));
+                    var input = driver.FindElement(By.Id(field));
+                    var checkBox = input.FindElement(By.TagName("input"));
+                    var bCheck = checkBox.GetAttribute("value") == "1";
 
-                    if (bool.Parse(input.FindElement(By.TagName("input")).GetAttribute("checked")) && !check)
-                        input.FindElement(By.TagName("input")).Click();
+                    if (bCheck != check)
+                    {
+                        checkBox.Click();
+                    }
                 }
                 else
                     throw new InvalidOperationException($"Field: {field} Does not exist");
