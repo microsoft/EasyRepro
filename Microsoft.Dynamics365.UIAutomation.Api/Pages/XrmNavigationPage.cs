@@ -60,7 +60,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 foreach (var subItem in subItems)
                 {
-                    dictionary.Add(subItem.Text.ToLowerString(), subItem);
+                    dictionary.Add(subItem.GetAttribute("title").ToLowerString(), subItem);
                 }
 
                 return dictionary;
@@ -163,7 +163,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     d =>
                     {
                         driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.Search])).SendKeys(searchText, true);
-                        driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.StartSearch]));
+                        Thread.Sleep(500);
+                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.Search])).SendKeys(Keys.Enter);
                     },
                     d => { throw new InvalidOperationException("The Global Search text field is not available."); });
 

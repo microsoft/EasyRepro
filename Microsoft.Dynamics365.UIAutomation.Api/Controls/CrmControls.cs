@@ -51,6 +51,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public string Value { get; set; }
     }
 
+    public class MultiValueOptionSet
+    {
+        public string Name { get; set; }
+        public string[] Values { get; set; }
+    }
+
     public class Lookup
     {
         public string Name { get; set; }

@@ -2,10 +2,6 @@
 // Licensed under the MIT license.
 
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using OpenQA.Selenium;
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
@@ -29,49 +25,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             : base(browser)
         {
             SwitchToDefault();
-        }
-
-
-        /// <summary>
-        /// Gets the Commands
-        /// </summary>
-        /// <param name="moreCommands">The MoreCommands</param>
-        /// <example></example>
-        private BrowserCommandResult<ReadOnlyCollection<IWebElement>> GetCommands(bool moreCommands = false)
-        {
-            return this.Execute("Get Command Bar Buttons", driver =>
-            {
-                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.RibbonManager]),new TimeSpan(0,0,5));
-
-                IWebElement ribbon = null;
-                if (moreCommands)
-                    ribbon = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.List]));
-                else
-                    ribbon = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.RibbonManager]));
-
-                var items = ribbon.FindElements(By.TagName("li"));
-
-                return items;//.Where(item => item.Text.Length > 0).ToDictionary(item => item.Text, item => item.GetAttribute("id"));
-            });
-        }
-
-        /// <summary>
-        /// Clicks the  Command
-        /// </summary>
-        /// <param name="name">The Name of the command</param>
-        /// <param name="subName">The SubName</param>
-        /// <param name="moreCommands">The MoreCommands</param>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.CommandBar.ClickCommand("New");</example>
-        public BrowserCommandResult<bool> ClickCommand(string name, string subName = "", bool moreCommands = false, int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions("Click Command"), driver =>
-            {
-                ClickCommandButton(name, subName, moreCommands, thinkTime);
-                return true;
-            });
         }
     }
 }

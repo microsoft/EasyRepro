@@ -232,11 +232,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.Pages
 
                 this.SetValue(Elements.ElementId[Reference.ActivityFeed.ActivityTaskSubjectId], subject);
                 this.SetValue(Elements.ElementId[Reference.ActivityFeed.ActivityTaskDescriptionId], description);
-
                 this.SetCalenderValue(Elements.ElementId[Reference.ActivityFeed.ActivityAddTaskDueDateId], dueDate.ToShortDateString());
-                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.ActivityFeed.ActivityTaskScheduledEnd]));
                 this.SetCalenderValue(Elements.ElementId[Reference.ActivityFeed.ActivityAddTaskDueTimeId], dueDate.ToShortTimeString());
                 this.SetValue(priority);
+
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.ActivityFeed.ActivityTaskOk]));
 
                 return true;

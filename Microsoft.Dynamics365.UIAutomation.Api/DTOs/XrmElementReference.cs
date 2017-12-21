@@ -42,6 +42,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Dialog_AddConnectionSave", "id(\"connection|NoRelationship|Form|Mscrm.Form.connection.SaveAndClose-Large\")" },
             { "Dialog_RoleLookupButton",  "id(\"record2roleid\")" },
             { "Dialog_RoleLookupTable",   "id(\"record2roleid_IMenu\")" },
+            { "Dialog_WarningFooter" , "//*[@id=\"crmDialogFooter\"]" },
+            { "Dialog_WarningCloseButton", "//*[@id=\"butBegin\"]" },
 
             //GuidedHelp
             { "GuidedHelp_MarsOverlay"       , "id(\"marsOverlay\")"},
@@ -152,10 +154,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Notes_ActivityAddTaskDueTime"    ,"id(\"selectTable_Date\")"},
                       
             //Login           
-            { "Login_UserId", "id(\"i0116\")"},
-            { "Login_Password", "id(\"i0118\")"},
-            { "Login_OldUserId", "id(\"cred_userid_inputtext\")"},
-            { "Login_OldPassword", "id(\"cred_password_inputtext\")"},
+            { "Login_UserId", "//input[@type='email']"},
+            { "Login_Password", "//input[@type='password']"},
             { "Login_SignIn", "id(\"cred_sign_in_button\")"},
             { "Login_CrmMainPage", "id(\"crmTopBar\")"},
             { "Login_StaySignedIn", "id(\"idSIButton9\")"},
@@ -279,7 +279,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             //SetValue
             { "SetValue_LookupRenderClass"       , "Lookup_RenderButton_td"},
             { "SetValue_EditClass"     , "ms-crm-Inline-Edit"},
-            { "SetValue_ValueClass"       , "ms-crm-Inline-Value"},    
+            { "SetValue_ValueClass"       , "ms-crm-Inline-Value"},
+            { "SetValue_MultiSelectPicklistDelete"       , "sol-quick-delete"},
+
 
             //DashBoard
             { "DashBoard_ViewContainerClass"       , "ms-crm-VS-Menu"},
@@ -337,6 +339,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string WorkflowHeader = "Dialog_WorkflowHeader";
             public static string ProcessFlowHeader = "Dialog_ProcessFlowHeader";
             public static string AddConnectionHeader = "Dialog_AddConnectionHeader";
+            public static string WarningFooter = "Dialog_WarningFooter";
+            public static string WarningCloseButton = "Dialog_WarningCloseButton";
 
             public static class CloseOpportunity
             {
@@ -404,6 +408,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string CompositionLinkControl = "SetValue_CompositionLinkControlId";
             public static string Cancel = "SetValue_Cancel";
             public static string Save = "SetValue_Save";
+            public static string MultiSelectPicklistDeleteClass = "SetValue_MultiSelectPicklistDelete";
         }
 
         public static class QuickCreate
@@ -609,9 +614,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public static class Login
         {
             public static string UserId = "Login_UserId";
-            public static string Password = "Login_Password";
-            public static string OldSignInUserId = "Login_OldUserId";
-            public static string OldSignInPassword = "Login_OldPassword";
+            public static string LoginPassword = "Login_Password";
             public static string SignIn = "Login_SignIn";
             public static string CrmMainPage = "Login_CrmMainPage";
             public static string StaySignedIn = "Login_StaySignedIn";
