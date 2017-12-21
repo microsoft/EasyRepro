@@ -288,5 +288,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
+        public BrowserCommandResult<bool> CloseWarningDialog()
+        {
+            return this.Execute(GetOptions($"Close Warning Dialog"), driver =>
+            {
+                var dialogFooter = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Dialogs.WarningFooter]));
+
+                if (dialogFooter != null
+                    && (dialogFooter?.FindElements(By.XPath(Elements.Xpath[Reference.Dialogs.WarningCloseButton]))).Any())
+                {
+                    var closeBtn =
+                        dialogFooter.FindElement(By.XPath(Elements.Xpath[Reference.Dialogs.WarningCloseButton]));
+                    closeBtn.Click();
+                }
+
+                return true;
+            });
+        }
     }
 }

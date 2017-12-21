@@ -88,7 +88,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             var redirect = false;
             bool online = !(this.OnlineDomains != null && !this.OnlineDomains.Any(d => uri.Host.EndsWith(d)));
-            bool redirectToNewPassword = false;
             driver.Navigate().GoToUrl(uri);
 
             if (online)
@@ -96,25 +95,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (driver.IsVisible(By.Id("use_another_account_link")))
                     driver.ClickWhenAvailable(By.Id("use_another_account_link"));
 
-                if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.UserId])))
-                {
                     driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]),
                         $"The Office 365 sign in page did not return the expected result and the user '{username}' could not be signed in.");
 
                     driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(username.ToUnsecureString());
                     driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Tab);
                     driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Enter);
-                    redirectToNewPassword = true;
                     Thread.Sleep(2000);
-                }
-                else
-                {
-                    driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.OldSignInUserId]),
-                        $"The Office 365 sign in page did not return the expected result and the user '{username}' could not be signed in.");
-
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.OldSignInUserId])).SendKeys(username.ToUnsecureString());
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.OldSignInUserId])).SendKeys(Keys.Tab);
-                }
 
                     //If expecting redirect then wait for redirect to trigger
                 if (redirectAction != null)
@@ -128,24 +115,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 }
                 else
                 {
-                    if (redirectToNewPassword)
-                    {
-                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).SendKeys(password.ToUnsecureString());
-                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).SendKeys(Keys.Tab);
-                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.Password])).Submit();
+                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).SendKeys(password.ToUnsecureString());
+                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).SendKeys(Keys.Tab);
+                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).Submit();
 
                         if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])))
                         {
                                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])); 
                                 driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])).Submit();
                         }
-                    }
-                    else
-                    {
-                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.OldSignInPassword])).SendKeys(password.ToUnsecureString());
-                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.OldSignInPassword])).SendKeys(Keys.Tab);
-                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.OldSignInPassword])).Submit();
-                    }
 
                     driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
                         , new TimeSpan(0, 0, 60),
