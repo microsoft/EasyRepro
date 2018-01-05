@@ -295,7 +295,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var dialogFooter = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Dialogs.WarningFooter]));
 
                 if (dialogFooter != null
-                    && (dialogFooter?.FindElements(By.XPath(Elements.Xpath[Reference.Dialogs.WarningCloseButton]))).Any())
+                    && (dialogFooter?.FindElements(By.XPath(Elements.Xpath[Reference.Dialogs.WarningCloseButton]))).Count > 0)
                 {
                     var closeBtn =
                         dialogFooter.FindElement(By.XPath(Elements.Xpath[Reference.Dialogs.WarningCloseButton]));
