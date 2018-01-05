@@ -49,13 +49,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                     xrmBrowser.ThinkTime(2000);
                     Dictionary<string, XrmPerformanceMarker> perfResults = perf.GetMarkers().Value;
 
-                    new Telemetry().AzureKey("[AZURE KEY GOES HERE]")
+                    new Telemetry().AzureKey(System.Configuration.ConfigurationManager.AppSettings["AzureKey"])
                         .ExecutionId(executionId)
                         .RequestId(perf.GetRequestId())
                         .TrackEvents(perfResults.Select(x => x.Value).ToList());
 
                 }
-                new Telemetry().AzureKey("[AZURE KEY GOES HERE]")
+                new Telemetry().AzureKey(System.Configuration.ConfigurationManager.AppSettings["AzureKey"])
                     .ExecutionId(executionId)
                     .TrackEvents(xrmBrowser.CommandResults);
 
