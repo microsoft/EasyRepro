@@ -17,8 +17,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.DOCValidationTests
         [TestMethod]
         public void TestValidateVersion()
         {
-            var validAppVersion = "8.2.1.360";
-            var validDBVersion = "8.2.1.360";
+            var validAppVersion = "8.2.0.749";
+            var validDBVersion = "8.2.0.749";
 
             using (var xrmBrowser = new XrmBrowser(TestSettings.Options))
             {

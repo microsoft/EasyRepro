@@ -134,7 +134,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             }
             else
             {
-                driver.Navigate().GoToUrl("http://" + Uri.EscapeDataString(username.ToUnsecureString()) + ":" + Uri.EscapeDataString(password.ToUnsecureString()) + "@" + uri);
+                driver.Navigate().GoToUrl("http://" + Uri.EscapeDataString(username.ToUnsecureString()) + ":" + Uri.EscapeDataString(password.ToUnsecureString()) + "@" + uri.Authority + uri.AbsolutePath);
             }
 
             return redirect ? LoginResult.Redirect : LoginResult.Success;

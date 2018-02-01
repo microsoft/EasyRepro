@@ -2,12 +2,13 @@
 using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
+using System.Collections.Generic;
 using System.Security;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class Dashboard
+    public class CreateLead
     {
 
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
@@ -15,18 +16,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
-        public void TestSwitchDashboard()
+        public void TestCreateNewLead()
         {
             using (var xrmBrowser = new XrmBrowser(TestSettings.Options))
             {
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
+                
+                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Potencjalni klienci");
+                xrmBrowser.CommandBar.ClickCommand("Nowy");
 
-                xrmBrowser.Navigation.OpenSubArea("Sales", "Dashboards");
-                xrmBrowser.GuidedHelp.CloseGuidedHelp();
+                xrmBrowser.ThinkTime(2000);
+                List<Field> fields = new List<Field>
+                {
+                    new Field {Id = "firstname", Value = "Test"},
+                    new Field {Id = "lastname", Value = "Lead"}
+                };
+                xrmBrowser.Entity.SetValue("subject", "Test API Lead");
+                xrmBrowser.Entity.SetValue(new CompositeControl { Id = "fullname", Fields = fields });
+                xrmBrowser.Entity.SetValue("mobilephone", "555-555-5555");
+                xrmBrowser.Entity.SetValue("description", "Test lead creation with API commands");
 
-                xrmBrowser.Dashboard.SelectDashBoard("Sales Performance Dashboard");
-
+                xrmBrowser.CommandBar.ClickCommand("Zapisz");
             }
         }
     }

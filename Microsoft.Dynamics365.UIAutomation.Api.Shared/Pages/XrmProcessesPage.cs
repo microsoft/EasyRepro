@@ -32,6 +32,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             Dialog,
             Workflow
         }
+#if CRM_ONPREM
         public BrowserCommandResult<bool> CreateProcess(string name, string processType, string entity, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
@@ -55,6 +56,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 return true;
             });
         }
+#endif
+
+#if CRM_ONLINE
+        public BrowserCommandResult<bool> CreateProcess(string name, ProcessType type, string entity, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Create Process"), driver =>
+            {
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Process.Open]));
+
+                SwitchToDialogFrame();
+
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Process.Name]))
+                    .SendKeys(name);
+
+                SetValue(new OptionSet() { Name = Elements.ElementId[Reference.Process.Category], Value = type.ToString() });
+                SetValue(new OptionSet() { Name = Elements.ElementId[Reference.Process.Entity], Value = entity });
+
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Process.BlankWorkflow]));
+
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Process.Create]));
+
+                return true;
+            });
+        }
+#endif
 
         public BrowserCommandResult<bool> Activate(int thinkTime = Constants.DefaultThinkTime)
         {

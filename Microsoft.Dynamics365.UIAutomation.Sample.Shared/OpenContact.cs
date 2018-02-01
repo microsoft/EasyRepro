@@ -7,7 +7,7 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class CreateOpportunity
+    public class OpenContact
     {
 
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
@@ -15,7 +15,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
-        public void TestCreateNewOpportunity()
+        public void TestOpenActiveContact()
         {
             using (var xrmBrowser = new XrmBrowser(TestSettings.Options))
             {
@@ -23,21 +23,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
                 xrmBrowser.ThinkTime(500);
-                xrmBrowser.Navigation.OpenSubArea("Sales", "Opportunities");
+                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Kontakty");
 
-                xrmBrowser.ThinkTime(200);
-                xrmBrowser.Grid.SwitchView("Open Opportunities");
+                xrmBrowser.ThinkTime(2000);
+                xrmBrowser.Grid.SwitchView("Aktywne kontakty");
 
                 xrmBrowser.ThinkTime(1000);
-                xrmBrowser.CommandBar.ClickCommand("New");
+                xrmBrowser.Grid.OpenRecord(0);
 
-                xrmBrowser.ThinkTime(5000);
-
-                xrmBrowser.Entity.SetValue("name", "Test API Opportunity");
-                xrmBrowser.Entity.SetValue("description", "Testing the create api for Opportunity");
-
-                xrmBrowser.CommandBar.ClickCommand("Save");
-                xrmBrowser.ThinkTime(2000);
             }
         }
     }

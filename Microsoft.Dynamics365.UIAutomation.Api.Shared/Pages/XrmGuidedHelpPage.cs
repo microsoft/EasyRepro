@@ -28,29 +28,37 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             get
             {
                 bool isGuidedHelpEnabled = false;
+                string getIsEnabledGuideScript;
+#if CRM_ONPREM
+                getIsEnabledGuideScript = "return Xrm.Internal.isGuidedHelpEnabledForUser();";
+#endif
+#if CRM_ONLINE
+                getIsEnabledGuideScript = "return Xrm.Internal.isFeatureEnabled('FCB.GuidedHelp') && Xrm.Internal.isGuidedHelpEnabledForUser();";
+#endif
                 bool.TryParse(
-                    this.Browser.Driver.ExecuteScript("return Xrm.Internal.isGuidedHelpEnabledForUser();").ToString(),
+                    this.Browser.Driver.ExecuteScript(getIsEnabledGuideScript).ToString(),
                     out isGuidedHelpEnabled);
 
                 return isGuidedHelpEnabled;
             }
         }
 
-        /// <summary>
-        /// Closes the Guided Help
-        /// </summary>
-        /// <example>xrmBrowser.GuidedHelp.CloseGuidedHelp();</example>
-        public BrowserCommandResult<bool> CloseGuidedHelp()
+                /// <summary>
+                /// Closes the Guided Help
+                /// </summary>
+                /// <example>xrmBrowser.GuidedHelp.CloseGuidedHelp();</example>
+                public BrowserCommandResult<bool> CloseGuidedHelp()
         {
             return this.Execute(GetOptions("Close Guided Help"), driver =>
             {
                 bool returnValue = false;
 
+#if CRM_ONPREM
                 if (IsEnabled)
                 {
                     driver.WaitUntilVisible(By.Id(Reference.GuidedHelp.MarsOverlay), new TimeSpan(0, 0, 15), d =>
                     {
-                        driver.SwitchTo().Frame("InlineDialog_Iframe");
+                        driver.SwitchTo().Frame(Reference.GuidedHelp.GuideIFrame);
                         driver.WaitUntilClickable(By.Id(Reference.GuidedHelp.ButtonClose), new TimeSpan(0, 0, 5));
                         var e = driver.FindElement(By.Id(Reference.GuidedHelp.ButtonClose));
                         e.Click(true);
@@ -59,6 +67,29 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         returnValue = true;
                     });
                 }
+#endif
+#if CRM_ONLINE
+                    driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.GuidedHelp.MarsOverlay]), new TimeSpan(0, 0, 15), d =>
+                    {
+                        var allMarsElements = driver
+                            .FindElement(By.XPath(Elements.Xpath[Reference.GuidedHelp.MarsOverlay]))
+                            .FindElements(By.XPath(".//*"));
+
+                        foreach (var element in allMarsElements)
+                        {
+                            var buttonId = driver.ExecuteScript("return arguments[0].id;", element).ToString();
+
+                            if (buttonId.Equals(Elements.ElementId[Reference.GuidedHelp.Close], StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                driver.WaitUntilClickable(By.Id(buttonId), new TimeSpan(0, 0, 5));
+
+                                element.Click();
+                            }
+                        }
+
+                        returnValue = true;
+                    });
+#endif
 
                 return returnValue;
             });

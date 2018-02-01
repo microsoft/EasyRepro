@@ -23,15 +23,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
                 xrmBrowser.ThinkTime(500);
-                xrmBrowser.Navigation.OpenSubArea("Sales", "Opportunities");
+                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Szanse sprzedaży");
 
                 xrmBrowser.ThinkTime(2000);
-                xrmBrowser.Grid.SwitchView("Open Opportunities");
+                xrmBrowser.Grid.SwitchView("Otwarte szanse sprzedaży");
 
                 xrmBrowser.ThinkTime(1000);
                 xrmBrowser.Grid.OpenRecord(0);
 
-                xrmBrowser.CommandBar.ClickCommand("Close as Won");
+                xrmBrowser.CommandBar.ClickCommand("Zamknij jako wykorzystaną");
 
                 xrmBrowser.Dialogs.CloseOpportunity(10000, DateTime.Now, "Testing the Close Opportunity API");
             }

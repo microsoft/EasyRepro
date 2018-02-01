@@ -25,7 +25,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CRM_2016</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -87,37 +87,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="ADFSLogin.cs" />
-    <Compile Include="Dashboard.cs" />
-    <Compile Include="CloseOpportunity.cs" />
-    <Compile Include="CreateAccount.cs" />
-    <Compile Include="CreateCase.cs" />
-    <Compile Include="CreateContact.cs" />
-    <Compile Include="CreateLead.cs" />
-    <Compile Include="CreateOpportunity.cs" />
-    <Compile Include="DOCValidationTests\CreateUser.cs" />
-    <Compile Include="DOCValidationTests\CreateWorkflow.cs" />
-    <Compile Include="DOCValidationTests\OpenMobile.cs" />
-    <Compile Include="DOCValidationTests\ValidationVersion.cs" />
-    <Compile Include="DuplicateDetection.cs" />
-    <Compile Include="OpenAccount.cs" />
-    <Compile Include="OpenCase.cs" />
-    <Compile Include="OpenContact.cs" />
-    <Compile Include="OpenLead.cs" />
-    <Compile Include="OpenOpportunity.cs" />
-    <Compile Include="QuickCreate.cs" />
-    <Compile Include="Reports.cs" />
-    <Compile Include="Telemetry.cs" />
-    <Compile Include="UpdateAccount.cs" />
-    <Compile Include="UpdateCase.cs" />
-    <Compile Include="UpdateContact.cs" />
-    <Compile Include="UpdateLead.cs" />
-    <Compile Include="UpdateOpportunity.cs" />
-    <Compile Include="GlobalSearch.cs" />
-    <Compile Include="TestSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UploadTelemetry.cs" />
-    <Compile Include="Views.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
@@ -132,13 +102,9 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Api\Microsoft.Dynamics365.UIAutomation.Api.csproj">
-      <Project>{dfe2c141-f1aa-4d4b-8df8-0fb93023cf45}</Project>
-      <Name>Microsoft.Dynamics365.UIAutomation.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Browser\Microsoft.Dynamics365.UIAutomation.Browser.csproj">
-      <Project>{c9748803-f3cb-4531-b313-bc24d4d0bf0c}</Project>
-      <Name>Microsoft.Dynamics365.UIAutomation.Browser</Name>
+    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Api.2016\Microsoft.Dynamics365.UIAutomation.Api.2016.csproj">
+      <Project>{80a65998-62a8-4e7b-87a0-8492c16703d3}</Project>
+      <Name>Microsoft.Dynamics365.UIAutomation.Api.2016</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

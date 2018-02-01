@@ -22,24 +22,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sales", "Leads");
+                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Potencjalni klienci");
 
-                xrmBrowser.Grid.SwitchView("All Leads");
-
-                xrmBrowser.CommandBar.ClickCommand("New");
+                xrmBrowser.CommandBar.ClickCommand("Nowy");
 
                 List<Field> fields = new List<Field>
                 {
-                    new Field() {Id = "firstname", Value = "Test"},
-                    new Field() {Id = "lastname", Value = "Lead"}
+                    new Field {Id = "firstname", Value = "Test"},
+                    new Field {Id = "lastname", Value = "Lead"}
                 };
                 xrmBrowser.Entity.SetValue("subject", "Test API Lead");
-                xrmBrowser.Entity.SetValue(new CompositeControl() { Id = "fullname", Fields = fields });
+                xrmBrowser.Entity.SetValue(new CompositeControl { Id = "fullname", Fields = fields });
                 xrmBrowser.Entity.SetValue("mobilephone", "555-555-5555");
                 xrmBrowser.Entity.SetValue("description", "Test lead creation with API commands");
                 xrmBrowser.Entity.SetValue("emailaddress1", "test@contoso.com");
 
-                xrmBrowser.CommandBar.ClickCommand("Save");
+                xrmBrowser.CommandBar.ClickCommand("Zapisz");
 
                 xrmBrowser.Dialogs.DuplicateDetection(true);
             }

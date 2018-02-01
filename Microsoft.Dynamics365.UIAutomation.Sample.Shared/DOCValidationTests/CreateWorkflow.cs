@@ -20,17 +20,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.DOCValidationTests
             using (var xrmBrowser = new XrmBrowser(TestSettings.Options))
             {
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
+                xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Settings", "Processes");
+                xrmBrowser.Navigation.OpenSubArea("Ustawienia", "Procesy");
 
-                xrmBrowser.Processes.CreateProcess("Test Process", XrmProcessesPage.ProcessType.Workflow,"Account");
+                xrmBrowser.Processes.CreateProcess("Test Process", "Przepływ pracy","Klient");
 
                 xrmBrowser.Driver.LastWindow().Close();
 
                 xrmBrowser.Driver.LastWindow();
 
                 var rows = xrmBrowser.Grid.GetGridItems().Value;
-                xrmBrowser.Grid.Sort("Created On");
+                xrmBrowser.Grid.Sort("Data utworzenia");
 
                 xrmBrowser.Grid.SelectRecord(rows.Count-1);   //Select the newly created record
                 xrmBrowser.Processes.Activate();

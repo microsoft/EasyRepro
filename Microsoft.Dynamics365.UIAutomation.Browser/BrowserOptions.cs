@@ -8,6 +8,7 @@ using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using System;
 using System.IO;
+using OpenQA.Selenium;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
@@ -103,7 +104,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             var options = new EdgeOptions()
             {
-                PageLoadStrategy = EdgePageLoadStrategy.Normal
+                PageLoadStrategy = PageLoadStrategy.Normal
             };
 
             return options;

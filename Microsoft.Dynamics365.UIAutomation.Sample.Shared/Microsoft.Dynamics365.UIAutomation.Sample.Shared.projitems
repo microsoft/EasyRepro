@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>430c39e8-41df-4e82-95c9-39153107a30f</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Microsoft.Dynamics365.UIAutomation.Sample.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ADFSLogin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CloseOpportunity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CreateAccount.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CreateCase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CreateContact.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CreateLead.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CreateOpportunity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dashboard.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DOCValidationTests\CreateUser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DOCValidationTests\CreateWorkflow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DOCValidationTests\OpenMobile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DOCValidationTests\ValidationVersion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DuplicateDetection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalSearch.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OpenAccount.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OpenCase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OpenContact.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OpenLead.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OpenOpportunity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)QuickCreate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Reports.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Telemetry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpdateAccount.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpdateCase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpdateContact.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpdateLead.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UpdateOpportunity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UploadTelemetry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views.cs" />
+  </ItemGroup>
+</Project>

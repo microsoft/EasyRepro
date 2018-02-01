@@ -2,12 +2,13 @@
 using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
+using System.Collections.Generic;
 using System.Security;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class OpenContact
+    public class CreateContact
     {
 
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
@@ -15,27 +16,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
-        public void TestOpenActiveContact()
+        public void TestCreateNewContact()
         {
             using (var xrmBrowser = new XrmBrowser(TestSettings.Options))
             {
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                var perf = xrmBrowser.PerformanceCenter;
-
-                if (!perf.IsEnabled)
-                    perf.IsEnabled = true;
-
                 xrmBrowser.ThinkTime(500);
-                xrmBrowser.Navigation.OpenSubArea("Sales", "Contacts");
-
-                xrmBrowser.ThinkTime(2000);
-                xrmBrowser.Grid.SwitchView("Active Contacts");
+                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Kontakty");
 
                 xrmBrowser.ThinkTime(1000);
-                xrmBrowser.Grid.OpenRecord(0);
+                xrmBrowser.CommandBar.ClickCommand("Nowy");
 
+                xrmBrowser.ThinkTime(5000);
+
+                List<Field> fields = new List<Field>
+                {
+                    new Field {Id = "firstname", Value = "Test"},
+                    new Field {Id = "lastname", Value = "Contact"}
+                };
+                xrmBrowser.Entity.SetValue(new CompositeControl {Id = "fullname", Fields = fields});
+                xrmBrowser.Entity.SetValue("emailaddress1", "test@contoso.com");
+                xrmBrowser.Entity.SetValue("mobilephone", "555-555-5555");
+                xrmBrowser.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));
+                xrmBrowser.Entity.SetValue(new OptionSet {Name = "preferredcontactmethodcode", Value = "Email"});
+
+                xrmBrowser.CommandBar.ClickCommand("Zapisz");
             }
         }
     }
