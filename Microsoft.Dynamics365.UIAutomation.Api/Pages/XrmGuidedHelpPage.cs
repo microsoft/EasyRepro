@@ -29,7 +29,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 bool isGuidedHelpEnabled = false;
                 bool.TryParse(
-                    this.Browser.Driver.ExecuteScript("return Xrm.Internal.isFeatureEnabled('FCB.GuidedHelp') && Xrm.Internal.isGuidedHelpEnabledForUser();").ToString(),
+                    this.Browser.Driver.ExecuteScript("return Xrm.Internal.isGuidedHelpEnabledForUser();").ToString(),
                     out isGuidedHelpEnabled);
 
                 return isGuidedHelpEnabled;
@@ -48,23 +48,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 if (IsEnabled)
                 {
-                    driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.GuidedHelp.MarsOverlay]), new TimeSpan(0, 0, 15), d =>
+                    driver.WaitUntilVisible(By.Id(Reference.GuidedHelp.MarsOverlay), new TimeSpan(0, 0, 15), d =>
                     {
-                        var allMarsElements = driver
-                            .FindElement(By.XPath(Elements.Xpath[Reference.GuidedHelp.MarsOverlay]))
-                            .FindElements(By.XPath(".//*"));
-
-                        foreach (var element in allMarsElements)
-                        {
-                            var buttonId = driver.ExecuteScript("return arguments[0].id;", element).ToString();
-
-                            if (buttonId.Equals(Elements.ElementId[Reference.GuidedHelp.Close], StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                driver.WaitUntilClickable(By.Id(buttonId), new TimeSpan(0, 0, 5));
-
-                                element.Click();
-                            }
-                        }
+                        driver.SwitchTo().Frame("InlineDialog_Iframe");
+                        driver.WaitUntilClickable(By.Id(Reference.GuidedHelp.ButtonClose), new TimeSpan(0, 0, 5));
+                        var e = driver.FindElement(By.Id(Reference.GuidedHelp.ButtonClose));
+                        e.Click(true);
+                        driver.SwitchTo().DefaultContent();
 
                         returnValue = true;
                     });

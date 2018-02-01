@@ -583,9 +583,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
         public static class GuidedHelp
         {
-            public static string MarsOverlay = "GuidedHelp_MarsOverlay";
+            public static string MarsOverlay = "InlineDialog_Background";
             public static string ButBegin = "GuidedHelp_ButBegin";
-            public static string ButtonClose = "GuidedHelp_ButtonClose";
+            public static string ButtonClose = "buttonClose";
             public static string Close = "GuidedHelp_Close";
 
         }

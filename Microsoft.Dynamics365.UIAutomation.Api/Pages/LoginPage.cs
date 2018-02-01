@@ -88,10 +88,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             var redirect = false;
             bool online = !(this.OnlineDomains != null && !this.OnlineDomains.Any(d => uri.Host.EndsWith(d)));
-            driver.Navigate().GoToUrl(uri);
 
             if (online)
             {
+                driver.Navigate().GoToUrl(uri);
+
                 if (driver.IsVisible(By.Id("use_another_account_link")))
                     driver.ClickWhenAvailable(By.Id("use_another_account_link"));
 
@@ -130,6 +131,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         e => { e.WaitForPageToLoad(); },
                         f => { throw new Exception("Login page failed."); });
                 }
+            }
+            else
+            {
+                driver.Navigate().GoToUrl("http://" + Uri.EscapeDataString(username.ToUnsecureString()) + ":" + Uri.EscapeDataString(password.ToUnsecureString()) + "@" + uri);
             }
 
             return redirect ? LoginResult.Redirect : LoginResult.Success;
