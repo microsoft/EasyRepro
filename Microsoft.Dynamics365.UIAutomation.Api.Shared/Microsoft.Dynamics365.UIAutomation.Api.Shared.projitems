@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>632515d8-12c2-4a36-b900-b29d283933a6</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Microsoft.Dynamics365.UIAutomation.Api.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\CrmControls.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DTOs\XrmAppNotification.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DTOs\XrmElementReference.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DTOs\XrmGridItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DTOs\XrmInstanceInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DTOs\XrmLink.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DTOs\XrmListItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DTOs\XrmPerformanceMarker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LoginRedirectEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Office365Browser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\LoginPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\Office365NavigationPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\Office365Page.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\Office365XrmInstancePickerPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmActivityFeedPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmAdministrationPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmBusinessProcessFlow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmCommandBarPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmDashboardPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmDialogPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmDocumentPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmEntityPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmGlobalSearchPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmGridPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmGuidedHelpPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmLookupPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmMobilePage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmNavigationPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmNotficationPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmPerformanceCenterPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmProcessesPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmQuickCreatePage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmRelatedGridPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\XrmReportPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReportEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)XrmBrowser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)XrmPage.cs" />
+  </ItemGroup>
+</Project>

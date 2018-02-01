@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Dynamics365.UIAutomation.Sample", "Microsoft.Dynamics365.UIAutomation.Sample\Microsoft.Dynamics365.UIAutomation.Sample.csproj", "{A075B87E-DCA5-4A2A-909B-932E2F5F98B4}"
 EndProject
@@ -9,7 +9,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Dynamics365.UIAut
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Dynamics365.UIAutomation.Browser", "Microsoft.Dynamics365.UIAutomation.Browser\Microsoft.Dynamics365.UIAutomation.Browser.csproj", "{C9748803-F3CB-4531-B313-BC24D4D0BF0C}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Microsoft.Dynamics365.UIAutomation.Api.Shared", "Microsoft.Dynamics365.UIAutomation.Api.Shared\Microsoft.Dynamics365.UIAutomation.Api.Shared.shproj", "{632515D8-12C2-4A36-B900-B29D283933A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Dynamics365.UIAutomation.Api.2016", "Microsoft.Dynamics365.UIAutomation.Api.2016\Microsoft.Dynamics365.UIAutomation.Api.2016.csproj", "{80A65998-62A8-4E7B-87A0-8492C16703D3}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Microsoft.Dynamics365.UIAutomation.Api.Shared\Microsoft.Dynamics365.UIAutomation.Api.Shared.projitems*{632515d8-12c2-4a36-b900-b29d283933a6}*SharedItemsImports = 13
+		Microsoft.Dynamics365.UIAutomation.Api.Shared\Microsoft.Dynamics365.UIAutomation.Api.Shared.projitems*{80a65998-62a8-4e7b-87a0-8492c16703d3}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -34,8 +42,17 @@ Global
 		{C9748803-F3CB-4531-B313-BC24D4D0BF0C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C9748803-F3CB-4531-B313-BC24D4D0BF0C}.UnitTest|Any CPU.ActiveCfg = Release|Any CPU
 		{C9748803-F3CB-4531-B313-BC24D4D0BF0C}.UnitTest|Any CPU.Build.0 = Release|Any CPU
+		{80A65998-62A8-4E7B-87A0-8492C16703D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80A65998-62A8-4E7B-87A0-8492C16703D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80A65998-62A8-4E7B-87A0-8492C16703D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80A65998-62A8-4E7B-87A0-8492C16703D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80A65998-62A8-4E7B-87A0-8492C16703D3}.UnitTest|Any CPU.ActiveCfg = Release|Any CPU
+		{80A65998-62A8-4E7B-87A0-8492C16703D3}.UnitTest|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {86EA1D07-98D1-4C66-A409-BE8811774F2E}
 	EndGlobalSection
 EndGlobal
