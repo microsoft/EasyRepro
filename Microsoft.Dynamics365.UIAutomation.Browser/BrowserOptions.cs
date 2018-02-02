@@ -41,6 +41,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public TimeSpan RecordingScanInterval { get; set; }
         public string TraceSource { get; set; }
         public bool HideDiagnosticWindow { get; set; }
+        /// <summary>
+        /// Setting that will run the browser in a headless manner.  This setting is only valid for Chrome. 
+        /// </summary>
+        public bool Headless { get; set; }
 
         public ChromeOptions ToChrome()
         {
@@ -54,6 +58,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             if (this.PrivateMode)
             {
                 options.AddArgument("--incognito");
+            }
+            if (this.Headless)
+            {
+                options.AddArgument("--headless");
             }
 
             return options;
