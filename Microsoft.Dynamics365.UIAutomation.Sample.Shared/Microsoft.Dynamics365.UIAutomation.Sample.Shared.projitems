@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CreateContact.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CreateLead.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CreateOpportunity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CrmTestBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Dashboard.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DOCValidationTests\CreateUser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DOCValidationTests\CreateWorkflow.cs" />

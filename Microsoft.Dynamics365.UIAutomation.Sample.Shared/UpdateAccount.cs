@@ -3,11 +3,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Security;
 using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using Microsoft.Dynamics365.UIAutomation.Sample.Shared;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class UpdateAccount
+    public class UpdateAccount: CrmTestBase
     {
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
@@ -22,10 +23,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
                 xrmBrowser.ThinkTime(500);
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Konta");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Accounts);
 
                 xrmBrowser.ThinkTime(2000);
-                xrmBrowser.Grid.SwitchView("Aktywne konta");
+                xrmBrowser.Grid.SwitchView(Reference.Localization.ActiveAccounts);
 
                 xrmBrowser.ThinkTime(1000);
                 xrmBrowser.Grid.OpenRecord(0);
@@ -33,6 +34,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.ThinkTime(1000);
                 xrmBrowser.Entity.SelectLookup("parentaccountid", 0);
                 xrmBrowser.Entity.Save();
+                xrmBrowser.ThinkTime(5000);
             }
         }
     }

@@ -81,6 +81,10 @@
       <Project>{C9748803-F3CB-4531-B313-BC24D4D0BF0C}</Project>
       <Name>Microsoft.Dynamics365.UIAutomation.Browser</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Reference\Microsoft.Dynamics365.UIAutomation.Reference.csproj">
+      <Project>{82090bfa-6376-4aea-a5e8-adca1be0b76b}</Project>
+      <Name>Microsoft.Dynamics365.UIAutomation.Reference</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\Microsoft.Dynamics365.UIAutomation.Sample.Shared\Microsoft.Dynamics365.UIAutomation.Sample.Shared.projitems" Label="Shared" />
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

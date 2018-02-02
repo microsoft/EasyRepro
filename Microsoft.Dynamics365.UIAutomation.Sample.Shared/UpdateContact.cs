@@ -3,11 +3,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Security;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.Dynamics365.UIAutomation.Api;
+using Microsoft.Dynamics365.UIAutomation.Sample.Shared;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class UpdateContact
+    public class UpdateContact: CrmTestBase
     {
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
@@ -27,10 +28,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                     perf.IsEnabled = true;
 
                 xrmBrowser.ThinkTime(500);
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Kontakty");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Contacts);
 
                 xrmBrowser.ThinkTime(2000);
-                xrmBrowser.Grid.SwitchView("Aktywne kontakty");
+                xrmBrowser.Grid.SwitchView(Reference.Localization.ActiveContacts);
 
                 xrmBrowser.ThinkTime(1000);
                 xrmBrowser.Grid.OpenRecord(0);
@@ -40,6 +41,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.Entity.SetValue("birthdate", DateTime.Parse("12/2/1984"));
 
                 xrmBrowser.Entity.Save();
+                xrmBrowser.ThinkTime(5000);
             }
         }
     }

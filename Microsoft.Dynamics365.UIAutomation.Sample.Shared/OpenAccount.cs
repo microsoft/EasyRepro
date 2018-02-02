@@ -3,11 +3,12 @@ using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Security;
+using Microsoft.Dynamics365.UIAutomation.Sample.Shared;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class OpenAccount
+    public class OpenAccount: CrmTestBase
     {
 
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
@@ -24,10 +25,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
                 xrmBrowser.ThinkTime(500);
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Konta");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Accounts);
 
                 xrmBrowser.ThinkTime(2000);
-                xrmBrowser.Grid.SwitchView("Aktywne konta");
+                xrmBrowser.Grid.SwitchView(Reference.Localization.ActiveAccounts);
 
                 xrmBrowser.ThinkTime(1000);
                 xrmBrowser.Grid.OpenRecord(0);

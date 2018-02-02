@@ -22,9 +22,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Pulpity nawigacyjne");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Dashboards);
 
-                xrmBrowser.Dashboard.SelectDashBoard("Pulpit nawigacyjny wydajności sprzedaży");
+                xrmBrowser.Dashboard.SelectDashBoard(Reference.Localization.SalesPerformanceDashboard);
+                xrmBrowser.ThinkTime(2000);
             }
         }
     }

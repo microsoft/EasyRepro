@@ -15,6 +15,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Microsoft.Dynamics365.UIAut
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Dynamics365.UIAutomation.Sample.OnPremise", "Microsoft.Dynamics365.UIAutomation.Sample.2016\Microsoft.Dynamics365.UIAutomation.Sample.OnPremise.csproj", "{B2829BBC-2DFC-4BEB-BCFA-7E48DC488C8E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Dynamics365.UIAutomation.Reference", "Microsoft.Dynamics365.UIAutomation.Reference\Microsoft.Dynamics365.UIAutomation.Reference.csproj", "{82090BFA-6376-4AEA-A5E8-ADCA1BE0B76B}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Microsoft.Dynamics365.UIAutomation.Sample.Shared\Microsoft.Dynamics365.UIAutomation.Sample.Shared.projitems*{430c39e8-41df-4e82-95c9-39153107a30f}*SharedItemsImports = 13
@@ -53,6 +55,12 @@ Global
 		{B2829BBC-2DFC-4BEB-BCFA-7E48DC488C8E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B2829BBC-2DFC-4BEB-BCFA-7E48DC488C8E}.UnitTest|Any CPU.ActiveCfg = Release|Any CPU
 		{B2829BBC-2DFC-4BEB-BCFA-7E48DC488C8E}.UnitTest|Any CPU.Build.0 = Release|Any CPU
+		{82090BFA-6376-4AEA-A5E8-ADCA1BE0B76B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82090BFA-6376-4AEA-A5E8-ADCA1BE0B76B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82090BFA-6376-4AEA-A5E8-ADCA1BE0B76B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82090BFA-6376-4AEA-A5E8-ADCA1BE0B76B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82090BFA-6376-4AEA-A5E8-ADCA1BE0B76B}.UnitTest|Any CPU.ActiveCfg = Release|Any CPU
+		{82090BFA-6376-4AEA-A5E8-ADCA1BE0B76B}.UnitTest|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

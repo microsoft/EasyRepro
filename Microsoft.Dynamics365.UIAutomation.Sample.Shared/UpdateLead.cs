@@ -3,11 +3,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.Dynamics365.UIAutomation.Api;
 using System.Security;
+using Microsoft.Dynamics365.UIAutomation.Sample.Shared;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class UpdateLead
+    public class UpdateLead: CrmTestBase
     {
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
@@ -21,9 +22,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Potencjalni klienci");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Leads);
 
-                xrmBrowser.Grid.SwitchView("Wszyscy potencjalni klienci");
+                xrmBrowser.Grid.SwitchView(Reference.Localization.AllLeads);
 
                 xrmBrowser.Grid.OpenRecord(0);
 
@@ -32,6 +33,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.Entity.SetValue("description", "Test lead updation with API commands");
 
                 xrmBrowser.Entity.Save();
+                xrmBrowser.ThinkTime(5000);
             }
         }
     }

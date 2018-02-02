@@ -3,12 +3,13 @@ using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Security;
+using Microsoft.Dynamics365.UIAutomation.Sample.Shared;
 using OpenQA.Selenium;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class Reports
+    public class Reports: CrmTestBase
     {
 
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
@@ -23,9 +24,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Raporty");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Reports);
 
-                xrmBrowser.Grid.Search("Przegląd klientów");
+                xrmBrowser.Grid.Search(Reference.Localization.AccountOverview);
 
                 xrmBrowser.Grid.OpenRecord(0);
 
@@ -41,9 +42,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Konta");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Accounts);
 
-                xrmBrowser.CommandBar.ClickCommand("Uruchom raport", "Przegląd klientów");
+                xrmBrowser.CommandBar.ClickCommand(Reference.Localization.RunReport, Reference.Localization.AccountOverview);
 
                 xrmBrowser.Dialogs.RunReport(XrmDialogPage.ReportRecords.AllRecords);
             }
@@ -56,11 +57,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Konta");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Accounts);
 
                 xrmBrowser.Grid.OpenRecord(0);
 
-                xrmBrowser.CommandBar.ClickCommand("Uruchom raport", "Przegląd klientów", true);
+                xrmBrowser.CommandBar.ClickCommand(Reference.Localization.RunReport, Reference.Localization.AccountOverview, true);
             }
         }
 
@@ -72,9 +73,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Raporty");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Reports);
 
-                xrmBrowser.Grid.Search("Przegląd klientów");
+                xrmBrowser.Grid.Search(Reference.Localization.AccountOverview);
 
                 xrmBrowser.Grid.OpenRecord(0);
 

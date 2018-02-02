@@ -3,11 +3,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.Dynamics365.UIAutomation.Api;
 using System.Security;
+using Microsoft.Dynamics365.UIAutomation.Sample.Shared;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class UpdateOpportunity
+    public class UpdateOpportunity: CrmTestBase
     {
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
@@ -22,10 +23,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
                 xrmBrowser.ThinkTime(500);
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Szanse sprzedaży");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Opportunities);
 
                 xrmBrowser.ThinkTime(200);
-                xrmBrowser.Grid.SwitchView("Otwarte szanse sprzedaży");
+                xrmBrowser.Grid.SwitchView(Reference.Localization.OpenOpportunities);
 
 
                 xrmBrowser.ThinkTime(1000);

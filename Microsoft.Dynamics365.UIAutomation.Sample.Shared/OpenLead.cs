@@ -3,11 +3,12 @@ using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Security;
+using Microsoft.Dynamics365.UIAutomation.Sample.Shared;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class OpenLead
+    public class OpenLead: CrmTestBase
     {
 
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
@@ -22,9 +23,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
                 
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Potencjalni klienci");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Leads);
                 
-                xrmBrowser.Grid.SwitchView("Wszyscy potencjalni klienci");
+                xrmBrowser.Grid.SwitchView(Reference.Localization.AllLeads);
                 
                 xrmBrowser.Grid.OpenRecord(0);
             }

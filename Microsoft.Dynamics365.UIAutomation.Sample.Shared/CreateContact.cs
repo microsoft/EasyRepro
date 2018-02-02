@@ -4,11 +4,12 @@ using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Collections.Generic;
 using System.Security;
+using Microsoft.Dynamics365.UIAutomation.Sample.Shared;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class CreateContact
+    public class CreateContact: CrmTestBase
     {
 
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
@@ -24,10 +25,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
                 xrmBrowser.ThinkTime(500);
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Kontakty");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Contacts);
 
                 xrmBrowser.ThinkTime(1000);
-                xrmBrowser.CommandBar.ClickCommand("Nowy");
+                xrmBrowser.CommandBar.ClickCommand(Reference.Localization.New);
 
                 xrmBrowser.ThinkTime(5000);
 
@@ -42,7 +43,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));
                 xrmBrowser.Entity.SetValue(new OptionSet {Name = "preferredcontactmethodcode", Value = "Email"});
 
-                xrmBrowser.CommandBar.ClickCommand("Zapisz");
+                xrmBrowser.CommandBar.ClickCommand(Reference.Localization.Save);
+                xrmBrowser.ThinkTime(5000);
             }
         }
     }

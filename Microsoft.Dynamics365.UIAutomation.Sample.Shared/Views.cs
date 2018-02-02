@@ -3,11 +3,12 @@ using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Security;
+using Microsoft.Dynamics365.UIAutomation.Sample.Shared;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class Views
+    public class Views: CrmTestBase
     {
 
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
@@ -22,9 +23,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Konta");
-                xrmBrowser.Grid.SwitchView("Aktywne konta");
-                xrmBrowser.Grid.Sort("Nazwa konta");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Accounts);
+                xrmBrowser.Grid.SwitchView(Reference.Localization.ActiveAccounts);
+                xrmBrowser.Grid.Sort(Reference.Localization.AccountName);
                 xrmBrowser.ThinkTime(2000);
             }
         }
@@ -37,8 +38,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Konta");
-                xrmBrowser.Grid.SwitchView("Aktywne konta");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Accounts);
+                xrmBrowser.Grid.SwitchView(Reference.Localization.ActiveAccounts);
                 xrmBrowser.Grid.FilterByLetter('A');
                 xrmBrowser.ThinkTime(2000);
             }
@@ -52,8 +53,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Potencjalni klienci");
-                xrmBrowser.Grid.SwitchView("Otwarci potencjalni klienci");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Leads);
+                xrmBrowser.Grid.SwitchView(Reference.Localization.OpenLeads);
                 xrmBrowser.Grid.FilterByAll();
                 xrmBrowser.ThinkTime(2000);
             }
@@ -67,8 +68,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Potencjalni klienci");
-                xrmBrowser.Grid.SwitchView("Otwarci potencjalni klienci");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Leads);
+                xrmBrowser.Grid.SwitchView(Reference.Localization.OpenLeads);
                 xrmBrowser.Grid.EnableFilter();
                 xrmBrowser.ThinkTime(2000);
             }

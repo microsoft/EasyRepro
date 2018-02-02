@@ -4,11 +4,12 @@ using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Collections.Generic;
 using System.Security;
+using Microsoft.Dynamics365.UIAutomation.Sample.Shared;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class DuplicateDetection
+    public class DuplicateDetection: CrmTestBase
     {
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
@@ -22,9 +23,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Potencjalni klienci");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Leads);
 
-                xrmBrowser.CommandBar.ClickCommand("Nowy");
+                xrmBrowser.CommandBar.ClickCommand(Reference.Localization.New);
+
+                xrmBrowser.ThinkTime(2000);
 
                 List<Field> fields = new List<Field>
                 {
@@ -37,9 +40,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.Entity.SetValue("description", "Test lead creation with API commands");
                 xrmBrowser.Entity.SetValue("emailaddress1", "test@contoso.com");
 
-                xrmBrowser.CommandBar.ClickCommand("Zapisz");
-
+                xrmBrowser.CommandBar.ClickCommand(Reference.Localization.Save);
                 xrmBrowser.Dialogs.DuplicateDetection(true);
+                xrmBrowser.ThinkTime(5000);
             }
         }
     }

@@ -3,11 +3,12 @@ using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Security;
+using Microsoft.Dynamics365.UIAutomation.Sample.Shared;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class OpenOpportunity
+    public class OpenOpportunity: CrmTestBase
     {
 
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
@@ -23,10 +24,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
                 xrmBrowser.ThinkTime(500);
-                xrmBrowser.Navigation.OpenSubArea("Sprzedaż", "Szanse sprzedaży");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Sales, Reference.Localization.Opportunities);
 
                 xrmBrowser.ThinkTime(2000);
-                xrmBrowser.Grid.SwitchView("Otwarte szanse sprzedaży");
+                xrmBrowser.Grid.SwitchView(Reference.Localization.OpenOpportunities);
 
                 xrmBrowser.Grid.OpenRecord(0);
             }
