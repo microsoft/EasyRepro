@@ -28,7 +28,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             get
             {
                 bool isGuidedHelpEnabled = false;
-                string getIsEnabledGuideScript;
+                string getIsEnabledGuideScript = string.Empty;
 #if CRM_ONPREM
                 getIsEnabledGuideScript = "return Xrm.Internal.isGuidedHelpEnabledForUser();";
 #endif
