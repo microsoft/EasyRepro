@@ -117,41 +117,47 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Account" xml:space="preserve">
+    <value>Account</value>
+  </data>
   <data name="AccountName" xml:space="preserve">
     <value>Account name</value>
   </data>
   <data name="AccountOverview" xml:space="preserve">
-    <value>Account overview</value>
+    <value>Account Overview</value>
   </data>
   <data name="Accounts" xml:space="preserve">
     <value>Accounts</value>
   </data>
   <data name="ActiveAccounts" xml:space="preserve">
-    <value>Acive accounts</value>
+    <value>Active Accounts</value>
   </data>
   <data name="ActiveCases" xml:space="preserve">
-    <value>Active cases</value>
+    <value>Active Cases</value>
   </data>
   <data name="ActiveContacts" xml:space="preserve">
-    <value>Active contacts</value>
+    <value>Active Contacts</value>
   </data>
   <data name="AddNewCase" xml:space="preserve">
-    <value>Add new case</value>
+    <value>Add New Case</value>
   </data>
   <data name="AllLeads" xml:space="preserve">
-    <value>All leads</value>
+    <value>All Leads</value>
   </data>
   <data name="Cases" xml:space="preserve">
     <value>Cases</value>
   </data>
   <data name="CloseWon" xml:space="preserve">
-    <value>Close as won</value>
+    <value>Close As Won</value>
   </data>
   <data name="Contact" xml:space="preserve">
     <value>Contact</value>
   </data>
   <data name="Contacts" xml:space="preserve">
     <value>Contacts</value>
+  </data>
+  <data name="CreatedOn" xml:space="preserve">
+    <value>Created on</value>
   </data>
   <data name="Dashboards" xml:space="preserve">
     <value>Dashboards</value>
@@ -163,13 +169,16 @@
     <value>New</value>
   </data>
   <data name="OpenLeads" xml:space="preserve">
-    <value>Open leads</value>
+    <value>Open Leads</value>
   </data>
   <data name="OpenOpportunities" xml:space="preserve">
-    <value>Open opportunities</value>
+    <value>Open Opportunities</value>
   </data>
   <data name="Opportunities" xml:space="preserve">
     <value>Opportunities</value>
+  </data>
+  <data name="Processes" xml:space="preserve">
+    <value>Processes</value>
   </data>
   <data name="Reports" xml:space="preserve">
     <value>Reports</value>
@@ -181,12 +190,18 @@
     <value>Sales</value>
   </data>
   <data name="SalesPerformanceDashboard" xml:space="preserve">
-    <value>Sales performance dashboard</value>
+    <value>Sales Performance Dashboard</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
   <data name="SaveClose" xml:space="preserve">
-    <value>Save and close</value>
+    <value>Save &amp; Close</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Workflow" xml:space="preserve">
+    <value>Workflow</value>
   </data>
 </root>

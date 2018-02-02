@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Account" xml:space="preserve">
+    <value>Klient</value>
+  </data>
   <data name="AccountName" xml:space="preserve">
     <value>Nazwa konta</value>
   </data>
@@ -153,6 +156,9 @@
   <data name="Contacts" xml:space="preserve">
     <value>Kontakty</value>
   </data>
+  <data name="CreatedOn" xml:space="preserve">
+    <value>Data utworzenia</value>
+  </data>
   <data name="Dashboards" xml:space="preserve">
     <value>Pulpity nawigacyjne</value>
   </data>
@@ -171,6 +177,9 @@
   <data name="Opportunities" xml:space="preserve">
     <value>Szanse sprzedaży</value>
   </data>
+  <data name="Processes" xml:space="preserve">
+    <value>Procesy</value>
+  </data>
   <data name="Reports" xml:space="preserve">
     <value>Raporty</value>
   </data>
@@ -188,5 +197,11 @@
   </data>
   <data name="SaveClose" xml:space="preserve">
     <value>Zapisz i zamknij</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Ustawienia</value>
+  </data>
+  <data name="Workflow" xml:space="preserve">
+    <value>Przepływ pracy</value>
   </data>
 </root>

@@ -61,6 +61,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account.
+        /// </summary>
+        public static string Account {
+            get {
+                return ResourceManager.GetString("Account", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Account name.
         /// </summary>
         public static string AccountName {
@@ -70,7 +79,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Account overview.
+        ///   Looks up a localized string similar to Account Overview.
         /// </summary>
         public static string AccountOverview {
             get {
@@ -88,7 +97,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Acive accounts.
+        ///   Looks up a localized string similar to Active Accounts.
         /// </summary>
         public static string ActiveAccounts {
             get {
@@ -97,7 +106,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Active cases.
+        ///   Looks up a localized string similar to Active Cases.
         /// </summary>
         public static string ActiveCases {
             get {
@@ -106,7 +115,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Active contacts.
+        ///   Looks up a localized string similar to Active Contacts.
         /// </summary>
         public static string ActiveContacts {
             get {
@@ -115,7 +124,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add new case.
+        ///   Looks up a localized string similar to Add New Case.
         /// </summary>
         public static string AddNewCase {
             get {
@@ -124,7 +133,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to All leads.
+        ///   Looks up a localized string similar to All Leads.
         /// </summary>
         public static string AllLeads {
             get {
@@ -142,7 +151,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Close as won.
+        ///   Looks up a localized string similar to Close As Won.
         /// </summary>
         public static string CloseWon {
             get {
@@ -165,6 +174,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         public static string Contacts {
             get {
                 return ResourceManager.GetString("Contacts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created on.
+        /// </summary>
+        public static string CreatedOn {
+            get {
+                return ResourceManager.GetString("CreatedOn", resourceCulture);
             }
         }
         
@@ -196,7 +214,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open leads.
+        ///   Looks up a localized string similar to Open Leads.
         /// </summary>
         public static string OpenLeads {
             get {
@@ -205,7 +223,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open opportunities.
+        ///   Looks up a localized string similar to Open Opportunities.
         /// </summary>
         public static string OpenOpportunities {
             get {
@@ -219,6 +237,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         public static string Opportunities {
             get {
                 return ResourceManager.GetString("Opportunities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Processes.
+        /// </summary>
+        public static string Processes {
+            get {
+                return ResourceManager.GetString("Processes", resourceCulture);
             }
         }
         
@@ -250,7 +277,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sales performance dashboard.
+        ///   Looks up a localized string similar to Sales Performance Dashboard.
         /// </summary>
         public static string SalesPerformanceDashboard {
             get {
@@ -268,11 +295,29 @@ namespace Microsoft.Dynamics365.UIAutomation.Reference {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Save and close.
+        ///   Looks up a localized string similar to Save &amp; Close.
         /// </summary>
         public static string SaveClose {
             get {
                 return ResourceManager.GetString("SaveClose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Workflow.
+        /// </summary>
+        public static string Workflow {
+            get {
+                return ResourceManager.GetString("Workflow", resourceCulture);
             }
         }
     }

@@ -3,11 +3,12 @@ using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Security;
+using Microsoft.Dynamics365.UIAutomation.Sample.Shared;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.DOCValidationTests
 {
     [TestClass]
-    public class CreateWorkflow
+    public class CreateWorkflow: CrmTestBase
     {
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
@@ -22,18 +23,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.DOCValidationTests
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Ustawienia", "Procesy");
+                xrmBrowser.Navigation.OpenSubArea(Reference.Localization.Settings, Reference.Localization.Processes);
 
-                xrmBrowser.Processes.CreateProcess("Test Process", "Przepływ pracy","Klient");
-
+#if CRM_ONPREM
+                xrmBrowser.Processes.CreateProcess("Test Process", Reference.Localization.Workflow, Reference.Localization.Account);
+#endif
+#if CRM_365
+                xrmBrowser.Processes.CreateProcess("Test Process", XrmProcessesPage.ProcessType.Workflow, Reference.Localization.Account);          
+#endif
                 xrmBrowser.Driver.LastWindow().Close();
 
                 xrmBrowser.Driver.LastWindow();
 
                 var rows = xrmBrowser.Grid.GetGridItems().Value;
-                xrmBrowser.Grid.Sort("Data utworzenia");
+                xrmBrowser.Grid.Sort(Reference.Localization.CreatedOn);
 
-                xrmBrowser.Grid.SelectRecord(rows.Count-1);   //Select the newly created record
+                xrmBrowser.Grid.SelectRecord(rows.Count - 1);   //Select the newly created record
                 xrmBrowser.Processes.Activate();
 
                 xrmBrowser.Grid.SelectRecord(rows.Count - 1);

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B2829BBC-2DFC-4BEB-BCFA-7E48DC488C8E}</ProjectGuid>
+    <ProjectGuid>{AE375A2F-5FF5-487D-B043-51A3336BBF83}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.Dynamics365.UIAutomation.Sample._OnPremise</RootNamespace>
-    <AssemblyName>Microsoft.Dynamics365.UIAutomation.Sample.OnPremise</AssemblyName>
+    <RootNamespace>Microsoft.Dynamics365.UIAutomation.Sample.Online</RootNamespace>
+    <AssemblyName>Microsoft.Dynamics365.UIAutomation.Sample.Online</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -25,7 +25,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -47,19 +47,12 @@
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\MSTest.TestFramework.1.2.0\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.4.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
-    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="WebDriver, Version=3.8.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Selenium.WebDriver.3.8.0\lib\net45\WebDriver.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="WebDriver.Support, Version=3.8.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Selenium.Support.3.8.0\lib\net45\WebDriver.Support.dll</HintPath>
@@ -73,12 +66,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Api.2016\Microsoft.Dynamics365.UIAutomation.Api.OnPremise.csproj">
-      <Project>{80a65998-62a8-4e7b-87a0-8492c16703d3}</Project>
-      <Name>Microsoft.Dynamics365.UIAutomation.Api.OnPremise</Name>
+    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Api.Online\Microsoft.Dynamics365.UIAutomation.Api.Online.csproj">
+      <Project>{73dcf3f6-dd2f-43b1-b795-4428ec0456d4}</Project>
+      <Name>Microsoft.Dynamics365.UIAutomation.Api.Online</Name>
     </ProjectReference>
     <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Browser\Microsoft.Dynamics365.UIAutomation.Browser.csproj">
-      <Project>{C9748803-F3CB-4531-B313-BC24D4D0BF0C}</Project>
+      <Project>{c9748803-f3cb-4531-b313-bc24d4d0bf0c}</Project>
       <Name>Microsoft.Dynamics365.UIAutomation.Browser</Name>
     </ProjectReference>
     <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Reference\Microsoft.Dynamics365.UIAutomation.Reference.csproj">

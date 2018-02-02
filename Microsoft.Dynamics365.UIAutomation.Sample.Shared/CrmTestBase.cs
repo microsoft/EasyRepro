@@ -7,7 +7,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Shared
     {
         protected CrmTestBase()
         {
-            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("pl-PL");
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-EN");
         }
     }
 }
