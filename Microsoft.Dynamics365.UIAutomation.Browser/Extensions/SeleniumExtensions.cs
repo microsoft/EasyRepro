@@ -57,7 +57,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             WaitUntilClickable(driver,
                                 by,
                                 timeout,
-                                d => { element.Click(); },
+                                d => { element.Click(true); },
                                 e => { throw new InvalidOperationException($"Unable to click element."); });
 
 
