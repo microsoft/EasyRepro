@@ -63,12 +63,12 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="WebDriver, Version=3.5.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selenium.WebDriver.3.5.1\lib\net40\WebDriver.dll</HintPath>
+    <Reference Include="WebDriver, Version=3.11.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selenium.WebDriver.3.11.2\lib\net45\WebDriver.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="WebDriver.Support, Version=3.5.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selenium.Support.3.5.1\lib\net40\WebDriver.Support.dll</HintPath>
+    <Reference Include="WebDriver.Support, Version=3.11.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selenium.Support.3.11.2\lib\net45\WebDriver.Support.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -87,47 +87,109 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="ADFSLogin.cs" />
-    <Compile Include="Dashboard.cs" />
-    <Compile Include="CloseOpportunity.cs" />
-    <Compile Include="CreateAccount.cs" />
-    <Compile Include="CreateCase.cs" />
-    <Compile Include="CreateContact.cs" />
-    <Compile Include="CreateLead.cs" />
-    <Compile Include="CreateOpportunity.cs" />
-    <Compile Include="DOCValidationTests\CreateUser.cs" />
-    <Compile Include="DOCValidationTests\CreateWorkflow.cs" />
-    <Compile Include="DOCValidationTests\OpenMobile.cs" />
-    <Compile Include="DOCValidationTests\ValidationVersion.cs" />
-    <Compile Include="DuplicateDetection.cs" />
-    <Compile Include="OpenAccount.cs" />
-    <Compile Include="OpenCase.cs" />
-    <Compile Include="OpenContact.cs" />
-    <Compile Include="OpenLead.cs" />
-    <Compile Include="OpenOpportunity.cs" />
-    <Compile Include="QuickCreate.cs" />
-    <Compile Include="Reports.cs" />
-    <Compile Include="Telemetry.cs" />
-    <Compile Include="UpdateAccount.cs" />
-    <Compile Include="UpdateCase.cs" />
-    <Compile Include="UpdateContact.cs" />
-    <Compile Include="UpdateLead.cs" />
-    <Compile Include="UpdateOpportunity.cs" />
-    <Compile Include="GlobalSearch.cs" />
+    <Compile Include="SharedAPI\AzureInsights\OpenLead.cs" />
+    <Compile Include="SharedAPI\BrowserTests\BrowserTests.cs" />
+    <Compile Include="Web\BusinessProcessFlow\BusinessProcessFlow.cs" />
+    <Compile Include="Web\CommandBar\CommandButton.cs" />
+    <Compile Include="Web\Delete\DeleteAccount.cs" />
+    <Compile Include="Web\Delete\DeleteCase.cs" />
+    <Compile Include="Web\Delete\DeleteContact.cs" />
+    <Compile Include="Web\Delete\DeleteLead.cs" />
+    <Compile Include="Web\Delete\DeleteOpportunity.cs" />
+    <Compile Include="Web\Dialogs\CloseWarning.cs" />
+    <Compile Include="Web\AddConnection.cs" />
+    <Compile Include="Web\Entity\TestBase.cs" />
+    <Compile Include="Web\Entity\Account.cs" />
+    <Compile Include="Web\ValidationTests\CreateUser.cs" />
+    <Compile Include="Web\ValidationTests\OpenMobile.cs" />
+    <Compile Include="Web\ValidationTests\CreateWorkflow.cs" />
+    <Compile Include="Web\ValidationTests\OpenO365App.cs" />
+    <Compile Include="Web\ValidationTests\ValidationVersion.cs" />
+    <Compile Include="Web\Create\CreateCase.cs" />
+    <Compile Include="Web\DashBoard\Dashboard.cs" />
+    <Compile Include="Web\Dialogs\Assign.cs" />
+    <Compile Include="Web\Dialogs\CloseOpportunity.cs" />
+    <Compile Include="Web\Dialogs\Delete.cs" />
+    <Compile Include="Web\Dialogs\DuplicateDetection.cs" />
+    <Compile Include="Web\Dialogs\RunWorkFlow.cs" />
+    <Compile Include="Web\Dialogs\SelectBusinessProcessFlow.cs" />
+    <Compile Include="Web\Create\CreateAccount.cs" />
+    <Compile Include="Web\Create\CreateContact.cs" />
+    <Compile Include="Web\Create\CreateLead.cs" />
+    <Compile Include="Web\Create\CreateOpportunity.cs" />
+    <Compile Include="Web\EndUserScenerio.cs" />
+    <Compile Include="Web\LeadSubgrid.cs" />
+    <Compile Include="Web\Read\OpenAccount.cs" />
+    <Compile Include="Web\Read\OpenContact.cs" />
+    <Compile Include="Web\Read\OpenLead.cs" />
+    <Compile Include="Web\Read\OpenOpportunity.cs" />
+    <Compile Include="Web\QuickCreate\QuickCreateAccount.cs" />
+    <Compile Include="Web\RelatedTest.cs" />
+    <Compile Include="Web\Entity\Entity.cs" />
+    <Compile Include="Web\Entity\GetValue.cs" />
+    <Compile Include="Web\Entity\RecordWall.cs" />
+    <Compile Include="Web\Entity\SetValue.cs" />
+    <Compile Include="Web\GlobalSearch\GlobalSearchXrm.cs" />
+    <Compile Include="Web\Navigation\AdvancedFind.cs" />
+    <Compile Include="Web\Navigation\GlobalSearch.cs" />
+    <Compile Include="Web\Navigation\GuidedHelp.cs" />
+    <Compile Include="Web\Navigation\Options.cs" />
+    <Compile Include="Web\Navigation\Portal.cs" />
+    <Compile Include="Web\Navigation\QuickCreate.cs" />
+    <Compile Include="Web\Navigation\SignOut.cs" />
+    <Compile Include="Web\NegativeScenarios\BusinessProcessFlow\InvalidBusinessProcessFlow.cs" />
+    <Compile Include="Web\NegativeScenarios\BusinessProcessFlow\InvalidNextStage.cs" />
+    <Compile Include="Web\NegativeScenarios\BusinessProcessFlow\InvalidPreviousStage.cs" />
+    <Compile Include="Web\NegativeScenarios\BusinessProcessFlow\InvalidSelectBusinessProcessFlow.cs" />
+    <Compile Include="Web\NegativeScenarios\CommandBar\InvalidClickCommand.cs" />
+    <Compile Include="Web\NegativeScenarios\DashBoard\InvalidSwitchDashBoard.cs" />
+    <Compile Include="Web\NegativeScenarios\Dialogs\InvalidRunWorkFlow.cs" />
+    <Compile Include="Web\NegativeScenarios\Entity\InvalidCollapseTab.cs" />
+    <Compile Include="Web\NegativeScenarios\Entity\InvalidExpandTab.cs" />
+    <Compile Include="Web\NegativeScenarios\Entity\InvalidOpenEntity.cs" />
+    <Compile Include="Web\NegativeScenarios\Entity\InvalidSelectTab.cs" />
+    <Compile Include="Web\NegativeScenarios\GlobalSearch\InvalidFilterWith.cs" />
+    <Compile Include="Web\NegativeScenarios\GlobalSearch\InvalidSearchOpenRecord.cs" />
+    <Compile Include="Web\NegativeScenarios\Grid\InvalidFilterByLetter.cs" />
+    <Compile Include="Web\NegativeScenarios\Grid\InvalidSort.cs" />
+    <Compile Include="Web\NegativeScenarios\Grid\InvalidSwitchChart.cs" />
+    <Compile Include="Web\NegativeScenarios\InvalidOpenArea.cs" />
+    <Compile Include="Web\NegativeScenarios\InvalidOpenRecord.cs" />
+    <Compile Include="Web\NegativeScenarios\InvalidSetValue.cs" />
+    <Compile Include="Web\NegativeScenarios\InvalidSubArea.cs" />
+    <Compile Include="Web\NegativeScenarios\InvalidSwitchView.cs" />
+    <Compile Include="Web\NegativeScenarios\Navigation\InvalidQuickCreate.cs" />
+    <Compile Include="Web\NegativeScenarios\RelatedGrid\InvalidRelatedArea.cs" />
+    <Compile Include="Web\NegativeScenarios\RelatedGrid\InvalidRelatedClickCommand.cs" />
+    <Compile Include="Web\NegativeScenarios\RelatedGrid\InvalidRelatedOpenGrid.cs" />
+    <Compile Include="Web\NegativeScenarios\RelatedGrid\InvalidRelatedSort.cs" />
+    <Compile Include="Web\NegativeScenarios\RelatedGrid\InvalidRelatedSwitchView.cs" />
+    <Compile Include="Web\Notification\Notifications.cs" />
+    <Compile Include="Web\Read\OpenCase.cs" />
+    <Compile Include="Web\Update\UpdateAccount.cs" />
+    <Compile Include="Web\Update\UpdateCase.cs" />
+    <Compile Include="Web\Update\UpdateContact.cs" />
+    <Compile Include="Web\Update\UpdateLead.cs" />
+    <Compile Include="Web\Update\UpdateOpportunity.cs" />
+    <Compile Include="Web\Reports\Reports.cs" />
+    <Compile Include="Web\TakeScreenshot\ScreenShot.cs" />
+    <Compile Include="SharedAPI\AzureInsights\Telemetry.cs" />
     <Compile Include="TestSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UploadTelemetry.cs" />
-    <Compile Include="Views.cs" />
+    <Compile Include="SharedAPI\AzureInsights\UploadTelemetry.cs" />
+    <Compile Include="Web\Views\Views.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
+    <None Include="Web\WebClient.orderedtest" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="packages\" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
@@ -161,12 +223,12 @@
   </Choose>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Selenium.Chrome.WebDriver.2.31\build\Selenium.Chrome.WebDriver.targets" Condition="Exists('..\packages\Selenium.Chrome.WebDriver.2.31\build\Selenium.Chrome.WebDriver.targets')" />
+  <Import Project="..\packages\Selenium.Chrome.WebDriver.2.38\build\Selenium.Chrome.WebDriver.targets" Condition="Exists('..\packages\Selenium.Chrome.WebDriver.2.38\build\Selenium.Chrome.WebDriver.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Selenium.Chrome.WebDriver.2.31\build\Selenium.Chrome.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.Chrome.WebDriver.2.31\build\Selenium.Chrome.WebDriver.targets'))" />
+    <Error Condition="!Exists('..\packages\Selenium.Chrome.WebDriver.2.38\build\Selenium.Chrome.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.Chrome.WebDriver.2.38\build\Selenium.Chrome.WebDriver.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

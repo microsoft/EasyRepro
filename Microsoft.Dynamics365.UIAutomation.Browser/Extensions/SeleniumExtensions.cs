@@ -3,14 +3,15 @@
 
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Support.UI;
 using System;
-using System.Linq;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
@@ -41,7 +42,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             catch(StaleElementReferenceException ex)
             {
                 if (!ignoreStaleElementException)
-                    throw;
+                    throw ex;
             }
         }
 
@@ -57,7 +58,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             WaitUntilClickable(driver,
                                 by,
                                 timeout,
-                                d => { element.Click(true); },
+                                d => { element.Click(); },
                                 e => { throw new InvalidOperationException($"Unable to click element."); });
 
 
@@ -66,6 +67,38 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
 
         #endregion Click
+
+        #region Double Click
+
+        public static void DoubleClick(this IWebDriver driver, IWebElement element, bool ignoreStaleElementException = false)
+        {
+            try
+            {
+                Actions actions = new Actions(driver);
+                actions.DoubleClick(element).Perform();
+            }
+            catch (StaleElementReferenceException ex)
+            {
+                if (!ignoreStaleElementException)
+                    throw ex;
+            }
+        }
+
+        public static void DoubleClick(this IWebDriver driver, By by, bool ignoreStaleElementException = false)
+        {
+            try
+            {
+                var element = driver.FindElement(by);
+                driver.DoubleClick(element, ignoreStaleElementException);
+            }
+            catch (StaleElementReferenceException ex)
+            {
+                if (!ignoreStaleElementException)
+                    throw ex;
+            }
+        }
+
+        #endregion
 
         #region Script Execution
 
@@ -309,6 +342,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return WaitForPageToLoad(driver, Constants.DefaultTimeout.Seconds);
         }
 
+        public static bool WaitForTransaction(this IWebDriver driver)
+        {
+            return WaitForTransaction(driver, Constants.DefaultTimeout.Seconds);
+        }
+
         //public static bool WaitForPageToLoad(this IWebDriver driver, TimeSpan timeout)
         //{
         //    object readyState = WaitForScript(driver, "if (document.readyState) return document.readyState;", timeout);
@@ -370,6 +408,40 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     throw;
             }
             return true;
+        }
+
+        public static bool WaitForTransaction(this IWebDriver driver, int maxWaitTimeInSeconds)
+        {
+            bool state = false;
+            try
+            {
+                //Poll every half second to see if UCI is idle
+                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(500));
+                wait.Until(d =>
+                {
+                    try
+                    {
+                        //Check to see if UCI is idle
+                        state = (bool)driver.ExecuteScript("return window.UCWorkBlockTracker.isAppIdle()", "");
+                    }
+                    catch (TimeoutException)
+                    {
+
+                    }
+                    catch (NullReferenceException)
+                    {
+
+                    }
+
+                    return state;
+                });
+            }
+            catch(Exception)
+            {
+
+            }
+           
+            return state;
         }
         public static string Last(this System.Collections.ObjectModel.ReadOnlyCollection<string> handles, IWebDriver driver)
         {
@@ -562,11 +634,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public static string ToTraceString(this FindElementEventArgs e)
         {
-            if (e.Element != null)
+            try
             {
-                return string.Format("{4} - [{0},{1}] - <{2}>{3}</{2}>", e.Element.Location.X, e.Element.Location.Y, e.Element.TagName, e.Element.Text, e.FindMethod);
+                if (e.Element != null)
+                {
+                    return string.Format("{4} - [{0},{1}] - <{2}>{3}</{2}>", e.Element.Location.X, e.Element.Location.Y, e.Element.TagName, e.Element.Text, e.FindMethod);
+                }
+                else
+                {
+                    return e.FindMethod.ToString();
+                }
             }
-            else
+            catch(Exception)
             {
                 return e.FindMethod.ToString();
             }
