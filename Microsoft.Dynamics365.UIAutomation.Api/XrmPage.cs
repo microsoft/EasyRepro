@@ -325,7 +325,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmBrowser.Entity.SetValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
-        public BrowserCommandResult<bool> SetValue(Lookup control)
+        public BrowserCommandResult<bool> SetValue(LookupItem control)
         {
             return this.Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
             {
@@ -515,7 +515,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmBrowser.Entity.GetValue(new Lookup { Name = "primarycontactid" });</example>
-        public BrowserCommandResult<string> GetValue(Lookup control)
+        public BrowserCommandResult<string> GetValue(LookupItem control)
         {
             return this.Execute($"Get Lookup Value: {control.Name}", driver =>
             {
@@ -743,25 +743,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         internal bool ClickCommandButton(string name, string subName = "", bool moreCommands = false, int thinkTime = Constants.DefaultThinkTime)
         {
             var driver = Browser.Driver;
-                
-            if (moreCommands)
-                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.MoreCommands]));
 
-            var buttons = GetCommands(moreCommands).Value;
+            var buttons = GetCommands(false).Value;
             var button = buttons.FirstOrDefault(x => x.Text.Split('\r')[0].ToLowerString() == name.ToLowerString());
+
+            if (button == null)
+            {
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.MoreCommands]));
+                buttons = GetCommands(true).Value;
+                button = buttons.FirstOrDefault(x => x.Text.Split('\r')[0].ToLowerString() == name.ToLowerString());
+            }
+
+            if (button == null)
+            {
+                throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
+            }
 
             if (string.IsNullOrEmpty(subName))
             {
-                if (button != null)
-                {
-                    button.Click();
-                }
-                else
-                {
-                    throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
-                }
+                button.Click(true);
             }
-
             else
             {
 
@@ -777,7 +778,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             driver.WaitForPageToLoad();
             return true;
-           
         }
 
         /// <summary>
@@ -905,13 +905,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Get the Grid Items
         /// </summary>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        public BrowserCommandResult<List<XrmGridItem>> GetGridItems(int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<List<GridItem>> GetGridItems(int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
 
             return this.Execute(GetOptions("Get Grid Items"), driver =>
             {
-                var returnList = new List<XrmGridItem>();
+                var returnList = new List<GridItem>();
 
                 var itemsTable = driver.FindElement(By.XPath(@"//*[@id=""gridBodyTable""]/tbody"));
                 var columnGroup = driver.FindElement(By.XPath(@"//*[@id=""gridBodyTable""]/colgroup"));
@@ -926,7 +926,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         var link =
                             $"{new Uri(driver.Url).Scheme}://{new Uri(driver.Url).Authority}/main.aspx?etn={row.GetAttribute("otypename")}&pagetype=entityrecord&id=%7B{id:D}%7D";
 
-                        var item = new XrmGridItem
+                        var item = new GridItem
                         {
                             EntityName = row.GetAttribute("otypename"),
                             Id = id,
@@ -1072,9 +1072,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Opens the dialog
         /// </summary>
         /// <param name="dialog"></param>
-        public BrowserCommandResult<List<XrmListItem>> OpenDialog(IWebElement dialog)
+        public BrowserCommandResult<List<ListItem>> OpenDialog(IWebElement dialog)
         {
-            var list = new List<XrmListItem>();
+            var list = new List<ListItem>();
             var dialogItems = dialog.FindElements(By.TagName("li"));
 
             foreach (var dialogItem in dialogItems)
@@ -1087,7 +1087,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         var title = links[1].GetAttribute("title");
 
-                        list.Add(new XrmListItem()
+                        list.Add(new ListItem()
                         {
                             Title = title,
                             Element = links[1]

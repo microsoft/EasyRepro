@@ -8,6 +8,7 @@ using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using System;
 using System.IO;
+using OpenQA.Selenium;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
@@ -41,12 +42,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public TimeSpan RecordingScanInterval { get; set; }
         public string TraceSource { get; set; }
         public bool HideDiagnosticWindow { get; set; }
-        /// <summary>
-        /// Setting that will run the browser in a headless manner.  This setting is only valid for Chrome. 
-        /// </summary>
         public bool Headless { get; set; }
+        public bool UserAgent { get; set; }
+        public string UserAgentValue { get; set; }
 
-        public ChromeOptions ToChrome()
+        public virtual ChromeOptions ToChrome()
         {
             var options = new ChromeOptions();
 
@@ -59,15 +59,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             {
                 options.AddArgument("--incognito");
             }
+
             if (this.Headless)
             {
                 options.AddArgument("--headless");
             }
 
+            if (UserAgent && !string.IsNullOrEmpty(UserAgentValue))
+            {
+                options.AddArgument("--user-agent=" + UserAgentValue);
+            }
+
             return options;
         }
         
-        public InternetExplorerOptions ToInternetExplorer()
+        public virtual InternetExplorerOptions ToInternetExplorer()
         {
 
             // For IE, TabProcGrowth must be set to 0 if we want to initiate through
@@ -97,7 +103,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return options;
         }
 
-        public FirefoxOptions ToFireFox()
+        public  virtual FirefoxOptions ToFireFox()
         {
             var options = new FirefoxOptions()
             {
@@ -107,11 +113,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return options;
         }
 
-        public EdgeOptions ToEdge()
+        public virtual EdgeOptions ToEdge()
         {
             var options = new EdgeOptions()
             {
-                PageLoadStrategy = EdgePageLoadStrategy.Normal
+                PageLoadStrategy = PageLoadStrategy.Normal
             };
 
             return options;
