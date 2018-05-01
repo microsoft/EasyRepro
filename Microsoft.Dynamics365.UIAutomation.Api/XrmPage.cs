@@ -5,8 +5,9 @@ using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
-
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
@@ -123,11 +124,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     try
                     { 
-                    //Check to see if focus is on field already
-                    if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
-                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
-                    else
-                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
+                        //Check to see if focus is on field already
+                        if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
+                            fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
+                        else
+                            fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
                     }
                     catch (NoSuchElementException) { }
 
@@ -143,8 +144,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                     else
                     {
-                        fieldElement.FindElement(By.TagName("input")).Clear();
-                        fieldElement.FindElement(By.TagName("input")).SendKeys(value);
+                        //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
+                        //driver.ExecuteScript("Xrm.Page.getAttribute('" + field + "').setValue('')");
+                        fieldElement.FindElement(By.TagName("input")).SendKeys(value, true);
                     }
                 }
                 else
@@ -230,6 +232,52 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
+        /// Sets the value of a multi-value picklist.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
+        /// <example>xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
+        public BrowserCommandResult<bool> SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
+        {
+            return this.Execute(GetOptions($"Set Value: {option.Name}"), driver =>
+            {
+                driver.WaitUntilVisible(By.Id(option.Name));
+
+                if (driver.HasElement(By.Id(option.Name)))
+                {
+                    var container = driver.ClickWhenAvailable(By.Id(option.Name));
+                    
+                    if(removeExistingValues)
+                    {
+                        //Remove Existing Values
+                        var values = container.FindElements(By.ClassName(Elements.CssClass[Reference.SetValue.MultiSelectPicklistDeleteClass]));
+                        foreach (var value in values)
+                            value.Click(true);
+                    }
+
+                    var input = container.FindElement(By.TagName("input"));
+                    input.Click();
+                    input.SendKeys(" ");
+
+                    var options = container.FindElements(By.TagName("li"));
+
+                    foreach (var op in options)
+                    {
+                        var label = op.FindElement(By.TagName("label"));
+
+                        if (option.Values.Contains(op.Text) || option.Values.Contains(op.GetAttribute("value")) || option.Values.Contains(label.GetAttribute("title")))
+                            op.Click(true);
+                    }
+
+                    container.Click();
+                }
+                else
+                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+
+                return true;
+            });
+        }
+
+        /// <summary>
         /// Sets the value of a Composite control.
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
@@ -258,7 +306,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                             .ToList()
                             .FirstOrDefault(i => i.GetAttribute("id").Contains(field.Id));
 
-                        result?.Clear();
+                        //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
+                        driver.ExecuteScript("document.getElementById('" + result?.GetAttribute("id") + "').value = ''");
                         result?.SendKeys(field.Value);
                     }
 
@@ -276,7 +325,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmBrowser.Entity.SetValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
-        public BrowserCommandResult<bool> SetValue(Lookup control)
+        public BrowserCommandResult<bool> SetValue(LookupItem control)
         {
             return this.Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
             {
@@ -296,21 +345,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     var dialogItems = OpenDialog(dialog).Value;
 
+
                     if (control.Value != null)
                     {
-                        if (!dialogItems.Keys.Contains(control.Value))
+
+                        if (!dialogItems.Exists(x => x.Title == control.Value))
                             throw new InvalidOperationException($"List does not have {control.Value}.");
 
-                        var dialogItem = dialogItems[control.Value];
-                        dialogItem.Click();
+                        var dialogItem = dialogItems.Where(x => x.Title == control.Value).First();
+                        dialogItem.Element.Click();
+
                     }
                     else
                     {
                         if (dialogItems.Count < control.Index)
                             throw new InvalidOperationException($"List does not have {control.Index + 1} items.");
 
-                        var dialogItem = dialogItems.Values.ToList()[control.Index];
-                        dialogItem.Click();
+                        var dialogItem = dialogItems[control.Index];
+                        dialogItem.Element.Click();
                     }
                 }
                 else
@@ -415,10 +467,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 {
                     var compcntrl =
                         driver.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut]));
-                     
+
                     foreach (var field in control.Fields)
                     {
-                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
+                        compcntrl.FindElement(By.Id(Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
 
                         var result = compcntrl.FindElements(By.TagName("input"))
                             .ToList()
@@ -463,7 +515,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmBrowser.Entity.GetValue(new Lookup { Name = "primarycontactid" });</example>
-        public BrowserCommandResult<string> GetValue(Lookup control)
+        public BrowserCommandResult<string> GetValue(LookupItem control)
         {
             return this.Execute($"Get Lookup Value: {control.Name}", driver =>
             {
@@ -526,10 +578,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             var inlineDialog = Browser.Driver.HasElement(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)));
             if (inlineDialog)
             {
-            //wait for the content panel to render
-            Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)),
-                new TimeSpan(0, 0, 2),
-                d => { Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
+                //wait for the content panel to render
+                Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)),
+                                                  new TimeSpan(0, 0, 2),
+                                                  d => { Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
             }
             else
             {
@@ -657,15 +709,372 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 typeof(NoSuchElementException), typeof(StaleElementReferenceException));
         }
 
+        /// <summary>
+        /// Gets the Commands
+        /// </summary>
+        /// <param name="moreCommands">The MoreCommands</param>
+        /// <example></example>
+        public BrowserCommandResult<ReadOnlyCollection<IWebElement>> GetCommands(bool moreCommands = false)
+        {
+            return this.Execute(GetOptions("Get Command Bar Buttons"), driver =>
+            {
+                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.RibbonManager]), new TimeSpan(0, 0, 5));
+
+                IWebElement ribbon = null;
+                if (moreCommands)
+                    ribbon = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.List]));
+                else
+                    ribbon = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.RibbonManager]));
+
+                var items = ribbon.FindElements(By.TagName("li"));
+
+                return items;//.Where(item => item.Text.Length > 0).ToDictionary(item => item.Text, item => item.GetAttribute("id"));
+            });
+        }
 
         /// <summary>
-        /// Open Dialog
+        /// Clicks the  Command Button on the menu
         /// </summary>
-        /// <param name="dialog">The dialog</param>
-        /// <example></example>
-        private BrowserCommandResult<Dictionary<string, IWebElement>> OpenDialog(IWebElement dialog)
+        /// <param name="name">The Name of the command</param>
+        /// <param name="subName">The SubName</param>
+        /// <param name="moreCommands">The MoreCommands</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.CommandBar.ClickCommand("New");</example>
+        internal bool ClickCommandButton(string name, string subName = "", bool moreCommands = false, int thinkTime = Constants.DefaultThinkTime)
         {
-            var dictionary = new Dictionary<string, IWebElement>();
+            var driver = Browser.Driver;
+
+            var buttons = GetCommands(false).Value;
+            var button = buttons.FirstOrDefault(x => x.Text.Split('\r')[0].ToLowerString() == name.ToLowerString());
+
+            if (button == null)
+            {
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.MoreCommands]));
+                buttons = GetCommands(true).Value;
+                button = buttons.FirstOrDefault(x => x.Text.Split('\r')[0].ToLowerString() == name.ToLowerString());
+            }
+
+            if (button == null)
+            {
+                throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
+            }
+
+            if (string.IsNullOrEmpty(subName))
+            {
+                button.Click(true);
+            }
+            else
+            {
+
+                button.FindElement(By.ClassName(Elements.CssClass[Reference.CommandBar.FlyoutAnchorArrow])).Click();
+
+                var flyoutId = button.GetAttribute("id").Replace("|", "_").Replace(".", "_") + "Menu";
+                var subButtons = driver.FindElement(By.Id(flyoutId)).FindElements(By.ClassName("ms-crm-CommandBar-Menu"));
+                var item = subButtons.FirstOrDefault(x => x.Text.ToLowerString() == subName.ToLowerString());
+                if (item == null) { throw new InvalidOperationException($"The sub menu item '{subName}' is not found."); }
+
+                item.Click();
+            }
+
+            driver.WaitForPageToLoad();
+            return true;
+        }
+
+        /// <summary>
+        /// Clicks the  Command
+        /// </summary>
+        /// <param name="name">The name</param>
+        /// <param name="subName">The subName</param>
+        /// <param name="moreCommands">The moreCommands</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Related.ClickCommand("ADD NEW CASE");</example>
+        public BrowserCommandResult<bool> ClickCommand(string name, string subName = "", bool moreCommands = false, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Click Command"), driver =>
+            {
+                ClickCommandButton(name, subName, moreCommands, thinkTime);
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Refreshes this instance.
+        /// </summary>
+        /// <example></example>
+        public BrowserCommandResult<bool> Refresh(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Refresh"), driver =>
+            {
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Grid.Refresh]));
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Firsts the page.
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Grid.FirstPage();</example>
+        public BrowserCommandResult<bool> FirstPage(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("FirstPage"), driver =>
+            {
+                var firstPageIcon = driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FirstPage]));
+
+                if (firstPageIcon.GetAttribute("disabled") != null)
+                    return false;
+                else
+                    firstPageIcon.Click();
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Nexts the page.
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Grid.NextPage();</example>
+        public BrowserCommandResult<bool> NextPage(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Next"), driver =>
+            {
+                var nextIcon = driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.NextPage]));
+
+                if (nextIcon.GetAttribute("disabled") != null)
+                    return false;
+                else
+                    nextIcon.Click();
+                return true;
+            });
+        }
+        
+        /// <summary>
+        /// Previouses the page.
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Grid.PreviousPage();</example>
+        public BrowserCommandResult<bool> PreviousPage(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("PreviousPage"), driver =>
+            {
+                var previousIcon = driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.PreviousPage]));
+
+                if (previousIcon.GetAttribute("disabled") != null)
+                    return false;
+                else
+                    previousIcon.Click();
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Toggles the select all.
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Grid.SelectAllRecords();</example>
+        public BrowserCommandResult<bool> SelectAllRecords(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("ToggleSelectAll"), driver =>
+            {
+                // We can check if any record selected by using
+                // driver.FindElements(By.ClassName("ms-crm-List-SelectedRow")).Count == 0
+                // but this function doesn't check it.
+                var selectAll = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Grid.ToggleSelectAll]),
+                          "The Toggle SelectAll is not available.");
+
+                selectAll.Click();
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Get the Grid Items
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        public BrowserCommandResult<List<GridItem>> GetGridItems(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Get Grid Items"), driver =>
+            {
+                var returnList = new List<GridItem>();
+
+                var itemsTable = driver.FindElement(By.XPath(@"//*[@id=""gridBodyTable""]/tbody"));
+                var columnGroup = driver.FindElement(By.XPath(@"//*[@id=""gridBodyTable""]/colgroup"));
+
+                var rows = itemsTable.FindElements(By.TagName("tr"));
+
+                foreach (var row in rows)
+                {
+                    if (!string.IsNullOrEmpty(row.GetAttribute("oid")))
+                    {
+                        Guid id = Guid.Parse(row.GetAttribute("oid"));
+                        var link =
+                            $"{new Uri(driver.Url).Scheme}://{new Uri(driver.Url).Authority}/main.aspx?etn={row.GetAttribute("otypename")}&pagetype=entityrecord&id=%7B{id:D}%7D";
+
+                        var item = new GridItem
+                        {
+                            EntityName = row.GetAttribute("otypename"),
+                            Id = id,
+                            Url = new Uri(link)
+                        };
+
+                        var cells = row.FindElements(By.TagName("td"));
+                        var idx = 0;
+
+                        foreach (var column in columnGroup.FindElements(By.TagName("col")))
+                        {
+                            var name = column.GetAttribute<string>("name");
+
+                            if (!string.IsNullOrEmpty(name)
+                                && column.GetAttribute("class").Contains(Elements.CssClass[Reference.Grid.DataColumn])
+                                && cells.Count > idx)
+                            {
+                                item[name] = cells[idx].Text;
+                            }
+
+                            idx++;
+                        }
+
+                        returnList.Add(item);
+                    }
+                }
+
+                return returnList;
+            });
+        }
+
+        /// <summary>
+        /// Set Lookup Value for the field
+        /// </summary>
+        /// <param name="field">The Field</param>
+        /// <param name="index">The Index</param>
+        /// <example>xrmBrowser.Entity.SelectLookup("customerid", 0);</example>
+        public BrowserCommandResult<bool> SelectLookup(string field, [Range(0, 9)]int index)
+        {
+            return this.Execute(GetOptions($"Set Lookup Value: {field}"), driver =>
+            {
+                if (driver.HasElement(By.Id(field)))
+                {
+                    var input = driver.ClickWhenAvailable(By.Id(field));
+
+                    if (input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])) == null)
+                        throw new InvalidOperationException($"Field: {field} is not lookup");
+
+                    input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click();
+
+                    var dialogName = $"Dialog_{field}_IMenu";
+                    var dialog = driver.FindElement(By.Id(dialogName));
+
+                    var dialogItems = OpenDialog(dialog).Value;
+
+                    if (dialogItems.Count < index)
+                        throw new InvalidOperationException($"List does not have {index + 1} items.");
+
+                    var dialogItem = dialogItems[index];
+                    dialogItem.Element.Click();
+                }
+                else
+                    throw new InvalidOperationException($"Field: {field} Does not exist");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Set Lookup Value for the field
+        /// </summary>
+        /// <param name="field">The Field</param>
+        /// <param name="value">The Lookup value</param>
+        public BrowserCommandResult<bool> SelectLookup(string field, string value)
+        {
+            return this.Execute(GetOptions($"Set Lookup Value: {field}"), driver =>
+            {
+                if (driver.HasElement(By.Id(field)))
+                {
+                    var input = driver.ClickWhenAvailable(By.Id(field));
+
+                    if (input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])) == null)
+                        throw new InvalidOperationException($"Field: {field} is not lookup");
+
+                    var lookupIcon = input.FindElement(By.ClassName("Lookup_RenderButton_td"));
+                    lookupIcon.Click();
+
+                    var dialogName = $"Dialog_{field}_IMenu";
+                    var dialog = driver.FindElement(By.Id(dialogName));
+
+                    var dialogItems = OpenDialog(dialog).Value;
+
+                    if (!dialogItems.Exists(x => x.Title == value))
+                        throw new InvalidOperationException($"List does not have {value}.");
+
+                    var dialogItem = dialogItems.Where(x => x.Title == value).First();
+                    dialogItem.Element.Click();
+                }
+                else
+                    throw new InvalidOperationException($"Field: {field} Does not exist");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Set Lookup Value for the field
+        /// </summary>
+        /// <param name="field">The Field</param>
+        /// <param name="openLookupPage">The Open Lookup Page</param>
+        public BrowserCommandResult<bool> SelectLookup(string field, bool openLookupPage = true)
+        {
+            return this.Execute(GetOptions($"Set Lookup Value: {field}"), driver =>
+            {
+                if (driver.HasElement(By.Id(field)))
+                {
+                    var input = driver.ClickWhenAvailable(By.Id(field));
+
+                    if (input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])) == null)
+                        throw new InvalidOperationException($"Field: {field} is not lookup");
+
+                    input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click();
+
+                    var dialogName = $"Dialog_{field}_IMenu";
+                    var dialog = driver.FindElement(By.Id(dialogName));
+
+                    var dialogItems = OpenDialog(dialog).Value;
+
+                    if (dialogItems.Any())
+                    {
+                        var dialogItem = dialogItems.Last();
+                        dialogItem.Element.Click();
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Field: {field} Does not exist");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Opens the dialog
+        /// </summary>
+        /// <param name="dialog"></param>
+        public BrowserCommandResult<List<ListItem>> OpenDialog(IWebElement dialog)
+        {
+            var list = new List<ListItem>();
             var dialogItems = dialog.FindElements(By.TagName("li"));
 
             foreach (var dialogItem in dialogItems)
@@ -678,11 +1087,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         var title = links[1].GetAttribute("title");
 
-                        dictionary.Add(title, links[1]);
+                        list.Add(new ListItem()
+                        {
+                            Title = title,
+                            Element = links[1]
+                        });
                     }
                 }
             }
-            return dictionary;
+
+            return list;
         }
 
 
