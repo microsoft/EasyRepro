@@ -174,6 +174,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
+        /*
         /// <summary>
         /// Selects the tab and clicks. If the tab is expanded it will collapse it. If the tab is collapsed it will expand it. 
         /// </summary>
@@ -197,6 +198,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 return true;
             });
         }
+        */
+
+        /// <summary>
+        /// Selects the tab and clicks. If the tab is expanded it will collapse it. If the tab is collapsed it will expand it. 
+        /// </summary>
+        /// <param name="name">The name of the tab.</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Entity.SelectTab("Details");</example>
+        public BrowserCommandResult<bool> SelectTab(string name, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"SelectTab: {name}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
+                {
+                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
+                }
+                var tab = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name)));
+
+                tab?.Click();
+
+                return true;
+            });
+        }
 
         /// <summary>
         /// Collapses the Tab on a CRM Entity form.
@@ -210,14 +236,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions($"Collapse Tab: {name}"), driver =>
             {
-                if(!driver.HasElement(By.Id(Elements.ElementId[Reference.Entity.Tab].Replace("[NAME]", name.ToUpper()))))
+                if(!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
                 {
-                    throw new InvalidOperationException($"Section with name '{name}' does not exist.");
+                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
                 }
-                var section = driver.FindElement(By.Id(Elements.ElementId[Reference.Entity.Tab].Replace("[NAME]",name.ToUpper())));
+                var tab = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]",name)));
 
-               if (section.FindElement(By.TagName("img")).GetAttribute("title").Contains("Collapse"))
-                    section?.Click();
+                if (tab.GetAttribute("title").Contains("Collapse"))
+                    tab?.Click();
 
                 return true;
             });
@@ -235,14 +261,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions($"Expand Tab: {name}"), driver =>
             {
-                if (!driver.HasElement(By.Id(Elements.ElementId[Reference.Entity.Tab].Replace("[NAME]", name.ToUpper()))))
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
                 {
-                    throw new InvalidOperationException($"Section with name '{name}' does not exist.");
+                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
                 }
-                var section = driver.FindElement(By.Id(Elements.ElementId[Reference.Entity.Tab].Replace("[NAME]", name.ToUpper())));
+                var tab = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name)));
 
-                if (section.FindElement(By.TagName("img")).GetAttribute("title").Contains("Expand"))
-                    section?.Click();
+                if (tab.GetAttribute("title").Contains("Expand"))
+                    tab?.Click();
 
                 return true;
             });
