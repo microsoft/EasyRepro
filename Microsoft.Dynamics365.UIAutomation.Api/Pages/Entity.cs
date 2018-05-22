@@ -186,13 +186,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions($"SelectTab: {name}"), driver =>
             {
-                if (!driver.HasElement(By.Id(Elements.ElementId[Reference.Entity.Tab].Replace("[NAME]", name.ToUpper()))))
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
                 {
-                    throw new InvalidOperationException($"Section with name '{name}' does not exist.");
+                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
                 }
-                var section = driver.FindElement(By.Id(Elements.ElementId[Reference.Entity.Tab].Replace("[NAME]", name.ToUpper())));
-                
-                section?.Click();
+                var tab = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name)));
+
+                tab?.Click();
 
                 return true;
             });
@@ -210,14 +210,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions($"Collapse Tab: {name}"), driver =>
             {
-                if(!driver.HasElement(By.Id(Elements.ElementId[Reference.Entity.Tab].Replace("[NAME]", name.ToUpper()))))
+                if(!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
                 {
-                    throw new InvalidOperationException($"Section with name '{name}' does not exist.");
+                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
                 }
-                var section = driver.FindElement(By.Id(Elements.ElementId[Reference.Entity.Tab].Replace("[NAME]",name.ToUpper())));
+                var tab = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]",name)));
 
-               if (section.FindElement(By.TagName("img")).GetAttribute("title").Contains("Collapse"))
-                    section?.Click();
+                if (tab.GetAttribute("title").Contains("Collapse"))
+                    tab?.Click();
 
                 return true;
             });
@@ -235,14 +235,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions($"Expand Tab: {name}"), driver =>
             {
-                if (!driver.HasElement(By.Id(Elements.ElementId[Reference.Entity.Tab].Replace("[NAME]", name.ToUpper()))))
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
                 {
-                    throw new InvalidOperationException($"Section with name '{name}' does not exist.");
+                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
                 }
-                var section = driver.FindElement(By.Id(Elements.ElementId[Reference.Entity.Tab].Replace("[NAME]", name.ToUpper())));
+                var tab = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name)));
 
-                if (section.FindElement(By.TagName("img")).GetAttribute("title").Contains("Expand"))
-                    section?.Click();
+                if (tab.GetAttribute("title").Contains("Expand"))
+                    tab?.Click();
 
                 return true;
             });

@@ -123,6 +123,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Entity_SelectFormContentTable" , "id(\"Dialog_0\")" }, //GitHub Issue 56
             { "Entity_SelectForm",  "id(\"header_crmFormSelector\")"}, //GitHub Issue #56 - Correcting reference point for SelectForm() method
             { "Entity_SelectFormSection",  "id(\"FormSecNavigationControl-Icon\")"}, //GitHub Issue 56
+            { "Entity_TabId"       , "//a/*[contains(text(),'[NAME]')]/parent::a"}, //GitHub Issue 124
 
             //Related MenuItems
             { "Related_Popout",                 "//li[contains(@data-id,\"tablist-tab_related\")]" },
