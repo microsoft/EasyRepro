@@ -174,32 +174,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
-        /*
-        /// <summary>
-        /// Selects the tab and clicks. If the tab is expanded it will collapse it. If the tab is collapsed it will expand it. 
-        /// </summary>
-        /// <param name="name">The name of the tab.</param>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Entity.SelectTab("Details");</example>
-        public BrowserCommandResult<bool> SelectTab(string name, int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"SelectTab: {name}"), driver =>
-            {
-                if (!driver.HasElement(By.Id(Elements.ElementId[Reference.Entity.Tab].Replace("[NAME]", name.ToUpper()))))
-                {
-                    throw new InvalidOperationException($"Section with name '{name}' does not exist.");
-                }
-                var section = driver.FindElement(By.Id(Elements.ElementId[Reference.Entity.Tab].Replace("[NAME]", name.ToUpper())));
-                
-                section?.Click();
-
-                return true;
-            });
-        }
-        */
-
         /// <summary>
         /// Selects the tab and clicks. If the tab is expanded it will collapse it. If the tab is collapsed it will expand it. 
         /// </summary>
