@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Dynamics365.UIAutomation.Api</id>
+    <version>8.2.0.2</version>
+    <title>Automated UI testing API for Microsoft Dynamics 365 Version 1612 (8.2.1.185) (DB 8.2.1.185) online</title>
+    <authors>Ranger Team</authors>
+    <owners>Microsoft Corporation</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>The purpose of this library is to provide Dynamics customers the ability to facilitate automated UI testing for their projects.</description>
+    <summary>The purpose of this library is to provide Dynamics customers the ability to facilitate automated UI testing for their projects. These API's provide an easy to use set of commands that make setting up UI testing quick and easy. The functionality provided covers the core CRM commands that end users would perform on a typical workday and working to extend that coverage to more functionality. Supported CRM Version - Microsoft Dynamics 365 Version 1612 (8.2.1.185) (DB 8.2.1.185) online.</summary>
+    <releaseNotes>https://github.com/Microsoft/EasyRepro</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>EasyRepro Testing Dynamics365 UI-Automation API</tags>
+    <dependencies>
+      <group targetFramework="uap">
+        <dependency id="Newtonsoft.Json" version="9.0.1" />
+        <dependency id="Selenium.Support" version="3.5.1" />
+        <dependency id="Selenium.WebDriver" version="3.5.1" />
+        <dependency id="Selenium.Chrome.WebDriver" version="2.31" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\Microsoft.Dynamics365.UIAutomation.Api.dll" target="lib\net46\Microsoft.Dynamics365.UIAutomation.Api.dll" />
+    <file src="bin\Release\Microsoft.Dynamics365.UIAutomation.Browser.dll" target="lib\net46\Microsoft.Dynamics365.UIAutomation.Browser.dll" />
+  </files>
+</package>

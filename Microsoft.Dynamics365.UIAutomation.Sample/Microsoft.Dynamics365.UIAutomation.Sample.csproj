@@ -189,6 +189,7 @@
   <ItemGroup>
     <Folder Include="packages\" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
