@@ -70,11 +70,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
+                xrmApp.Grid.SwitchView("All Accounts");
+
                 xrmApp.Grid.OpenRecord(0);
 
                 xrmApp.ThinkTime(3000);
 
-                xrmApp.Navigation.OpenTab(Reference.Navigation.DetailsTab);
+                xrmApp.Entity.SelectTab("Details");
+
+                xrmApp.Entity.SelectTab("Related","Contacts");
 
                 xrmApp.ThinkTime(3000);
             }

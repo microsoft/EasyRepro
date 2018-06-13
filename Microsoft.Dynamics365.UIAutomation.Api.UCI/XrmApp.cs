@@ -23,7 +23,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public CommandBar CommandBar => this.GetElement<CommandBar>(_client);
         public Grid Grid => this.GetElement<Grid>(_client);
         public Entity Entity => this.GetElement<Entity>(_client);
-        public Dialog Dialog => this.GetElement<Dialog>(_client);
+        public Dialogs Dialogs => this.GetElement<Dialogs>(_client);
         public Timeline Timeline => this.GetElement<Timeline>(_client);
         public BusinessProcessFlow BusinessProcessFlow => this.GetElement<BusinessProcessFlow>(_client);
         public Dashboard Dashboard => this.GetElement<Dashboard>(_client);

@@ -82,11 +82,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.SwitchProcess(processToSwitchTo);
         }
 
-        public void CloseOpportunity(bool closeAsWon)
-        {
-            _client.CloseOpportunity(closeAsWon);
-        }
-
         public void OpenRecordSetNavigator(int index = 0)
         {
             _client.OpenRecordSetNavigator(index);
@@ -95,6 +90,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public void CloseRecordSetNavigator()
         {
             _client.CloseRecordSetNavigator();
+        }
+
+        /// <summary>
+        /// Opens any tab on the web page.
+        /// </summary>
+        /// <param name="tabName">The name of the tab based on the References class</param>
+        public void SelectTab(string tabName, string subTabName = "")
+        {
+            _client.SelectTab(tabName, subTabName);
         }
     }   
 }

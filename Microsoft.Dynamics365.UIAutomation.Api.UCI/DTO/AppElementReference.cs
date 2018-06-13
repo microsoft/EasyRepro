@@ -73,7 +73,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string CloseOpportunityLoss = "Entity_CloseOpportunityLoss";
             public static string ProcessButton = "Entity_Process";
             public static string SwitchProcessDialog = "Entity_SwitchProcessDialog";
-            
+            public static string TabList = "Entity_TabList";
+            public static string Tab = "Entity_Tab";
+            public static string SubTab = "Entity_SubTab";
+
         }
 
         public static class CommandBar
@@ -204,10 +207,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_RecordSetNavList", "//ul[contains(@data-id, 'recordSetNaveList')]" },
             { "Entity_RecordSetNavCollapseIcon", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
             { "Entity_RecordSetNavCollapseIconParent", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
-            
-            
+            { "Entity_TabList", "//ul[@id=\"tablist\"]" },
+            { "Entity_Tab", "//li[@aria-label=\"{0}\"]" },
+            { "Entity_SubTab", "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]" },
                         
-            
             //CommandBar
             { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
             { "Cmd_ContainerGrid"       , "//ul[contains(@data-lp-id,\"commandbar-HomePageGrid\")]"},

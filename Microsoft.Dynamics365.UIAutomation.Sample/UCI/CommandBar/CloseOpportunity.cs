@@ -32,7 +32,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.OpenRecord(0);
 
-                xrmApp.Entity.CloseOpportunity(true);
+                xrmApp.Dialogs.CloseOpportunity(true);
 
             }
         }
