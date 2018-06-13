@@ -79,14 +79,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.OpenAndClickPopoutMenu(menuName, menuItemName);
         }
 
-        /// <summary>
-        /// Opens any tab on the web page.
-        /// </summary>
-        /// <param name="tabName">The name of the tab based on the References class</param>
-        public void OpenTab(string tabName)
-        {
-            _client.ClickItem(By.XPath(Elements.Xpath[tabName]));
-        }
         public void ClickQuickLaunchButton(string toolTip)
         {
             _client.ClickQuickLaunchButton(toolTip);

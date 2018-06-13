@@ -666,8 +666,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     if (viewItem.GetAttribute("role") != null && viewItem.GetAttribute("role") == "option")
                     {
-                        var title = viewItem.GetAttribute("title");
-                        dictionary.Add(title, viewItem.GetAttribute("id"));
+                        dictionary.Add(viewItem.Text, viewItem.GetAttribute("id"));
                     }
                 }
 
@@ -1723,20 +1722,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="by">The xpath of the HTML item as a By object</param>
         /// <returns>True on success, Exception on failure to invoke any action</returns>
-        internal BrowserCommandResult<bool> ClickItem(By by)
+        internal BrowserCommandResult<bool> SelectTab(string tabName, string subTabName = "")
         {
-            return this.Execute($"Open item", driver =>
+            return this.Execute($"Select Tab", driver =>
             {
-                    try
-                    {
-                        driver.ClickWhenAvailable(by);
-                    }
-                    catch(Exception e)
-                    {
-                        throw new Exception(String.Format("The By search item {0} threw an exception", by.ToString()) , e);
-                    }
-                    return true;
+                driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
+
+                ClickTab(AppElements.Xpath[AppReference.Entity.Tab], tabName);
+
+                //Click Sub Tab if provided
+                if (!String.IsNullOrEmpty(subTabName))
+                {
+                    ClickTab(AppElements.Xpath[AppReference.Entity.SubTab], subTabName);
+                }
+
+                return true;
             });
+        }
+
+        internal void ClickTab(string xpath, string name)
+        {
+            if (this.Browser.Driver.HasElement(By.XPath(String.Format(xpath, name))))
+            {
+                this.Browser.Driver.FindElement(By.XPath(String.Format(xpath, name))).Click(true);
+            }
+            else
+            {
+                throw new Exception($"The tab with name: {name} does not exist");
+            }
         }
 
         /// <summary>
