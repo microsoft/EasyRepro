@@ -101,7 +101,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(username.ToUnsecureString());
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Tab);
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Enter);
-                Thread.Sleep(2000);
+
+                Thread.Sleep(1000);
+
+                //Check if account selection screen is present (AAD vs MSA accounts)
+                if (driver.IsVisible(By.Id("aadTile")))
+                {
+                    driver.FindElement(By.Id("aadTile")).Click(true);
+                }
+
+                Thread.Sleep(1000);
 
                 //If expecting redirect then wait for redirect to trigger
                 if (redirectAction != null)
@@ -127,7 +136,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
                         , new TimeSpan(0, 0, 60),
-                        e => { e.WaitForPageToLoad(); },
+                        e => 
+                        {
+                            e.WaitForPageToLoad();
+                            e.SwitchTo().Frame(0);
+                            e.WaitForPageToLoad();
+                        },
                         f => { throw new Exception("Login page failed."); });
                 }
             }
