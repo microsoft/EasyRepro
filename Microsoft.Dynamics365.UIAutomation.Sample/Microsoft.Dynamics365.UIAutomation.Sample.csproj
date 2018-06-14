@@ -89,6 +89,42 @@
   <ItemGroup>
     <Compile Include="SharedAPI\AzureInsights\OpenLead.cs" />
     <Compile Include="SharedAPI\BrowserTests\BrowserTests.cs" />
+    <Compile Include="UCI\BusinessProcessFlow\BusinessProcessFlowNextStage.cs" />
+    <Compile Include="UCI\BusinessProcessFlow\SwitchBusinessProcessFlow.cs" />
+    <Compile Include="UCI\CommandBar\AssignAccount.cs" />
+    <Compile Include="UCI\CommandBar\CloseOpportunity.cs" />
+    <Compile Include="UCI\CommandBar\DuplicateDetection.cs" />
+    <Compile Include="UCI\CommandBar\SelectDashboard.cs" />
+    <Compile Include="UCI\Create\CreateAccount.cs" />
+    <Compile Include="UCI\Create\CreateCase.cs" />
+    <Compile Include="UCI\Create\CreateContact.cs" />
+    <Compile Include="UCI\Create\CreateLead.cs" />
+    <Compile Include="UCI\Create\CreateOpportunity.cs" />
+    <Compile Include="UCI\Delete\DeleteAccount.cs" />
+    <Compile Include="UCI\Delete\DeleteCase.cs" />
+    <Compile Include="UCI\Delete\DeleteContact.cs" />
+    <Compile Include="UCI\Delete\DeleteLead.cs" />
+    <Compile Include="UCI\Delete\DeleteOpportunity.cs" />
+    <Compile Include="UCI\GetValue.cs" />
+    <Compile Include="UCI\GlobalSearch\GlobalSearch.cs" />
+    <Compile Include="UCI\Navigation\GlobalSearch.cs" />
+    <Compile Include="UCI\Navigation\OpenNavigation.cs" />
+    <Compile Include="UCI\Navigation\PortalAdmin.cs" />
+    <Compile Include="UCI\Read\OpenAccount.cs" />
+    <Compile Include="UCI\Read\OpenAccountBPF.cs" />
+    <Compile Include="UCI\Read\OpenCase.cs" />
+    <Compile Include="UCI\Read\OpenContact.cs" />
+    <Compile Include="UCI\Read\OpenLead.cs" />
+    <Compile Include="UCI\Read\OpenOpportunity.cs" />
+    <Compile Include="UCI\SetValue.cs" />
+    <Compile Include="UCI\Timeline\AddActivity.cs" />
+    <Compile Include="UCI\Timeline\AddNote.cs" />
+    <Compile Include="UCI\Timeline\AddPost.cs" />
+    <Compile Include="UCI\Update\UpdateAccount.cs" />
+    <Compile Include="UCI\Update\UpdateCase.cs" />
+    <Compile Include="UCI\Update\UpdateContact.cs" />
+    <Compile Include="UCI\Update\UpdateLead.cs" />
+    <Compile Include="UCI\Update\UpdateOpportunity.cs" />
     <Compile Include="Web\BusinessProcessFlow\BusinessProcessFlow.cs" />
     <Compile Include="Web\CommandBar\CommandButton.cs" />
     <Compile Include="Web\Delete\DeleteAccount.cs" />
@@ -184,16 +220,15 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
+    <None Include="UCI\UnifiedInterface.orderedtest" />
     <None Include="Web\WebClient.orderedtest" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="packages\" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Api.UCI\Microsoft.Dynamics365.UIAutomation.Api.UCI.csproj">
+      <Project>{afcb5bb5-4512-4019-a911-5d56cff4f3d0}</Project>
+      <Name>Microsoft.Dynamics365.UIAutomation.Api.UCI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Api\Microsoft.Dynamics365.UIAutomation.Api.csproj">
       <Project>{dfe2c141-f1aa-4d4b-8df8-0fb93023cf45}</Project>
       <Name>Microsoft.Dynamics365.UIAutomation.Api</Name>
