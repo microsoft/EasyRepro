@@ -639,6 +639,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
 
                 }
+
+                driver.WaitForTransaction();
+
                 return true;
             });
         }

@@ -17,6 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string AreaMenu = "Nav_AreaMenu";
             public static string SubAreaContainer = "Nav_SubAreaContainer";
             public static string AppMenuButton = "Nav_AppMenuButton";
+            public static string SiteMapLauncherButton = "Nav_SiteMapLauncherButton";
             public static string AppMenuContainer = "Nav_AppMenuContainer";
             public static string SettingsLauncherBar = "Nav_SettingsLauncherBar";
             public static string SettingsLauncher = "Nav_SettingsLauncher";
@@ -155,6 +156,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_AreaMenu"       , "//*[@id=\"__flyoutRootNode\"]"},
             { "Nav_SubAreaContainer"       , "//*[@id=\"ApplicationShell\"]/div[1]/div[2]/div/div/div[2]/div[3]/ul"},
             { "Nav_AppMenuButton"       , "//*[@id=\"TabArrowDivider\"]/a"},
+            { "Nav_SiteMapLauncherButton", "//button[@data-lp-id=\"sitemap-launcher\"]" },
             { "Nav_AppMenuContainer"       , "//*[@id=\"taskpane-scroll-container\"]"},
             { "Nav_SettingsLauncherBar"       , "//*[@id=\"[NAME]Launcher_buttonaction-bar\"]"},
             { "Nav_SettingsLauncher"       , "//*[@id=\"[NAME]Launcher\"]"},
