@@ -20,8 +20,8 @@ Selenium is a set of different software tools each with a different approach to 
 
 | File Name         | Version | Release date   |
 | ------------------|---------|----------------|
-| Selenium.WebDriver| v3.5.1  | April 21, 2017 |
-| Selenium.Support  | v3.5.1  | April 21, 2017 |
+| Selenium.WebDriver| v3.11.2  | April 12, 2018 |
+| Selenium.Support  | v3.11.2  | April 12, 2018 |
 
 ## Coverage #
 ### CRM Functionality Covered
@@ -66,7 +66,7 @@ The Sample project should have NUGET packages added and you just need to build t
   
 | Browser    | WebDriver           | Version           | Release date      |
 | -----------|-------------------- |-----------------  | --------------    |
-| Chrome     | ChromeDriver        |v.2.31.0.0         |  April 4, 2017    |
+| Chrome     | ChromeDriver        |v.2.38.0.0         |  April 23, 2018    |
 | Firefox    | GeckoDriver         |v.0.16.1           |  April 27, 2017   |
 | IE         | IEDriver            |v.3.4              |  April 22, 2017   |
 | Edge       | MicrosoftWebDriver  |v.10.0.15063.0     |  April 18, 2017   |
