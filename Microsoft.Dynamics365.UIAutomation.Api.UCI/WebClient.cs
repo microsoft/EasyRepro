@@ -63,7 +63,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(username.ToUnsecureString());
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Tab);
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Enter);
-                Thread.Sleep(2000);
+
+                Thread.Sleep(1000);
+
+                if (driver.IsVisible(By.Id("aadTile")))
+                {
+                    driver.FindElement(By.Id("aadTile")).Click(true);
+                }
+
+                Thread.Sleep(1000);
 
                 //If expecting redirect then wait for redirect to trigger
                 if (redirectAction != null)
@@ -89,7 +97,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
                         , new TimeSpan(0, 0, 60),
-                        e => { e.WaitForPageToLoad(); },
+                        e => {
+                            e.WaitForPageToLoad();
+                            e.SwitchTo().Frame(0);
+                            e.WaitForPageToLoad();
+                        },
                         f => { throw new Exception("Login page failed."); });
                 }
             }
@@ -119,7 +131,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new InvalidOperationException($"App Name {appName} not found.");
 
                 driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuButton]));
+                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
                 driver.WaitForPageToLoad();
 
                 return true;
@@ -627,7 +639,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
 
                 }
-               
+
+                driver.WaitForTransaction();
 
                 return true;
             });
