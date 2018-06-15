@@ -130,11 +130,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
         public static class Dialogs
         {
+            public static class CloseOpportunity
+            {
+                public static string Ok = "CloseOpportunityDialog_OKButton";
+                public static string Cancel = "CloseOpportunityDialog_CancelButton";
+                public static string ActualRevenueId = "Dialog_ActualRevenue";
+                public static string CloseDateId = "Dialog_CloseDate";
+                public static string DescriptionId = "Dialog_Description";
+            }
             public static string AssignDialogUserTeamLookupResults = "AssignDialog_UserTeamLookupResults";
             public static string AssignDialogOKButton = "AssignDialog_OKButton";
             public static string AssignDialogToggle = "AssignDialog_ToggleField";
-            public static string CloseOpportunityOKButton = "CloseOpportunityDialog_OKButton";
-            public static string CloseOpportunityCancelButton = "CloseOpportunityDialog_CancelButton";
             public static string ConfirmButton = "Dialog_ConfirmButton";
             public static string SwitchProcessDialog = "Entity_SwitchProcessDialog";
             public static string SwitchProcessDialogOK = "Entity_SwitchProcessDialogOK";
@@ -212,6 +218,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_TabList", "//ul[@id=\"tablist\"]" },
             { "Entity_Tab", "//li[@aria-label=\"{0}\"]" },
             { "Entity_SubTab", "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]" },
+            { "Entity_FieldControlDateTimeInput","//input[contains(@id,'[FIELD].fieldControl-date-time-input')]" },
                         
             //CommandBar
             { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
@@ -256,6 +263,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "AssignDialog_OKButton" , "//button[contains(@data-id, 'ok_id')]" },
             { "CloseOpportunityDialog_OKButton" , "//button[contains(@data-id, 'ok_id')]" },
             { "CloseOpportunityDialog_CancelButton" , "//button[contains(@data-id, 'cancel_id')]" },
+            { "Dialog_ActualRevenue", "//input[contains(@data-id,'actualrevenue_id')]" },
+            { "Dialog_CloseDate", "//input[contains(@data-id,'closedate_id')]" },
+            { "Dialog_DescriptionId", "//input[contains(@data-id,'description_id')]" },
             { "Dialog_ConfirmButton" , "//*[@id=\"confirmButton\"]" },
             { "Dialog_CancelButton" , "//*[@id=\"cancelButton\"]" },
             { "Dialog_SwitchProcessContainer" , "//div[contains(@id,'switchProcess_id-FieldSectionItemContainer')]" },

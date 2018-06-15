@@ -33,7 +33,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.ThinkTime(2000);
 
-                xrmApp.Entity.Assign("Grant");
+                xrmApp.CommandBar.ClickCommand("Assign");
+
+               xrmApp.Dialogs.Assign(Dialogs.AssignTo.User, "Grant");
+
             }
         }
     }

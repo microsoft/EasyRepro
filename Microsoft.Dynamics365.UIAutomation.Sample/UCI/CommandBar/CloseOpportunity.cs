@@ -28,11 +28,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
 
-                //xrmApp.Grid.Search("EasyRepro");
-
                 xrmApp.Grid.OpenRecord(0);
 
-                xrmApp.Dialogs.CloseOpportunity(true);
+                xrmApp.CommandBar.ClickCommand("Close as Won");
+
+                xrmApp.Dialogs.CloseOpportunity(123.45, DateTime.Now, "test");
 
             }
         }

@@ -411,54 +411,57 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-        internal BrowserCommandResult<bool> AssignDialog(string userOrTeamName)
+        internal BrowserCommandResult<bool> AssignDialog(Dialogs.AssignTo to, string userOrTeamName)
         {
             return this.Execute(GetOptions($"Assign to User or Team Dialog"), driver =>
             {
                 var inlineDialog = this.SwitchToDialog();
                 if (inlineDialog)
                 {
-                    //Click the Option to Assign to User Or Team
-                    driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogToggle]));
-
-                    var toggleButton = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogToggle]),"Me/UserTeam toggle button unavailable");
-                    if (toggleButton.Text == "Me")
-                        toggleButton.Click();
-
-                    //Set the User Or Team
-                    var userOrTeamField = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookup]), "User field unavailable");
-
-                    if (userOrTeamField.FindElements(By.TagName("input")).Count > 0)
+                    if (to != Dialogs.AssignTo.Me)
                     {
-                        var input = userOrTeamField.FindElement(By.TagName("input"));
-                        if (input != null)
-                        {
-                            input.Click();
-                            input.SendKeys(userOrTeamName, true);
-                        }
-                    }
+                        //Click the Option to Assign to User Or Team
+                        driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogToggle]));
 
-                    //Pick the User from the list
-                    driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogUserTeamLookupResults]));
-                    //Remove this line
-                    driver.WaitUntilVisible(By.XPath("//label[text()='[NAME]']".Replace("[NAME]", userOrTeamName)));
+                        var toggleButton = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogToggle]), "Me/UserTeam toggle button unavailable");
+                        if (toggleButton.Text == "Me")
+                            toggleButton.Click();
 
-                    //WaitUntilVisible is too fast, adding a wait to allow CRM to catch up.  This needs to be removed.
-                    Browser.ThinkTime(5000);
-                    var container = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogUserTeamLookupResults]));
-                    var records = container.FindElements(By.TagName("li"));
-                    foreach (var record in records)
-                    {
-                        if (record.Text.StartsWith(userOrTeamName, StringComparison.OrdinalIgnoreCase))
+                        //Set the User Or Team
+                        var userOrTeamField = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookup]), "User field unavailable");
+
+                        if (userOrTeamField.FindElements(By.TagName("input")).Count > 0)
                         {
-                            try
+                            var input = userOrTeamField.FindElement(By.TagName("input"));
+                            if (input != null)
                             {
-                                record.Click();
-                                break;
+                                input.Click();
+                                input.SendKeys(userOrTeamName, true);
                             }
-                            catch (StaleElementReferenceException)
+                        }
+
+                        //Pick the User from the list
+                        driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogUserTeamLookupResults]));
+                        //Remove this line
+                        driver.WaitUntilVisible(By.XPath("//label[text()='[NAME]']".Replace("[NAME]", userOrTeamName)));
+
+                        //WaitUntilVisible is too fast, adding a wait to allow CRM to catch up.  This needs to be removed.
+                        Browser.ThinkTime(5000);
+                        var container = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogUserTeamLookupResults]));
+                        var records = container.FindElements(By.TagName("li"));
+                        foreach (var record in records)
+                        {
+                            if (record.Text.StartsWith(userOrTeamName, StringComparison.OrdinalIgnoreCase))
                             {
-                                continue;
+                                try
+                                {
+                                    record.Click();
+                                    break;
+                                }
+                                catch (StaleElementReferenceException)
+                                {
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -469,7 +472,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         buttonToClick.Click();
                     }
-                    catch(StaleElementReferenceException)
+                    catch (StaleElementReferenceException)
                     {
                     }
                 }
@@ -504,18 +507,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
         internal BrowserCommandResult<bool> CloseOpportunityDialog(bool clickOK)
         {
-            return this.Execute(GetOptions($"Assign to User or Team Dialog"), driver =>
+            return this.Execute(GetOptions($"Close Opportunity Dialog"), driver =>
             {
                 var inlineDialog = this.SwitchToDialog();
 
                 if (inlineDialog)
                 {
                     //Close Opportunity
-                    var xPath = AppElements.Xpath[AppReference.Dialogs.CloseOpportunityOKButton];
+                    var xPath = AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok];
 
                     //Cancel
                     if (!clickOK)
-                        xPath = AppElements.Xpath[AppReference.Dialogs.CloseOpportunityCancelButton];
+                        xPath = AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok];
 
                     driver.WaitUntilClickable(By.XPath(xPath),
                         new TimeSpan(0, 0, 5),
@@ -1599,7 +1602,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     "Assign Button is not available");
 
                 assignBtn?.Click();
-                AssignDialog(userOrTeamToAssign);
+                AssignDialog(Dialogs.AssignTo.User, userOrTeamToAssign);
 
                 return true;
             });
@@ -1652,8 +1655,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var closeBtn = driver.WaitUntilAvailable(By.XPath(xPathQuery), "Opportunity Close Button is not available");
 
                 closeBtn?.Click();
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunityOKButton]));
+                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]));
                 CloseOpportunityDialog(true);
+
+                return true;
+            });
+        }
+        internal BrowserCommandResult<bool> CloseOpportunity(double revenue, DateTime closeDate, string description, int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Close Opportunity"), driver =>
+            {
+                SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.ActualRevenueId], revenue.ToString());
+                SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.CloseDateId], closeDate);
+                SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
+
+                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]),
+                    new TimeSpan(0, 0, 5),
+                    d => { driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok])); },
+                    d => { throw new InvalidOperationException("The Close Opportunity dialog is not available."); });
 
                 return true;
             });
