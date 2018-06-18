@@ -295,7 +295,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions($"Click GridView button of {subgridName}"), driver =>
             {
-                driver.FindElement(By.Id($"{subgridName}_openAssociatedGridViewImageButtonImage"))?.Click();
+                driver.FindElement(By.Id($"{subgridName}_openAssociatedGridViewImageButton"))?.Click();
 
                 return true;
             });
