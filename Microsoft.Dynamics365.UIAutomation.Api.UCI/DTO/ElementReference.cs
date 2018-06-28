@@ -183,7 +183,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Login_Password", "//input[@type='password']"},
             { "Login_SignIn", "id(\"cred_sign_in_button\")"},
             { "Login_CrmMainPage", "id(\"crmTopBar\")"},
-            { "Login_StaySignedIn", "id(\"idSIButton9\")"},
+            { "Login_StaySignedIn", "//input[@id=\"idSIButton9\"]"},
 
             //Notification           
             { "Notification_AppMessageBar", "id(\"crmAppMessageBar\")"},
