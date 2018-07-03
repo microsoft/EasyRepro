@@ -35,9 +35,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public string[] OnlineDomains { get; set; }
 
         #region Login
-        internal BrowserCommandResult<LoginResult> Login(Uri orUri, SecureString username, SecureString password)
+        internal BrowserCommandResult<LoginResult> Login(Uri orgUri, SecureString username, SecureString password)
         {
-            return this.Execute(GetOptions("Login"), this.Login, orUri, username, password, default(Action<LoginRedirectEventArgs>));
+            return this.Execute(GetOptions("Login"), this.Login, orgUri, username, password, default(Action<LoginRedirectEventArgs>));
         }
 
         internal BrowserCommandResult<LoginResult> Login(Uri orgUri, SecureString username, SecureString password, Action<LoginRedirectEventArgs> redirectAction)
@@ -89,10 +89,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).SendKeys(Keys.Tab);
                     driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).Submit();
 
+                    Thread.Sleep(1000);
+
+                    driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]), new TimeSpan(0, 0, 5));
+
                     if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])))
                     {
                         driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]));
-                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])).Submit();
                     }
 
                     driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
@@ -101,6 +104,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             e.WaitForPageToLoad();
                             e.SwitchTo().Frame(0);
                             e.WaitForPageToLoad();
+
+                            //Switch Back to Default Content for Navigation Steps
+                            e.SwitchTo().DefaultContent();
                         },
                         f => { throw new Exception("Login page failed."); });
                 }
@@ -123,16 +129,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 var buttons = container.FindElements(By.TagName("button"));
 
-                var button = buttons.FirstOrDefault(x => x.Text == appName);
+                var button = buttons.FirstOrDefault(x => x.Text.Trim() == appName);
 
                 if (button != null)
-                    button.Click();
+                    button.Click(true);
                 else
                     throw new InvalidOperationException($"App Name {appName} not found.");
 
                 driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
                 driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
                 driver.WaitForPageToLoad();
+
+                driver.WaitForTransaction();
 
                 return true;
             });
@@ -178,10 +186,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new InvalidOperationException($"No subarea with the name '{subarea}' exists inside of '{area}'.");
                 }
 
-                subAreas[subarea].Click();
+                subAreas[subarea].Click(true);
 
                 driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
                 driver.WaitForPageToLoad();
+
+                driver.WaitForTransaction();
 
                 return true;
             });
@@ -1206,30 +1216,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var input = fieldContainer.FindElement(By.TagName("input"));
                     if (input != null)
                     {
-                        input.Click();
+                        input.Click(true);
                         input.SendKeys(control.Value, true);
+                        this.ThinkTime(1000);
+                        input.Click();
                     }
-                }
+                 }
 
-                var flyoutDialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupMenu].Replace("[NAME]", control.Name)));
-                var dialogItems = OpenDialog(flyoutDialog).Value;
 
-                if (control.Value != null)
-                {
-                    if (!dialogItems.Exists(x => x.Title == control.Value))
-                        throw new InvalidOperationException($"List does not have {control.Value}.");
+                    var flyoutDialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupMenu].Replace("[NAME]", control.Name)));
+                    var dialogItems = OpenDialog(flyoutDialog).Value;
 
-                    var dialogItem = dialogItems.Where(x => x.Title == control.Value).First();
-                    driver.ClickWhenAvailable(By.Id(dialogItem.Id));
-                }
-                else
-                {
-                    if (dialogItems.Count < control.Index)
-                        throw new InvalidOperationException($"List does not have {control.Index + 1} items.");
+                    if (control.Value != null)
+                    {
+                        if (!dialogItems.Exists(x => x.Title == control.Value))
+                            throw new InvalidOperationException($"List does not have {control.Value}.");
 
-                    var dialogItem = dialogItems[control.Index];
-                    driver.ClickWhenAvailable(By.Id(dialogItem.Id));
-                }
+                        var dialogItem = dialogItems.Where(x => x.Title.ToLower() == control.Value.ToLower()).First();
+                        driver.ClickWhenAvailable(By.Id(dialogItem.Id));
+                    }
+                    else
+                    {
+                        if (dialogItems.Count < control.Index)
+                            throw new InvalidOperationException($"List does not have {control.Index + 1} items.");
+
+                        var dialogItem = dialogItems[control.Index];
+                        driver.ClickWhenAvailable(By.Id(dialogItem.Id));
+                    }
                 return true;
             });
         }
@@ -1756,8 +1769,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="by">The xpath of the HTML item as a By object</param>
         /// <returns>True on success, Exception on failure to invoke any action</returns>
-        internal BrowserCommandResult<bool> SelectTab(string tabName, string subTabName = "")
+        internal BrowserCommandResult<bool> SelectTab(string tabName, string subTabName = "", int thinkTime = Constants.DefaultThinkTime)
         {
+            Browser.ThinkTime(thinkTime);
+
             return this.Execute($"Select Tab", driver =>
             {
                 driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));

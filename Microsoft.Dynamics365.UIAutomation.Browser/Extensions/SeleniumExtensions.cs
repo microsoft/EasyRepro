@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
@@ -58,7 +59,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             WaitUntilClickable(driver,
                                 by,
                                 timeout,
-                                d => { element.Click(); },
+                                d => { element.Click(true); },
                                 e => { throw new InvalidOperationException($"Unable to click element."); });
 
 
@@ -279,9 +280,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             if (clear)
             {
                 element.Clear();
+                element.SendKeys(value);
             }
-
-            element.SendKeys(value);
+            else
+            {
+                element.SendKeys(value);
+            }
         }
 
         public static bool AlertIsPresent(this IWebDriver driver)
