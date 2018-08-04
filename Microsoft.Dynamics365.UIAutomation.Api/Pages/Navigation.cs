@@ -450,8 +450,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Navigation.SubActionGroupContainer]));
 
-                Thread.Sleep(1000);
-
                 var subNavElement = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.SubActionGroupContainer]));
 
                 var subItems = subNavElement.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.SubActionElementClass]));
