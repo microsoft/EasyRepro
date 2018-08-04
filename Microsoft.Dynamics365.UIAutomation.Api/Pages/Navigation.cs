@@ -96,8 +96,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     throw new InvalidOperationException($"No subarea with the name '{subArea}' exists inside of '{area}'.");
                 }
 
-                subAreas[subArea].Click();
 
+                try
+                {
+                    subAreas[subArea].Click();
+                }
+                catch(Exception ex)
+                {
+                    //The subarea might be displayed on the second/etc page
+                    //Then try using javascript as per
+                    //https://stackoverflow.com/questions/22110282/how-to-click-on-hidden-element-in-selenium-webdriver
+
+                    IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+                    js.ExecuteScript("arguments[0].click();", subAreas[subArea]);
+                }
+                
                 SwitchToContent();
                 driver.WaitForPageToLoad();
 
@@ -437,14 +450,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Navigation.SubActionGroupContainer]));
 
+                Thread.Sleep(1000);
+
                 var subNavElement = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.SubActionGroupContainer]));
 
                 var subItems = subNavElement.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.SubActionElementClass]));
 
-                foreach (var subItem in subItems)
+                foreach (var subItem in subItems )
                 {
+                    
                     if(!string.IsNullOrEmpty(subItem.Text))
-                    dictionary.Add(subItem.Text.ToLowerString(), subItem);
+                      dictionary.Add(subItem.Text.ToLowerString(), subItem);
+                    else //if the subarea is hidden, it won't have "text" populate. GetAttribute("text") seems to have the right value (at least when tested in Chrome)
+                    {
+                        var text = subItem.GetAttribute("text");
+                        if (!string.IsNullOrEmpty(text))
+                            dictionary.Add(text.ToLowerString(), subItem);
+                    }
+                    
                 }
 
                 return dictionary;
