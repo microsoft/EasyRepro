@@ -101,7 +101,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 {
                     subAreas[subArea].Click();
                 }
-                catch(Exception ex)
+                catch(ElementNotVisibleException )
                 {
                     //The subarea might be displayed on the second/etc page
                     //Then try using javascript as per
@@ -463,7 +463,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         var text = subItem.GetAttribute("text");
                         if (!string.IsNullOrEmpty(text))
-                            dictionary.Add(text.ToLowerString(), subItem);
+                           dictionary.Add(text.ToLowerString(), subItem);
                     }
                     
                 }
