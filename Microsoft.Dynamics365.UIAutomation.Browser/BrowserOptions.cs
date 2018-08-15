@@ -45,6 +45,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool Headless { get; set; }
         public bool UserAgent { get; set; }
         public string UserAgentValue { get; set; }
+        public Uri RemoteServerUrl { get; set; }
 
         public virtual ChromeOptions ToChrome()
         {
@@ -72,7 +73,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
             return options;
         }
-        
+
         public virtual InternetExplorerOptions ToInternetExplorer()
         {
 
@@ -97,13 +98,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 IgnoreZoomLevel = true,
                 EnablePersistentHover = true,
                 BrowserCommandLineArguments = this.PrivateMode ? "-private" : ""
-               
+
             };
-            
+
             return options;
         }
 
-        public  virtual FirefoxOptions ToFireFox()
+        public virtual FirefoxOptions ToFireFox()
         {
             var options = new FirefoxOptions()
             {

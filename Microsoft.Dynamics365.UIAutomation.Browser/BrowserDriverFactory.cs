@@ -9,6 +9,7 @@ using OpenQA.Selenium.PhantomJS;
 using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Edge;
 using System;
+using OpenQA.Selenium.Remote;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
@@ -16,8 +17,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
     {
         public static IWebDriver CreateWebDriver(BrowserOptions options)
         {
+            var driver = options.RemoteServerUrl != null ? CreateRemoteDriver(options) : CreateLocalDriver(options);
+
+            driver.Manage().Timeouts().PageLoad = options.PageLoadTimeout;
+
+            if (options.StartMaximized && options.BrowserType != BrowserType.Chrome) //Handle Chrome in the Browser Options
+                driver.Manage().Window.Maximize();
+
+            if (options.FireEvents || options.EnableRecording)
+            {
+                // Wrap the newly created driver.
+                driver = new EventFiringWebDriver(driver);
+            }
+
+            return driver;
+        }
+
+        private static IWebDriver CreateLocalDriver(BrowserOptions options)
+        {
             IWebDriver driver;
-           
+
             switch (options.BrowserType)
             {
                 case BrowserType.Chrome:
@@ -39,26 +58,37 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 case BrowserType.Edge:
                     var edgeService = EdgeDriverService.CreateDefaultService();
                     edgeService.HideCommandPromptWindow = options.HideDiagnosticWindow;
-                    driver = new EdgeDriver(edgeService,options.ToEdge(), TimeSpan.FromMinutes(20));
-
+                    driver = new EdgeDriver(edgeService, options.ToEdge(), TimeSpan.FromMinutes(20));
                     break;
                 default:
                     throw new InvalidOperationException(
                         $"The browser type '{options.BrowserType}' is not recognized.");
             }
 
-            driver.Manage().Timeouts().PageLoad = options.PageLoadTimeout;
-
-            if(options.StartMaximized && options.BrowserType != BrowserType.Chrome) //Handle Chrome in the Browser Options
-                driver.Manage().Window.Maximize();
-
-            if (options.FireEvents || options.EnableRecording)
-            {
-                // Wrap the newly created driver.
-                driver = new EventFiringWebDriver(driver);
-            }
-
             return driver;
+        }
+
+        private static IWebDriver CreateRemoteDriver(BrowserOptions browserOptions)
+        {
+            return new RemoteWebDriver(browserOptions.RemoteServerUrl, GetDriverOptions(browserOptions));
+        }
+
+        private static DriverOptions GetDriverOptions(BrowserOptions options)
+        {
+            switch (options.BrowserType)
+            {
+                case BrowserType.Chrome:
+                    return options.ToChrome();
+                case BrowserType.IE:
+                    return options.ToInternetExplorer();
+                case BrowserType.Firefox:
+                    return options.ToFireFox();
+                case BrowserType.Edge:
+                    return options.ToEdge();
+                default:
+                    throw new InvalidOperationException(
+                        $"The browser type '{options.BrowserType}' is not recognized.");
+            }
         }
     }
 }
