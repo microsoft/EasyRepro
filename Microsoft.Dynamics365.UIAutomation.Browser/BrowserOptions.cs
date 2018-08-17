@@ -7,6 +7,7 @@ using OpenQA.Selenium.IE;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using OpenQA.Selenium;
 
@@ -27,8 +28,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.RecordingScanInterval = TimeSpan.FromMilliseconds(Constants.Browser.Recording.DefaultScanInterval);
             this.Credentials = BrowserCredentials.Default;
             this.HideDiagnosticWindow = true;
+            this.TimeFactor = 1.0f;
         }
 
+        public float TimeFactor { get; set; }
         public BrowserType BrowserType { get; set; }
         public BrowserCredentials Credentials { get; set; }
         public string DriversPath { get; set; }
@@ -45,6 +48,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool Headless { get; set; }
         public bool UserAgent { get; set; }
         public string UserAgentValue { get; set; }
+        public string[] ExtraChromeArguments { get; set; }
 
         public virtual ChromeOptions ToChrome()
         {
@@ -69,6 +73,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             {
                 options.AddArgument("--user-agent=" + UserAgentValue);
             }
+
+            if (ExtraChromeArguments != null)
+                foreach (var argument in ExtraChromeArguments)
+                {
+                    options.AddArgument(argument);
+                }
 
             return options;
         }

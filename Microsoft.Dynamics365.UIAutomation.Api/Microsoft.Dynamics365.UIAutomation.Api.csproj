@@ -78,8 +78,10 @@
     <Compile Include="DTOs\Link.cs" />
     <Compile Include="DTOs\ListItem.cs" />
     <Compile Include="DTOs\PerformanceMarker.cs" />
+    <Compile Include="Extensions\EntityExtensions.cs" />
     <Compile Include="LoginRedirectEventArgs.cs" />
     <Compile Include="Office365Browser.cs" />
+    <Compile Include="Pages\FormJS.cs" />
     <Compile Include="Pages\Office365.cs" />
     <Compile Include="Pages\WindowPerformanceNavigation.cs" />
     <Compile Include="Pages\Administration.cs" />
