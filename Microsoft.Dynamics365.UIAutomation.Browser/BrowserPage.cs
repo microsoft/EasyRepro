@@ -13,10 +13,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             Browser = browser;
             Browser.Depth = 1;
+<<<<<<< HEAD
         }
 
         public BrowserPage()
         {
+=======
+
+
+>>>>>>> origin/releases/v8.1
         }
 
         public InteractiveBrowser Browser;

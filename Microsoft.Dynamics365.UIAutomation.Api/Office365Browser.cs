@@ -27,7 +27,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         #region Login
 
+<<<<<<< HEAD
         public LoginDialog LoginPage => this.GetPage<LoginDialog>();
+=======
+        public LoginPage LoginPage => this.GetPage<LoginPage>();
+>>>>>>> origin/releases/v8.1
 
         public void GoToPortalHome()
         {
@@ -39,13 +43,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         #region Navigation
 
+<<<<<<< HEAD
         public Office365Navigation Navigation => this.GetPage<Office365Navigation>();
+=======
+        public Office365NavigationPage Navigation => this.GetPage<Office365NavigationPage>();
+>>>>>>> origin/releases/v8.1
 
         #endregion Navigation
 
         #region Instance Picker
 
+<<<<<<< HEAD
         public Office365XrmInstancePicker XrmInstancePicker => this.GetPage<Office365XrmInstancePicker>();
+=======
+        public Office365XrmInstancePickerPage XrmInstancePicker => this.GetPage<Office365XrmInstancePickerPage>();
+>>>>>>> origin/releases/v8.1
 
         #endregion Instance Picker
     }

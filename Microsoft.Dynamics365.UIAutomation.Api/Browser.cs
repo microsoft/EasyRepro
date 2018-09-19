@@ -82,6 +82,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         public Entity Entity => this.GetPage<Entity>();
 
+        public FormJS FormJS => this.GetPage<FormJS>();
+
         #endregion Forms
 
         #region Related

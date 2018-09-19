@@ -3,7 +3,10 @@
 
 using OpenQA.Selenium;
 using System;
+<<<<<<< HEAD
 using System.Security;
+=======
+>>>>>>> origin/releases/v8.1
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {

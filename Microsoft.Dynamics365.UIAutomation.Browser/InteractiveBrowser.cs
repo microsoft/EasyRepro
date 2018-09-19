@@ -130,12 +130,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         internal DateTime? LastCommandEndTime;
         public int Depth = 1;
 
+<<<<<<< HEAD
+        public float TimeFactor { get; set; } = 1.0f;
+
+=======
+>>>>>>> origin/releases/v8.1
         #endregion Properties
 
         #region Methods
 
+<<<<<<< HEAD
+
         public void ThinkTime(int milliseconds)
         {
+            var timeFactor = Math.Abs(this.TimeFactor - 1.0f) > 0.0001f ? this.TimeFactor : this.Options.TimeFactor;
+            milliseconds = (int)(timeFactor * milliseconds);
+
+=======
+        public void ThinkTime(int milliseconds)
+        {
+>>>>>>> origin/releases/v8.1
             if(!CommandThinkTimes.ContainsKey((Depth)))
                 CommandThinkTimes.Add(Depth,milliseconds);
             else if(Depth==1)
