@@ -3,15 +3,25 @@
 
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
+<<<<<<< HEAD
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Support.UI;
 using System;
+=======
+using OpenQA.Selenium.Support.Events;
+using OpenQA.Selenium.Support.UI;
+using System;
+using System.Linq;
+>>>>>>> origin/releases/v8.1
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+<<<<<<< HEAD
 using System.Linq;
+=======
+>>>>>>> origin/releases/v8.1
 using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
@@ -32,17 +42,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
             return driver;
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/releases/v8.1
         public static void Click(this IWebElement element, bool ignoreStaleElementException = false)
         {
             try
             {
                 element.Click();
             }
+<<<<<<< HEAD
             catch(StaleElementReferenceException ex)
             {
                 if (!ignoreStaleElementException)
                     throw ex;
+=======
+            catch (StaleElementReferenceException ex)
+            {
+                if (!ignoreStaleElementException)
+                    throw;
+>>>>>>> origin/releases/v8.1
             }
         }
 
@@ -58,7 +78,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             WaitUntilClickable(driver,
                                 by,
                                 timeout,
+<<<<<<< HEAD
                                 d => { element.Click(); },
+=======
+                                d => { element.Click(true); },
+>>>>>>> origin/releases/v8.1
                                 e => { throw new InvalidOperationException($"Unable to click element."); });
 
 
@@ -68,6 +92,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         #endregion Click
 
+<<<<<<< HEAD
         #region Double Click
 
         public static void DoubleClick(this IWebDriver driver, IWebElement element, bool ignoreStaleElementException = false)
@@ -100,6 +125,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         #endregion
 
+=======
+>>>>>>> origin/releases/v8.1
         #region Script Execution
 
         [DebuggerNonUserCode()]
@@ -342,11 +369,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return WaitForPageToLoad(driver, Constants.DefaultTimeout.Seconds);
         }
 
+<<<<<<< HEAD
         public static bool WaitForTransaction(this IWebDriver driver)
         {
             return WaitForTransaction(driver, Constants.DefaultTimeout.Seconds);
         }
 
+=======
+>>>>>>> origin/releases/v8.1
         //public static bool WaitForPageToLoad(this IWebDriver driver, TimeSpan timeout)
         //{
         //    object readyState = WaitForScript(driver, "if (document.readyState) return document.readyState;", timeout);
@@ -409,6 +439,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
             return true;
         }
+<<<<<<< HEAD
 
         public static bool WaitForTransaction(this IWebDriver driver, int maxWaitTimeInSeconds)
         {
@@ -443,6 +474,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
            
             return state;
         }
+=======
+>>>>>>> origin/releases/v8.1
         public static string Last(this System.Collections.ObjectModel.ReadOnlyCollection<string> handles, IWebDriver driver)
         {
             return handles[handles.Count - 1];
@@ -634,6 +667,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public static string ToTraceString(this FindElementEventArgs e)
         {
+<<<<<<< HEAD
             try
             {
                 if (e.Element != null)
@@ -646,6 +680,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 }
             }
             catch(Exception)
+=======
+            if (e.Element != null)
+            {
+                return string.Format("{4} - [{0},{1}] - <{2}>{3}</{2}>", e.Element.Location.X, e.Element.Location.Y, e.Element.TagName, e.Element.Text, e.FindMethod);
+            }
+            else
+>>>>>>> origin/releases/v8.1
             {
                 return e.FindMethod.ToString();
             }

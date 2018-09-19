@@ -5,10 +5,16 @@ using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
+<<<<<<< HEAD
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
+=======
+using System.Linq;
+
+
+>>>>>>> origin/releases/v8.1
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
 
@@ -37,6 +43,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             //return this.Execute($"Set Value: {field}", SetValue, field, check);
             return this.Execute(GetOptions($"Set Value: {field}"), driver =>
             {
+<<<<<<< HEAD
                 if (driver.HasElement(By.Id(field)))
                 {
                     var input = driver.FindElement(By.Id(field));
@@ -47,6 +54,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         checkBox.Click();
                     }
+=======
+                if (driver.HasElement(By.Id("int_" + field)))
+                {
+                    var input = driver.FindElement(By.Id("int_" + field));
+
+                    if (bool.Parse(input.FindElement(By.TagName("input")).GetAttribute("checked")) && !check)
+                        input.FindElement(By.TagName("input")).Click();
+>>>>>>> origin/releases/v8.1
                 }
                 else
                     throw new InvalidOperationException($"Field: {field} Does not exist");
@@ -107,7 +122,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public BrowserCommandResult<bool> SetValue(string field, string value)
         {
             //return this.Execute($"Set Value: {field}", SetValue, field, value);
+<<<<<<< HEAD
             var returnval = this.Execute(GetOptions($"Set Value: {field}"), driver =>
+=======
+            return this.Execute(GetOptions($"Set Value: {field}"), driver =>
+>>>>>>> origin/releases/v8.1
             {
                 if (driver.HasElement(By.Id(field)))
                 {
@@ -121,6 +140,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         js.ExecuteScript("arguments[0].setAttribute('style', 'pointer-events: none; cursor: default')", element);
                     }
                     fieldElement.Click();
+<<<<<<< HEAD
 
                     try
                     { 
@@ -131,12 +151,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                             fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
                     }
                     catch (NoSuchElementException) { }
+=======
+                    //Check to see if focus is on field already
+                    if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
+                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
+                    else
+                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
+>>>>>>> origin/releases/v8.1
 
                     if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
                     {
                         fieldElement.FindElement(By.TagName("textarea")).Clear();
                         fieldElement.FindElement(By.TagName("textarea")).SendKeys(value);
                     }
+<<<<<<< HEAD
                     else if(fieldElement.TagName =="textarea")
                     {
                         fieldElement.Clear();
@@ -147,6 +175,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
                         //driver.ExecuteScript("Xrm.Page.getAttribute('" + field + "').setValue('')");
                         fieldElement.FindElement(By.TagName("input")).SendKeys(value, true);
+=======
+                    else
+                    {
+                        //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
+                        driver.ExecuteScript("Xrm.Page.getAttribute('" + field + "').setValue('')");
+                        fieldElement.FindElement(By.TagName("input")).SendKeys(value);
+>>>>>>> origin/releases/v8.1
                     }
                 }
                 else
@@ -154,7 +189,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 return true;
             });
+<<<<<<< HEAD
             return returnval;
+=======
+>>>>>>> origin/releases/v8.1
         }
 
         /// <summary>
@@ -232,6 +270,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
+<<<<<<< HEAD
         /// Sets the value of a multi-value picklist.
         /// </summary>
         /// <param name="option">The option you want to set.</param>
@@ -278,6 +317,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
+=======
+>>>>>>> origin/releases/v8.1
         /// Sets the value of a Composite control.
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
@@ -304,11 +345,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                         var result = compcntrl.FindElements(By.TagName("input"))
                             .ToList()
+<<<<<<< HEAD
                             .FirstOrDefault(i => i.GetAttribute("id").Contains(field.Id));
 
                         //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
                         driver.ExecuteScript("document.getElementById('" + result?.GetAttribute("id") + "').value = ''");
                         result?.SendKeys(field.Value);
+=======
+                            .FirstOrDefault(i => i.GetAttribute("id").Contains(field.Id)); 
+                                            
+                         //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
+                         driver.ExecuteScript("document.getElementById('" + result?.GetAttribute("id") + "').value = ''");
+
+                         result?.SendKeys(field.Value);
+>>>>>>> origin/releases/v8.1
                     }
 
                     compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.Confirm])).Click();
@@ -325,7 +375,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmBrowser.Entity.SetValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
+<<<<<<< HEAD
         public BrowserCommandResult<bool> SetValue(LookupItem control)
+=======
+        public BrowserCommandResult<bool> SetValue(Lookup control)
+>>>>>>> origin/releases/v8.1
         {
             return this.Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
             {
@@ -345,6 +399,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     var dialogItems = OpenDialog(dialog).Value;
 
+<<<<<<< HEAD
 
                     if (control.Value != null)
                     {
@@ -355,14 +410,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         var dialogItem = dialogItems.Where(x => x.Title == control.Value).First();
                         dialogItem.Element.Click();
 
+=======
+                    if(control.Value != null)
+                    {
+                        if (!dialogItems.Keys.Contains(control.Value))
+                            throw new InvalidOperationException($"List does not have {control.Value}.");
+
+                        var dialogItem = dialogItems[control.Value];
+                        dialogItem.Click();
+>>>>>>> origin/releases/v8.1
                     }
                     else
                     {
                         if (dialogItems.Count < control.Index)
                             throw new InvalidOperationException($"List does not have {control.Index + 1} items.");
 
+<<<<<<< HEAD
                         var dialogItem = dialogItems[control.Index];
                         dialogItem.Element.Click();
+=======
+                        var dialogItem = dialogItems.Values.ToList()[control.Index];
+                        dialogItem.Click();
+>>>>>>> origin/releases/v8.1
                     }
                 }
                 else
@@ -467,10 +536,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 {
                     var compcntrl =
                         driver.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut]));
+<<<<<<< HEAD
 
                     foreach (var field in control.Fields)
                     {
                         compcntrl.FindElement(By.Id(Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
+=======
+                     
+                    foreach (var field in control.Fields)
+                    {
+                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
+>>>>>>> origin/releases/v8.1
 
                         var result = compcntrl.FindElements(By.TagName("input"))
                             .ToList()
@@ -515,7 +591,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmBrowser.Entity.GetValue(new Lookup { Name = "primarycontactid" });</example>
+<<<<<<< HEAD
         public BrowserCommandResult<string> GetValue(LookupItem control)
+=======
+        public BrowserCommandResult<string> GetValue(Lookup control)
+>>>>>>> origin/releases/v8.1
         {
             return this.Execute($"Get Lookup Value: {control.Name}", driver =>
             {
@@ -573,6 +653,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 index = frameIndex.ToString();
 
             Browser.Driver.SwitchTo().DefaultContent();
+<<<<<<< HEAD
             
             // Check to see if dialog is InlineDialog or popup
             var inlineDialog = Browser.Driver.HasElement(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)));
@@ -593,6 +674,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <summary>
         /// Switches to Quick Find frame in the CRM application.
         /// </summary>
+=======
+            //wait for the content panel to render
+
+            Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)),
+                new TimeSpan(0, 0, 2),
+                d => { Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
+
+            return true;
+
+        }
+        /// <summary>
+        /// Switches to Quick Find frame in the CRM application.
+        /// </summary>
+
+>>>>>>> origin/releases/v8.1
         public bool SwitchToQuickCreateFrame()
         {
             return this.Execute("Switch to Quick Create Frame", driver => SwitchToQuickCreate());
@@ -647,6 +743,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return true;
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// Switches to Wizard frame in the CRM application.
         /// </summary>
@@ -698,6 +795,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
 
+=======
+>>>>>>> origin/releases/v8.1
         internal BrowserCommandOptions GetOptions(string commandName)
         {
             return new BrowserCommandOptions(Constants.DefaultTraceSource,
@@ -709,6 +808,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 typeof(NoSuchElementException), typeof(StaleElementReferenceException));
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// Gets the Commands
         /// </summary>
@@ -1075,6 +1175,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public BrowserCommandResult<List<ListItem>> OpenDialog(IWebElement dialog)
         {
             var list = new List<ListItem>();
+=======
+
+        /// <summary>
+        /// Open Dialog
+        /// </summary>
+        /// <param name="dialog">The dialog</param>
+        /// <example></example>
+        private BrowserCommandResult<Dictionary<string, IWebElement>> OpenDialog(IWebElement dialog)
+        {
+            var dictionary = new Dictionary<string, IWebElement>();
+>>>>>>> origin/releases/v8.1
             var dialogItems = dialog.FindElements(By.TagName("li"));
 
             foreach (var dialogItem in dialogItems)
@@ -1087,6 +1198,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         var title = links[1].GetAttribute("title");
 
+<<<<<<< HEAD
                         list.Add(new ListItem()
                         {
                             Title = title,
@@ -1097,6 +1209,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             }
 
             return list;
+=======
+                        dictionary.Add(title, links[1]);
+                    }
+                }
+            }
+            return dictionary;
+>>>>>>> origin/releases/v8.1
         }
 
 
