@@ -89,18 +89,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.Pages
             return ExecuteJS<bool>(commandName, code);
         }
 
-        public enum RequiereLevel { Unknown = 0, None, Required, Recommended }
+        public enum RequiredLevel { Unknown = 0, None, Required, Recommended }
 
-        public BrowserCommandResult<RequiereLevel> GetRequiredLevel(string attributte)
+        public BrowserCommandResult<RequiredLevel> GetRequiredLevel(string attributte)
         {
             var commandName = $"Get Attribute RequiredLevel via Form JS: {attributte}";
             string code = $"return Xrm.Page.getAttribute('{attributte}').getRequiredLevel()";
             
-            return ExecuteJS<string, RequiereLevel>(commandName, code,
+            return ExecuteJS<string, RequiredLevel>(commandName, code,
                 v =>
                 {
-                    bool success =  Enum.TryParse(v, true, out RequiereLevel result);
-                    return success ? result : RequiereLevel.Unknown;
+                    bool success =  Enum.TryParse(v, true, out RequiredLevel result);
+                    return success ? result : RequiredLevel.Unknown;
                 });
         }
 

@@ -26,7 +26,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
         {
             var options = TestSettings.Options;
             options.TimeFactor = 0.5f;
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(options))
+            using (var xrmBrowser = new Api.Browser(options))
             {
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
              
@@ -45,17 +45,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
                 xrmBrowser.Entity.SetValue("creditonhold", true);
 
                 xrmBrowser.CommandBar.ClickCommand("Save & Close");
-                // Is not posible to check Save Sucess or Fail
+                // Is not possible to check Save Success or Fail
                 xrmBrowser.ThinkTime(2000);
             }
         }
 
         [TestMethod]
-        public void CreateNewAccount_InconcluseSetValue()
+        public void CreateNewAccount_InconclusiveSetValue()
         {
             var options = TestSettings.Options;
             options.TimeFactor = 0.5f;
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(options))
+            using (var xrmBrowser = new Api.Browser(options))
             {
                 var newAccountUrl = _create("account");
                 xrmBrowser.LoginPage.Login(newAccountUrl, _username, _password);
@@ -75,7 +75,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
         [TestMethod]
         public void CreateNewAccount_ExecuteJavaScript_Generic()
         {
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(TestSettings.Options))
+            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
 
@@ -101,7 +101,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
         [TestMethod]
         public void CreateNewAccount_ExecuteJavaScript_Xrm()
         {
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(TestSettings.Options))
+            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
                 var newAccountUrl = _create("account");
                 xrmBrowser.LoginPage.Login(newAccountUrl, _username, _password);
@@ -131,7 +131,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
         [TestMethod]
         public void CreateNewAccount_ExecuteJavaScript_Xrm_GetId()
         {
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(TestSettings.Options))
+            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
                 var newAccountUrl = _create("account");
                  xrmBrowser.LoginPage.Login(newAccountUrl, _username, _password);
@@ -154,7 +154,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
         [TestMethod]
         public void CreateNewAccount_ExecuteJavaScript_Xrm_Using_HelperClass()
         {
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(TestSettings.Options))
+            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
                 var newAccountUrl = _create("account");
                 xrmBrowser.LoginPage.Login(newAccountUrl, _username, _password);
@@ -177,7 +177,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
         [TestMethod]
         public void CreateNewAccount_CheckSave()
         {
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(TestSettings.Options))
+            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
                 var newAccountUrl = _create("account");
                 xrmBrowser.LoginPage.Login(newAccountUrl, _username, _password);
@@ -201,7 +201,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
         [TestMethod]
         public void CreateNewAccount_SetPhoneNummer()
         {
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(TestSettings.Options))
+            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
                 var newAccountUrl = _create("account");
                 xrmBrowser.LoginPage.Login(newAccountUrl, _username, _password);
@@ -236,7 +236,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
         [TestMethod]
         public void CreateNewAccount_OverridePhoneNummer_Fail()
         {
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(TestSettings.Options))
+            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
                 var newAccountUrl = _create("account");
                 xrmBrowser.LoginPage.Login(newAccountUrl, _username, _password);
@@ -285,7 +285,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
         [TestMethod]
         public void CreateNewAccount_OverridePhoneNummer_Clearing()
         {
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(TestSettings.Options))
+            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
                 var newAccountUrl = _create("account");
                 xrmBrowser.LoginPage.Login(newAccountUrl, _username, _password);
@@ -335,7 +335,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
         [TestMethod]
         public void CreateNewAccount_OverrideCurrency_Fail()
         {
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(TestSettings.Options))
+            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
                 var newAccountUrl = _create("account");
                 xrmBrowser.LoginPage.Login(newAccountUrl, _username, _password);
@@ -354,7 +354,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
         [TestMethod]
         public void CreateNewAccount_OverrideCurrency_Clearing()
         {
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(TestSettings.Options))
+            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
                 var newAccountUrl = _create("account");
                 xrmBrowser.LoginPage.Login(newAccountUrl, _username, _password);
@@ -374,7 +374,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
         [TestMethod]
         public void OnChangeContry_UpdatePhonePrefix_OverrideCurrency_UsingDialog()
         {
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(TestSettings.Options))
+            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
                 var newAccountUrl = _create("account");
                 xrmBrowser.LoginPage.Login(newAccountUrl, _username, _password);
@@ -398,11 +398,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.FormJS
             }
         }
 
-        // EntityExtention is a Combination of more Commands
+        // EntityExtension is a Combination of more Commands
         [TestMethod]
         public void CreateNewAccount_OverrideCurrency_JS_Clearing_Twice()
         {
-            using (var xrmBrowser = new Microsoft.Dynamics365.UIAutomation.Api.Browser(TestSettings.Options))
+            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
                 var newAccountUrl = _create("account");
                 xrmBrowser.LoginPage.Login(newAccountUrl, _username, _password);
