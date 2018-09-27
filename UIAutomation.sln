@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Dynamics365.UIAut
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Dynamics365.UIAutomation.Api.UCI", "Microsoft.Dynamics365.UIAutomation.Api.UCI\Microsoft.Dynamics365.UIAutomation.Api.UCI.csproj", "{AFCB5BB5-4512-4019-A911-5D56CFF4F3D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.PowerApps.UIAutomation.Api", "Microsoft.PowerApps.UIAutomation.Api\Microsoft.PowerApps.UIAutomation.Api.csproj", "{CB621ADC-A2F3-4AD6-8E65-B29DC3034D54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.PowerApps.UIAutomation.Sample", "Microsoft.PowerApps.UIAutomation.Sample\Microsoft.PowerApps.UIAutomation.Sample.csproj", "{9105FB92-7952-4F1B-9F6F-6769B4B5ED21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +46,18 @@ Global
 		{AFCB5BB5-4512-4019-A911-5D56CFF4F3D0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AFCB5BB5-4512-4019-A911-5D56CFF4F3D0}.UnitTest|Any CPU.ActiveCfg = Release|Any CPU
 		{AFCB5BB5-4512-4019-A911-5D56CFF4F3D0}.UnitTest|Any CPU.Build.0 = Release|Any CPU
+		{CB621ADC-A2F3-4AD6-8E65-B29DC3034D54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB621ADC-A2F3-4AD6-8E65-B29DC3034D54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB621ADC-A2F3-4AD6-8E65-B29DC3034D54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB621ADC-A2F3-4AD6-8E65-B29DC3034D54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB621ADC-A2F3-4AD6-8E65-B29DC3034D54}.UnitTest|Any CPU.ActiveCfg = Release|Any CPU
+		{CB621ADC-A2F3-4AD6-8E65-B29DC3034D54}.UnitTest|Any CPU.Build.0 = Release|Any CPU
+		{9105FB92-7952-4F1B-9F6F-6769B4B5ED21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9105FB92-7952-4F1B-9F6F-6769B4B5ED21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9105FB92-7952-4F1B-9F6F-6769B4B5ED21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9105FB92-7952-4F1B-9F6F-6769B4B5ED21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9105FB92-7952-4F1B-9F6F-6769B4B5ED21}.UnitTest|Any CPU.ActiveCfg = Release|Any CPU
+		{9105FB92-7952-4F1B-9F6F-6769B4B5ED21}.UnitTest|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
