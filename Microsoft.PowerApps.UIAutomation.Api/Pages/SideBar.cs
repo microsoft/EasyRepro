@@ -69,47 +69,6 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         /// Opens the Menu
         /// </summary>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        public BrowserCommandResult<bool> NavigateTIPApps(string menuItem, int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions("SideBar Navigate"), driver =>
-            {
-              
-
-                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.TIPApps]));
-
-                /* THIS IS OLD CODE - RETAINING IN THE EVENT THE SIDEBAR IS RESTORED IN TIP
-                 
-                bool itemExists = false;
-                 
-                //start with the sidebar html item
-                var sidebar = driver.FindElement(By.TagName("sidebar"));
-
-                //Get menu items
-                var items = driver.FindElements(By.TagName("sidebar-item"));
-
-
-                foreach (var item in items)
-                {
-                    var name = item.GetAttribute("label");
-
-                    if (string.Equals(name, menuItem, StringComparison.OrdinalIgnoreCase))
-                    {
-                        item.Click();
-                        itemExists = true;
-                        break;
-                    }
-                }
-
-                if (!itemExists) throw new Exception($"The menu item with name: {menuItem} does not exist.");
-                */
-
-
-                return true;
-            });
-        }
-
         public BrowserCommandResult<bool> ExpandCollapse(int thinkTime = Constants.DefaultThinkTime)
         {
           

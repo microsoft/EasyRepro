@@ -23,8 +23,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             //Canvas
             { "Canvas_Shell", "//*[@id=\"shell-root\"]" },
-            { "Canvas_AppManagementPageTIP", "//section[contains(@class, 'app-management-page')]" },
-            { "Canvas_AppManagementPagePreview", "//section[contains(@class, 'app-management-page')]" },
+            { "Canvas_AppManagementPage", "//section[contains(@class, 'app-management-page')]" },
             { "Canvas_Skip", "//*[@id=\"rootBody\"]/div[1]/div[2]/div[2]/div/button" },
             { "Canvas_ColorWhite", "//button[@title=\"RGBA(255, 255, 255, 1)\"]" },
             { "Canvas_ColorBlue", "//button[@title=\"RGBA(0, 120, 215, 1)\"]" },
@@ -33,8 +32,6 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             //Navigation
             { "Navigation_HomePage", "//*[@class=\"home-page\"]" },
-            { "Navigation_TIPApps", "//button[@title=\"Apps\"]" },
-            { "Navigation_TIP_SPConnectedList", "//h3[@title=\"SPConnectedList\"]"},
 
             //Backstage
             { "Backstage_MenuContainer","//div[contains(@class, 'backstage-nav')]" },
@@ -98,8 +95,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         public static class Canvas
         {
             public static string CanvasMainPage = "Canvas_Shell";
-            public static string AppManagementPageTIP = "Canvas_AppManagementPageTIP";
-            public static string AppManagementPagePreview = "Canvas_AppManagementPagePreview";
+            public static string AppManagementPage = "Canvas_AppManagementPage";
             public static string CanvasSkipButton = "Canvas_Skip";
             public static string ColorWhite = "Canvas_ColorWhite";
             public static string ColorBlue = "Canvas_ColorBlue";
@@ -109,7 +105,6 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         public static class Navigation
         {
             public static string AppLink = "Navigation_AppLink";
-            public static string TIPApps = "Navigation_TIPApps";
             public static string AppCommandBarButton = "Navigation_AppCommandBarButton";
             public static string CanvasPageLoaded = "Navigation_CanvasPageLoaded";
             public static string SaveButton = "Navigation_SaveButton";
@@ -125,11 +120,9 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             public static string CreateAppFromTemplateButtonId = "app-from-template-icon-container-id-phone";
             public static string CreateAppFromTemplateServiceDeskButtonId = "/providers/Microsoft.PowerApps/galleries/public/items/Microsoft.ServiceDeskNew.0.2.0";
             public static string CreateAppFromTemplateChooseButtonId = "templates-choose-button-id";
-
             public static string CreateAppFromSPOListButtonId = "shared_sharepointonline-phone";
             public static string CreateAppFromSPOListSPURLClassName = "new-site-text-input";
             public static string CreateAppFromDataNewSiteButtonClassName = "new-site-button";
-            public static string CreateAppFromDataSPConnectedList = "Navigation_TIP_SPConnectedList";
             public static string CreateAppFromDataSPConnectButtonClassName = "data-sources-pane-connect-button";
             
         }

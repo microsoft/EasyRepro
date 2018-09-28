@@ -34,7 +34,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return driver;
         }
 
-        public static void Click(this IWebElement element, bool ignoreStaleElementException = false)
+        public static void Click(this IWebElement element, bool ignoreStaleElementException = true)
         {
             try
             {
@@ -44,6 +44,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             {
                 if (!ignoreStaleElementException)
                     throw ex;
+            }
+        }
+        public static void Click(this IWebElement element, IWebDriver driver, bool ignoreStaleElementException = false)
+        {
+            try
+            {
+                if (driver.GetType().Name == "InternetExplorerDriver")
+                {
+                    driver.ExecuteScript("arguments[0].click();", element);
+                }
+                else
+                {
+                    element.Click();
+                }
+            }
+            catch (StaleElementReferenceException ex)
+            {
+                if (!ignoreStaleElementException)
+                    throw;
             }
         }
 
@@ -65,6 +84,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
 
             return element;
+        }
+
+        public static void Hover(this IWebElement Element, IWebDriver driver, bool ignoreStaleElementException = false)
+        {
+            try
+            {
+                Actions action = new Actions(driver);
+                action.MoveToElement(Element).Build().Perform();
+            }
+            catch (StaleElementReferenceException ex)
+            {
+                if (!ignoreStaleElementException)
+                    throw;
+            }
+        }
+
+        public static void DragAndDrop(this IWebElement Element, IWebDriver driver, int xOffset, int yOffset, bool ignoreStaleElementException = false)
+        {
+            try
+            {
+                Actions action = new Actions(driver);
+                action.DragAndDropToOffset(Element, xOffset, yOffset);
+                //action.ClickAndHold(Element).MoveByOffset(xOffset, yOffset).Release(Element).Build().Perform();
+
+            }
+            catch (StaleElementReferenceException ex)
+            {
+                if (!ignoreStaleElementException)
+                    throw;
+            }
         }
 
         #endregion Click
@@ -322,6 +371,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             return driver.SwitchTo().Window(driver.WindowHandles.Last());
         }
+        public static void OpenNewTab(this IWebDriver driver)
+        {
+            driver.ExecuteScript("window.open('about:blank', '_blank'); ");
+        }
 
         #endregion Elements
 
@@ -339,6 +392,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             var result = wait.Until(d => predicate(d));
 
             return result;
+        }
+
+        public static bool WaitForPlayerToLoad(this IWebDriver driver)
+        {
+            return WaitForPlayerToLoad(driver, Constants.DefaultTimeout.Seconds);
         }
 
         public static bool WaitForPageToLoad(this IWebDriver driver)
@@ -413,7 +471,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
             return true;
         }
+        public static bool WaitForPlayerToLoad(this IWebDriver driver, int maxWaitTimeInSeconds)
+        {
+            bool state = false;
+            try
+            {
+                Thread.Sleep(15000);
+                //Check to see if PowerApp load is completed
+                //state = (bool)driver.ExecuteScript("return window.performance.getEntriesByName('appMagicStart_End').length > 0", "");
+                state = (bool)driver.ExecuteScript("return window.performance.getEntriesByName('end_PowerAppsClient.PowerApp.Performance.SplashScreen').length > 0", "");
+            }
+            catch (TimeoutException)
+            {
+                Console.WriteLine("A timeout exception occurred checking for performance markers during appload.");
+            }
+            catch (NullReferenceException)
+            {
+                Console.WriteLine("A null reference exception occurred when checking performance markers during appload.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"An error occurred during appload: {e}");
+                throw e;
+            }
 
+            return state;
+        }
         public static bool WaitForTransaction(this IWebDriver driver, int maxWaitTimeInSeconds)
         {
             bool state = false;

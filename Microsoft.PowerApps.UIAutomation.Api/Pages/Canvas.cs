@@ -135,8 +135,6 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
         public BrowserCommandResult<bool> ClickButton(string name, int thinkTime = Constants.DefaultThinkTime)
         {
-            
-            
             return this.Execute(GetOptions("Change Canvas Color"), driver =>
             {
 

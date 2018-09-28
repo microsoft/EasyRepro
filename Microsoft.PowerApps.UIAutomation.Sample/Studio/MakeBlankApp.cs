@@ -15,7 +15,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample
             var username = ConfigurationManager.AppSettings["OnlineUsername"];
             var password = ConfigurationManager.AppSettings["OnlinePassword"];
             var uri = new System.Uri("https://web.powerapps.com");
-            var AZURE_KEY = "0c7a9c90-4cff-417f-8d97-28aac7aa76aa";
+            var AZURE_KEY = ConfigurationManager.AppSettings["AzureKey"];
 
             //Create a button that uses CDS to read an account out of CRM
 
@@ -49,24 +49,6 @@ namespace Microsoft.PowerApps.UIAutomation.Sample
                 button.ControlProperties.Add(new CanvasControlProperty("Height", "40"));
                 button.ControlProperties.Add(new CanvasControlProperty("Text", "Search"));
                 appCanvas.Canvas.AddControl(button);
-                
-                //Click the Button button in the ribbon
-                var label = new CanvasControl { Name = "Label", ControlType = "Label" };
-                label.ControlProperties.Add(new CanvasControlProperty("X", "36"));
-                label.ControlProperties.Add(new CanvasControlProperty("Y", "123"));
-                label.ControlProperties.Add(new CanvasControlProperty("Width", "150"));
-                label.ControlProperties.Add(new CanvasControlProperty("Height", "40"));
-                label.ControlProperties.Add(new CanvasControlProperty("Text", "Find Contact:"));
-                appCanvas.Canvas.AddControl(label);
-
-                //Click the Button button in the ribbon
-                var text = new CanvasControl { Name = "Text", ControlType = "Text:Text input" };
-                text.ControlProperties.Add(new CanvasControlProperty("X", "236"));
-                text.ControlProperties.Add(new CanvasControlProperty("Y", "123"));
-                text.ControlProperties.Add(new CanvasControlProperty("Width", "754"));
-                text.ControlProperties.Add(new CanvasControlProperty("Height", "40"));
-                text.ControlProperties.Add(new CanvasControlProperty("Default", ""));
-                appCanvas.Canvas.AddControl(text);
 
                 //Upload Telemetry
                 new Telemetry().AzureKey(AZURE_KEY)

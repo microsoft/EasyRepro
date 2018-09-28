@@ -50,7 +50,6 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
                 button.Click(driver, true);
 
-                driver.WaitForSPPlayerToLoad();
                 return true;
             }
             );
@@ -75,42 +74,12 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         /// <summary>
         /// Open a SharePoint form app direct
         /// </summary>
-        public BrowserCommandResult<bool> OpenSharePointApp(string listName, int listItem, string featureFlag = "", bool openInNewTab = false)
+        public BrowserCommandResult<bool> OpenSharePointList(string listName)
         {
             return this.Execute(GetOptions("Open SharePoint Form App"), driver =>
             {
                 var uri = new Uri(this.Browser.Driver.Url);
-                var link = $"{uri.Scheme}://{uri.Authority}/Lists/{listName}/DispForm.aspx?ID={listItem}&pa=1&e=b0yr4W{featureFlag}";
-
-
-                if (openInNewTab)
-                {
-                    driver.OpenNewTab();
-
-                    Thread.Sleep(1000);
-                    driver.LastWindow();
-
-                    Thread.Sleep(1000);
-
-                    driver.Navigate().GoToUrl(link);
-                }
-                else
-                {
-                    driver.Navigate().GoToUrl(link);
-                }
-
-                driver.WaitForSPPlayerToLoad();
-
-                return true;
-            });
-        }
-
-        public BrowserCommandResult<bool> OpenSharePointList(string listName, string featureFlag = "")
-        {
-            return this.Execute(GetOptions("Open SharePoint Form App"), driver =>
-            {
-                var uri = new Uri(this.Browser.Driver.Url);
-                var link = $"{uri.Scheme}://{uri.Authority}/Lists/{listName}/AllItems.aspx{featureFlag}";
+                var link = $"{uri.Scheme}://{uri.Authority}/Lists/{listName}/AllItems.aspx";
 
                 driver.Navigate().GoToUrl(link);
 
