@@ -233,23 +233,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var rowType = driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FirstRow])).GetAttribute("otypename");
 
                 var itemsTable = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Grid.GridBodyTable]));
-                var links = itemsTable.FindElements(By.XPath(Elements.Xpath[Reference.Grid.GridBodyTableRow]));
+                var rows = itemsTable.FindElements(By.XPath(Elements.Xpath[Reference.Grid.GridBodyTableRow]));
 
                 var clicked = false;
 
-                if (links.Any() && (index) < links.Count)
+                if (rows.Any() && (index) < rows.Count)
                 {
-                    // look for any span tag within the tr and click on that
-                    var blankSpans = links[index].FindElements(By.XPath(Elements.Xpath[Reference.Grid.GridBodyTableRowSpan]));
-                    if (blankSpans.Any())
-                    {
-                        driver.DoubleClick(blankSpans[0]);
-                    }
-                    else
-                    {
-                        // as a fall back click on the row
-                        driver.DoubleClick(links[index]);
-                    }
+
+                    driver.DoubleClick(rows[index].FindElement(By.XPath(Elements.Xpath[Reference.Grid.GridBodyTableRowCheckbox])));
+
                     clicked = true;
                 }
                 else
