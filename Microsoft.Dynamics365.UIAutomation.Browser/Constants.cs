@@ -95,9 +95,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             public static readonly string[] XrmDomains =
             {
                 ".crm.dynamics.com", ".crm2.dynamics.com", ".crm3.dynamics.com",
-                ".crm4.dynamics.com", "crm5.dynamics.com", "crm6.dynamics.com", "crm7.dynamics.com",
+                ".crm4.dynamics.com", ".crm5.dynamics.com", ".crm6.dynamics.com", ".crm7.dynamics.com",
                 ".crm8.dynamics.com", ".crm9.dynamics.com", ".crm10.dynamics.com", ".crm11.dynamics.com",
-                "portal.office.com", "crm2.crmlivetie.com"
+                "portal.office.com", "web.powerapps.com", "create.powerapps.com"
             };
         }
 
