@@ -24,9 +24,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.SetValue(field, value);
         }
 
-        public void SetValue(LookupItem control)
+        public void SetValue(LookupItem control, int index = 0)
         {
-            _client.SetValue(control);
+            _client.SetValue(control, index);
         }
 
         public void SetValue(OptionSet optionSet)

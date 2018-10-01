@@ -1205,7 +1205,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmApp.Entity.SetValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
-        internal BrowserCommandResult<bool> SetValue(LookupItem control)
+        internal BrowserCommandResult<bool> SetValue(LookupItem control, int index = 0)
         {
             return this.Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
             {
@@ -1229,10 +1229,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     if (control.Value != null)
                     {
-                        if (!dialogItems.Exists(x => x.Title == control.Value))
+                        if (!dialogItems.Exists(x => x.Title.ToLower() == control.Value.ToLower()))
                             throw new InvalidOperationException($"List does not have {control.Value}.");
 
-                        var dialogItem = dialogItems.Where(x => x.Title.ToLower() == control.Value.ToLower()).First();
+                        var dialogItem = dialogItems.Where(x => x.Title.ToLower() == control.Value.ToLower().[index]);
                         driver.ClickWhenAvailable(By.Id(dialogItem.Id));
                     }
                     else
