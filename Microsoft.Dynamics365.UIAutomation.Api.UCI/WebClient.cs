@@ -1235,12 +1235,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmApp.Entity.SetValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
-        /// The default index position is 0, which will be the first results record in the lookup results window. Suppy a value > 0 to select a different record if multiple are present.
+        /// The default index position is 0, which will be the first result record in the lookup results window. Suppy a value > 0 to select a different record if multiple are present.
         internal BrowserCommandResult<bool> SetValue(LookupItem control, int index = 0)
         {
             return this.Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
+
+                if (fieldContainer.FindElements(By.TagName("input")).Count == 0)
+                {
+                    var existingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", control.Name)));
+                    existingLookupValue.Hover(driver);
+                    
+                    var deleteExistingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
+                    deleteExistingLookupValue.Click();
+                }
+
+                fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
 
                 if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
                 {
