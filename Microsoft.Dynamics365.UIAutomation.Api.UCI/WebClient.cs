@@ -565,6 +565,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Opens the dialog
         /// </summary>
         /// <param name="dialog"></param>
+        public BrowserCommandResult<List<ListItem>> LookupResultsDropdown(IWebElement dialog)
+        {
+            var list = new List<ListItem>();
+            var dialogItems = dialog.FindElements(By.XPath(".//li"));
+
+            foreach (var dialogItem in dialogItems)
+            {
+                var titleLinks = dialogItem.FindElements(By.XPath(".//label"));
+                var divLinks = dialogItem.FindElements(By.XPath(".//div"));
+
+                if (titleLinks != null && titleLinks.Count > 0 && divLinks != null && divLinks.Count > 0)
+                {
+                    var title = titleLinks[0].GetAttribute("innerText");
+                    var divId = divLinks[0].GetAttribute("id");
+
+                    list.Add(new ListItem()
+                    {
+                        Title = title,
+                        Id = divId,
+                    });
+                }
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// Opens the dialog
+        /// </summary>
+        /// <param name="dialog"></param>
         public BrowserCommandResult<List<ListItem>> OpenDialog(IWebElement dialog)
         {
             var list = new List<ListItem>();
@@ -1205,6 +1235,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmApp.Entity.SetValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
+        /// The default index position is 0, which will be the first results record in the lookup results window. Suppy a value > 0 to select a different record if multiple are present.
         internal BrowserCommandResult<bool> SetValue(LookupItem control, int index = 0)
         {
             return this.Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
@@ -1223,26 +1254,46 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                  }
 
-
+                if (control.Value != null && control.Value != "")
+                {
                     var flyoutDialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupMenu].Replace("[NAME]", control.Name)));
                     var dialogItems = OpenDialog(flyoutDialog).Value;
 
-                    if (control.Value != null)
-                    {
-                        if (!dialogItems.Exists(x => x.Title.ToLower() == control.Value.ToLower()))
-                            throw new InvalidOperationException($"List does not have {control.Value}.");
+                    if (dialogItems.Count <= 0)
+                        throw new InvalidOperationException($"List does not contain a record with the name:  {control.Value}");
 
-                        var dialogItem = dialogItems.Where(x => x.Title.ToLower() == control.Value.ToLower().[index]);
-                        driver.ClickWhenAvailable(By.Id(dialogItem.Id));
+                    if (index + 1 > dialogItems.Count)
+                    {
+                        throw new InvalidOperationException($"List does not contain {index + 1} records. Please provide an index value less than {dialogItems.Count} ");
                     }
                     else
                     {
-                        if (dialogItems.Count < control.Index)
-                            throw new InvalidOperationException($"List does not have {control.Index + 1} items.");
-
-                        var dialogItem = dialogItems[control.Index];
+                        var dialogItem = dialogItems[index];
                         driver.ClickWhenAvailable(By.Id(dialogItem.Id));
                     }
+                }
+                else if (control.Value == "")
+                {
+                    var lookupResultsDialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.LookupResultsDropdown].Replace("[NAME]", control.Name)));
+                    var lookupResults = LookupResultsDropdown(lookupResultsDialog).Value;
+
+                    if (lookupResults.Count > 0)
+                    {
+                        if (index +1 > lookupResults.Count)
+                            throw new InvalidOperationException($"Recently Viewed list does not contain {index + 1} records. Please provide an index value less than {lookupResults.Count}");
+
+                        var lookupResult = lookupResults[index];
+
+                        driver.ClickWhenAvailable(By.Id(lookupResult.Id));
+                    }
+                    else
+                        throw new InvalidOperationException($"No results exist in the Recently Viewed flyout menu. Please provide a text value for {control.Name}");
+                }
+                else if (control.Value == null)
+                {
+                    throw new InvalidOperationException($"No value has been provided for the LookupItem {control.Name}. Please provide a value and try again.");
+                }
+
                 return true;
             });
         }

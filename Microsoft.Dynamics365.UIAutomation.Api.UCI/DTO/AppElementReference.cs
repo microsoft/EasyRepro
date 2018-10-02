@@ -60,6 +60,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string TextFieldContainer = "Entity_TextFieldContainer";
             public static string TextFieldLookup = "Entity_TextFieldLookup";
             public static string TextFieldLookupMenu = "Entity_TextFieldLookupMenu";
+            public static string LookupResultsDropdown = "Entity_LookupResultsDropdown";
             public static string TextFieldLookupFieldContainer = "Entity_TextFieldLookupFieldContainer";
             public static string RecordSetNavigator = "Entity_RecordSetNavigator";
             public static string RecordSetNavigatorOpen = "Entity_RecordSetNavigatorOpen";
@@ -219,6 +220,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Tab", "//li[@title=\"{0}\"]" },
             { "Entity_SubTab", "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]" },
             { "Entity_FieldControlDateTimeInput","//input[contains(@id,'[FIELD].fieldControl-date-time-input')]" },
+            { "Entity_LookupResultsDropdown", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
                         
             //CommandBar
             { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
