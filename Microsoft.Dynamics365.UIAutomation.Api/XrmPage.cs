@@ -1039,7 +1039,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="openLookupPage">The Open Lookup Page</param>
         public BrowserCommandResult<bool> SelectLookup(string field, bool openLookupPage = true)
         {
-            return this.Execute(GetOptions($"Set Lookup Value: {field}"), driver =>
+            return this.Execute(GetOptions($"Select Lookup for: {field}"), driver =>
             {
                 if (driver.HasElement(By.Id(field)))
                 {
@@ -1050,6 +1050,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click();
 
+                    Browser.ThinkTime(1000);
                     var dialogName = $"Dialog_{field}_IMenu";
                     var dialog = driver.FindElement(By.Id(dialogName));
 
