@@ -34,7 +34,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return driver;
         }
 
-        public static void Click(this IWebElement element, bool ignoreStaleElementException = false)
+        public static void Click(this IWebElement element, bool ignoreStaleElementException = true)
         {
             try
             {
@@ -44,6 +44,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             {
                 if (!ignoreStaleElementException)
                     throw ex;
+            }
+        }
+
+        public static void Hover(this IWebElement Element, IWebDriver driver, bool ignoreStaleElementException = true)
+        {
+            try
+            {
+                Actions action = new Actions(driver);
+                action.MoveToElement(Element).Build().Perform();
+            }
+            catch (StaleElementReferenceException ex)
+            {
+                if (!ignoreStaleElementException)
+                    throw;
             }
         }
 

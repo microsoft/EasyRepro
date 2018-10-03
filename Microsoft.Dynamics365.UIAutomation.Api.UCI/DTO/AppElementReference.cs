@@ -60,6 +60,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string TextFieldContainer = "Entity_TextFieldContainer";
             public static string TextFieldLookup = "Entity_TextFieldLookup";
             public static string TextFieldLookupMenu = "Entity_TextFieldLookupMenu";
+            public static string LookupFieldDeleteExistingValue = "Entity_LookupFieldDeleteExistingValue";
+            public static string LookupFieldHoverExistingValue = "Entity_LookupFieldHoverExistingValue";
+            public static string LookupResultsDropdown = "Entity_LookupResultsDropdown";
             public static string TextFieldLookupFieldContainer = "Entity_TextFieldLookupFieldContainer";
             public static string RecordSetNavigator = "Entity_RecordSetNavigator";
             public static string RecordSetNavigatorOpen = "Entity_RecordSetNavigatorOpen";
@@ -209,6 +212,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_TextFieldContainer", "//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
             { "Entity_TextFieldLookup", "//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
             { "Entity_TextFieldLookupMenu", "//*[contains(@id, \'[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout')]" },
+            { "Entity_LookupFieldDeleteExistingValue", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]" },
+            { "Entity_LookupFieldHoverExistingValue", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList')]" },
             { "Entity_TextFieldLookupFieldContainer", "//*[contains(@id, '[NAME].fieldControl-LookupResultsDropdown')]" },
             { "Entity_RecordSetNavigatorOpen", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
             { "Entity_RecordSetNavigator", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
@@ -219,6 +224,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Tab", "//li[@title=\"{0}\"]" },
             { "Entity_SubTab", "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]" },
             { "Entity_FieldControlDateTimeInput","//input[contains(@id,'[FIELD].fieldControl-date-time-input')]" },
+            { "Entity_LookupResultsDropdown", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
                         
             //CommandBar
             { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
