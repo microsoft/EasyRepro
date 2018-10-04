@@ -20,6 +20,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.Login(orgUrl, username, password);
         }
 
+        public void Login(Uri orgUrl, SecureString username, SecureString password, Action<LoginRedirectEventArgs> redirectAction)
+        {
+            _client.Login(orgUrl, username, password, redirectAction);
+        }
 
     }
 }
