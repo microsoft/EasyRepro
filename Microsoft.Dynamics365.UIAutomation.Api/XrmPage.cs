@@ -1037,35 +1037,51 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="field">The Field</param>
         /// <param name="openLookupPage">The Open Lookup Page</param>
-        public BrowserCommandResult<bool> SelectLookup(string field, bool openLookupPage = true)
+        /// <param name="clearFieldValue">Remove Existing Field Value, if present. False = Click the existing value</param>
+        public BrowserCommandResult<bool> SelectLookup(string field, bool clearFieldValue = true, bool openLookupPage = true)
         {
             return this.Execute(GetOptions($"Select Lookup for: {field}"), driver =>
             {
                 if (driver.HasElement(By.Id(field)))
                 {
-                    var input = driver.ClickWhenAvailable(By.Id(field));
+                    var fieldContainer = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.FieldContainer].Replace("[NAME]", field)));
 
-                    if (input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])) == null)
-                        throw new InvalidOperationException($"Field: {field} is not lookup");
-
-                    input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click();
-
-                    Browser.ThinkTime(1000);
-                    var dialogName = $"Dialog_{field}_IMenu";
-                    var dialog = driver.FindElement(By.Id(dialogName));
-
-                    var dialogItems = OpenDialog(dialog).Value;
-
-                    if (dialogItems.Any())
+                    if (fieldContainer.Text != "" && clearFieldValue)
                     {
-                        var dialogItem = dialogItems.Last();
-                        dialogItem.Element.Click();
+                        fieldContainer.SendKeys(Keys.Clear);
                     }
-                }
+                    else if (fieldContainer.Text != "" && !clearFieldValue)
+                    {
+                        fieldContainer.Click();
+                        return true;
+                    }
+
+                        var input = driver.ClickWhenAvailable(By.Id(field));
+
+                        if (input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])) == null)
+                            throw new InvalidOperationException($"Field: {field} is not lookup");
+
+                        input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click();
+
+                        Browser.ThinkTime(1000);
+                        var dialogName = $"Dialog_{field}_IMenu";
+                        var dialog = driver.FindElement(By.Id(dialogName));
+
+                        var dialogItems = OpenDialog(dialog).Value;
+
+                        if (dialogItems.Any())
+                        {
+                            var dialogItem = dialogItems.Last();
+                            dialogItem.Element.Click();
+                        }
+                    }
+
+                
                 else
                     throw new InvalidOperationException($"Field: {field} Does not exist");
 
                 return true;
+
             });
         }
 

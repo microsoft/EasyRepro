@@ -124,6 +124,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Entity_SelectForm",  "id(\"header_crmFormSelector\")"}, //GitHub Issue #56 - Correcting reference point for SelectForm() method
             { "Entity_SelectFormSection",  "id(\"FormSecNavigationControl-Icon\")"}, //GitHub Issue 56
             { "Entity_TabId"       , "//a/*[contains(text(),'[NAME]')]/parent::a"}, //GitHub Issue 124
+            { "Entity_FieldContainer"       , "//div[contains(@id,'[NAME]')]"},
 
             //Related MenuItems
             { "Related_Popout",                 "//li[contains(@data-id,\"tablist-tab_related\")]" },
@@ -591,6 +592,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string SelectFormSection = "Entity_SelectFormSection"; //GitHub Issue 56
             public static string LookupRender = "Entity_LookupRenderClass";
             public static string Popout = "Entity_PopoutClass";
+            public static string FieldContainer = "Entity_FieldContainer";
         }
         public static class MenuRelated
         {
