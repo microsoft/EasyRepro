@@ -1415,7 +1415,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var input = fieldContainer.FindElement(By.TagName("input"));
                     if (input != null)
                     {
-                        text = input.GetAttribute(field);
+                        IWebElement fieldValue = input.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldValue].Replace("[NAME]", field)));
+                        text = fieldValue.GetAttribute("value").ToString();
                     }
                 }
                 else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)

@@ -58,6 +58,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Form = "Entity_FormContainer";
             public static string Save = "Entity_Save";
             public static string TextFieldContainer = "Entity_TextFieldContainer";
+            public static string TextFieldValue = "Entity_TextFieldValue";
             public static string TextFieldLookup = "Entity_TextFieldLookup";
             public static string TextFieldLookupMenu = "Entity_TextFieldLookupMenu";
             public static string LookupFieldDeleteExistingValue = "Entity_LookupFieldDeleteExistingValue";
@@ -210,6 +211,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Save"       , "//*[@id=\"footerWrapper\"]/div/div[4]/button"},
             { "Entity_SwitchProcess"       , "//button[contains(@data-id,'SwitchProcess')]"},
             { "Entity_TextFieldContainer", "//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
+            { "Entity_TextFieldValue", "//input[contains(@data-id, \'[NAME].fieldControl\')]" },
             { "Entity_TextFieldLookup", "//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
             { "Entity_TextFieldLookupMenu", "//*[contains(@id, \'[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout')]" },
             { "Entity_LookupFieldDeleteExistingValue", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]" },
