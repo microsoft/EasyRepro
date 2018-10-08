@@ -56,6 +56,9 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             { "Navigation_PublishButtonSuccess", "//div[contains(text(),'All changes are saved')]"},
             { "Navigation_PublishVerifyButton", "//button[contains(text(), 'Publish this version')]"},
             { "Navigation_PublishVerifyButtonSuccess", "//div[contains(text(),'All changes are saved and published')]"},
+            { "Navigation_SwitchDesignMode", "//div[contains(@class, 'react-sidebar-mode-switcher')]"},
+            { "Navigation_DesignModeButton", "//button[contains(@title, '[NAME]')]"},
+
 
             //SharePoint
             { "Close_App", "//button[contains(@aria-label,'Close')]/i"},
@@ -114,6 +117,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             public static string PublishToSharePointDialogButton = "Navigation_PublishToSharePointDialogButton";
             public static string PublishVerifyButton = "Navigation_PublishVerifyButton";
             public static string PublishVerifyButtonSuccess = "Navigation_PublishVerifyButtonSuccess";
+            public static string SwitchDesignMode = "Navigation_SwitchDesignMode";
+            public static string DesignModeButton = "Navigation_DesignModeButton";
             public static string HomePage = "Navigation_HomePage";
             public static string CreateAnApp = "Create an app";
             public static string CreateBlankAppPhoneButtonId = "blank-app-icon-container-id-phone";

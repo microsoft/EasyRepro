@@ -6,21 +6,9 @@ using System;
 
 namespace Microsoft.PowerApps.UIAutomation.Sample
 {
-    public class TestSettings
+    public static class TestSettings
     {
-
-        public TestContext TestContext { get; set; }
-
-        private static TestContext _testContext;
-
-        private static BrowserType Type;
-
-        [ClassInitialize]
-        public static void Initialize(TestContext TestContext)
-        {
-            _testContext = TestContext;
-            Type = (BrowserType)Enum.Parse(typeof(BrowserType), _testContext.Properties["BrowserType"].ToString());
-        }
+        private static readonly string Type = System.Configuration.ConfigurationManager.AppSettings["BrowserType"].ToString();
 
         public static BrowserOptions Options = new BrowserOptions
         {
