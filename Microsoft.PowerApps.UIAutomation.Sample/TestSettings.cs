@@ -6,8 +6,9 @@ using System.Configuration;
 
 namespace Microsoft.PowerApps.UIAutomation.Sample
 {
-    public static class TestSettings
+    public class TestSettings
     {
+
         private static string Type = ConfigurationManager.AppSettings["BrowserType"].ToString();
 
         public static BrowserOptions Options = new BrowserOptions
