@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using System.Configuration;
 using System;
+using System.Configuration;
 
 namespace Microsoft.PowerApps.UIAutomation.Sample
 {
     public static class TestSettings
     {
-        private static readonly string Type = ConfigurationManager.AppSettings["BrowserType"].ToString();
+        private static string Type = ConfigurationManager.AppSettings["BrowserType"].ToString();
 
         public static BrowserOptions Options = new BrowserOptions
         {
