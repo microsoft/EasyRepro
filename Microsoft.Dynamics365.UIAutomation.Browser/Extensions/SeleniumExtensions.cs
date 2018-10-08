@@ -34,7 +34,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return driver;
         }
 
-        public static void Click(this IWebElement element, bool ignoreStaleElementException = true)
+        public static void Click(this IWebElement element, bool ignoreStaleElementException = false)
         {
             try
             {

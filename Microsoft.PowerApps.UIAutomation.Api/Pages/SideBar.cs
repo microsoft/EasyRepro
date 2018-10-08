@@ -66,6 +66,43 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         }
 
         /// <summary>
+        /// Change between Canvas and Model Driven design modes
+        /// </summary>
+        /// <param name="designMode">Switch between Canvas or Model-driven design modes. If model-driven design mode isn't availalbe. You may need to create an environment.</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        public BrowserCommandResult<bool> ChangeDesignMode(string designMode, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Change Design Mode"), driver =>
+            {
+
+                //For future implementation - if model driven design mode is not available, catch and throw error if it is the desired design mode
+                //bool isModelDrivenModeAvailable = false;
+
+                var buttonSwitchDesignMode = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Navigation.SwitchDesignMode]));
+
+                var designModeText = buttonSwitchDesignMode.Text;
+                
+                if (!designModeText.Contains(designMode))
+                {
+                    buttonSwitchDesignMode.Click(true);
+
+                    var button = buttonSwitchDesignMode.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.DesignModeButton].Replace("[NAME]", designMode)));
+
+                    button.Click(true);
+
+                }
+                else
+                {
+                    return true;
+                }
+
+                return true;
+            });
+        }
+
+        /// <summary>
         /// Opens the Menu
         /// </summary>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
