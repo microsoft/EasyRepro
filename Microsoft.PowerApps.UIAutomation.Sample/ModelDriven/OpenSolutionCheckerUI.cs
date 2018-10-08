@@ -1,4 +1,6 @@
-﻿using Microsoft.Dynamics365.UIAutomation.Browser;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.PowerApps.UIAutomation.Api;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -24,10 +26,13 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                 appBrowser.ThinkTime(10000);
 
+                appBrowser.Navigation.ChangeEnvironment("Customization Advisor Development");
+
                 appBrowser.SideBar.ChangeDesignMode("Model-driven");
 
                 appBrowser.ThinkTime(5000);
 
+                
             }
         }
     }
