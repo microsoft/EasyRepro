@@ -32,6 +32,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             //Navigation
             { "Navigation_HomePage", "//*[@class=\"home-page\"]" },
+            { "Navigation_ChangeEnvironmentButton", "//button[contains(@class, 'groups-menu-toggle')]" },
+            { "Navigation_ChangeEnvironmentList", "//div[contains(@class, 'action-menu-panel')]" },
 
             //Backstage
             { "Backstage_MenuContainer","//div[contains(@class, 'backstage-nav')]" },
@@ -120,6 +122,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             public static string SwitchDesignMode = "Navigation_SwitchDesignMode";
             public static string DesignModeButton = "Navigation_DesignModeButton";
             public static string HomePage = "Navigation_HomePage";
+            public static string ChangeEnvironmentButton = "Navigation_ChangeEnvironmentButton";
+            public static string ChangeEnvironmentList = "Navigation_ChangeEnvironmentList";
             public static string CreateAnApp = "Create an app";
             public static string CreateBlankAppPhoneButtonId = "blank-app-icon-container-id-phone";
             public static string CreateAppFromTemplateButtonId = "app-from-template-icon-container-id-phone";

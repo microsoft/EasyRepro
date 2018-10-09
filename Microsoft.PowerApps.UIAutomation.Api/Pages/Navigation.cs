@@ -43,5 +43,45 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 return true;
             });
         }
+
+        public BrowserCommandResult<bool> ChangeEnvironment(string environmentName)
+        {
+            return this.Execute(GetOptions("Change Environment"), driver =>
+            {
+
+            var environmentButton = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ChangeEnvironmentButton]));
+            environmentButton.Click(true);
+
+            var environments = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ChangeEnvironmentList]));
+
+            var environmentsList = environments.FindElements(By.TagName("li"));
+
+                if (environmentsList != null)
+                {
+                    foreach (var environmentListItem in environmentsList)
+                    {
+                        var titleLinks = environmentListItem.FindElements(By.XPath(".//div/div"));
+
+                        if (titleLinks != null && titleLinks.Count > 0)
+                        {
+                            var title = titleLinks[0].GetAttribute("innerText");
+
+                            if (title.ToLower().Contains(environmentName.ToLower()))
+                            {
+                                environmentListItem.Click(true);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                  throw new InvalidOperationException($"Environment List contains no values. Please create an environment via the PowerApps Admin Center.");
+                }
+
+                return true;
+
+            });
+        }
+
     }
 }
