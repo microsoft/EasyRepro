@@ -4,17 +4,31 @@ using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.PowerApps.UIAutomation.Api;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Configuration;
-using System.Security;
 
 namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 {
     [TestClass]
     public class OpenSolutionCheckerUI
     {
-        private readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(ConfigurationManager.AppSettings["OnlineUrl"].ToString());
+        private static string _username = "";
+        private static string _password = "";
+        private static BrowserType _browserType;
+        private static Uri _xrmUri;
+        public TestContext TestContext { get; set; }
+
+        private static TestContext _testContext;
+
+        [ClassInitialize]
+        public static void Initialize(TestContext TestContext)
+        {
+            _testContext = TestContext;
+
+            _username = _testContext.Properties["OnlineUsername"].ToString();
+            _password = _testContext.Properties["OnlinePassword"].ToString();
+            _xrmUri = new System.Uri(_testContext.Properties["OnlineUrl"].ToString());
+            _browserType = (BrowserType)Enum.Parse(typeof(BrowserType), _testContext.Properties["BrowserType"].ToString());
+
+        }
 
         [TestMethod]
         public void TestOpenSolutionCheckerUI()
@@ -22,7 +36,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             using (var appBrowser = new PowerAppBrowser(TestSettings.Options))
             {
 
-                appBrowser.OnlineLogin.Login(_xrmUri, _username, _password);
+                appBrowser.OnlineLogin.Login(_xrmUri, _username.ToSecureString(), _password.ToSecureString());
 
                 appBrowser.ThinkTime(10000);
 
