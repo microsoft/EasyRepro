@@ -2,14 +2,25 @@
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
-using System.Configuration;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.PowerApps.UIAutomation.Sample
 {
     public class TestSettings
     {
 
-        private static string Type = ConfigurationManager.AppSettings["BrowserType"].ToString();
+        public TestContext TestContext { get; set; }
+
+        private static TestContext _testContext;
+
+        private static BrowserType Type;
+
+        [ClassInitialize]
+        public static void Initialize(TestContext TestContext)
+        {
+            _testContext = TestContext;
+            Type = (BrowserType)Enum.Parse(typeof(BrowserType), _testContext.Properties["BrowserType"].ToString());
+        }
 
         public static BrowserOptions Options = new BrowserOptions
         {
