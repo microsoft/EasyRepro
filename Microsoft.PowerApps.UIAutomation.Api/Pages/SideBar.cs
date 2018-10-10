@@ -38,22 +38,19 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             {
                 bool itemExists = false;
 
-                driver.WaitUntilClickable(By.TagName("sidebar"));
+                driver.WaitUntilClickable(By.XPath("//div[contains(@class,'react-sidebar-app')]"));
 
                 //start with the sidebar html item
-                var sidebar = driver.FindElement(By.TagName("sidebar"));
+                var sidebar = driver.FindElement(By.XPath("//div[contains(@class,'react-sidebar-app')]"));
 
                 //Get menu items
-                var items = driver.FindElements(By.TagName("sidebar-item"));
-
+                var items = sidebar.FindElements(By.TagName("button"));
 
                 foreach(var item in items)
                 {
-                    var name = item.GetAttribute("label");
-                    
-                    if (string.Equals(name, menuItem, StringComparison.OrdinalIgnoreCase))
+                    if(item.Text.Contains(menuItem,StringComparison.OrdinalIgnoreCase))
                     {
-                        item.Click();
+                        item.Click(true);
                         itemExists = true;
                         break;
                     }

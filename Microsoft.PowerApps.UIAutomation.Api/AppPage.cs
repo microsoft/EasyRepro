@@ -18,7 +18,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
     {
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="XrmPage"/> class.
+        /// Initializes a new instance of the <see cref="AppPage"/> class.
         /// </summary>
         /// <param name="browser">The browser.</param>
         public AppPage(InteractiveBrowser browser) : base(browser)

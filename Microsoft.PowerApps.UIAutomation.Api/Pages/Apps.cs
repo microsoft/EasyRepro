@@ -178,7 +178,6 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 return true;
             });
         }
-
         internal void ClickButtonInAppHeader(String buttonName, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
