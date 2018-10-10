@@ -72,5 +72,11 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         #region Sharepoint
         public Sharepoint Sharepoint => this.GetPage<Sharepoint>();
         #endregion
+        #region ModelDrivenApps
+        public ModelDrivenApps ModelDrivenApps => this.GetPage<ModelDrivenApps>();
+        #endregion
+        #region CommandBar
+        public CommandBar CommandBar => this.GetPage<CommandBar>();
+        #endregion
     }
 }

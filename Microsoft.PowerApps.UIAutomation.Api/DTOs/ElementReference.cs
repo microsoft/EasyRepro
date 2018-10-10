@@ -65,6 +65,15 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             { "Click_Button", "//button[@name=\"[NAME]\"]" },
             { "Click_SubButton", "//button[@name=\"[NAME]\"]" },
 
+            //CommandBar
+            { "CommandBar_Container","//div[contains(@class,'ba-CommandBar')]"},
+            { "CommandBar_SubButtonContainer", "//ul[contains(@class,'ms-ContextualMenu')]" },
+            { "CommandBar_GridSolutionNameColumn", "//div[@data-automation-key='name']"},
+            { "CommandBar_GridSolutionStatusColumn", "//div[contains(@data-automation-key,'solutionChecker')]"},
+
+
+            //ModelDrivenApps
+            { "ModelDrivenApps_CellsContainer", "//div[contains(@data-automationid,'DetailsRowCell')]"}
         };
 
         public static Dictionary<string, string> ElementId = new Dictionary<string, string>()
@@ -154,5 +163,19 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             public static string ClickSubButton = "Click_SubButton";
         }
 
+        public static class CommandBar
+        {
+            public static string Container = "CommandBar_Container";
+            public static string SubButtonContainer = "CommandBar_SubButtonContainer";
+            public static string GridSolutionNameColumn = "CommandBar_GridSolutionNameColumn";
+            public static string GridSolutionStatusColumn = "CommandBar_GridSolutionStatusColumn";
+        }
+
+        public static class ModelDrivenApps
+        {
+            public static string CellsContainer = "ModelDrivenApps_CellsContainer";
+        }
+
     }
 }
+

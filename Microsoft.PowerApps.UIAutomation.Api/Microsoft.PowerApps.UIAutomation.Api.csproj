@@ -50,9 +50,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Pages\AppPage.cs" />
+    <Compile Include="AppPage.cs" />
     <Compile Include="Controls\CanvasControl.cs" />
     <Compile Include="DTOs\ElementReference.cs" />
+    <Compile Include="Pages\CommandBar.cs" />
+    <Compile Include="Pages\ModelDrivenApps.cs" />
     <Compile Include="Pages\Apps.cs" />
     <Compile Include="Pages\Backstage.cs" />
     <Compile Include="Pages\BackstageAppSettings.cs" />
