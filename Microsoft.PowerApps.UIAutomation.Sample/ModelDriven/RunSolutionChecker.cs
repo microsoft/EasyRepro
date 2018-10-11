@@ -10,20 +10,47 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
     [TestClass]
     public class RunSolutionChecker
     {
-        private readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(ConfigurationManager.AppSettings["OnlineUrl"].ToString());
-        private readonly String _solutionName = "Plugins Demo";
+        private static string _username = "";
+        private static string _password = "";
+        private static BrowserType _browserType;
+        private static Uri _xrmUri;
+        private static string _solutionName = "";
+        private static string _environmentName = "";
+
+        public TestContext TestContext { get; set; }
+
+        private static TestContext _testContext;
+
+        [ClassInitialize]
+        public static void Initialize(TestContext TestContext)
+        {
+            _testContext = TestContext;
+
+            _username = _testContext.Properties["OnlineUsername"].ToString();
+            _password = _testContext.Properties["OnlinePassword"].ToString();
+            _solutionName = _testContext.Properties["SolutionName"].ToString();
+            _environmentName = _testContext.Properties["EnvironmentName"].ToString();
+            _xrmUri = new System.Uri(_testContext.Properties["OnlineUrl"].ToString());
+            _browserType = (BrowserType)Enum.Parse(typeof(BrowserType), _testContext.Properties["BrowserType"].ToString());
+
+        }
 
         [TestMethod]
         public void TestRunSolutionChecker()
         {
+            BrowserOptions options = TestSettings.Options;
+            options.BrowserType = _browserType;
+
             using (var appBrowser = new PowerAppBrowser(TestSettings.Options))
             {
 
-                appBrowser.OnlineLogin.Login(_xrmUri, _username, _password);
+                appBrowser.OnlineLogin.Login(_xrmUri, _username.ToSecureString(), _password.ToSecureString());
 
-                appBrowser.ThinkTime(5000);
+                appBrowser.ThinkTime(1500);
+
+                appBrowser.Navigation.ChangeEnvironment(_environmentName);
+
+                appBrowser.ThinkTime(1500);
 
                 appBrowser.SideBar.ChangeDesignMode("Model-driven");
                 
@@ -52,6 +79,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                 //When status changes, verify if it succeeded or failed.  If successful, download results and verify notification is present
                 appBrowser.CommandBar.DownloadResults(_solutionName);
+
+                appBrowser.ThinkTime(5000);
             }
         }
     }

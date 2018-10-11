@@ -43,6 +43,8 @@
     <Parameter name="OnlineUsername" value="" />
     <Parameter name="OnlinePassword" value="" />
     <Parameter name="OnlineUrl" value="" />
+    <Parameter name="SolutionName" value="" />
+    <Parameter name="EnvironmentName" value="" />
     <Parameter name="BrowserType" value="" />
   </TestRunParameters>
   <!-- Adapter Specific sections -->
