@@ -70,6 +70,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             //CommandBar
             { "CommandBar_Container","//div[contains(@class,'ba-CommandBar')]"},
             { "CommandBar_SubButtonContainer", "//ul[contains(@class,'ms-ContextualMenu')]" },
+            { "CommandBar_OverflowContainer", "//div[contains(@class,'ms-OverflowSet-overflowButton')]" },
+            { "CommandBar_ContextualMenuList", "//ul[contains(@class,'ms-ContextualMenu-list')]" },
             { "CommandBar_GridSolutionNameColumn", "//div[@data-automation-key='name']"},
             { "CommandBar_GridSolutionStatusColumn", "//div[contains(@data-automation-key,'solutionChecker')]"},
 
@@ -171,6 +173,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         {
             public static string Container = "CommandBar_Container";
             public static string SubButtonContainer = "CommandBar_SubButtonContainer";
+            public static string OverflowContainer = "CommandBar_OverflowContainer";
+            public static string ContextualMenuList = "CommandBar_ContextualMenuList";
             public static string GridSolutionNameColumn = "CommandBar_GridSolutionNameColumn";
             public static string GridSolutionStatusColumn = "CommandBar_GridSolutionStatusColumn";
         }

@@ -5,6 +5,7 @@ using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Microsoft.PowerApps.UIAutomation.Api
@@ -75,27 +76,63 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 return true;
             });
         }
-        
+
+        /// <summary>
+        /// Gets the Commands
+        /// </summary>
+        /// <param name="moreCommands">The MoreCommands</param>
+        /// <example></example>
+        public BrowserCommandResult<ReadOnlyCollection<IWebElement>> GetCommands(bool moreCommands = false)
+        {
+            return this.Execute(GetOptions("Get Command Bar Buttons"), driver =>
+            {
+                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.OverflowContainer]), new TimeSpan(0, 0, 5));
+
+                IWebElement ribbon = null;
+                if (moreCommands)
+                    ribbon = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.ContextualMenuList]));
+                //else
+                  //  ribbon = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.RibbonManager]));
+
+                var items = ribbon.FindElements(By.TagName("li"));
+
+                return items;//.Where(item => item.Text.Length > 0).ToDictionary(item => item.Text, item => item.GetAttribute("id"));
+            });
+        }
+
         internal bool ClickCommandButton(string name, string subButton = "", bool throwExceptionIfVisible = false)
         {
             var driver = Browser.Driver;
+
+            int nestedSubContainer = 0;
 
             //First button
             var commandBarContainer = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.Container]));
             var buttons = commandBarContainer.FindElements(By.TagName("button"));
             var button = buttons.FirstOrDefault(b => b.Text.Contains(name, StringComparison.OrdinalIgnoreCase));
 
-            if(button == null)
+            if (button == null)
+            {
+                
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.OverflowContainer]));
+                buttons = GetCommands(true).Value;
+                button = buttons.FirstOrDefault(x => x.Text.Contains(name, StringComparison.OrdinalIgnoreCase));
+                nestedSubContainer = 1;
+            }
+
+            if (button == null)
                 throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
 
             button.Click(true);
+
+            Browser.ThinkTime(1500);
             
             //Sub Button
             if (!string.IsNullOrEmpty(subButton))
             {
                 //found = false;
                 var subButtonContainer = driver.FindElements(By.XPath(Elements.Xpath[Reference.CommandBar.SubButtonContainer]));
-                var subButtons = subButtonContainer[0].FindElements(By.TagName("button"));
+                var subButtons = subButtonContainer[nestedSubContainer].FindElements(By.TagName("button"));
 
                 var sButton = subButtons.FirstOrDefault(b => b.Text.Contains(subButton, StringComparison.OrdinalIgnoreCase));
 
