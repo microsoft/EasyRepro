@@ -46,6 +46,7 @@
     <Parameter name="SolutionName" value="" />
     <Parameter name="EnvironmentName" value="" />
     <Parameter name="BrowserType" value="" />
+    <Parameter name="ResultsDirectory" value="" />
   </TestRunParameters>
   <!-- Adapter Specific sections -->
   
