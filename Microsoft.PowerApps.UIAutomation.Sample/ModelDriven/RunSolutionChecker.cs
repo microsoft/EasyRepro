@@ -56,6 +56,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         try
                         {
                             appBrowser.OnlineLogin.Login(_xrmUri, _username.ToSecureString(), _password.ToSecureString());
+                            break;
                         }
                         catch (Exception)
                         {
