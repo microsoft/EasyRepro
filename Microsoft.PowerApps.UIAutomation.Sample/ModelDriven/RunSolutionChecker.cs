@@ -86,6 +86,10 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine($"Click Solutions via Sidebar");
                     appBrowser.SideBar.Navigate("Solutions");
 
+                    //Collapse the sidebar
+                    Console.WriteLine("Collapse the sidebar");
+                    appBrowser.SideBar.ExpandCollapse();
+
                     //Highlight Solution Name
                     Console.WriteLine($"Select solution with name: {_solutionName}");
                     appBrowser.ModelDrivenApps.SelectGridRecord(_solutionName);
@@ -127,6 +131,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
                     _testContext.AddResultFile(location);
+
                 }
 
                 Console.WriteLine("Solution Checker Test Run Complete");
