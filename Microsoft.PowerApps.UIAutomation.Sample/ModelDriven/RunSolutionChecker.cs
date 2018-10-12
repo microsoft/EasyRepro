@@ -110,7 +110,9 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                     //Wait for processing to complete
                     Console.WriteLine($"Waiting for Solution Checker run to finish");
-                    appBrowser.ModelDrivenApps.WaitForProcessingToComplete(_solutionName);
+                    //appBrowser.ModelDrivenApps.WaitForProcessingToComplete(_solutionName);
+
+                    appBrowser.ThinkTime(600000);
 
                     //Once processing is complete, you must select a different row, and re-select your row in order to make the buttons enabled
                     Console.WriteLine($"Change to Default Solution grid item, then switch back to {_solutionName} solution");
