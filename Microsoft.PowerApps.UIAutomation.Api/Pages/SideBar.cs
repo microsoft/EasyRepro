@@ -38,10 +38,10 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             {
                 bool itemExists = false;
 
-                driver.WaitUntilClickable(By.XPath("//div[contains(@class,'react-sidebar-app')]"));
+                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Navigation.Sidebar]));
 
                 //start with the sidebar html item
-                var sidebar = driver.FindElement(By.XPath("//div[contains(@class,'react-sidebar-app')]"));
+                var sidebar = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.Sidebar]));
 
                 //Get menu items
                 var items = sidebar.FindElements(By.TagName("button"));
@@ -105,8 +105,23 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
         public BrowserCommandResult<bool> ExpandCollapse(int thinkTime = Constants.DefaultThinkTime)
         {
-          
-            return this.Navigate("", thinkTime);
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Expand/Collapse the Sidebar"), driver =>
+            {
+
+                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Navigation.Sidebar]));
+
+                //start with the sidebar html item
+                var sidebar = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.Sidebar]));
+
+                //Get menu items
+                var items = sidebar.FindElements(By.TagName("button"));
+
+                items[0].Click(true);
+
+                return true;
+            });
         }
     }
 }
