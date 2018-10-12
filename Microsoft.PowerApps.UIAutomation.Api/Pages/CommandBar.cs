@@ -64,6 +64,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             return this.Execute(GetOptions("Download Results"), driver =>
             {
+
+                /*
                 string currentStatus = GetCurrentStatus(solutionName);
 
                 //Download results if/when complete
@@ -72,6 +74,9 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                     //Click off the current record and back onto this one before downloading results
                     ClickCommandButton("Solution Checker", "Download last results");
                 }
+                */
+
+                ClickCommandButton("Solution Checker", "Download last results");
 
                 return true;
             });
