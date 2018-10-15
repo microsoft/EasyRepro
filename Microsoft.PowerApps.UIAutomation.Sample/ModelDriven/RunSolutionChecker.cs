@@ -101,18 +101,15 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     //Wait 5 seconds
                     appBrowser.ThinkTime(5000);
 
-                    /* Temporarily removing Verify step due to Command Bar overlay issue with 'Solution Checker Running...' button
                     //Click Solution Checker button and verify the run button and "download results" buttons are grayed out.  Verify Status is running
                     Console.WriteLine($"Verifying that Run and Download Last Results buttons are disabled");
                     appBrowser.CommandBar.VerifyButtonIsClickable("Solution Checker", "Run", true);
-                    appBrowser.CommandBar.VerifyButtonIsClickable("Solution Checker", "Download last results", true);
-                    */
+                    appBrowser.CommandBar.VerifyButtonIsClickable("Solution Checker", "Download last results", true);                   
 
                     //Wait for processing to complete
                     Console.WriteLine($"Waiting for Solution Checker run to finish");
-                    //appBrowser.ModelDrivenApps.WaitForProcessingToComplete(_solutionName);
+                    appBrowser.ModelDrivenApps.WaitForProcessingToComplete(_solutionName);
 
-                    appBrowser.ThinkTime(600000);
 
                     //Once processing is complete, you must select a different row, and re-select your row in order to make the buttons enabled
                     Console.WriteLine($"Change to Default Solution grid item, then switch back to {_solutionName} solution");
