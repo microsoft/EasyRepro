@@ -38,7 +38,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
         }
 
         [TestMethod]
-        public void TestRunSolutionChecker()
+        public void TestRunSolutionCheckerFromCommandBar()
         {
             BrowserOptions options = TestSettings.Options;
             options.BrowserType = _browserType;
