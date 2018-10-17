@@ -104,6 +104,18 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 return items;//.Where(item => item.Text.Length > 0).ToDictionary(item => item.Text, item => item.GetAttribute("id"));
             });
         }
+        public BrowserCommandResult<ReadOnlyCollection<IWebElement>> GetVisibleCommands(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Get Command Bar Buttons"), driver =>
+            {
+                var commandBarContainer = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.Container]));
+                var buttons = commandBarContainer.FindElements(By.TagName("button"));
+
+                return buttons;
+            });
+        }
 
         internal bool ClickCommandButton(string name, string subButton = "", bool throwExceptionIfVisible = false)
         {
