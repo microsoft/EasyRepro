@@ -7,6 +7,7 @@ using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Microsoft.PowerApps.UIAutomation.Api
@@ -73,6 +74,26 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 return true;
             });
         }
+
+        public BrowserCommandResult<bool> MoreCommands(string solutionName, string commandName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            return this.Execute(GetOptions("Click More Commands Button"), driver =>
+            {
+                MoreCommands(solutionName, commandName, "", thinkTime);
+                return true;
+            });
+        }
+        public BrowserCommandResult<bool> MoreCommands(string solutionName, string commandName, string subButton = "", int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Click More Commands Button"), driver =>
+            {
+                ClickMoreCommandsButton(solutionName, commandName, subButton, false);
+                return true;
+            });
+        }
+
         public BrowserCommandResult<bool> WaitForProcessingToComplete(string solutionName)
         {
             return this.Execute(GetOptions("Wait For Processing To Complete"), driver =>
@@ -106,9 +127,100 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                         throw new InvalidOperationException("Solution checker button should not be present");
                 }
 
+
                 return true;
             });
         }
+
+        public BrowserCommandResult<bool> VerifyButtonIsClickable(string solutionName, string commandName, string subButton, bool throwExceptionIfVisible, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Verify Button is Clickable"), driver =>
+            {
+                bool isDisabled = IsButtonDisabled(solutionName, commandName, subButton);
+
+                if (throwExceptionIfVisible && !isDisabled)
+                    throw new InvalidOperationException($"SubButton '{subButton}' should not be visible.");
+
+                return true;
+            });
+        }
+
+        internal bool ClickMoreCommandsButton(string solutionName, string commandName, string subButton = "", bool throwExceptionIfVisible = false)
+        {
+            var driver = Browser.Driver;
+
+            //Need to click the <div>, not the <a>.  Selenium FindElements By.XPath misbehaved when trying to break into rows and cells
+            //Get a collection of cells and find the cell with the record name
+            var cells = driver.FindElements(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.CellsContainer]));
+            var cell = cells.FirstOrDefault(c => c.Text.Equals(solutionName, StringComparison.OrdinalIgnoreCase));
+
+            if (cell == null)
+                throw new InvalidOperationException($"No record with the name '{solutionName}' exists in the grid.");
+
+            //Click on the More Commands menu
+            var moreCommandsButton = cell.FindElement(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.MoreCommandsButton]));
+            moreCommandsButton.Click(true);
+
+            //First Command button
+            var moreCommandsContainer = driver.FindElement(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.MoreCommandsContainer]));
+            var buttons = moreCommandsContainer.FindElements(By.TagName("button"));
+            var button = buttons.FirstOrDefault(b => b.Text.Contains(commandName, StringComparison.OrdinalIgnoreCase));
+
+            if (button == null)
+                throw new InvalidOperationException($"No command with the name '{commandName}' exists inside of Commandbar.");
+
+            button.Click(true);
+
+            Browser.ThinkTime(1500);
+
+            //Sub Command Button
+            if (!string.IsNullOrEmpty(subButton))
+            {
+                //found = false;
+                var subButtonContainer = driver.FindElements(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.SubButtonContainer]));
+                var subButtons = subButtonContainer[1].FindElements(By.TagName("button"));
+
+                var sButton = subButtons.FirstOrDefault(b => b.Text.Contains(subButton, StringComparison.OrdinalIgnoreCase));
+
+                if (sButton == null)
+                    throw new InvalidOperationException($"No subButton with the name '{subButton}' exists inside of the More Commands menu.");
+
+                //Is the button visible?
+                bool isDisabled;
+                var currentVisibleStatus = sButton.GetAttribute("aria-disabled");
+                bool.TryParse(currentVisibleStatus, out isDisabled);
+
+                if (!isDisabled)
+                    sButton.Click(true);
+            }
+
+            return true;
+        }
+
+        internal bool IsButtonDisabled(string solutionName, string commandName, string subButton = "")
+        {
+            var driver = Browser.Driver;
+            bool isDisabled = true;
+
+            ClickMoreCommandsButton(solutionName, commandName, "");
+
+            var subButtonContainer = driver.FindElements(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.SubButtonContainer]));
+
+            if (subButtonContainer.Count == 0)
+                Console.WriteLine("SubButton container is empty");
+
+            var subButtons = subButtonContainer[1].FindElements(By.TagName("button"));
+            var sButton = subButtons.FirstOrDefault(b => b.Text.Equals(subButton, StringComparison.OrdinalIgnoreCase));
+
+            bool.TryParse(sButton.GetAttribute("aria-disabled"), out isDisabled);
+
+            ClickMoreCommandsButton(solutionName, commandName, "");
+
+            return isDisabled;
+        }
+
 
         internal bool WaitUntilStatusChanges(string solutionName, string currentStatus, int maxWaitTimeInSeconds)
         {
@@ -171,6 +283,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 Console.WriteLine("Could not find status for this solution");
             return solutionStatuses[rowNumber].Text;
         }
+
         internal List<SolutionGridRow> GetSolutionTableRows()
         {
             var driver = Browser.Driver;
@@ -219,6 +332,30 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         {
             this.Name = name;
             this.ManagedExternally = managedExternally;
+
+
+        public BrowserCommandResult<bool> DownloadResults(string solutionName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Download Results"), driver =>
+            {
+
+
+                string currentStatus = GetCurrentStatus(solutionName);
+
+                //Download results if/when complete
+                if (currentStatus.Contains("Results", StringComparison.OrdinalIgnoreCase))
+                {
+                    //Click off the current record and back onto this one before downloading results
+                    ClickMoreCommandsButton(solutionName, "Solution Checker", "Download last results");
+                }
+
+                return true;
+            });
+
         }
     }
 }
+
+
