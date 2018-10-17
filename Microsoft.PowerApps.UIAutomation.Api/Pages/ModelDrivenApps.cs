@@ -3,8 +3,10 @@
 
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -41,6 +43,16 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             return this.Execute(GetOptions("Select Grid Record"), driver =>
             {
+                SelectGridRecord(name, true, thinkTime);
+                return true;
+            });
+        }
+        public BrowserCommandResult<bool> SelectGridRecord(string name, bool clickRightSide, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Select Grid Record"), driver =>
+            {
                 //Need to click the <div>, not the <a>.  Selenium FindElements By.XPath misbehaved when trying to break into rows and cells
                 //Get a collection of cells and find the cell with the record name
                 var cells = driver.FindElements(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.CellsContainer]));
@@ -49,24 +61,16 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 if(cell == null)
                     throw new InvalidOperationException($"No record with the name '{name}' exists in the grid.");
 
-                cell.Click(true);
-
-
-                /*bool found = false;
-
-                foreach (var cell in cells)
+                //In the Solution grid, clicking the element opens the solution in the CRM org.  Clicking the far right side of the div highlights the row
+                if (clickRightSide)
                 {
-                    if (cell.Text.Equals(name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        found = true;
-                        cell.Click(true);
-                        break;
-                    }
+                    //Ignore StaleElementReferenceExceptions?????
+                    Actions act = new Actions(driver);
+                    act.MoveToElement(cell).MoveByOffset((cell.Size.Width / 2) - 2, 0).Click().Perform();
                 }
+                else
+                    cell.Click(true);
 
-                if(!found)
-                    throw new InvalidOperationException($"No record with the name '{name}' exists in the grid.");
-                    */
                 return true;
             });
         }
@@ -98,6 +102,31 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
                 if (currentStatus.Contains("running", StringComparison.OrdinalIgnoreCase))
                     WaitUntilStatusChanges(solutionName, currentStatus, 3600);
+
+                return true;
+            });
+        }
+        public BrowserCommandResult<bool> VerifyManagedSolutionsUnavailable(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Verify Managed Soltuions Unavailable"), driver =>
+            {
+                List<SolutionGridRow> solutions = GetSolutionTableRows();
+
+                var solutionRows = solutions.Where(s => s.ManagedExternally.Equals("Yes", StringComparison.OrdinalIgnoreCase));
+                foreach(var row in solutionRows)
+                {
+                    SelectGridRecord(row.Name, true);
+
+                    CommandBar bar = new CommandBar(Browser);
+                    var commands = bar.GetVisibleCommands(250);
+                    
+                    //Converting the collection ToList() is not great for performance
+                    if(commands.Value.ToList().Exists(cmd => cmd.Text.Contains("Solution checker", StringComparison.OrdinalIgnoreCase)))
+                        throw new InvalidOperationException("Solution checker button should not be present");
+                }
+
 
                 return true;
             });
@@ -192,6 +221,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             return isDisabled;
         }
 
+
         internal bool WaitUntilStatusChanges(string solutionName, string currentStatus, int maxWaitTimeInSeconds)
         {
             var driver = Browser.Driver;
@@ -254,6 +284,56 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             return solutionStatuses[rowNumber].Text;
         }
 
+        internal List<SolutionGridRow> GetSolutionTableRows()
+        {
+            var driver = Browser.Driver;
+
+            List<String> columnHeaders = new List<string>();
+            List<SolutionGridRow> tableRows = new List<SolutionGridRow>();
+
+            var rows = driver.FindElements(By.XPath("//div[@role='row']"));
+            foreach (var row in rows)
+            {
+                List<String> cellValues = new List<string>();
+
+                var cells = row.FindElements(By.TagName("div"));
+                foreach (var cell in cells)
+                {
+                    if (cell.GetAttribute("data-automationid") != null)
+                    {
+                        //If it's the header row, figure out the column order.  If it's a record, collect all of the values
+                        switch (cell.GetAttribute("data-automationid").ToLower())
+                        {
+                            case "columnsheadercolumn":
+                                if (!columnHeaders.Contains(cell.Text))
+                                    columnHeaders.Add(cell.Text);
+                                break;
+                            case "detailsrowcell":
+                                cellValues.Add(cell.Text);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                if (cellValues.Count > 0)
+                    tableRows.Add(new SolutionGridRow(cellValues[columnHeaders.FindIndex(x => x.Equals("name", StringComparison.OrdinalIgnoreCase))], cellValues[columnHeaders.FindIndex(x => x.Contains("Managed externally", StringComparison.OrdinalIgnoreCase))]));
+            }
+
+            return tableRows;
+        }
+    }
+    internal class SolutionGridRow
+    {
+        public String Name { get; set; }
+        public String ManagedExternally { get; set; }
+
+        public SolutionGridRow(String name, String managedExternally)
+        {
+            this.Name = name;
+            this.ManagedExternally = managedExternally;
+
+
         public BrowserCommandResult<bool> DownloadResults(string solutionName, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
@@ -273,6 +353,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
                 return true;
             });
+
         }
     }
 }
