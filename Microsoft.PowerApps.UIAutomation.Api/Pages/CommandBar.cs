@@ -155,6 +155,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             return true;
         }
+
         internal bool IsButtonDisabled (string name, string subButton = "")
         {
             var driver = Browser.Driver;
