@@ -58,7 +58,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 var cells = driver.FindElements(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.CellsContainer]));
                 var cell = cells.FirstOrDefault(c => c.Text.Equals(name, StringComparison.OrdinalIgnoreCase));
 
-                if(cell == null)
+                if (cell == null)
                     throw new InvalidOperationException($"No record with the name '{name}' exists in the grid.");
 
                 //In the Solution grid, clicking the element opens the solution in the CRM org.  Clicking the far right side of the div highlights the row
@@ -115,15 +115,15 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 List<SolutionGridRow> solutions = GetSolutionTableRows();
 
                 var solutionRows = solutions.Where(s => s.ManagedExternally.Equals("Yes", StringComparison.OrdinalIgnoreCase));
-                foreach(var row in solutionRows)
+                foreach (var row in solutionRows)
                 {
                     SelectGridRecord(row.Name, true);
 
                     CommandBar bar = new CommandBar(Browser);
                     var commands = bar.GetVisibleCommands(250);
-                    
+
                     //Converting the collection ToList() is not great for performance
-                    if(commands.Value.ToList().Exists(cmd => cmd.Text.Contains("Solution checker", StringComparison.OrdinalIgnoreCase)))
+                    if (commands.Value.ToList().Exists(cmd => cmd.Text.Contains("Solution checker", StringComparison.OrdinalIgnoreCase)))
                         throw new InvalidOperationException("Solution checker button should not be present");
                 }
 
@@ -322,18 +322,6 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             return tableRows;
         }
-    }
-    internal class SolutionGridRow
-    {
-        public String Name { get; set; }
-        public String ManagedExternally { get; set; }
-
-        public SolutionGridRow(String name, String managedExternally)
-        {
-            this.Name = name;
-            this.ManagedExternally = managedExternally;
-
-
         public BrowserCommandResult<bool> DownloadResults(string solutionName, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
@@ -355,7 +343,20 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             });
 
         }
+        internal class SolutionGridRow
+        {
+            public String Name { get; set; }
+            public String ManagedExternally { get; set; }
+
+            public SolutionGridRow(String name, String managedExternally)
+            {
+                this.Name = name;
+                this.ManagedExternally = managedExternally;
+
+            }
+        }
     }
 }
+
 
 
