@@ -81,6 +81,7 @@
     <Compile Include="LoginRedirectEventArgs.cs" />
     <Compile Include="Office365Browser.cs" />
     <Compile Include="Pages\Office365.cs" />
+    <Compile Include="Pages\PendingEmailReminder.cs" />
     <Compile Include="Pages\WindowPerformanceNavigation.cs" />
     <Compile Include="Pages\Administration.cs" />
     <Compile Include="Pages\Dashboard.cs" />

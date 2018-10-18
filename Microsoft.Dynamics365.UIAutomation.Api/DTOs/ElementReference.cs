@@ -322,6 +322,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Process_Category", "WorkflowCategory"},
             { "Process_Entity", "PrimaryEntity"},
 
+            //PendingEmail
+            { "PendingEmail_InlineDialog" , "InlineDialog_Iframe"},
+            { "PendingEmail_ButBegin" , "butBegin"},
+            { "PendingEmail_InlineDialogUri" , @"/Activities/email/dlg_pendingEmailReminder.aspx?dType=1"},
     };
 
         public static Dictionary<string, string> CssClass = new Dictionary<string, string>()
@@ -778,6 +782,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string Deactivate = "Process_Deactivate";
             public static string Delete = "Process_Delete";
             public static string Begin = "Process_Begin";
+        }
+
+        public static class PendingEmail
+        {
+            public static string InlineDialog = "PendingEmail_InlineDialog";
+            public static string ButBegin = "PendingEmail_ButBegin";
+            public static string InlineDialogUri = "PendingEmail_InlineDialogUri";
         }
     }
 }
