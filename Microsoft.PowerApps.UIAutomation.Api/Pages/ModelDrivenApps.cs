@@ -110,7 +110,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         {
             Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions("Verify Managed Soltuions Unavailable"), driver =>
+            return this.Execute(GetOptions("Verify Managed Solutions Unavailable"), driver =>
             {
                 List<SolutionGridRow> solutions = GetSolutionTableRows();
 
@@ -123,8 +123,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                     var commands = bar.GetVisibleCommands(250);
 
                     //Converting the collection ToList() is not great for performance
-                    if (commands.Value.ToList().Exists(cmd => cmd.Text.Contains("Solution checker", StringComparison.OrdinalIgnoreCase)))
-                        throw new InvalidOperationException("Solution checker button should not be present");
+                    if (commands.Value.ToList().Exists(cmd => cmd.Text.Contains("Project checker", StringComparison.OrdinalIgnoreCase)))
+                        throw new InvalidOperationException("Project checker button should not be present");
                 }
 
 

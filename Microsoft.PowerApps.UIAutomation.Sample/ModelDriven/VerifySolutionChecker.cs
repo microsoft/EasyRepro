@@ -44,25 +44,38 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
             using (var appBrowser = new PowerAppBrowser(TestSettings.Options))
             {
-                //Login
-                PerformLogin(appBrowser);
+                try
+                {
+                    //Login
+                    PerformLogin(appBrowser);
 
-                //Pick the Org
-                Console.WriteLine($"Changing PowerApps Environment to {_environmentName}");
-                appBrowser.Navigation.ChangeEnvironment(_environmentName);
-                appBrowser.ThinkTime(1500);
+                    //Pick the Org
+                    Console.WriteLine($"Changing PowerApps Environment to {_environmentName}");
+                    appBrowser.Navigation.ChangeEnvironment(_environmentName);
+                    appBrowser.ThinkTime(1500);
 
-                //Change to Model-Driven mode
-                Console.WriteLine($"Switch to Model-driven design mode");
-                appBrowser.SideBar.ChangeDesignMode("Model-driven");
+                    //Click Solutions
+                    Console.WriteLine($"Click Solutions via Sidebar");
+                    appBrowser.SideBar.Navigate("Projects");
 
-                //Click Solutions
-                Console.WriteLine($"Click Solutions via Sidebar");
-                appBrowser.SideBar.Navigate("Solutions");
+                    Console.WriteLine("Make sure each managed solution does not have the solution checker button in the command bar");
+                    appBrowser.ModelDrivenApps.VerifyManagedSolutionsUnavailable(1000);
 
-                Console.WriteLine("Make sure each managed solution does not have the solution checker button in the command bar");
-                appBrowser.ModelDrivenApps.VerifyManagedSolutionsUnavailable(1000);
+                    appBrowser.ThinkTime(2000);
 
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"An error occurred during Project Checker test run for solution {_solutionName}: {e}");
+                    string location = $@"{_resultsDirectory}\RunSolutionChecker-{_solutionName}-GenericError.bmp";
+
+                    appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
+                    _testContext.AddResultFile(location);
+
+                    Assert.Fail($"An error occurred during Project Checker test run for solution {_solutionName}: {e}");
+                }
+
+                Console.WriteLine("Project Checker Test Run Complete");
             }
         }
 
