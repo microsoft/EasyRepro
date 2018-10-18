@@ -72,11 +72,11 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 if (currentStatus.Contains("Results", StringComparison.OrdinalIgnoreCase))
                 {
                     //Click off the current record and back onto this one before downloading results
-                    ClickCommandButton("Solution Checker", "Download last results");
+                    ClickCommandButton("Project Checker", "Download last results");
                 }
                 
 
-                ClickCommandButton("Solution Checker", "Download last results");
+                ClickCommandButton("Project Checker", "Download last results");
 
                 return true;
             });

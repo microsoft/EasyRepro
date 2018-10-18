@@ -79,12 +79,9 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                     appBrowser.ThinkTime(1500);
 
-                    Console.WriteLine($"Switch to Model-driven design mode");
-                    appBrowser.SideBar.ChangeDesignMode("Model-driven");
-
                     //Click Solutions
-                    Console.WriteLine($"Click Solutions via Sidebar");
-                    appBrowser.SideBar.Navigate("Solutions");
+                    Console.WriteLine($"Click Projects via Sidebar");
+                    appBrowser.SideBar.Navigate("Projects");
 
                     //Collapse the sidebar
                     Console.WriteLine("Collapse the sidebar");
@@ -95,19 +92,19 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.ModelDrivenApps.SelectGridRecord(_solutionName);
 
                     //Click Solution Checker button
-                    Console.WriteLine($"Click Solution Checker button in Command Bar and then click sub-command Run");
-                    appBrowser.CommandBar.ClickCommand("Solution Checker", "Run");
+                    Console.WriteLine($"Click Project Checker button in Command Bar and then click sub-command Run");
+                    appBrowser.CommandBar.ClickCommand("Project Checker", "Run");
 
                     //Wait 5 seconds
                     appBrowser.ThinkTime(5000);
 
                     //Click Solution Checker button and verify the run button and "download results" buttons are grayed out.  Verify Status is running
                     Console.WriteLine($"Verifying that Run and Download Last Results buttons are disabled");
-                    appBrowser.CommandBar.VerifyButtonIsClickable("Solution Checker", "Run", true);
-                    appBrowser.CommandBar.VerifyButtonIsClickable("Solution Checker", "Download last results", true);                   
+                    appBrowser.CommandBar.VerifyButtonIsClickable("Project Checker", "Run", true);
+                    appBrowser.CommandBar.VerifyButtonIsClickable("Project Checker", "Download last results", true);                   
 
                     //Wait for processing to complete
-                    Console.WriteLine($"Waiting for Solution Checker run to finish");
+                    Console.WriteLine($"Waiting for Project Checker run to finish");
                     appBrowser.ModelDrivenApps.WaitForProcessingToComplete(_solutionName);
 
 
@@ -117,7 +114,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.ModelDrivenApps.SelectGridRecord(_solutionName);
 
                     //When status changes, verify if it succeeded or failed.  If successful, download results and verify notification is present
-                    Console.WriteLine($"Downloading Results for Solution Checker run");
+                    Console.WriteLine($"Downloading Results for Project Checker run");
                     appBrowser.CommandBar.DownloadResults(_solutionName);
 
                     appBrowser.ThinkTime(5000);
@@ -125,16 +122,16 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+                    Console.WriteLine($"An error occurred during Project Checker test run for solution {_solutionName}: {e}");
                     string location = $@"{_resultsDirectory}\RunSolutionChecker-{_solutionName}-GenericError.bmp";
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
                     _testContext.AddResultFile(location);
 
-                    Assert.Fail($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+                    Assert.Fail($"An error occurred during Project Checker test run for solution {_solutionName}: {e}");
                 }
 
-                Console.WriteLine("Solution Checker Test Run Complete");
+                Console.WriteLine("Project Checker Test Run Complete");
             }
         }
 
@@ -180,28 +177,25 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                     appBrowser.ThinkTime(1500);
 
-                    Console.WriteLine($"Switch to Model-driven design mode");
-                    appBrowser.SideBar.ChangeDesignMode("Model-driven");
-
-                    //Click Solutions
-                    Console.WriteLine($"Click Solutions via Sidebar");
-                    appBrowser.SideBar.Navigate("Solutions");
+                    //Click Projects
+                    Console.WriteLine($"Click Projects via Sidebar");
+                    appBrowser.SideBar.Navigate("Projects");
 
                     //Collapse the sidebar
                     Console.WriteLine("Collapse the sidebar");
                     appBrowser.SideBar.ExpandCollapse();
 
-                    //Click desired grid row, then click Solution Checker button via ... commands in the grid
-                    Console.WriteLine($"Click the ... button in Solution grid, click on 'Solution Checker', and then click sub-command 'Run'");
-                    appBrowser.ModelDrivenApps.MoreCommands(_solutionName, "Solution Checker", "Run");
+                    //Click desired grid row, then click Projects Checker button via ... commands in the grid
+                    Console.WriteLine($"Click the ... button in Projects grid, click on 'Projects Checker', and then click sub-command 'Run'");
+                    appBrowser.ModelDrivenApps.MoreCommands(_solutionName, "Project Checker", "Run");
 
                     //Wait 5 seconds
                     appBrowser.ThinkTime(5000);
 
                     //Click Solution Checker button and verify the run button and "download results" buttons are grayed out.  Verify Status is running
                     Console.WriteLine($"Verifying that Run and Download Last Results buttons are disabled in the grid");
-                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName ,"Solution Checker", "Run", true);
-                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName, "Solution Checker", "Download last results", true);
+                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName , "Project Checker", "Run", true);
+                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName, "Project Checker", "Download last results", true);
 
                     //Wait for processing to complete
                     Console.WriteLine($"Waiting for Solution Checker run to finish");
@@ -213,7 +207,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.ModelDrivenApps.SelectGridRecord(_solutionName);
 
                     //When status changes, verify if it succeeded or failed.  If successful, download results and verify notification is present
-                    Console.WriteLine($"Downloading Results for Solution Checker run");
+                    Console.WriteLine($"Downloading Results for Project Checker run");
                     appBrowser.ModelDrivenApps.DownloadResults(_solutionName);
 
                     appBrowser.ThinkTime(5000);
@@ -221,16 +215,16 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+                    Console.WriteLine($"An error occurred during Project Checker test run for solution {_solutionName}: {e}");
                     string location = $@"{_resultsDirectory}\RunSolutionChecker-{_solutionName}-GenericError.bmp";
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
                     _testContext.AddResultFile(location);
                  
-                    Assert.Fail($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+                    Assert.Fail($"An error occurred during Project Checker test run for solution {_solutionName}: {e}");
                 }
 
-                Console.WriteLine("Solution Checker Test Run Complete");
+                Console.WriteLine("Project Checker Test Run Complete");
             }
         }
 
