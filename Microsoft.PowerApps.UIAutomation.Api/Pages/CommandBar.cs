@@ -74,9 +74,6 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                     //Click off the current record and back onto this one before downloading results
                     ClickCommandButton("Project Checker", "Download last results");
                 }
-                
-
-                ClickCommandButton("Project Checker", "Download last results");
 
                 return true;
             });
