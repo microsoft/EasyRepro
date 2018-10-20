@@ -571,6 +571,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //If you click save and something happens, handle it.  Duplicate Detection/Errors/etc...
             //Check for Dialog and figure out which type it is and return the dialog type.
 
+            //Introduce think time to avoid timing issues on save dialog
+            Browser.ThinkTime(1000);
+
             return this.Execute(GetOptions($"Validate Save"), driver =>
             {
                 //Is it Duplicate Detection?
