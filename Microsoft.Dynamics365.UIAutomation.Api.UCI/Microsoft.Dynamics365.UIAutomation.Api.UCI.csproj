@@ -60,6 +60,7 @@
     <Compile Include="Controls\Field.cs" />
     <Compile Include="Controls\LookupItem.cs" />
     <Compile Include="Controls\MultiValueOptionSet.cs" />
+    <Compile Include="Controls\BooleanItem.cs" />
     <Compile Include="Controls\OptionSet.cs" />
     <Compile Include="Elements\BusinessProcessFlow.cs" />
     <Compile Include="Elements\CommandBar.cs" />

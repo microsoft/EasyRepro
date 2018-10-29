@@ -1372,6 +1372,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Sets the value of a Boolean Item.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
+        /// <example>xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
+        public BrowserCommandResult<bool> SetValue(BooleanItem option)
+        {
+            return this.Execute(GetOptions($"Set Value: {option.Name}"), driver =>
+            {
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
+                if (option.Value)
+                {
+                    if (!fieldContainer.Selected)
+                    {
+                        fieldContainer.Click();
+                    }
+                }
+                else
+                {
+                    if (fieldContainer.Selected)
+                    {
+                        fieldContainer.Click();
+                    }
+                }
+                return true;
+            });
+        }
+
+        /// <summary>
         /// Sets the value of a Date Field.
         /// </summary>
         /// <param name="field">The field id or name.</param>
@@ -1382,7 +1410,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Set Value: {field}"), driver =>
             {
-                var dateField = AppElements.Xpath[AppReference.Entity.FieldControlDateTimeInput].Replace("[FIELD]",field);
+                var dateField = AppElements.Xpath[AppReference.Entity.FieldControlDateTimeInputUCI].Replace("[FIELD]",field);
 
                 if (driver.HasElement(By.XPath(dateField)))
                 {
@@ -1390,9 +1418,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     if (fieldElement.GetAttribute("value").Length > 0)
                     {
+                        //fieldElement.Click();
+                        //fieldElement.SendKeys(date.ToString(format));
+                        //fieldElement.SendKeys(Keys.Enter);
+
                         fieldElement.Click();
+                        fieldElement.SendKeys(Keys.Backspace);
+                        fieldElement.SendKeys(Keys.Backspace);
+                        fieldElement.SendKeys(Keys.Backspace);
+                        fieldElement.SendKeys(Keys.Backspace);
                         fieldElement.SendKeys(date.ToString(format));
-                        fieldElement.SendKeys(Keys.Enter);
+                        fieldElement.SendKeys(Keys.Tab);
                     }
                     else
                     {
