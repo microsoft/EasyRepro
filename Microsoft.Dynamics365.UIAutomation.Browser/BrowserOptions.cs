@@ -111,6 +111,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 UseLegacyImplementation = false
             };
 
+            if (this.PrivateMode)
+            {
+                options.AddArgument("--incognito");
+            }
+
+            if (this.Headless)
+            {
+                options.AddArgument("--headless");
+            }
+
             return options;
         }
 
