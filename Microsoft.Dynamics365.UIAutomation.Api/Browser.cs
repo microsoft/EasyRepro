@@ -175,12 +175,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public Office365Navigation Office365Navigation => this.GetPage<Office365Navigation>();
 
         #endregion Office365
-
-        #region Pending Email Reminder
-
-        public PendingEmail PendingEmail => this.GetPage<PendingEmail>();
-
-        #endregion Pending Email Reminder
     }
 
 

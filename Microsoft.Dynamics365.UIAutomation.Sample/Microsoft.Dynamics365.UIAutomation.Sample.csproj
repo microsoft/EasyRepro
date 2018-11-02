@@ -100,7 +100,6 @@
     <Compile Include="Web\AddConnection.cs" />
     <Compile Include="Web\Entity\TestBase.cs" />
     <Compile Include="Web\Entity\Account.cs" />
-    <Compile Include="Web\Navigation\PendingEmailReminder.cs" />
     <Compile Include="Web\ValidationTests\CreateUser.cs" />
     <Compile Include="Web\ValidationTests\OpenMobile.cs" />
     <Compile Include="Web\ValidationTests\CreateWorkflow.cs" />
