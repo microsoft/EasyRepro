@@ -52,7 +52,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 case BrowserType.Firefox:
                     var ffService = FirefoxDriverService.CreateDefaultService();
                     ffService.HideCommandPromptWindow = options.HideDiagnosticWindow;
-                    driver = new FirefoxDriver(ffService);
+                    driver = new FirefoxDriver(ffService, options.ToFireFox(), TimeSpan.FromMinutes(20));
                     driver.Manage().Timeouts().ImplicitWait = new TimeSpan(0, 0, 5);
                     break;
                 case BrowserType.Edge:
