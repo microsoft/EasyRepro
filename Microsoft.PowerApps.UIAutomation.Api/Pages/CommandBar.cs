@@ -58,7 +58,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 return true;
             });
         }
-        public BrowserCommandResult<bool> DownloadResults(string solutionName, int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> DownloadResults(string solutionName, string commandBarButton, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
 
@@ -72,7 +72,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 if (currentStatus.Contains("Results", StringComparison.OrdinalIgnoreCase))
                 {
                     //Click off the current record and back onto this one before downloading results
-                    ClickCommandButton("Project Checker", "Download last results");
+                    ClickCommandButton(commandBarButton, "Download last results");
                 }
 
                 return true;

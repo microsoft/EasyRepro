@@ -106,7 +106,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 return true;
             });
         }
-        public BrowserCommandResult<bool> VerifyManagedSolutionsUnavailable(int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> VerifyManagedSolutionsUnavailable(string commandBarButton, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
 
@@ -123,8 +123,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                     var commands = bar.GetVisibleCommands(250);
 
                     //Converting the collection ToList() is not great for performance
-                    if (commands.Value.ToList().Exists(cmd => cmd.Text.Contains("Project checker", StringComparison.OrdinalIgnoreCase)))
-                        throw new InvalidOperationException("Project checker button should not be present");
+                    if (commands.Value.ToList().Exists(cmd => cmd.Text.Contains(commandBarButton, StringComparison.OrdinalIgnoreCase)))
+                        throw new InvalidOperationException($"{commandBarButton} button should not be present");
                 }
 
 
@@ -322,7 +322,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             return tableRows;
         }
-        public BrowserCommandResult<bool> DownloadResults(string solutionName, int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> DownloadResults(string solutionName, string commandBarButton, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
 
@@ -336,7 +336,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 if (currentStatus.Contains("Results", StringComparison.OrdinalIgnoreCase))
                 {
                     //Click off the current record and back onto this one before downloading results
-                    ClickMoreCommandsButton(solutionName, "Project Checker", "Download last results");
+                    ClickMoreCommandsButton(solutionName, commandBarButton, "Download last results");
                 }
 
                 return true;

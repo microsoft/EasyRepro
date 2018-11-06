@@ -16,6 +16,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
         private static Uri _xrmUri;
         private static string _solutionName = "";
         private static string _environmentName = "";
+        private static string _sideBarButton = "";
+        private static string _commandBarButton = "";
         private static string _resultsDirectory = "";
 
         public TestContext TestContext { get; set; }
@@ -31,6 +33,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             _password = _testContext.Properties["OnlinePassword"].ToString();
             _solutionName = _testContext.Properties["SolutionName"].ToString();
             _environmentName = _testContext.Properties["EnvironmentName"].ToString();
+            _sideBarButton = _testContext.Properties["SideBarButton"].ToString();
+            _commandBarButton = _testContext.Properties["CommandBarButton"].ToString();
             _xrmUri = new Uri(_testContext.Properties["OnlineUrl"].ToString());
             _resultsDirectory = _testContext.Properties["ResultsDirectory"].ToString();
             _browserType = (BrowserType)Enum.Parse(typeof(BrowserType), _testContext.Properties["BrowserType"].ToString());
@@ -55,27 +59,27 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.ThinkTime(1500);
 
                     //Click Solutions
-                    Console.WriteLine($"Click Solutions via Sidebar");
-                    appBrowser.SideBar.Navigate("Projects");
+                    Console.WriteLine($"Click {_sideBarButton} via Sidebar");
+                    appBrowser.SideBar.Navigate(_sideBarButton);
 
                     Console.WriteLine("Make sure each managed solution does not have the solution checker button in the command bar");
-                    appBrowser.ModelDrivenApps.VerifyManagedSolutionsUnavailable(1000);
+                    appBrowser.ModelDrivenApps.VerifyManagedSolutionsUnavailable(_commandBarButton ,1000);
 
                     appBrowser.ThinkTime(2000);
 
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"An error occurred during Project Checker test run for solution {_solutionName}: {e}");
+                    Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
                     string location = $@"{_resultsDirectory}\RunSolutionChecker-{_solutionName}-GenericError.bmp";
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
                     _testContext.AddResultFile(location);
 
-                    Assert.Fail($"An error occurred during Project Checker test run for solution {_solutionName}: {e}");
+                    Assert.Fail($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
                 }
 
-                Console.WriteLine("Project Checker Test Run Complete");
+                Console.WriteLine("Solution Checker Test Run Complete");
             }
         }
 
