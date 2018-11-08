@@ -376,6 +376,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+		internal BrowserCommandResult<bool> QuickCreate(string entityName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+            return this.Execute(GetOptions($"Quick Create: {entityName}"), driver =>
+            {
+                var quickCreateButton = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.QuickCreateButton]));
+                quickCreateButton.Click(true);
+
+                var entityMenuList = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.QuickCreateMenuList]));
+                var entityMenuItems = entityMenuList.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.QuickCreateMenuItems]));
+                var entitybutton = entityMenuItems.FirstOrDefault(e => e.Text.Contains(entityName, StringComparison.OrdinalIgnoreCase));
+
+                if (entitybutton == null)
+                    throw new Exception(String.Format("{0} not found in Quick Create list.", entityName));
+
+                entitybutton.Click(driver, true);
+
+                return true;
+            });
+		}
         #endregion
 
         #region Dialogs
@@ -1161,6 +1181,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     "Save Buttton is not available");
 
                 save?.Click();
+
+                return true;
+            });
+        }
+		
+		internal BrowserCommandResult<bool> SaveQuickCreate(int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"SaveQuickCreate"), driver =>
+            {
+                var save = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.SaveButton]),
+                    "Quick Create Save Button is not available");
+                save?.Click(driver, true);
 
                 return true;
             });

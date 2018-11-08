@@ -70,6 +70,7 @@
     <Compile Include="Elements\Grid.cs" />
     <Compile Include="Elements\OnlineLogin.cs" />
     <Compile Include="Elements\Navigation.cs" />
+    <Compile Include="Elements\QuickCreate.cs" />
     <Compile Include="Elements\RelatedGrid.cs" />
     <Compile Include="Elements\Timeline.cs" />
     <Compile Include="LoginRedirectEventArgs.cs" />

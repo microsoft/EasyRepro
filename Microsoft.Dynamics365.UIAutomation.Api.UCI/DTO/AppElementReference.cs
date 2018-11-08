@@ -28,6 +28,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Search = "Nav_Search";
             public static string QuickLaunchMenu = "Nav_QuickLaunchMenu";
             public static string QuickLaunchButton = "Nav_QuickLaunchButton";
+            public static string QuickCreateButton = "Nav_QuickCreateButton";
+            public static string QuickCreateMenuList = "Nav_QuickCreateMenuList";
+            public static string QuickCreateMenuItems = "Nav_QuickCreateMenuItems";
         }
 
         public static class Grid
@@ -152,6 +155,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string CancelButton = "Dialog_CancelButton";
             public static string SwitchProcessContainer = "Dialog_SwitchProcessContainer";
         }
+
+        public static class QuickCreate
+        {
+            public static string SaveButton = "QuickCreate_SaveButton";
+        }
     }
 
     public static class AppElements
@@ -178,6 +186,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_Search",                "//*[@id=\"categorizedSearchInputAndButton\"]"},
             { "Nav_QuickLaunchMenu",                "//div[contains(@data-id,'quick-launch-bar')]"},
             { "Nav_QuickLaunchButton",                "//li[contains(@title, '[NAME]')]"},
+            { "Nav_QuickCreateButton", "//button[contains(@data-id,'quickCreateLauncher')]" },
+            { "Nav_QuickCreateMenuList", "//ul[contains(@id,'MenuSectionItemsquickCreate')]" },
+            { "Nav_QuickCreateMenuItems", "//li[@role='menuitem']" },
 
             
             //Grid
@@ -280,6 +291,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_ActiveProcessGridControlContainer"       , "//div[contains(@data-lp-id,'activeProcessGridControlContainer')]"},
             { "Entity_SwitchProcessDialogOK"       , "//button[contains(@data-id,'ok_id')]"},
             { "SwitchProcess_Container" , "//section[contains(@id, 'popupContainer')]" },
+
+            //QuickCreate 
+            { "QuickCreate_SaveButton" , "//button[contains(@id,'quickCreateSaveBtn')]" }
         };
     }
 

@@ -36,11 +36,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public static void Click(this IWebElement element, bool ignoreStaleElementException = true)
         {
+            Click(element, null, ignoreStaleElementException);
+        }
+        public static void Click(this IWebElement element, IWebDriver driver, bool ignoreStaleElementException = true)
+        {
+            //Use this Click if you would like to wait until the click is complete before returning.  WaitForTransaction() is UCI specific.
             try
             {
                 element.Click();
+
+                if (driver != null)
+                    driver.WaitForTransaction();
             }
-            catch(StaleElementReferenceException ex)
+            catch (StaleElementReferenceException ex)
             {
                 if (!ignoreStaleElementException)
                     throw ex;
