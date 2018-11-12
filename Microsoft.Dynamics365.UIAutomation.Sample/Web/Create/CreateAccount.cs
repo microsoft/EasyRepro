@@ -6,6 +6,7 @@ using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Security;
+using System.Collections.Generic;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 {
@@ -16,6 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
         private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
+        private readonly string _azureKey = System.Configuration.ConfigurationManager.AppSettings["AzureKey"].ToString();
 
         [TestMethod]
         public void WEBTestCreateNewAccount()
@@ -41,6 +43,30 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.CommandBar.ClickCommand("Save & Close");
                 xrmBrowser.ThinkTime(2000);
+
+                var telemetry = new Microsoft.ApplicationInsights.TelemetryClient();
+                telemetry.InstrumentationKey = _azureKey;
+
+
+                foreach (ICommandResult result in xrmBrowser.CommandResults)
+                {
+
+                    var properties = new Dictionary<string, string>();
+                    var metrics = new Dictionary<string, double>();
+
+                    properties.Add("StartTime", result.StartTime.Value.ToLongDateString());
+                    properties.Add("EndTime", result.StopTime.Value.ToLongDateString());
+
+                    metrics.Add("ThinkTime", result.ThinkTime);
+                    metrics.Add("TransitionTime", result.TransitionTime);
+                    metrics.Add("ExecutionTime", result.ExecutionTime);
+                    metrics.Add("ExecutionAttempts", result.ExecutionAttempts);
+
+                    telemetry.TrackEvent(result.CommandName, properties, metrics);
+
+                }
+
+                telemetry.Flush();
             }
         }
     }

@@ -71,13 +71,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     driver.FindElement(By.Id("aadTile")).Click(true);
                 }
 
-                Thread.Sleep(1000);
+                Thread.Sleep(10000);
 
                 //If expecting redirect then wait for redirect to trigger
                 if (redirectAction != null)
                 {
                     //Wait for redirect to occur.
-                    Thread.Sleep(3000);
+                    Thread.Sleep(10000);
 
                     redirectAction?.Invoke(new LoginRedirectEventArgs(username, password, driver));
 
@@ -98,17 +98,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]));
                     }
 
-                    driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
-                        , new TimeSpan(0, 0, 60),
-                        e => {
-                            e.WaitForPageToLoad();
-                            e.SwitchTo().Frame(0);
-                            e.WaitForPageToLoad();
+                    //driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
+                    //    , new TimeSpan(0, 0, 60),
+                    //    e => {
+                    //        e.WaitForPageToLoad();
+                    //        e.SwitchTo().Frame(0);
+                    //        e.WaitForPageToLoad();
 
-                            //Switch Back to Default Content for Navigation Steps
-                            e.SwitchTo().DefaultContent();
-                        },
-                        f => { throw new Exception("Login page failed."); });
+                    //        //Switch Back to Default Content for Navigation Steps
+                    //        e.SwitchTo().DefaultContent();
+                    //    },
+                    //    f => { throw new Exception("Login page failed."); });
                 }
             }
 

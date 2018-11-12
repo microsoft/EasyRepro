@@ -195,7 +195,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Grid_Rows"           , "//div[contains(@role,'row')]"},
             { "Grid_ChartSelector"           , "//span[contains(@id,'ChartSelector')]"},
             { "Grid_ChartViewList"           , "//ul[contains(@role,'listbox')]"},
-            { "Grid_SortColumn",            "//div[@id='btnheaderselectcolumn']/parent::*//div[text()='[COLNAME]'"},
+            { "Grid_SortColumn",            "//div[@id='btnheaderselectcolumn']/parent::*//div[text()='[COLNAME]']"},
             { "Grid_CellContainer"    ,"//div[@role='grid'][@data-id='grid-cell-container']"},
             { "Grid_ViewSelector"   , "//span[contains(@id,'ViewSelector')]" },
             { "Grid_ViewContainer"   , "//ul[contains(@id,'ViewSelector')]" },
