@@ -278,7 +278,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             return state;
         }
-        internal string GetCurrentStatus(string solutionName)
+        public string GetCurrentStatus(string solutionName)
         {
             var driver = Browser.Driver;
             //Retrieve current status.  XPath was misbehaving trying to traverse rows and columns so we have to cheat.

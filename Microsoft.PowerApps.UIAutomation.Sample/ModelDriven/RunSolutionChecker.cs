@@ -91,6 +91,9 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine("Collapse the sidebar");
                     appBrowser.SideBar.ExpandCollapse();
 
+                    // Get Solution check status value
+                    string originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+
                     // Highlight Solution Name
                     Console.WriteLine($"Select solution with name: {_solutionName}");
                     appBrowser.ModelDrivenApps.SelectGridRecord(_solutionName);
@@ -119,6 +122,20 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine($"Waiting for Solution Checker run to finish");
                     appBrowser.ModelDrivenApps.WaitForProcessingToComplete(_solutionName);
 
+                    // Get solution check status post-processing
+                    string solutionCheckStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+
+                    // Validate that we did not receive an error status
+                    if (!solutionCheckStatus.Contains("Results as of"))
+                    {
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} received instead of 'Results as of ...' ");
+                    }
+
+                    // Validate that new status is not the same as original status pre-processing
+                    if (solutionCheckStatus == originalSolutionStatus)
+                    {
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} has not changed from {originalSolutionStatus}. A failure occurred and was not reported to the message bar. ");
+                    }
 
                     // Once processing is complete, you must select a different row, and re-select your row in order to make the buttons enabled
                     Console.WriteLine($"Change to Default Solution grid item, then switch back to {_solutionName} solution");
@@ -129,7 +146,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine($"Downloading Results for Solution Checker run");
                     appBrowser.CommandBar.DownloadResults(_solutionName, _commandBarButton);
 
-                    appBrowser.ThinkTime(5000);
+                    appBrowser.ThinkTime(10000);
 
                 }
                 catch (Exception e)
@@ -197,6 +214,9 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine("Collapse the sidebar");
                     appBrowser.SideBar.ExpandCollapse();
 
+                    // Get Solution check status value
+                    string originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+
                     // Click desired grid row, then click Projects Checker button via ... commands in the grid
                     Console.WriteLine($"Click the ... button in Projects grid, click on 'Solution Checker', and then click sub-command 'Run'");
                     appBrowser.ModelDrivenApps.MoreCommands(_solutionName, _commandBarButton, "Run");
@@ -221,6 +241,21 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine($"Waiting for Solution Checker run to finish");
                     appBrowser.ModelDrivenApps.WaitForProcessingToComplete(_solutionName);
 
+                    // Get solution check status post-processing
+                    string solutionCheckStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+
+                    // Validate that we did not receive an error status
+                    if (!solutionCheckStatus.Contains("Results as of"))
+                    {
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} received instead of 'Results as of ...' ");
+                    }
+
+                    // Validate that new status is not the same as original status pre-processing
+                    if (solutionCheckStatus == originalSolutionStatus)
+                    {
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} has not changed from {originalSolutionStatus}. A failure occurred and was not reported to the message bar. ");
+                    }
+
                     // Once processing is complete, you must select a different row, and re-select your row in order to make the buttons enabled
                     Console.WriteLine($"Change to Default Solution grid item, then switch back to {_solutionName} solution");
                     appBrowser.ModelDrivenApps.SelectGridRecord("Default Solution");
@@ -230,7 +265,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine($"Downloading Results for Solution Checker run");
                     appBrowser.ModelDrivenApps.DownloadResults(_solutionName, _commandBarButton);
 
-                    appBrowser.ThinkTime(5000);
+                    appBrowser.ThinkTime(10000);
 
                 }
                 catch (Exception e)
