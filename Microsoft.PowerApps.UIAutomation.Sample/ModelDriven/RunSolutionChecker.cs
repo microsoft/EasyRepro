@@ -83,45 +83,70 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                     appBrowser.ThinkTime(1500);
 
-                    //Click Solutions
+                    // Click Solutions
                     Console.WriteLine($"Click {_sideBarButton} via Sidebar");
                     appBrowser.SideBar.Navigate(_sideBarButton);
 
-                    //Collapse the sidebar
+                    // Collapse the sidebar
                     Console.WriteLine("Collapse the sidebar");
                     appBrowser.SideBar.ExpandCollapse();
 
-                    //Highlight Solution Name
+                    // Get Solution check status value
+                    string originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+
+                    // Highlight Solution Name
                     Console.WriteLine($"Select solution with name: {_solutionName}");
                     appBrowser.ModelDrivenApps.SelectGridRecord(_solutionName);
 
-                    //Click Solution Checker button
+                    // Click Solution Checker button
                     Console.WriteLine($"Click Solution Checker button in Command Bar and then click sub-command Run");
                     appBrowser.CommandBar.ClickCommand(_commandBarButton, "Run");
 
-                    //Wait 5 seconds
+                    // Wait 5 seconds
                     appBrowser.ThinkTime(15000);
+
+                    // Check to confirm the run was successful
+                    string messageBarText = appBrowser.ModelDrivenApps.CheckForErrors();
+
+                    if (!string.IsNullOrEmpty(messageBarText))
+                    {
+                        throw new ApplicationException(messageBarText);
+                    }
 
                     //Click Solution Checker button and verify the run button and "download results" buttons are grayed out.  Verify Status is running
                     Console.WriteLine($"Verifying that Run and Download Last Results buttons are disabled");
                     appBrowser.CommandBar.VerifyButtonIsClickable(_commandBarButton, "Run", true);
                     appBrowser.CommandBar.VerifyButtonIsClickable(_commandBarButton, "Download last results", true);                   
 
-                    //Wait for processing to complete
+                    // Wait for processing to complete
                     Console.WriteLine($"Waiting for Solution Checker run to finish");
                     appBrowser.ModelDrivenApps.WaitForProcessingToComplete(_solutionName);
 
+                    // Get solution check status post-processing
+                    string solutionCheckStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
 
-                    //Once processing is complete, you must select a different row, and re-select your row in order to make the buttons enabled
+                    // Validate that we did not receive an error status
+                    if (!solutionCheckStatus.Contains("Results as of"))
+                    {
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} received instead of 'Results as of ...' ");
+                    }
+
+                    // Validate that new status is not the same as original status pre-processing
+                    if (solutionCheckStatus == originalSolutionStatus)
+                    {
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} has not changed from {originalSolutionStatus}. A failure occurred and was not reported to the message bar. ");
+                    }
+
+                    // Once processing is complete, you must select a different row, and re-select your row in order to make the buttons enabled
                     Console.WriteLine($"Change to Default Solution grid item, then switch back to {_solutionName} solution");
                     appBrowser.ModelDrivenApps.SelectGridRecord("Default Solution");
                     appBrowser.ModelDrivenApps.SelectGridRecord(_solutionName);
 
-                    //When status changes, verify if it succeeded or failed.  If successful, download results and verify notification is present
+                    // When status changes, verify if it succeeded or failed.  If successful, download results and verify notification is present
                     Console.WriteLine($"Downloading Results for Solution Checker run");
                     appBrowser.CommandBar.DownloadResults(_solutionName, _commandBarButton);
 
-                    appBrowser.ThinkTime(5000);
+                    appBrowser.ThinkTime(10000);
 
                 }
                 catch (Exception e)
@@ -150,7 +175,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 try
                 {
 
-                    //Login To PowerApps
+                    // Login To PowerApps
                     Console.WriteLine("Performing Login");
 
                     for (int retryCount = 0; retryCount < Reference.Login.SignInAttempts; retryCount++)
@@ -181,40 +206,66 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                     appBrowser.ThinkTime(1500);
 
-                    //Click Projects
+                    // Click Projects
                     Console.WriteLine($"Click {_sideBarButton} via Sidebar");
                     appBrowser.SideBar.Navigate(_sideBarButton);
 
-                    //Collapse the sidebar
+                    // Collapse the sidebar
                     Console.WriteLine("Collapse the sidebar");
                     appBrowser.SideBar.ExpandCollapse();
 
-                    //Click desired grid row, then click Projects Checker button via ... commands in the grid
+                    // Get Solution check status value
+                    string originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+
+                    // Click desired grid row, then click Projects Checker button via ... commands in the grid
                     Console.WriteLine($"Click the ... button in Projects grid, click on 'Solution Checker', and then click sub-command 'Run'");
                     appBrowser.ModelDrivenApps.MoreCommands(_solutionName, _commandBarButton, "Run");
 
-                    //Wait 5 seconds
+                    // Wait 5 seconds
                     appBrowser.ThinkTime(15000);
 
-                    //Click Solution Checker button and verify the run button and "download results" buttons are grayed out.  Verify Status is running
+                    // Check to confirm the run was successful
+                    string messageBarText = appBrowser.ModelDrivenApps.CheckForErrors();
+
+                    if (!string.IsNullOrEmpty(messageBarText))
+                    {
+                        throw new ApplicationException(messageBarText);
+                    }
+
+                    // Click Solution Checker button and verify the run button and "download results" buttons are grayed out.  Verify Status is running
                     Console.WriteLine($"Verifying that Run and Download Last Results buttons are disabled in the grid");
                     appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName , _commandBarButton, "Run", true);
                     appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName, _commandBarButton, "Download last results", true);
 
-                    //Wait for processing to complete
+                    // Wait for processing to complete
                     Console.WriteLine($"Waiting for Solution Checker run to finish");
                     appBrowser.ModelDrivenApps.WaitForProcessingToComplete(_solutionName);
 
-                    //Once processing is complete, you must select a different row, and re-select your row in order to make the buttons enabled
+                    // Get solution check status post-processing
+                    string solutionCheckStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+
+                    // Validate that we did not receive an error status
+                    if (!solutionCheckStatus.Contains("Results as of"))
+                    {
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} received instead of 'Results as of ...' ");
+                    }
+
+                    // Validate that new status is not the same as original status pre-processing
+                    if (solutionCheckStatus == originalSolutionStatus)
+                    {
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} has not changed from {originalSolutionStatus}. A failure occurred and was not reported to the message bar. ");
+                    }
+
+                    // Once processing is complete, you must select a different row, and re-select your row in order to make the buttons enabled
                     Console.WriteLine($"Change to Default Solution grid item, then switch back to {_solutionName} solution");
                     appBrowser.ModelDrivenApps.SelectGridRecord("Default Solution");
                     appBrowser.ModelDrivenApps.SelectGridRecord(_solutionName);
 
-                    //When status changes, verify if it succeeded or failed.  If successful, download results and verify notification is present
+                    // hen status changes, verify if it succeeded or failed.  If successful, download results and verify notification is present
                     Console.WriteLine($"Downloading Results for Solution Checker run");
                     appBrowser.ModelDrivenApps.DownloadResults(_solutionName, _commandBarButton);
 
-                    appBrowser.ThinkTime(5000);
+                    appBrowser.ThinkTime(10000);
 
                 }
                 catch (Exception e)

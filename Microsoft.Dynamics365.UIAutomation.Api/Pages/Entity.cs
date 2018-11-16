@@ -446,6 +446,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 save?.Click();
 
+                driver.WaitUntilVisible(By.Id("titlefooter_statuscontrol"));
+
+                // Wait until the footer is not equal to 'saving', indicating save is complete or failed
+                driver.WaitFor(x => x.FindElement(By.Id("titlefooter_statuscontrol")).Text != "saving", new TimeSpan(0, 2, 0));
+
+                var footerText = driver.FindElement(By.Id("titlefooter_statuscontrol")).Text;
+
+                // Initilize inlineDialogError for general error dialog scenarios
+                // Errors could include Business Process Error, Generic SQL Error, etc...
+                bool inlineDialogError = false;
+
+                if (String.IsNullOrEmpty(footerText))
+                {
+                    driver.SwitchTo().DefaultContent();
+                    inlineDialogError = driver.FindElement(By.Id("InlineDialog_Iframe")).Displayed;
+                }
+
+                if (inlineDialogError)
+                {
+                    driver.SwitchTo().Frame("InlineDialog_Iframe");
+                    footerText = driver.FindElement(By.Id("ErrorMessage")).Text;
+                }
+
+                if (!string.IsNullOrEmpty(footerText))
+                {
+                    throw new InvalidOperationException(footerText);
+                }
+
                 return true;
             });
         }
