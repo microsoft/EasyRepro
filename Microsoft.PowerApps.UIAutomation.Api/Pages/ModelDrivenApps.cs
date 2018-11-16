@@ -28,6 +28,26 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         {
         }
 
+        public BrowserCommandResult<string> CheckForErrors(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Check for Message Bar Errors"), driver =>
+            {
+                string messageBarText = "";                
+                bool isMessageBarVisible = driver.IsVisible(By.ClassName("ms-MessageBar"));
+
+                if (isMessageBarVisible)
+                {
+                    char[] trimCharacters = { '', '\r', '\n', '', '\r','\n','' };
+                    messageBarText = driver.FindElement(By.ClassName("ms-MessageBar")).Text.Trim(trimCharacters);
+                }
+
+
+                return messageBarText;
+            });
+        }
+
         public BrowserCommandResult<bool> SelectGridRecord(int index, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
