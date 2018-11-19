@@ -127,6 +127,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).SendKeys(Keys.Tab);
                     driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).Submit();
 
+                    Thread.Sleep(2000);
+
                     if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])))
                     {
                         driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]));
