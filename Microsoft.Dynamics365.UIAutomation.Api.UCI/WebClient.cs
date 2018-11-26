@@ -391,7 +391,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (entitybutton == null)
                     throw new Exception(String.Format("{0} not found in Quick Create list.", entityName));
 
-                entitybutton.Click(driver, true);
+                entitybutton.Click(true);
+
+                driver.WaitForTransaction();
 
                 return true;
             });
@@ -1194,7 +1196,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var save = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.SaveButton]),
                     "Quick Create Save Button is not available");
-                save?.Click(driver, true);
+                save?.Click(true);
+
+                driver.WaitForTransaction();
 
                 return true;
             });
