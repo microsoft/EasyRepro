@@ -78,6 +78,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenAndClickPopoutMenu(menuName, menuItemName);
         }
+		
+		public void QuickCreate(string entityName)
+        {
+            _client.QuickCreate(entityName);
+        }
 
         public void ClickQuickLaunchButton(string toolTip)
         {
