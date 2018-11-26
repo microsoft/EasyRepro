@@ -80,14 +80,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string ProcessButton = "Entity_Process";
             public static string SwitchProcessDialog = "Entity_SwitchProcessDialog";
             public static string TabList = "Entity_TabList";
+            public static string MoreTabList = "Entity_TabListMore";
             public static string Tab = "Entity_Tab";
             public static string SubTab = "Entity_SubTab";
+            public static string TextFieldNotificationAlert = "Entity_TextFieldNotificationAlert";
 
         }
 
         public static class CommandBar
         {
             public static string Container = "Cmd_Container";
+            public static string ContainerRelated = "Cmd_ContainerRelated";
             public static string ContainerGrid = "Cmd_ContainerGrid";
             public static string MoreCommandsMenu = "Cmd_MoreCommandsMenu";
         }
@@ -107,11 +110,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public static class MultiSelect
         {
             public static string DivContainer = "MultiSelect_DivContainer";
+            public static string DivContainer1 = "MultiSelect_DivContainer1";
             public static string InputSearch = "MultiSelect_InputSearch";
+            public static string InputSearch1 = "MultiSelect_InputSearch1";
             public static string SelectedRecord = "MultiSelect_SelectedRecord";
             public static string SelectedRecordButton = "MultiSelect_SelectedRecord_Button";
             public static string SelectedRecordLabel = "MultiSelect_SelectedRecord_Label";
             public static string FlyoutList = "MultiSelect_FlyoutList";
+            public static string FlyoutList1 = "MultiSelect_FlyoutList1";
             public static string ExpandCollapseButton = "MultiSelect_ExpandCollapseButton";
         }
         
@@ -224,14 +230,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_RecordSetNavCollapseIcon", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
             { "Entity_RecordSetNavCollapseIconParent", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
             { "Entity_TabList", "//ul[@id=\"tablist\"]" },
+            {"Entity_TabListMore","//ul[@id=\"tablist\"]//li[@data-id=\"tab_more\"]" },
             { "Entity_Tab", "//li[@title=\"{0}\"]" },
             { "Entity_SubTab", "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]" },
             { "Entity_FieldControlDateTimeInput","//input[contains(@id,'[FIELD].fieldControl-date-time-input')]" },
             { "Entity_FieldControlDateTimeInputUCI","//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
             { "Entity_LookupResultsDropdown", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
+            { "Entity_TextFieldNotificationAlert", "//*[contains(@data-id, \'[NAME]-error-message\')]" },
                         
             //CommandBar
             { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
+            { "Cmd_ContainerRelated"       , "//ul[contains(@data-lp-id,\"commandbar-SubGridAssociated\")]"},
             { "Cmd_ContainerGrid"       , "//ul[contains(@data-lp-id,\"commandbar-HomePageGrid\")]"},
             { "Cmd_MoreCommandsMenu"       , "//*[@id=\"__flyoutRootNode\"]"},
 
@@ -248,11 +257,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             //MultiSelect
             { "MultiSelect_DivContainer",     "//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]/div/div/div" },
+            { "MultiSelect_DivContainer1",     "//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]/div" },
             { "MultiSelect_InputSearch",     "//div[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_InputSearch\")]" },
+            { "MultiSelect_InputSearch1",     "//div[contains(@data-id,\"[NAME].fieldControl_container\")]" },
             { "MultiSelect_SelectedRecord",  "//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li" },
             { "MultiSelect_SelectedRecord_Button",  "//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li[descendant::label[text()=\"{0}\"]]/descendant::button" },
             { "MultiSelect_SelectedRecord_Label",  "//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]/descendant::label" },
             { "MultiSelect_FlyoutList",      "//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//li[descendant::label[text()=\"{0}\"]]" },
+            { "MultiSelect_FlyoutList1",      "//div[contains(@data-id,\"[NAME].fieldControl_container\")]//label[contains(@title,\"{0}\")]" },
             { "MultiSelect_ExpandCollapseButton", "//button[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse\")]/descendant::label[not(text()=\"+0\")]" },
 
             //Dashboard

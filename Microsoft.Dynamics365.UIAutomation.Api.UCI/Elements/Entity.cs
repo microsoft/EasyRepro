@@ -64,6 +64,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.GetValue(optionSet);
         }
 
+        public bool ValidateFieldMandatory(string field)
+        {
+            return _client.ValidateFieldMandatory(field);
+        }
+
         public void GetValue(MultiValueOptionSet option)
         {
             _client.GetValue(option);
@@ -105,5 +110,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.SelectTab(tabName, subTabName);
         }
+
+        
     }   
 }

@@ -719,6 +719,72 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
+        internal BrowserCommandResult<bool> ClickRelatedGridCommand(string name, string subname = "", bool moreCommands = false, int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Set Value"), driver =>
+            {
+                bool success = false;
+                IWebElement ribbon = null;
+
+                //Try to click the command bar from inside an entity record.  If that fails, try to click the Command Bar from within a Grid.
+                try
+                {
+                    ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerRelated]));
+                    success = true;
+                }
+                catch (Exception)
+                {
+                    success = false;
+                }
+
+                try
+                {
+                    ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid]));
+                    success = true;
+                }
+                catch (Exception)
+                {
+                    success = false;
+                }
+
+                var items = ribbon.FindElements(By.TagName("li"));
+
+                IWebElement button;
+
+                button = subname == "" ? items.FirstOrDefault(x => x.GetAttribute("aria-label") == name) : items.FirstOrDefault(x => x.GetAttribute("aria-label") == name + " More Commands");
+
+                if (button != null)
+                {
+                    button.Click();
+                }
+                else
+                {
+                    throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
+                }
+
+                if (!string.IsNullOrEmpty(subname))
+                {
+                    var submenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.MoreCommandsMenu]));
+
+                    var subbutton = submenu.FindElements(By.TagName("button")).FirstOrDefault(x => x.Text == subname);
+
+                    if (subbutton != null)
+                    {
+                        subbutton.Click();
+                    }
+                    else
+                        throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
+
+                }
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
         #endregion
 
         #region Grid
@@ -1570,7 +1636,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Remove Multi Select Value: {option.Name}"), driver =>
             {
-                string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name]);
+            string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", option.Name);// Elements.ElementId[option.Name]);
                 // If there is already some pre-selected items in the div then we must determine if it
                 // actually exists and simulate a set focus event on that div so that the input textbox
                 // becomes visible.
@@ -1617,7 +1683,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Add Multi Select Value: {option.Name}"), driver =>
             {
-                string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name]);
+            string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", option.Name);// Elements.ElementId[option.Name]);
                 // If there is already some pre-selected items in the div then we must determine if it
                 // actually exists and simulate a set focus event on that div so that the input textbox
                 // becomes visible.
@@ -1627,10 +1693,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     listItems.First().SendKeys("");
                 }
 
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch].Replace("[NAME]", Elements.ElementId[option.Name])));
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch1].Replace("[NAME]", option.Name)));//, Elements.ElementId[option.Name])));
                 foreach (var optionValue in option.Values)
                 {
-                    xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.FlyoutList].Replace("[NAME]", Elements.ElementId[option.Name]), optionValue);
+                    xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.FlyoutList1].Replace("[NAME]", option.Name), optionValue);//, Elements.ElementId[option.Name]), optionValue);
                     var flyout = driver.FindElements(By.XPath(xpath));
                     if (flyout.Any())
                     {
@@ -1638,11 +1704,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                 }
 
-                // Click on the div containing textbox so that the floyout collapses or else the flyout
-                // will interfere in finding the next multiselect control which by chance will be lying
-                // behind the flyout control.
-                //driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", Elements.ElementId[option.Name])));
-                xpath = AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", Elements.ElementId[option.Name]);
+            // Click on the div containing textbox so that the floyout collapses or else the flyout
+            // will interfere in finding the next multiselect control which by chance will be lying
+            // behind the flyout control.
+            //driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", Elements.ElementId[option.Name])));
+            xpath = AppElements.Xpath[AppReference.MultiSelect.DivContainer1].Replace("[NAME]", option.Name);// Elements.ElementId[option.Name]);
                 var divElements = driver.FindElements(By.XPath(xpath));
                 if(divElements.Any())
                 {
@@ -1684,6 +1750,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> ValidateFieldMandatory(string field)
+        {
+            return this.Execute(GetOptions($"Check Field Mandatory"), driver =>
+            {
+                try
+                {
+                    var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldNotificationAlert].Replace("[NAME]", field)));
+                    if (fieldContainer.Text == "A required field cannot be empty.")
+                        return true;
+                    else
+                        return false;
+                }
+                catch(Exception e)
+                {
+                    return false;
+                }
+            });
+        }
         #endregion
 
         #region Timeline
@@ -1906,13 +1990,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute($"Select Tab", driver =>
             {
                 driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
-
-                ClickTab(AppElements.Xpath[AppReference.Entity.Tab], tabName);
-
+                if (String.IsNullOrEmpty(subTabName))
+                {
+                    ClickTab(AppElements.Xpath[AppReference.Entity.Tab], tabName);
+                }
                 //Click Sub Tab if provided
                 if (!String.IsNullOrEmpty(subTabName))
                 {
-                    ClickTab(AppElements.Xpath[AppReference.Entity.SubTab], subTabName);
+                    if (this.Browser.Driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabList])))
+                    {
+                        this.Browser.Driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabList])).Click(true);
+                    }
+                    else
+                    {
+                        ClickTab(AppElements.Xpath[AppReference.Entity.Tab], tabName);
+                        ClickTab(AppElements.Xpath[AppReference.Entity.SubTab], subTabName);
+                    }
                 }
 
                 return true;

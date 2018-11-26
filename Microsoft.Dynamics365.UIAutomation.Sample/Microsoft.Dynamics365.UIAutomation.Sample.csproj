@@ -89,6 +89,8 @@
   <ItemGroup>
     <Compile Include="SharedAPI\AzureInsights\OpenLead.cs" />
     <Compile Include="SharedAPI\BrowserTests\BrowserTests.cs" />
+    <Compile Include="UCI\AZDCS\Intake.cs" />
+    <Compile Include="UCI\AZDCS\Person.cs" />
     <Compile Include="UCI\BusinessProcessFlow\BusinessProcessFlowNextStage.cs" />
     <Compile Include="UCI\BusinessProcessFlow\SwitchBusinessProcessFlow.cs" />
     <Compile Include="UCI\CommandBar\AssignAccount.cs" />
