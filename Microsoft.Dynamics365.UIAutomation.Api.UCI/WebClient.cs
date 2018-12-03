@@ -260,13 +260,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var dictionary = new Dictionary<string, IWebElement>();
 
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+
                 var menuContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaContainer]));
                 
                 var subItems = menuContainer.FindElements(By.TagName("li"));
 
                 foreach (var subItem in subItems)
                 {
-                    dictionary.Add(subItem.GetAttribute("title").ToLowerString(), subItem);
+                        if(!String.IsNullOrEmpty(subItem.GetAttribute("Id")))
+                    {
+                        if (subItem.GetAttribute("Id").StartsWith("sitemap", StringComparison.OrdinalIgnoreCase))
+                            dictionary.Add(subItem.Text.ToLowerString(), subItem);
+                    }
+                        
                 }
 
                 return dictionary;
