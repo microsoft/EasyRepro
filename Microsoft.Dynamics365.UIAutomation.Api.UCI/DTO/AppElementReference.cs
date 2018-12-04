@@ -170,9 +170,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "App_Shell"    , "//*[@id=\"ApplicationShell\"]"},
 
             //Navigation
-            { "Nav_AreaButton"       , "//button[contains(@aria-label,'All Areas')]"},
-            { "Nav_AreaMenu"       , "//*[@id=\"__flyoutRootNode\"]"},
-            { "Nav_SubAreaContainer"       , "//*[@id=\"ApplicationShell\"]/div[1]/div[2]/div/div/div[2]/div[3]/ul"},
+            { "Nav_AreaButton"       , "//button[contains(@data-lp-id,'sitemap-areaBar-more-btn')]"},
+            { "Nav_AreaMenu"       , "//*[@data-lp-id=\"sitemap-areabar-overflow-flyout\"]"},
+            { "Nav_SubAreaContainer"       , "//*[@data-id=\"navbar-container\"]/div/ul"},
             { "Nav_AppMenuButton"       , "//*[@id=\"TabArrowDivider\"]/a"},
             { "Nav_SiteMapLauncherButton", "//button[@data-lp-id=\"sitemap-launcher\"]" },
             { "Nav_AppMenuContainer"       , "//*[@id=\"taskpane-scroll-container\"]"},
