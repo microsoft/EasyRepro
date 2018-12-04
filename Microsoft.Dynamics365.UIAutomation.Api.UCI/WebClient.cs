@@ -268,10 +268,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 foreach (var subItem in subItems)
                 {
+                        // Check 'Id' attribute, NULL value == Group Header
                         if(!String.IsNullOrEmpty(subItem.GetAttribute("Id")))
-                    {
-                        if (subItem.GetAttribute("Id").StartsWith("sitemap", StringComparison.OrdinalIgnoreCase))
-                            dictionary.Add(subItem.Text.ToLowerString(), subItem);
+                    {              
+                        // Filter out duplicate entity keys - click the first one in the list
+                        if(!dictionary.ContainsKey(subItem.Text.ToLowerString()))
+                                dictionary.Add(subItem.Text.ToLowerString(), subItem);
                     }
                         
                 }
