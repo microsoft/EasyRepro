@@ -117,19 +117,17 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         internal bool ClickCommandButton(string name, string subButton = "", bool throwExceptionIfVisible = false)
         {
             var driver = Browser.Driver;
-
             int nestedSubContainer = 0;
 
             //First button
             var commandBarContainer = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.Container]));
-            var buttons = commandBarContainer.FindElements(By.TagName("button"));
-            var button = buttons.FirstOrDefault(b => b.Text.Contains(name, StringComparison.OrdinalIgnoreCase));
+            var button = commandBarContainer.FindElement(By.XPath($"//button[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')=\"{name.ToLowerString()}\"]"));
 
             if (button == null)
             {
                 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.OverflowContainer]));
-                buttons = GetCommands(true).Value;
+                var buttons = GetCommands(true).Value;
                 button = buttons.FirstOrDefault(x => x.Text.Contains(name, StringComparison.OrdinalIgnoreCase));
                 nestedSubContainer = 1;
             }
