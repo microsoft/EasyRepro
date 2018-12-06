@@ -65,7 +65,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine("Make sure each managed solution does not have the solution checker button in the command bar");
                     appBrowser.ModelDrivenApps.VerifyManagedSolutionsUnavailable(_commandBarButton ,1000);
 
-                    appBrowser.ThinkTime(2000);
+                    appBrowser.ThinkTime(5000);
 
                 }
                 catch (Exception e)

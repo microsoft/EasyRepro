@@ -132,15 +132,24 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             return this.Execute(GetOptions("Verify Managed Solutions Unavailable"), driver =>
             {
+
+                // Due to grid column changes, change filter to Managed solutions only
+                string buttonName = "All";
+                string subButton = "Managed";
+                CommandBar cmdBar = new CommandBar(Browser);
+                cmdBar.ClickCommand(buttonName, subButton);
+
+                Browser.ThinkTime(5000);
+
                 List<SolutionGridRow> solutions = GetSolutionTableRows();
 
-                var solutionRows = solutions.Where(s => s.ManagedExternally.Equals("Yes", StringComparison.OrdinalIgnoreCase));
-                foreach (var row in solutionRows)
+                foreach (var row in solutions)
                 {
                     SelectGridRecord(row.Name, true);
 
-                    CommandBar bar = new CommandBar(Browser);
-                    var commands = bar.GetVisibleCommands(250);
+                    Browser.ThinkTime(500);
+
+                    var commands = cmdBar.GetVisibleCommands(1000);
 
                     //Converting the collection ToList() is not great for performance
                     if (commands.Value.ToList().Exists(cmd => cmd.Text.Contains(commandBarButton, StringComparison.OrdinalIgnoreCase)))
@@ -337,7 +346,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                     }
                 }
                 if (cellValues.Count > 0)
-                    tableRows.Add(new SolutionGridRow(cellValues[columnHeaders.FindIndex(x => x.Equals("name", StringComparison.OrdinalIgnoreCase))], cellValues[columnHeaders.FindIndex(x => x.Contains("Managed externally", StringComparison.OrdinalIgnoreCase))]));
+                    tableRows.Add(new SolutionGridRow(cellValues[columnHeaders.FindIndex(x => x.Equals("display name", StringComparison.OrdinalIgnoreCase))]));
             }
 
             return tableRows;
@@ -366,12 +375,10 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         internal class SolutionGridRow
         {
             public String Name { get; set; }
-            public String ManagedExternally { get; set; }
 
-            public SolutionGridRow(String name, String managedExternally)
+            public SolutionGridRow(String name)
             {
                 this.Name = name;
-                this.ManagedExternally = managedExternally;
 
             }
         }
