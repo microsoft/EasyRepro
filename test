@@ -1,0 +1,209 @@
+// ===================================================================== 
+//  This file is part of the Microsoft Dynamics CRM SDK code samples. 
+// 
+//  Copyright (C) Microsoft Corporation.  All rights reserved. 
+// 
+//  This source code is intended only as a supplement to Microsoft 
+//  Development Tools and/or on-line documentation.  See these other 
+//  materials for detailed information regarding Microsoft code samples. 
+// 
+//  THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY 
+//  KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
+//  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A 
+//  PARTICULAR PURPOSE. 
+// ===================================================================== 
+
+//<snippetCustomActivity> 
+using System;
+using System.Activities;
+
+// These namespaces are found in the Microsoft.Xrm.Sdk.dll assembly 
+// located in the SDK\bin folder of the SDK download. 
+using Microsoft.Xrm.Sdk;
+
+// These namespaces are found in the Microsoft.Xrm.Sdk.Workflow.dll assembly 
+// located in the SDK\bin folder of the SDK download. 
+using Microsoft.Xrm.Sdk.Workflow;
+using Microsoft.Xrm.Sdk.Query;
+
+namespace UpdateGrids
+{ /// <summary> 
+  /// Creates a task with a subject equal to the ID of the input entity. 
+  /// Input arguments: 
+  ///   "Input Entity". Type: EntityReference. Is the account entity. 
+  /// Output argument: 
+  ///   "Task Created". Type: EntityReference. Is the task created. 
+  /// </summary> 
+    public sealed partial class CustomActivity : CodeActivity
+    {
+        /// <summary> 
+        /// Creates a task with a subject equal to the ID of the input EntityReference 
+        /// </summary> 
+        protected override void Execute(CodeActivityContext executionContext)
+        {
+            IWorkflowContext context = executionContext.GetExtension<IWorkflowContext>();
+            IOrganizationServiceFactory serviceFactory =
+                executionContext.GetExtension<IOrganizationServiceFactory>();
+            IOrganizationService service =
+                serviceFactory.CreateOrganizationService(context.UserId);
+
+            // Retrieve the id 
+            Guid OpportunityId = this.inputEntity.Get(executionContext).Id;
+
+            EntityReference OpportunityRef = this.inputEntity.Get(executionContext);
+
+            // Create a task entity 
+
+            //Entity task = new Entity();
+            //task.LogicalName = "task";
+            //task["subject"] = accountId.ToString();
+            //task["regardingobjectid"] = new EntityReference("account", accountId);
+            //Guid taskId = service.Create(task);
+            //this.taskCreated.Set(executionContext,
+            //    new EntityReference("task", taskId));
+
+            //new_tedad_aghsaat
+            //new_chand_mah_yekbar
+            //new_mablagh_har_ghest
+            //new_jame_mablagh_ghabel_pardakht
+            //new_tarikh_shorou_bime
+
+            //  OptionSetValue typeOfIssue = (OptionSetValue)Case["new_issue"];//["new_typeoferror"];
+
+
+            Entity OpportunityEnt = service.Retrieve(OpportunityRef.LogicalName, OpportunityRef.Id, new ColumnSet(true));//new String[] { "new_tedad_aghsaat", "new_chand_mah_yekbar", "new_mablagh_naghdi", "new_jame_mablagh_ghabel_pardakht", "new_tarikh_shorou_bime", "new_mablagh_karmozd", "new_tarikh_shorou_ghest", "new_nahve_pardakht", "new_tarikh_pardakht_naghdi", "new_hazine_sodour" }));
+
+            //new_takhfifat_badane
+            EntityCollection takhfifatbadane_list= find_takhfifat_badane(OpportunityId,service);
+
+            //if (takhfifatbadane_list == null)
+            //    return;
+
+            Entity tempENT = new Entity("new_takhfifat_badane");
+
+            int i =0;
+            int count = takhfifatbadane_list.Entities.Count;
+
+            foreach (Entity Item in takhfifatbadane_list.Entities)
+            {
+                tempENT["new_name"] = /*(String)takhfifatbadane_list.Entities[0].Attributes["new_name"];*/ (String)Item.Attributes["new_name"];
+                //tempENT = item;
+                //tempENT["new_name"] = "ali";
+                tempENT["new_related_op"] = new EntityReference(OpportunityEnt.LogicalName, OpportunityEnt.Id);
+                service.Create(tempENT);
+            }
+
+            //OptionSetValue nahve_pardakht = (OptionSetValue)bimename["new_nahve_pardakht"];
+
+            //DateTime tarikh_pardakht_naghdi = (DateTime)bimename["new_tarikh_pardakht_naghdi"];
+            //Money mablagh_naghdi = (Money)bimename["new_mablagh_naghdi"];
+            //Money jame_mablagh_ghabel_pardakht = (Money)bimename["new_jame_mablagh_ghabel_pardakht"];
+            //Money jame_mablagh_karmozd = (Money)bimename["new_mablagh_karmozd"];
+            //Money jame_hazine_sodour = (Money)bimename["new_hazine_sodour"];
+
+            //decimal karmozd = (mablagh_naghdi.Value / jame_mablagh_ghabel_pardakht.Value) * jame_mablagh_karmozd.Value;
+            //decimal hazine_sodour = (mablagh_naghdi.Value / jame_mablagh_ghabel_pardakht.Value) * jame_hazine_sodour.Value;
+
+
+            //Entity soratvaziat = new Entity("new_installment");
+            //soratvaziat["new_payment_type"] = new OptionSetValue(1);// (EntityReference)contract["customerid"];
+            //soratvaziat["new_name"] = "مبلغ نقدی بیمه نامه";
+            //soratvaziat["new_related_bimenameid"] = new EntityReference(bimenameRef.LogicalName, bimenameRef.Id);
+            //soratvaziat["new_sarresid"] = tarikh_pardakht_naghdi;
+            //soratvaziat["new_mablagh"] = mablagh_naghdi;
+            //soratvaziat["new_karmozd_vosouli"] = new Money(karmozd);
+            //soratvaziat["new_hazine_sodour_vosouli"] = new Money(hazine_sodour);
+
+            //service.Create(soratvaziat);
+
+            //DateTime sarresid = new DateTime();
+
+            //sarresid = DateTime.Now;
+            //soratvaziat["new_sarresid"] = sarresid;// new EntityReference("pricelevel", new Guid("8AC463A1-C2FA-E711-811A-000C29756A1B"));
+            //decimal d = 1200000 + i; 
+            // soratvaziat["new_mablagh"] = new Money(d); new EntityReference("systemuser", new Guid("D9F41281-E059-E511-84B7-000C29023294"));
+            // soratvaziat["new_related_contract"] = contractRef;
+
+            //if (nahve_pardakht.Value != 3)
+            //{
+            //    return;
+            //}
+
+
+
+            //if (nahve_pardakht.Value == 3)
+            //{
+            //    int tedad_aghsaat = (int)bimename["new_tedad_aghsaat"];
+
+            //    int chand_mah_yekbar = (int)bimename["new_chand_mah_yekbar"];
+
+            //    DateTime TempDate = (DateTime)bimename["new_tarikh_shorou_ghest"];
+
+            //    decimal mablagh_har_ghest = ((jame_mablagh_ghabel_pardakht.Value - mablagh_naghdi.Value) / tedad_aghsaat);
+
+            //    karmozd = (mablagh_har_ghest / jame_mablagh_ghabel_pardakht.Value) * jame_mablagh_karmozd.Value;
+            //    hazine_sodour = (mablagh_har_ghest / jame_mablagh_ghabel_pardakht.Value) * jame_hazine_sodour.Value;
+
+
+            //    for (int i = 1; i <= tedad_aghsaat; i++)
+            //    {
+            //        Entity soratvaziat2 = new Entity("new_installment");
+            //        soratvaziat2["new_payment_type"] = new OptionSetValue(2);// (EntityReference)contract["customerid"];
+            //        soratvaziat2["new_name"] = String.Format("قسط شماره {0} بیمه نامه", i);
+            //        soratvaziat2["new_related_bimenameid"] = new EntityReference(bimenameRef.LogicalName, bimenameRef.Id);
+            //        soratvaziat2["new_sarresid"] = TempDate;
+            //        soratvaziat2["new_mablagh"] = new Money(mablagh_har_ghest);
+            //        soratvaziat2["new_karmozd_vosouli"] = new Money(karmozd);
+            //        soratvaziat2["new_hazine_sodour_vosouli"] = new Money(hazine_sodour);
+
+
+            //        var persianCalendar = new System.Globalization.PersianCalendar();
+            //        TempDate = persianCalendar.AddMonths(TempDate, chand_mah_yekbar);
+
+
+            //        //DateTime sarresid = new DateTime();
+
+            //        //sarresid = DateTime.Now;
+            //        //soratvaziat["new_sarresid"] = sarresid;// new EntityReference("pricelevel", new Guid("8AC463A1-C2FA-E711-811A-000C29756A1B"));
+            //        //decimal d = 1200000 + i; 
+            //        // soratvaziat["new_mablagh"] = new Money(d); new EntityReference("systemuser", new Guid("D9F41281-E059-E511-84B7-000C29023294"));
+            //        // soratvaziat["new_related_contract"] = contractRef;
+
+            //        service.Create(soratvaziat2);
+
+
+
+            //        //Entity soratvaziat2 = new Entity("new_installment");
+            //        //soratvaziat2["new_payment_type"] = new OptionSetValue(2);// (EntityReference)contract["customerid"];
+            //        //soratvaziat2["new_name"] = "test2"; //String.Format("قسط شماره {0} بیمه نامه", i);
+            //        //service.Create(soratvaziat2);
+            //    }
+
+
+
+
+
+            //}
+        }
+
+        private EntityCollection find_takhfifat_badane(Guid oportunityId, IOrganizationService service)
+        {
+            QueryExpression Query = new QueryExpression("new_takhfifat_badane");
+            Query.ColumnSet = new ColumnSet();
+            Query.Criteria.AddCondition("new_related_op", ConditionOperator.Equal, oportunityId);
+            EntityCollection result = service.RetrieveMultiple(Query);
+            //if(result!=null)
+            return result;
+        }
+
+        // Define Input/Output Arguments 
+        [RequiredArgument]
+        [Input("InputEntity")]
+        [ReferenceTarget("opportunity")]
+        public InArgument<EntityReference> inputEntity { get; set; }
+
+        //[Output("TaskCreated")]
+        //[ReferenceTarget("task")]
+        //public OutArgument<EntityReference> taskCreated { get; set; }
+    }
+}
