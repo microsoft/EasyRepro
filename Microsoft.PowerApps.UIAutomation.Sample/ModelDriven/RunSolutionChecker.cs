@@ -143,8 +143,12 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.ModelDrivenApps.SelectGridRecord(_solutionName);
 
                     // When status changes, verify if it succeeded or failed.  If successful, download results and verify notification is present
-                    Console.WriteLine($"Downloading Results for Solution Checker run");
-                    appBrowser.CommandBar.DownloadResults(_solutionName, _commandBarButton);
+                    // Due to Modal Dialog on Download in IE, skip this step
+                    if (_browserType.ToString() != "IE")
+                    {
+                        Console.WriteLine($"Downloading Results for Solution Checker run");
+                        appBrowser.CommandBar.DownloadResults(_solutionName, _commandBarButton);
+                    }
 
                     appBrowser.ThinkTime(10000);
 
@@ -262,8 +266,12 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.ModelDrivenApps.SelectGridRecord(_solutionName);
 
                     // hen status changes, verify if it succeeded or failed.  If successful, download results and verify notification is present
-                    Console.WriteLine($"Downloading Results for Solution Checker run");
-                    appBrowser.ModelDrivenApps.DownloadResults(_solutionName, _commandBarButton);
+                    // Due to Modal Dialog on Download in IE, skip this step
+                    if (_browserType.ToString() != "IE")
+                    {
+                        Console.WriteLine($"Downloading Results for Solution Checker run");
+                        appBrowser.CommandBar.DownloadResults(_solutionName, _commandBarButton);
+                    }
 
                     appBrowser.ThinkTime(10000);
 
