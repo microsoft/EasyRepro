@@ -180,17 +180,43 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Searches the specified search criteria.
         /// </summary>
         /// <param name="searchCriteria">The search criteria.</param>
+        /// <param name="clearByDefault">By default, clear existing search criteria</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
         /// <example>xrmBrowser.Grid.Search("Test API");</example>
-        public BrowserCommandResult<bool> Search(string searchCriteria, int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> Search(string searchCriteria, bool clearByDefault = true, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
 
             return this.Execute(GetOptions("Search"), driver =>
             {
                 driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria]));
+
+                if (clearByDefault)
+                {
+                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria])).Clear();
+                }
+
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria])).SendKeys(searchCriteria);
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria])).SendKeys(Keys.Enter);
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Clears the search box on the grid
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Grid.ClearSearch();</example>
+        public BrowserCommandResult<bool> ClearSearch(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Search"), driver =>
+            {
+                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria]));
+
+                driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria])).Clear();
 
                 return true;
             });
