@@ -16,6 +16,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string AreaButton = "Nav_AreaButton";
             public static string AreaMenu = "Nav_AreaMenu";
             public static string SubAreaContainer = "Nav_SubAreaContainer";
+            public static string SubAreaItem = "Nav_SubAreaItem";
             public static string AppMenuButton = "Nav_AppMenuButton";
             public static string SiteMapLauncherButton = "Nav_SiteMapLauncherButton";
             public static string AppMenuContainer = "Nav_AppMenuContainer";
@@ -28,6 +29,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Search = "Nav_Search";
             public static string QuickLaunchMenu = "Nav_QuickLaunchMenu";
             public static string QuickLaunchButton = "Nav_QuickLaunchButton";
+			public static string QuickCreateButton = "Nav_QuickCreateButton";
+            public static string QuickCreateMenuList = "Nav_QuickCreateMenuList";
+            public static string QuickCreateMenuItems = "Nav_QuickCreateMenuItems";
         }
 
         public static class Grid
@@ -58,12 +62,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Form = "Entity_FormContainer";
             public static string Save = "Entity_Save";
             public static string TextFieldContainer = "Entity_TextFieldContainer";
+            public static string TextFieldContainerLabel = "Entity_TextFieldContainerLabel";
+            public static string TextFieldContainerCheckBox = "Entity_TextFieldContainerCheckBox";
             public static string TextFieldValue = "Entity_TextFieldValue";
             public static string TextFieldLookup = "Entity_TextFieldLookup";
             public static string TextFieldLookupMenu = "Entity_TextFieldLookupMenu";
             public static string LookupFieldDeleteExistingValue = "Entity_LookupFieldDeleteExistingValue";
             public static string LookupFieldHoverExistingValue = "Entity_LookupFieldHoverExistingValue";
             public static string LookupResultsDropdown = "Entity_LookupResultsDropdown";
+            public static string LookupResultsDropdownQuickCreate = "Entity_LookupResultsDropdownQuickCreate";
             public static string TextFieldLookupFieldContainer = "Entity_TextFieldLookupFieldContainer";
             public static string RecordSetNavigator = "Entity_RecordSetNavigator";
             public static string RecordSetNavigatorOpen = "Entity_RecordSetNavigatorOpen";
@@ -84,6 +91,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Tab = "Entity_Tab";
             public static string SubTab = "Entity_SubTab";
             public static string TextFieldNotificationAlert = "Entity_TextFieldNotificationAlert";
+            public static string TextFieldLocked = "Entity_TextFieldLocked";
 
         }
 
@@ -91,6 +99,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             public static string Container = "Cmd_Container";
             public static string ContainerRelated = "Cmd_ContainerRelated";
+            public static string ContainerSubrid = "Cmd_ContainerSubgrid";
             public static string ContainerGrid = "Cmd_ContainerGrid";
             public static string MoreCommandsMenu = "Cmd_MoreCommandsMenu";
         }
@@ -159,6 +168,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string CancelButton = "Dialog_CancelButton";
             public static string SwitchProcessContainer = "Dialog_SwitchProcessContainer";
         }
+		public static class QuickCreate
+        {
+            public static string SaveButton = "QuickCreate_SaveButton";
+        }
     }
 
     public static class AppElements
@@ -169,9 +182,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "App_Shell"    , "//*[@id=\"ApplicationShell\"]"},
 
             //Navigation
-            { "Nav_AreaButton"       , "//button[contains(@aria-label,'All Areas')]"},
-            { "Nav_AreaMenu"       , "//*[@id=\"__flyoutRootNode\"]"},
-            { "Nav_SubAreaContainer"       , "//*[@id=\"ApplicationShell\"]/div[1]/div[2]/div/div/div[2]/div[3]/ul"},
+            //{ "Nav_AreaButton"       , "//button[contains(@aria-label,'All Areas')]"},
+            { "Nav_AreaButton"       , "//button[@id=\"areaSwitcherId\"]"},
+            { "Nav_AreaMenu"       , "//*[@data-lp-id=\"sitemap-area-switcher-flyout\"]"},
+            //{ "Nav_AreaMenu"       , "//*[@id=\"__flyoutRootNode\"]"},
+            { "Nav_SubAreaContainer"       , "//*[@aria-label=\"Navigate Dynamics 365\"]" },///div[1]/div[2]/div/div/div[2]/div[3]/ul"},
+            //{ "Nav_SubAreaContainer"       , "//*[@id=\"ApplicationShell\"]/div[1]/div[2]/div/div/div[2]/div[3]/ul"},
+            {"Nav_SubAreaItem","//li[contains(@data-lp-id,'sitemap-entity-NewSubArea')]" },
             { "Nav_AppMenuButton"       , "//*[@id=\"TabArrowDivider\"]/a"},
             { "Nav_SiteMapLauncherButton", "//button[@data-lp-id=\"sitemap-launcher\"]" },
             { "Nav_AppMenuContainer"       , "//*[@id=\"taskpane-scroll-container\"]"},
@@ -185,6 +202,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_Search",                "//*[@id=\"categorizedSearchInputAndButton\"]"},
             { "Nav_QuickLaunchMenu",                "//div[contains(@data-id,'quick-launch-bar')]"},
             { "Nav_QuickLaunchButton",                "//li[contains(@title, '[NAME]')]"},
+			{ "Nav_QuickCreateButton", "//button[contains(@data-id,'quickCreateLauncher')]" },
+            { "Nav_QuickCreateMenuList", "//ul[contains(@id,'MenuSectionItemsquickCreate')]" },
+            { "Nav_QuickCreateMenuItems", "//li[@role='menuitem']" },
 
             
             //Grid
@@ -215,9 +235,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Delete"       , "//button[contains(@data-id,'Delete')]"},
             { "Entity_FormContainer"       , "//*[@id=\"tab-section\"]"},
             { "Entity_Process"       , "//button[contains(@data-id,'MBPF.ConvertTo')]"},
-            { "Entity_Save"       , "//*[@id=\"footerWrapper\"]/div/div[4]/button"},
+            //{ "Entity_Save"       , "//*[@id=\"footerWrapper\"]/div/div[4]/button"},
+            { "Entity_Save"       , "//*[@id=\"footerWrapper\"]//button[@data-id=\"edit-form-save-btn\"]"},
             { "Entity_SwitchProcess"       , "//button[contains(@data-id,'SwitchProcess')]"},
             { "Entity_TextFieldContainer", "//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
+            {"Entity_TextFieldContainerLabel","//*[contains(@for, \'[NAME].fieldControl-text-box-text\')]" },
+            {"Entity_TextFieldContainerCheckBox", "//*[contains(@id, \'[NAME].fieldControl-checkbox-toggle\')]" },
             { "Entity_TextFieldValue", "//input[contains(@data-id, \'[NAME].fieldControl\')]" },
             { "Entity_TextFieldLookup", "//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
             { "Entity_TextFieldLookupMenu", "//*[contains(@id, \'[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout')]" },
@@ -236,11 +259,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_FieldControlDateTimeInput","//input[contains(@id,'[FIELD].fieldControl-date-time-input')]" },
             { "Entity_FieldControlDateTimeInputUCI","//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
             { "Entity_LookupResultsDropdown", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
-            { "Entity_TextFieldNotificationAlert", "//*[contains(@data-id, \'[NAME]-error-message\')]" },
+            { "Entity_LookupResultsDropdownQuickCreate", "//ul[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
+            //{ "Entity_TextFieldNotificationAlert", "//*[contains(@data-id, \'[NAME]-error-message\')]" },
+            { "Entity_TextFieldNotificationAlert", "//*[contains(@data-id, \'[NAME]-required-icon\')]" },
+            {"Entity_TextFieldLocked","//*[contains(@data-id, \'[NAME]-locked-icon\')]" },
                         
             //CommandBar
             { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
             { "Cmd_ContainerRelated"       , "//ul[contains(@data-lp-id,\"commandbar-SubGridAssociated\")]"},
+            { "Cmd_ContainerSubgrid"       , "//ul[contains(@data-lp-id,\"SubGridStandard:\")]"},
             { "Cmd_ContainerGrid"       , "//ul[contains(@data-lp-id,\"commandbar-HomePageGrid\")]"},
             { "Cmd_MoreCommandsMenu"       , "//*[@id=\"__flyoutRootNode\"]"},
 
@@ -294,6 +321,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_ActiveProcessGridControlContainer"       , "//div[contains(@data-lp-id,'activeProcessGridControlContainer')]"},
             { "Entity_SwitchProcessDialogOK"       , "//button[contains(@data-id,'ok_id')]"},
             { "SwitchProcess_Container" , "//section[contains(@id, 'popupContainer')]" },
+			//QuickCreate 
+            { "QuickCreate_SaveButton" , "//button[contains(@id,'quickCreateSaveBtn')]" }
         };
     }
 

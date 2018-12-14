@@ -69,6 +69,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.ValidateFieldMandatory(field);
         }
 
+        public bool ValidateFieldLocked(string field)
+        {
+            return _client.ValidateFieldLocked(field);
+        }
+
         public void GetValue(MultiValueOptionSet option)
         {
             _client.GetValue(option);
@@ -111,6 +116,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.SelectTab(tabName, subTabName);
         }
 
-        
+        public void NavigateBrowserback()
+        {
+            _client.NavigateBrowserback();
+        }
     }   
 }

@@ -22,5 +22,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.ClickRelatedGridCommand(name, subname, moreCommands);
         }
+
+        public void ClickSubGridCommand(string name, string subname = "", bool moreCommands = false)
+        {
+            _client.ClickSubGridCommand(name, subname, moreCommands);
+        }
     }
 }

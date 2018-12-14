@@ -112,6 +112,7 @@
     <Compile Include="UCI\Navigation\GlobalSearch.cs" />
     <Compile Include="UCI\Navigation\OpenNavigation.cs" />
     <Compile Include="UCI\Navigation\PortalAdmin.cs" />
+    <Compile Include="UCI\QuickCreate\QuickCreate.cs" />
     <Compile Include="UCI\Read\OpenAccount.cs" />
     <Compile Include="UCI\Read\OpenAccountBPF.cs" />
     <Compile Include="UCI\Read\OpenCase.cs" />

@@ -66,9 +66,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI.AZDCS
                 mcshhs_title.Value = "Nurse";
                 xrmApp.Entity.SetValue(mcshhs_title);
 
-
+                MultiValueOptionSet mcshhs_race = new MultiValueOptionSet();
+                mcshhs_race.Name = "mcshhs_race";
+                mcshhs_race.Values = new string[]{ "American Indian or Alaska Native"};
+                xrmApp.Entity.SetValue(mcshhs_race);
                 //xrmApp.Entity.SetValue("mcshhs_armedservicesinformation", "uaiosuiouio aipaos aspoi asipo ipoias poiasi pia yuiysiu asu uias ");
 
+                OptionSet mcshhs_hispanicorlatinoorigin = new OptionSet();
+                mcshhs_hispanicorlatinoorigin.Name = "mcshhs_hispanicorlatinoorigin";
+                mcshhs_hispanicorlatinoorigin.Value = "No";
+                xrmApp.Entity.SetValue(mcshhs_hispanicorlatinoorigin);
 
                 OptionSet mcshhs_sexualorientation = new OptionSet();
                 mcshhs_sexualorientation.Name = "mcshhs_sexualorientation";
@@ -98,6 +105,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI.AZDCS
 
                 xrmApp.ThinkTime(10000);
                 xrmApp.Entity.SelectTab("Related Addresses");
+                xrmApp.CommandBar.ClickSubGridCommand("Add New Person Address");
+                xrmApp.ThinkTime(10000);
+
+                LookupItem mcshhs_addressstoreid = new LookupItem();
+                mcshhs_addressstoreid.Name = "mcshhs_addressstoreid";
+                mcshhs_addressstoreid.Value = "3555 S Perry Park Rd";
+                xrmApp.QuickCreate.SetValue(mcshhs_addressstoreid);
+
+                MultiValueOptionSet mcshhs_addresstype = new MultiValueOptionSet();
+                mcshhs_addresstype.Name = "mcshhs_addresstype";
+                mcshhs_addresstype.Values = new string[]{ "Home"};
+                xrmApp.QuickCreate.SetValue(mcshhs_addresstype);
+
+                xrmApp.QuickCreate.SetValue("mcshhs_addressstartdate", DateTime.Now, "MM/dd/yyyy");
+
+                xrmApp.QuickCreate.Save();
 
                 xrmApp.ThinkTime(10000);
                 xrmApp.Entity.SelectTab("Tracking Information");
@@ -112,9 +135,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI.AZDCS
                 xrmApp.Entity.SelectTab("Validation");
 
                 xrmApp.ThinkTime(10000);
-                xrmApp.Entity.SelectTab("Related", "Person Addresses");
+                xrmApp.Entity.SelectTab("Related", "Person Substances");
+                xrmApp.CommandBar.ClickRelatedGridCommand("Add New Person Substance");
 
+                LookupItem mcshhs_substance = new LookupItem();
+                mcshhs_substance.Name = "mcshhs_substance";
+                mcshhs_substance.Value = "Alcohol";
+                xrmApp.QuickCreate.SetValue(mcshhs_substance);
 
+                xrmApp.QuickCreate.SetValue("mcshhs_datetested", DateTime.Now, "MM/dd/yyyy");
+
+                OptionSet mcshhs_typeoftest = new OptionSet();
+                mcshhs_typeoftest.Name = "mcshhs_typeoftest";
+                mcshhs_typeoftest.Value = "Urine";
+                xrmApp.QuickCreate.SetValue(mcshhs_typeoftest);
+
+                xrmApp.QuickCreate.Save();
 
                 xrmApp.ThinkTime(10000);
                 xrmApp.Entity.SelectTab("Person Information");

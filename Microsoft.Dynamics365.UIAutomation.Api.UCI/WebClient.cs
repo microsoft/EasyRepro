@@ -261,12 +261,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var dictionary = new Dictionary<string, IWebElement>();
 
                 var menuContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaContainer]));
-                
-                var subItems = menuContainer.FindElements(By.TagName("li"));
+
+                //var subItems = menuContainer.FindElements(By.TagName("li"));
+                var subItems = menuContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaItem]));
 
                 foreach (var subItem in subItems)
                 {
-                    dictionary.Add(subItem.GetAttribute("title").ToLowerString(), subItem);
+                    dictionary.Add(subItem.GetAttribute("aria-label").ToLowerString(), subItem);
                 }
 
                 return dictionary;
@@ -375,6 +376,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+		
+		internal BrowserCommandResult<bool> QuickCreate(string entityName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+            return this.Execute(GetOptions($"Quick Create: {entityName}"), driver =>
+            {
+                var quickCreateButton = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.QuickCreateButton]));
+                quickCreateButton.Click(true);
+
+                var entityMenuList = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.QuickCreateMenuList]));
+                var entityMenuItems = entityMenuList.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.QuickCreateMenuItems]));
+                var entitybutton = entityMenuItems.FirstOrDefault(e => e.Text.Contains(entityName, StringComparison.OrdinalIgnoreCase));
+
+                if (entitybutton == null)
+                    throw new Exception(String.Format("{0} not found in Quick Create list.", entityName));
+
+                entitybutton.Click(true);
+				driver.WaitForTransaction();
+
+                return true;
+            });
+		}
 
         #endregion
 
@@ -651,6 +674,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return list;
         }
+
+        public BrowserCommandResult<List<ListItem>> OpenDialogQuickCreate(IWebElement dialog)
+        {
+            var list = new List<ListItem>();
+            var dialogItems = dialog.FindElements(By.XPath(".//li"));
+
+            foreach (var dialogItem in dialogItems)
+            {
+                var titleLinks = dialogItem.FindElements(By.XPath(".//label"));
+                var divLinks = dialogItem.FindElements(By.XPath(".//div"));
+
+                if (titleLinks != null && titleLinks.Count > 0 && divLinks != null && divLinks.Count > 0)
+                {
+                    var title = titleLinks[0].GetAttribute("innerText");
+                    var divId = divLinks[0].GetAttribute("id");
+
+                    list.Add(new ListItem()
+                    {
+                        Title = title,
+                        Id = divId,
+                    });
+                }
+            }
+
+            return list;
+        }
         #endregion
 
         #region CommandBar
@@ -743,6 +792,72 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 try
                 {
                     ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid]));
+                    success = true;
+                }
+                catch (Exception)
+                {
+                    success = false;
+                }
+
+                var items = ribbon.FindElements(By.TagName("li"));
+
+                IWebElement button;
+
+                button = subname == "" ? items.FirstOrDefault(x => x.GetAttribute("aria-label") == name) : items.FirstOrDefault(x => x.GetAttribute("aria-label") == name + " More Commands");
+
+                if (button != null)
+                {
+                    button.Click();
+                }
+                else
+                {
+                    throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
+                }
+
+                if (!string.IsNullOrEmpty(subname))
+                {
+                    var submenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.MoreCommandsMenu]));
+
+                    var subbutton = submenu.FindElements(By.TagName("button")).FirstOrDefault(x => x.Text == subname);
+
+                    if (subbutton != null)
+                    {
+                        subbutton.Click();
+                    }
+                    else
+                        throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
+
+                }
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> ClickSubGridCommand(string name, string subname = "", bool moreCommands = false, int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Set Value"), driver =>
+            {
+                bool success = false;
+                IWebElement ribbon = null;
+
+                //Try to click the command bar from inside an entity record.  If that fails, try to click the Command Bar from within a Grid.
+                try
+                {
+                    ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerSubrid]));
+                    success = true;
+                }
+                catch (Exception)
+                {
+                    success = false;
+                }
+
+                try
+                {
+                    ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerSubrid]));
                     success = true;
                 }
                 catch (Exception)
@@ -1231,6 +1346,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+		
+		internal BrowserCommandResult<bool> SaveQuickCreate(int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"SaveQuickCreate"), driver =>
+            {
+                var save = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.SaveButton]),
+                    "Quick Create Save Button is not available");
+                save?.Click(true);
+				
+				driver.WaitForTransaction();
+
+                return true;
+            });
+        }
 
         /// <summary>
         /// Open record set and navigate record index.
@@ -1302,7 +1433,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Set Value"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
-
+                fieldContainer.Click();
                 if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
                 {
                     var input = fieldContainer.FindElement(By.TagName("input"));
@@ -1406,6 +1537,79 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> SetValueQuickCreate(LookupItem control, int index = 0)
+        {
+            return this.Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
+            {
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
+
+                if (fieldContainer.FindElements(By.TagName("input")).Count == 0)
+                {
+                    var existingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", control.Name)));
+                    existingLookupValue.Hover(driver);
+
+                    var deleteExistingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
+                    deleteExistingLookupValue.Click();
+                }
+
+                fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
+
+                if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
+                {
+                    var input = fieldContainer.FindElement(By.TagName("input"));
+                    if (input != null)
+                    {
+                        input.Click(true);
+                        input.SendKeys(control.Value, true);
+                        this.ThinkTime(1000);
+                        input.Click();
+                    }
+                }
+
+                if (control.Value != null && control.Value != "")
+                {
+                    var flyoutDialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.LookupResultsDropdown].Replace("[NAME]", control.Name)));
+                    var dialogItems = OpenDialogQuickCreate(flyoutDialog).Value;
+
+                    if (dialogItems.Count <= 0)
+                        throw new InvalidOperationException($"List does not contain a record with the name:  {control.Value}");
+
+                    if (index + 1 > dialogItems.Count)
+                    {
+                        throw new InvalidOperationException($"List does not contain {index + 1} records. Please provide an index value less than {dialogItems.Count} ");
+                    }
+                    else
+                    {
+                        var dialogItem = dialogItems[index];
+                        driver.ClickWhenAvailable(By.Id(dialogItem.Id));
+                    }
+                }
+                else if (control.Value == "")
+                {
+                    var lookupResultsDialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.LookupResultsDropdown].Replace("[NAME]", control.Name)));
+                    var lookupResults = LookupResultsDropdown(lookupResultsDialog).Value;
+
+                    if (lookupResults.Count > 0)
+                    {
+                        if (index + 1 > lookupResults.Count)
+                            throw new InvalidOperationException($"Recently Viewed list does not contain {index + 1} records. Please provide an index value less than {lookupResults.Count}");
+
+                        var lookupResult = lookupResults[index];
+
+                        driver.ClickWhenAvailable(By.Id(lookupResult.Id));
+                    }
+                    else
+                        throw new InvalidOperationException($"No results exist in the Recently Viewed flyout menu. Please provide a text value for {control.Name}");
+                }
+                else if (control.Value == null)
+                {
+                    throw new InvalidOperationException($"No value has been provided for the LookupItem {control.Name}. Please provide a value and try again.");
+                }
+
+                return true;
+            });
+        }
+
         /// <summary>
         /// Sets the value of a picklist.
         /// </summary>
@@ -1446,7 +1650,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Set Value: {option.Name}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainerCheckBox].Replace("[NAME]", option.Name)));
                 if (option.Value)
                 {
                     if (!fieldContainer.Selected)
@@ -1756,13 +1960,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 try
                 {
-                    var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldNotificationAlert].Replace("[NAME]", field)));
-                    if (fieldContainer.Text == "A required field cannot be empty.")
+                    var fieldContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldNotificationAlert].Replace("[NAME]", field)));
+                    //if (fieldContainer.Text == "A required field cannot be empty.")
+                    //    return true;
+                    //else
+                    //    return false;
+                    if (fieldContainer != null)
                         return true;
                     else
                         return false;
                 }
                 catch(Exception e)
+                {
+                    return false;
+                }
+            });
+        }
+
+        internal BrowserCommandResult<bool> ValidateFieldLocked(string field)
+        {
+            return this.Execute(GetOptions($"Check Field Locked"), driver =>
+            {
+                try
+                {
+                    var fieldContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLocked].Replace("[NAME]", field)));
+                    if(fieldContainer!= null)
+                        return true;
+                    else
+                        return false;
+                }
+                catch (Exception e)
                 {
                     return false;
                 }
@@ -2010,6 +2237,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 return true;
             });
+        }
+
+        internal void NavigateBrowserback()
+        {
+            this.Browser.Navigate(NavigationOperation.NavigateBack);
         }
 
         internal void ClickTab(string xpath, string name)
