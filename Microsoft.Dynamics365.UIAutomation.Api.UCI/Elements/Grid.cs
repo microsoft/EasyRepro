@@ -21,9 +21,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenRecord(index);
         }
-        public void Search(string searchCriteria)
+        public void Search(string searchCriteria, bool clearByDefault = true)
         {
-            _client.Search(searchCriteria);
+            _client.Search(searchCriteria, clearByDefault);
+        }
+
+        public void ClearSearch()
+        {
+            _client.ClearSearch();
         }
 
         public void GetGridItems()

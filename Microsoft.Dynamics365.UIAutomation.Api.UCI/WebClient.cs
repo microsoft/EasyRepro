@@ -260,13 +260,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var dictionary = new Dictionary<string, IWebElement>();
 
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+
                 var menuContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaContainer]));
                 
                 var subItems = menuContainer.FindElements(By.TagName("li"));
 
                 foreach (var subItem in subItems)
                 {
-                    dictionary.Add(subItem.GetAttribute("title").ToLowerString(), subItem);
+                        // Check 'Id' attribute, NULL value == Group Header
+                        if(!String.IsNullOrEmpty(subItem.GetAttribute("Id")))
+                    {              
+                        // Filter out duplicate entity keys - click the first one in the list
+                        if(!dictionary.ContainsKey(subItem.Text.ToLowerString()))
+                                dictionary.Add(subItem.Text.ToLowerString(), subItem);
+                    }
+                        
                 }
 
                 return dictionary;
@@ -833,17 +842,37 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-        internal BrowserCommandResult<bool> Search(string searchCriteria, int thinkTime = Constants.DefaultThinkTime)
+        internal BrowserCommandResult<bool> Search(string searchCriteria, bool clearByDefault = true, int thinkTime = Constants.DefaultThinkTime)
         {
             this.Browser.ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Search"), driver =>
             {
                 driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Grid.QuickFind]));
+
+                if (clearByDefault)
+                {
+                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.QuickFind])).Clear();
+                }
+
                 driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.QuickFind])).SendKeys(searchCriteria);
                 driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.QuickFind])).SendKeys(Keys.Enter);
 
                 //driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> ClearSearch(int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Search"), driver =>
+            {
+                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Grid.QuickFind]));
+
+                driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.QuickFind])).Clear();
 
                 return true;
             });
