@@ -13,9 +13,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client = client;
         }
 
-        public void SetActive(string viewName)
+        public void SetActive(string stageName = "")
         {
-
+            // This makes the assumption that SelectStage() has already been called
+            _client.SetActive(stageName);
         }
 
         public void NextStage(string stageName, Field businessProcessFlowField = null)
@@ -24,9 +25,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.NextStage(stageName, businessProcessFlowField);
         }
 
-        public void SelectStage()
+        public void SelectStage(string stageName, Field businessProcessFlowField = null)
         {
-
+            _client.SelectStage(stageName, businessProcessFlowField);
         }
     }
 }

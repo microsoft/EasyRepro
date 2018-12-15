@@ -142,6 +142,44 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         }
 
+        public void MSFTLoginAction(LoginRedirectEventArgs args)
+
+        {
+            //Login Page details go here.  You will need to find out the id of the password field on the form as well as the submit button. 
+            //You will also need to add a reference to the Selenium Webdriver to use the base driver. 
+            //Example
+
+            var d = args.Driver;
+
+            //d.FindElement(By.Id("passwordInput")).SendKeys(args.Password.ToUnsecureString());
+            //d.ClickWhenAvailable(By.Id("submitButton"), new TimeSpan(0, 0, 2));
+
+            //This method expects single sign-on
+
+            Browser.ThinkTime(5000);
+
+            d.WaitUntilVisible(By.XPath("//div[@id=\"mfaGreetingDescription\"]"));
+
+            var AzureMFA = d.FindElement(By.XPath("//a[@id=\"WindowsAzureMultiFactorAuthentication\"]"));
+            AzureMFA.Click(true);
+
+            Thread.Sleep(20000);
+
+            //Insert any additional code as required for the SSO scenario
+
+            //Wait for CRM Page to load
+            d.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
+                , new TimeSpan(0, 0, 60),
+            e =>
+            {
+                e.WaitForPageToLoad();
+                e.SwitchTo().Frame(0);
+                e.WaitForPageToLoad();
+            },
+                f => { throw new Exception("Login page failed."); });
+
+        }
+
         #endregion
 
         #region Navigation
@@ -151,6 +189,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions("Open App"), driver =>
             {
+
+                driver.SwitchTo().DefaultContent();
+
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuButton]));
 
                 var container = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuContainer]));
@@ -180,15 +221,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions("Open Sub Area"), driver =>
             {
+
                 area = area.ToLowerString();
                 subarea = subarea.ToLowerString();
 
-                var areas = OpenMenu().Value;
+               var areas = OpenAreas(area).Value;
 
-                if (!areas.ContainsKey(area))
-                {
-                    throw new InvalidOperationException($"No area with the name '{area}' exists.");
-                }
+
 
                 //Added for Bug
                 IWebElement menuItem = null;
@@ -224,6 +263,40 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
+        public BrowserCommandResult<Dictionary<string, IWebElement>> OpenAreas(string area, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Open Unified Interface Area"), driver =>
+            {
+
+                try
+                {
+                    var areas = OpenMenu().Value;
+
+                    if (!areas.ContainsKey(area))
+                    {
+                        throw new InvalidOperationException($"No area with the name '{area}' exists.");
+                    }
+
+                    return areas;
+                }
+                catch (NullReferenceException)
+                {
+                    var areas = OpenMenuFallback(area).Value;
+
+                    if (!areas.ContainsKey(area))
+                    {
+                        // In this scenario - 
+                        throw new InvalidOperationException($"No area with the name '{area}' exists.");
+                    }
+
+                    return areas;
+
+                }
+            });
+        }
         public BrowserCommandResult<Dictionary<string, IWebElement>> OpenMenu(int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
@@ -254,11 +327,65 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return dictionary;
             });
         }
+        public BrowserCommandResult<Dictionary<string, IWebElement>> OpenMenuFallback(string area, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Open Menu"), driver =>
+            {
+                var dictionary = new Dictionary<string, IWebElement>();
+
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+
+                bool isVisible = driver.IsVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapAreaMoreButton]));
+
+                if (isVisible)
+                {
+                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapAreaMoreButton]));
+
+                    driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaMoreMenu]),
+                                           new TimeSpan(0, 0, 2),
+                                           d =>
+                                           {
+                                               var menu = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaMoreMenu]));
+                                               var menuItems = menu.FindElements(By.TagName("li"));
+                                               foreach (var item in menuItems)
+                                               {
+                                                   dictionary.Add(item.Text.ToLowerString(), item);
+                                               }
+                                           },
+                                           e =>
+                                           {
+                                               throw new InvalidOperationException("The Main Menu is not available.");
+                                           });
+                }
+                else
+                {
+
+                    var singleItem = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapSingleArea].Replace("[NAME]", area)));
+
+                    char[] trimCharacters = { '', '\r', '\n', '', '', ''};
+
+                    dictionary.Add(singleItem.Text.Trim(trimCharacters).ToLowerString(), singleItem);
+
+                }
+                
+                return dictionary;
+            });
+        }
         internal BrowserCommandResult<Dictionary<string, IWebElement>> OpenSubMenu(string subarea, int thinkTime = Constants.DefaultThinkTime)
         {
             return this.Execute(GetOptions($"Open Sub Menu: {subarea}"), driver =>
             {
                 var dictionary = new Dictionary<string, IWebElement>();
+
+                bool isSiteMapLauncherCloseButtonVisible = driver.IsVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+
+                if (isSiteMapLauncherCloseButtonVisible)
+                {
+                    // Close SiteMap launcher since it is open
+
+                }
 
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
 
@@ -2079,6 +2206,122 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
+        internal BrowserCommandResult<bool> SelectStage(string stageName, Field businessProcessFlowField = null, int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Select Stage: {stageName}"), driver =>
+            {
+
+            /*
+                //Find the Business Process Stages
+                var processStages = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStage_UCI]));
+
+                foreach (var processStage in processStages)
+                {
+                    var labels = processStage.FindElements(By.TagName("label"));
+
+                    //Click the Label of the Process Stage if found
+                    foreach (var label in labels)
+                    {
+                        if (label.Text.Equals(stageName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            label.Click();
+                        }
+                    }
+                }
+
+                var flyoutFooterControls = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.Flyout_UCI]));
+
+                foreach (var control in flyoutFooterControls)
+                {
+                    //If there's a field to enter, fill it out
+                    if (businessProcessFlowField != null)
+                    {
+                        var bpfField = control.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFieldName].Replace("[NAME]", businessProcessFlowField.Name)));
+
+                        if (bpfField != null)
+                        {
+                            bpfField.Click();
+                            for (int i = 0; i < businessProcessFlowField.Value.Length; i++)
+                            {
+                                bpfField.SendKeys(businessProcessFlowField.Value.Substring(i, 1));
+                            }
+                        }
+                    }
+
+                    //Click the Next Stage Button
+                    var nextButton = control.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStageButton]));
+                    nextButton.Click();
+                }
+
+            */
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SetActive(string stageName = "", int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Set Active Stage: {stageName}"), driver =>
+            {
+
+                if (stageName != "")
+                {
+                    // StageName was passed in, attempt to open the desired stage
+                }
+
+                /*
+                    //Find the Business Process Stages
+                    var processStages = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStage_UCI]));
+
+                    foreach (var processStage in processStages)
+                    {
+                        var labels = processStage.FindElements(By.TagName("label"));
+
+                        //Click the Label of the Process Stage if found
+                        foreach (var label in labels)
+                        {
+                            if (label.Text.Equals(stageName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                label.Click();
+                            }
+                        }
+                    }
+
+                    var flyoutFooterControls = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.Flyout_UCI]));
+
+                    foreach (var control in flyoutFooterControls)
+                    {
+                        //If there's a field to enter, fill it out
+                        if (businessProcessFlowField != null)
+                        {
+                            var bpfField = control.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFieldName].Replace("[NAME]", businessProcessFlowField.Name)));
+
+                            if (bpfField != null)
+                            {
+                                bpfField.Click();
+                                for (int i = 0; i < businessProcessFlowField.Value.Length; i++)
+                                {
+                                    bpfField.SendKeys(businessProcessFlowField.Value.Substring(i, 1));
+                                }
+                            }
+                        }
+
+                        //Click the Next Stage Button
+                        var nextButton = control.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStageButton]));
+                        nextButton.Click();
+                    }
+
+                */
+                return true;
+            });
+        }
+
+
+
         #endregion
 
         #region GlobalSearch
