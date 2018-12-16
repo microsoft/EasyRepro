@@ -19,6 +19,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SubAreaContainer = "Nav_SubAreaContainer";
             public static string AppMenuButton = "Nav_AppMenuButton";
             public static string SiteMapLauncherButton = "Nav_SiteMapLauncherButton";
+            public static string SiteMapLauncherCloseButton = "Nav_SiteMapLauncherCloseButton";
             public static string SiteMapAreaMoreButton = "Nav_SiteMapAreaMoreButton";
             public static string SiteMapSingleArea = "Nav_SiteMapSingleArea";
             public static string AppMenuContainer = "Nav_AppMenuContainer";
@@ -179,6 +180,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_SubAreaContainer"       , "//*[@data-id=\"navbar-container\"]/div/ul"},
             { "Nav_AppMenuButton"       , "//*[@id=\"TabArrowDivider\"]/a"},
             { "Nav_SiteMapLauncherButton", "//button[@data-lp-id=\"sitemap-launcher\"]" },
+            { "Nav_SiteMapLauncherCloseButton", "//button[@aria-label=\"Close Site Map\"]" },
             { "Nav_SiteMapAreaMoreButton", "//button[@data-lp-id=\"sitemap-areaBar-more-btn\"]" },
             { "Nav_SiteMapSingleArea", "//li[translate(@data-text,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = '[NAME]']" },
             { "Nav_AppMenuContainer"       , "//*[@id=\"taskpane-scroll-container\"]"},

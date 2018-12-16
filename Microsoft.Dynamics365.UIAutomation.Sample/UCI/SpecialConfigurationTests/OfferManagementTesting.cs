@@ -34,6 +34,40 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.ThinkTime(3000);
 
+                xrmApp.Entity.Save();
+
+                xrmApp.ThinkTime(3000);
+
+                xrmApp.BusinessProcessFlow.SelectStage("Details");
+
+                //xrmApp.Entity.SetValue(new OptionSet { Name = "" }, 2);
+
+                xrmApp.BusinessProcessFlow.NextStage("Details");
+
+                xrmApp.BusinessProcessFlow.SelectStage("Gold Member Costs");
+
+                xrmApp.Entity.SetValue("", ""); // Gold Member Price
+
+                xrmApp.Entity.SetValue("", ""); // Silver Member Price
+
+                xrmApp.BusinessProcessFlow.NextStage("Gold Member Costs");
+
+                xrmApp.BusinessProcessFlow.SelectStage("Sent To Approval");
+
+                //xrmApp.Entity.SetValue(new OptionSet { }, 0);
+
+                xrmApp.BusinessProcessFlow.NextStage("Sent To Approval");
+
+                xrmApp.BusinessProcessFlow.SelectStage("Publish Offer");
+
+                xrmApp.Entity.SetValue("", ""); // Available On
+
+                //xrmApp.Entity.SetValue(); // Featured On (Checkbox)
+
+
+
+
+
             }
 
         }

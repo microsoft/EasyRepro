@@ -379,12 +379,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var dictionary = new Dictionary<string, IWebElement>();
 
-                bool isSiteMapLauncherCloseButtonVisible = driver.IsVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+                bool isSiteMapLauncherCloseButtonVisible = driver.IsVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherCloseButton]));
 
                 if (isSiteMapLauncherCloseButtonVisible)
                 {
                     // Close SiteMap launcher since it is open
-
+                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherCloseButton]));
                 }
 
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
