@@ -118,6 +118,8 @@
     <Compile Include="UCI\Read\OpenLead.cs" />
     <Compile Include="UCI\Read\OpenOpportunity.cs" />
     <Compile Include="UCI\SetValue.cs" />
+    <Compile Include="UCI\SpecialConfigurationTests\RandomAccountTest.cs" />
+    <Compile Include="UCI\SpecialConfigurationTests\OfferManagementTesting.cs" />
     <Compile Include="UCI\Timeline\AddActivity.cs" />
     <Compile Include="UCI\Timeline\AddNote.cs" />
     <Compile Include="UCI\Timeline\AddPost.cs" />
