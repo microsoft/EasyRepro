@@ -227,8 +227,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                var areas = OpenAreas(area).Value;
 
-
-
                 //Added for Bug
                 IWebElement menuItem = null;
                 bool foundMenuItem = areas.TryGetValue(area, out menuItem);
@@ -1924,6 +1922,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 deleteBtn?.Click();
                 ConfirmationDialog(true);
+
+                driver.WaitForTransaction();
 
                 return true;
             });

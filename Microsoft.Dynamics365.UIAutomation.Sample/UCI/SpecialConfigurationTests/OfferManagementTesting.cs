@@ -23,7 +23,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             using (var xrmApp = new XrmApp(client))
             {
 
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, client.MSFTLoginAction);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
                 xrmApp.Navigation.OpenApp("Offer Management");
 
@@ -63,10 +63,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Entity.SetValue("", ""); // Available On
 
                 //xrmApp.Entity.SetValue(); // Featured On (Checkbox)
-
-
-
-
 
             }
 
