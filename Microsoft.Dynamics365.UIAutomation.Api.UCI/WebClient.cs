@@ -2156,6 +2156,173 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #endregion
 
         #region BusinessProcessFlow
+
+        /// <summary>
+        /// Set Value
+        /// </summary>
+        /// <param name="field">The field</param>
+        /// <param name="value">The value</param>
+        /// <example>xrmApp.BusinessProcessFlow.SetValue("firstname", "Test");</example>
+        internal BrowserCommandResult<bool> BPFSetValue(string field, string value)
+        {
+            return this.Execute(GetOptions($"Set Value"), driver =>
+            {
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.TextFieldContainer].Replace("[NAME]", field)));
+
+                if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
+                {
+                    var input = fieldContainer.FindElement(By.TagName("input"));
+                    if (input != null)
+                    {
+                        //input.Click(true);
+                        input.SendKeys(value, true);
+                    }
+                }
+                else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
+                {
+                    fieldContainer.FindElement(By.TagName("textarea")).Click();
+                    fieldContainer.FindElement(By.TagName("textarea")).Clear();
+                    fieldContainer.FindElement(By.TagName("textarea")).SendKeys(value);
+                }
+                else
+                {
+                    throw new Exception($"Field with name {field} does not exist.");
+                }
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Sets the value of a picklist.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
+        /// <example>xrmBrowser.BusinessProcessFlow.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
+        public BrowserCommandResult<bool> BPFSetValue(OptionSet option)
+        {
+            return this.Execute(GetOptions($"Set BPF Value: {option.Name}"), driver =>
+            {
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
+
+                if (fieldContainer.FindElements(By.TagName("select")).Count > 0)
+                {
+                    var select = fieldContainer.FindElement(By.TagName("select"));
+                    var options = select.FindElements(By.TagName("option"));
+
+                    foreach (var op in options)
+                    {
+                        if (op.Text != option.Value && op.GetAttribute("value") != option.Value) continue;
+                        op.Click(true);
+                        break;
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+                }
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Sets the value of a Boolean Item.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
+        /// <example>xrmBrowser.BusinessProcessFlow.SetValue(new BooleanItem { Name = "preferredcontactmethodcode"});</example>
+        public BrowserCommandResult<bool> BPFSetValue(BooleanItem option)
+        {
+            return this.Execute(GetOptions($"Set BPF Value: {option.Name}"), driver =>
+            {
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BooleanFieldContainer].Replace("[NAME]", option.Name)));
+                if (!option.Value)
+                {
+                    if (!fieldContainer.Selected)
+                    {
+                        fieldContainer.Click(true);
+                    }
+                    else
+                    {
+                        fieldContainer.Click(true);
+                    }
+                }
+                else
+                {
+                    if (fieldContainer.Selected)
+                    {
+                        fieldContainer.Click(true);
+                    }
+                    else
+                    {
+                        fieldContainer.Click(true);
+                    }
+                }
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Sets the value of a Date Field.
+        /// </summary>
+        /// <param name="field">The field id or name.</param>
+        /// <param name="date">DateTime value.</param>
+        /// <param name="format">DateTime format</param>
+        /// <example> xrmBrowser.BusinessProcessFlow.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
+        public BrowserCommandResult<bool> BPFSetValue(string field, DateTime date, string format = "MM dd yyyy")
+        {
+            return this.Execute(GetOptions($"Set BPF Value: {field}"), driver =>
+            {
+                var dateField = AppElements.Xpath[AppReference.BusinessProcessFlow.DateTimeFieldContainer].Replace("[FIELD]", field);
+
+                if (driver.HasElement(By.XPath(dateField)))
+                {
+                    var fieldElement = driver.ClickWhenAvailable(By.XPath(dateField));
+
+                    if (fieldElement.GetAttribute("value").Length > 0)
+                    {
+                        //fieldElement.Click();
+                        //fieldElement.SendKeys(date.ToString(format));
+                        //fieldElement.SendKeys(Keys.Enter);
+
+                        fieldElement.Click();
+                        this.Browser.ThinkTime(250);
+                        fieldElement.Click();
+                        this.Browser.ThinkTime(250);
+                        fieldElement.SendKeys(Keys.Backspace);
+                        this.Browser.ThinkTime(250);
+                        fieldElement.SendKeys(Keys.Backspace);
+                        this.Browser.ThinkTime(250);
+                        fieldElement.SendKeys(Keys.Backspace);
+                        this.Browser.ThinkTime(250);
+                        fieldElement.SendKeys(date.ToString(format),true);
+                        this.Browser.ThinkTime(500);
+                        fieldElement.SendKeys(Keys.Tab);
+                        this.Browser.ThinkTime(250);
+                    }
+                    else
+                    {
+                        fieldElement.Click();
+                        this.Browser.ThinkTime(250);
+                        fieldElement.Click();
+                        this.Browser.ThinkTime(250);
+                        fieldElement.SendKeys(Keys.Backspace);
+                        this.Browser.ThinkTime(250);
+                        fieldElement.SendKeys(Keys.Backspace);
+                        this.Browser.ThinkTime(250);
+                        fieldElement.SendKeys(Keys.Backspace);
+                        this.Browser.ThinkTime(250);
+                        fieldElement.SendKeys(date.ToString(format));
+                        this.Browser.ThinkTime(250);
+                        fieldElement.SendKeys(Keys.Tab);
+                        this.Browser.ThinkTime(250);
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Field: {field} Does not exist");
+
+                return true;
+            });
+        }
+
         internal BrowserCommandResult<bool> NextStage(string stageName, Field businessProcessFlowField = null, int thinkTime = Constants.DefaultThinkTime)
         {
             this.Browser.ThinkTime(thinkTime);
@@ -2207,14 +2374,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        internal BrowserCommandResult<bool> SelectStage(string stageName, Field businessProcessFlowField = null, int thinkTime = Constants.DefaultThinkTime)
+        internal BrowserCommandResult<bool> SelectStage(string stageName, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
-
             return this.Execute(GetOptions($"Select Stage: {stageName}"), driver =>
             {
 
-            /*
                 //Find the Business Process Stages
                 var processStages = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStage_UCI]));
 
@@ -2232,31 +2396,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                 }
 
-                var flyoutFooterControls = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.Flyout_UCI]));
+                this.Browser.ThinkTime(thinkTime);
 
-                foreach (var control in flyoutFooterControls)
-                {
-                    //If there's a field to enter, fill it out
-                    if (businessProcessFlowField != null)
-                    {
-                        var bpfField = control.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFieldName].Replace("[NAME]", businessProcessFlowField.Name)));
-
-                        if (bpfField != null)
-                        {
-                            bpfField.Click();
-                            for (int i = 0; i < businessProcessFlowField.Value.Length; i++)
-                            {
-                                bpfField.SendKeys(businessProcessFlowField.Value.Substring(i, 1));
-                            }
-                        }
-                    }
-
-                    //Click the Next Stage Button
-                    var nextButton = control.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStageButton]));
-                    nextButton.Click();
-                }
-
-            */
                 return true;
             });
         }
