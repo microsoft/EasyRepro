@@ -10,7 +10,7 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class OfferManagementTesting
+    public class OfferManagementTest
     {
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
@@ -30,7 +30,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Navigation.OpenSubArea("New Area", "Spa Offers");
                 xrmApp.CommandBar.ClickCommand("New");
 
-                xrmApp.Entity.SetValue("name", "Test Offer 123");
+                xrmApp.Entity.SetValue("name", "Test Offer 1234");
 
                 xrmApp.ThinkTime(3000);
 
@@ -40,29 +40,37 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.BusinessProcessFlow.SelectStage("Details");
 
-                //xrmApp.Entity.SetValue(new OptionSet { Name = "" }, 2);
+                xrmApp.BusinessProcessFlow.SetValue(new OptionSet { Name = "va_minimumtieravailability", Value = "Flying Club Gold" }); // Minimum Tier            
 
                 xrmApp.BusinessProcessFlow.NextStage("Details");
 
                 xrmApp.BusinessProcessFlow.SelectStage("Gold Member Costs");
 
-                xrmApp.Entity.SetValue("", ""); // Gold Member Price
+                xrmApp.BusinessProcessFlow.SetValue("va_goldmemberprice", "500.00"); // Gold Member Price
 
-                xrmApp.Entity.SetValue("", ""); // Silver Member Price
+                xrmApp.BusinessProcessFlow.SetValue("va_silvermemberprice", "200.00"); // Silver Member Price
 
                 xrmApp.BusinessProcessFlow.NextStage("Gold Member Costs");
 
                 xrmApp.BusinessProcessFlow.SelectStage("Sent To Approval");
 
-                //xrmApp.Entity.SetValue(new OptionSet { }, 0);
+                xrmApp.BusinessProcessFlow.SetValue(new OptionSet { Name = "va_sendforapproval", Value = "Send request" }); // Approval REquest
 
-                xrmApp.BusinessProcessFlow.NextStage("Sent To Approval");
+                 xrmApp.BusinessProcessFlow.NextStage("Sent To Approval");
 
                 xrmApp.BusinessProcessFlow.SelectStage("Publish Offer");
 
-                xrmApp.Entity.SetValue("", ""); // Available On
+                xrmApp.BusinessProcessFlow.SetValue("va_availableon", DateTime.Parse("01/12/2019")); ; // Available On
 
-                //xrmApp.Entity.SetValue(); // Featured On (Checkbox)
+                xrmApp.ThinkTime(2000);
+
+                xrmApp.BusinessProcessFlow.SetValue(new BooleanItem {Name = "va_isfeatured"}); // Featured On (Checkbox)
+
+                xrmApp.ThinkTime(2000);
+
+                xrmApp.Entity.Save();
+
+                xrmApp.ThinkTime(2000);
 
             }
 

@@ -139,6 +139,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Flyout_UCI = "BPF_Flyout_UCI";
             public static string NextStageButton = "BPF_NextStageButton_UCI";
             public static string BusinessProcessFlowFieldName = "BPF_FieldName_UCI";
+            public static string TextFieldContainer = "BPF_TextFieldContainer";
+            public static string BooleanFieldContainer = "BPF_BooleanFieldContainer";
+            public static string DateTimeFieldContainer = "BPF_DateTimeFieldContainer";
+            public static string FieldControlDateTimeInputUCI = "BPF_FieldControlDateTimeInputUCI";
         }
         public static class Dialogs
         {
@@ -227,7 +231,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Delete"       , "//button[contains(@data-id,'Delete')]"},
             { "Entity_FormContainer"       , "//*[@id=\"tab-section\"]"},
             { "Entity_Process"       , "//button[contains(@data-id,'MBPF.ConvertTo')]"},
-            { "Entity_Save"       , "//*[@id=\"footerWrapper\"]/div/div[4]/button"},
+            { "Entity_Save"       , "//button[contains(@data-id, 'form-save-btn')]"},
             { "Entity_SwitchProcess"       , "//button[contains(@data-id,'SwitchProcess')]"},
             { "Entity_TextFieldContainer", "//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
             { "Entity_TextFieldValue", "//input[contains(@data-id, \'[NAME].fieldControl\')]" },
@@ -283,6 +287,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_Flyout_UCI"     , "//div[contains(@id,'businessProcessFlowFlyoutHeaderContainer')]" },
             { "BPF_NextStageButton_UCI"     , "//button[contains(@data-id,'nextButtonContainer')]" },
             { "BPF_FieldName_UCI"     , "//input[contains(@id,'[NAME]')]" },
+            { "BPF_TextFieldContainer", "//div[contains(@data-lp-id, \'header_process_[NAME]\')]" },
+            { "BPF_BooleanFieldContainer", "//input[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-toggle\')]" },
+            { "BPF_DateTimeFieldContainer", "//input[contains(@data-id, \'[NAME].fieldControl-date-time-input\')]" },
+            { "BPF_FieldControlDateTimeInputUCI","//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
 
 
             //Dialogs
