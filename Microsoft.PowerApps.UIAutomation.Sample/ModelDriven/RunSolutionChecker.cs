@@ -291,5 +291,112 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             }
         }
 
+        [TestMethod]
+        public void TestCancelSolutionCheckerRun()
+        {
+            BrowserOptions options = TestSettings.Options;
+            options.BrowserType = _browserType;
+
+            using (var appBrowser = new PowerAppBrowser(TestSettings.Options))
+            {
+                try
+                {
+                    // Login To PowerApps
+                    Console.WriteLine("Performing Login");
+
+                    for (int retryCount = 0; retryCount < Reference.Login.SignInAttempts; retryCount++)
+                    {
+                        try
+                        {
+                            appBrowser.OnlineLogin.Login(_xrmUri, _username.ToSecureString(), _password.ToSecureString());
+                            break;
+                        }
+                        catch (Exception)
+                        {
+                            appBrowser.Navigate("about:blank");
+                            if (retryCount == Reference.Login.SignInAttempts - 1)
+                            {
+                                Console.WriteLine("Login failed after {0} attempts.", retryCount);
+                                throw;
+                            }
+                            Console.WriteLine("Login failed in #{0} attempt.", retryCount);
+                            continue;
+                        }
+                    }
+                    Console.WriteLine("Login Complete");
+
+                    appBrowser.ThinkTime(1500);
+
+                    Console.WriteLine($"Changing PowerApps Environment to {_environmentName}");
+                    appBrowser.Navigation.ChangeEnvironment(_environmentName);
+
+                    appBrowser.ThinkTime(1500);
+
+                    // Click Projects
+                    Console.WriteLine($"Click {_sideBarButton} via Sidebar");
+                    appBrowser.SideBar.Navigate(_sideBarButton);
+
+                    // Collapse the sidebar
+                    Console.WriteLine("Collapse the sidebar");
+                    appBrowser.SideBar.ExpandCollapse();
+
+                    // Get Solution check status value
+                    string originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+
+                    // Click desired grid row, then click Projects Checker button via ... commands in the grid
+                    Console.WriteLine($"Click the ... button in Projects grid, click on 'Solution Checker', and then click sub-command 'Run'");
+                    appBrowser.ModelDrivenApps.MoreCommands(_solutionName, _commandBarButton, "Run");
+
+                    // Wait 5 seconds
+                    appBrowser.ThinkTime(15000);
+
+                    // Check to confirm the run has not thrown an initial error
+                    string messageBarText = appBrowser.ModelDrivenApps.CheckForErrors();
+
+                    if (!string.IsNullOrEmpty(messageBarText))
+                    {
+                        throw new ApplicationException(messageBarText);
+                    }
+
+                    // Click Solution Checker running button on the right of the command bar
+                    Console.WriteLine($"Cancelling Solution Checker run...");
+                    var cancelSuccess = appBrowser.CommandBar.CancelSolutionCheckerRun(_solutionName);
+
+                    // Cancel should only take a few seconds at most... wait 10 seconds and check status
+                    appBrowser.ThinkTime(10000);
+
+                    // Get solution check status post-cancel
+                    string solutionCheckStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+
+                    // Validate that we did not receive an error status
+                    if (!solutionCheckStatus.Contains("Results as of"))
+                    {
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} received instead of 'Results as of ...' ");
+                    }
+
+                    // Validate that the cancel was successful and the "new" status is equal to the original starting status
+                    if (solutionCheckStatus != originalSolutionStatus)
+                    {
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} has changed from {originalSolutionStatus}. A failure occurred during cancellation and was not reported to the message bar. ");
+                    }
+
+                    appBrowser.ThinkTime(10000);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+                    string location = $@"{_resultsDirectory}\RunSolutionChecker-{_solutionName}-GenericError.bmp";
+
+                    appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
+                    _testContext.AddResultFile(location);
+
+                    Assert.Fail($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+                }
+
+                Console.WriteLine("Solution Checker Test Run Complete");
+            }
+        }
+
+
     }
 }

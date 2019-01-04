@@ -26,6 +26,48 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         {
         }
 
+        public BrowserCommandResult<bool> CancelSolutionCheckerRun(string solutionName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Cancel Solution Checker Run Results"), driver =>
+            {
+
+                // Verify Solution Checker running... button is present in the command bar
+                var commandBarButtonName = "Solution checker running";
+                var commandBarContainer = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.Container]));
+                var commandBarButton = commandBarContainer.FindElement(By.XPath($"//button[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')=\"{commandBarButtonName.ToLowerString()}\"]"));
+
+                // Check to confirm button was found
+                if (commandBarButton == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    // Click the 'Solution checker running' button to expose the cancel button
+                    commandBarButton.Click(true);
+
+                    // Verify the Cancel button is now available
+                    var cancelButton = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.CancelSolutionCheckerButton]));
+
+                    // Check to confirm Cancel button was found
+                    if (cancelButton == null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        // Click the cancel button to stop the solution checker run
+                        cancelButton.Click(true);
+                        Browser.ThinkTime(500);
+                    }                   
+                }
+
+                return true;
+            });
+        }
+
         public BrowserCommandResult<bool> ClickCommand(string name, int thinkTime = Constants.DefaultThinkTime)
         {
             return this.Execute(GetOptions("Click CommandBar Command"), driver =>
