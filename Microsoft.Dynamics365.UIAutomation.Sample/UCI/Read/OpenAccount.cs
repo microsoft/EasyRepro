@@ -83,5 +83,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(3000);
             }
         }
+
+        [TestMethod]
+        public void UCITestGetObjectId()
+        {
+            var client = new WebClient(TestSettings.Options);
+
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp("Sales Hub");
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                Guid objectId = xrmApp.Entity.GetObjectId();
+
+                xrmApp.ThinkTime(3000);
+            }
+        }
     }
 }
