@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Threading;
+using System.Web;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -1873,6 +1874,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 return returnValue;
+            });
+        }
+
+        internal BrowserCommandResult<Guid> GetObjectId(int thinkTime = Constants.DefaultThinkTime)
+        {
+            return this.Execute(GetOptions($"Get Object Id"), driver =>
+            {
+                Guid oId = Guid.Empty;
+
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]))) ;
+                {
+                    var footer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]));
+                    var popOutButton = footer.FindElements(By.XPath("//a[contains(@href,'id=')]")).FirstOrDefault();
+                    oId = Guid.Parse(HttpUtility.ParseQueryString(popOutButton.GetAttribute("href"))["id"]);
+                }
+
+                if (oId == Guid.Empty)
+                    throw new NotFoundException("Object Id for this record was not found");
+
+                return oId;
             });
         }
 

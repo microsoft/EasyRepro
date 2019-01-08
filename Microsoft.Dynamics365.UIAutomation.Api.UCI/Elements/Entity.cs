@@ -105,5 +105,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.SelectTab(tabName, subTabName);
         }
+
+        public Guid GetObjectId()
+        {
+            return _client.GetObjectId();
+        }
     }   
 }
