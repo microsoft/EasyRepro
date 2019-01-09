@@ -50,10 +50,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.SetValue(control, index);
         }
-
-
-
-
         public void SetValue(string field, DateTime date, string format = "MM dd yyyy")
         {
             _client.SetValue(field, date, format);
