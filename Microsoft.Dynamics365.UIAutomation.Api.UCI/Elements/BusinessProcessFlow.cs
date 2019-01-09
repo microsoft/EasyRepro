@@ -14,6 +14,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client = client;
         }
 
+        public string GetValue(string field)
+        {
+            return _client.GetValue(field);
+        }
+
+        public string GetValue(LookupItem field)
+        {
+            return _client.GetValue(field);
+        }
+
+        public string GetValue(OptionSet field)
+        {
+            return _client.GetValue(field);
+        }
+
         public void SetActive(string stageName = "")
         {
             // This makes the assumption that SelectStage() has already been called
@@ -50,10 +65,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.SetValue(control, index);
         }
-
-
-
-
         public void SetValue(string field, DateTime date, string format = "MM dd yyyy")
         {
             _client.SetValue(field, date, format);
