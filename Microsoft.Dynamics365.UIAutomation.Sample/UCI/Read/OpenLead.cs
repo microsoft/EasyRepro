@@ -36,5 +36,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
             
         }
+
+        [TestMethod]
+        public void UCITestRetrieveBPFFields()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp("Sales Hub");
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Leads");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                LookupItem contact = new LookupItem() { Name = "parentcontactid" };
+                LookupItem account = new LookupItem() { Name = "parentaccountid" };
+
+                xrmApp.BusinessProcessFlow.SelectStage("Qualify");
+                string contactName = xrmApp.BusinessProcessFlow.GetValue(contact);
+                string acctName = xrmApp.BusinessProcessFlow.GetValue(account);
+                string budgetAmt = xrmApp.BusinessProcessFlow.GetValue("budgetamount");
+
+                xrmApp.ThinkTime(1000);
+            }
+
+        }
     }
 }
