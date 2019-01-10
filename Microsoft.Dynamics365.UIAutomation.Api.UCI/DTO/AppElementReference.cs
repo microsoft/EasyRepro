@@ -237,7 +237,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_TextFieldContainer", "//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
             { "Entity_TextFieldValue", "//input[contains(@data-id, \'[NAME].fieldControl\')]" },
             { "Entity_TextFieldLookup", "//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
-            { "Entity_TextFieldLookupMenu", "//*[contains(@id, \'[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout')]" },
+            { "Entity_TextFieldLookupMenu", "//div[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_tabContainer')]" },
             { "Entity_LookupFieldDeleteExistingValue", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]" },
             { "Entity_LookupFieldHoverExistingValue", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList')]" },
             { "Entity_TextFieldLookupFieldContainer", "//*[contains(@id, '[NAME].fieldControl-LookupResultsDropdown')]" },

@@ -963,7 +963,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.Form]));
-                driver.WaitForPageToLoad();
+                //driver.WaitForPageToLoad();
+                driver.WaitForTransaction();
 
                 return true;
             });
@@ -2352,6 +2353,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 //Find the Business Process Stages
                 var processStages = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStage_UCI]));
+
+                if (processStages.Count == 0)
+                    return true;
 
                 foreach (var processStage in processStages)
                 {
