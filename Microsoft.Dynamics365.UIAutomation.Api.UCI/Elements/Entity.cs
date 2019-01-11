@@ -115,5 +115,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.SelectSubgridLookup(subgridName, openLookupPage);
         }
+
+        public void SelectLookup(LookupItem control)
+        {
+            _client.SelectLookup(control);
+        }
     }   
 }

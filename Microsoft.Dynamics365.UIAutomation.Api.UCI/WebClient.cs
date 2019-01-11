@@ -1916,13 +1916,124 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     //Click the first row
                     var firstRecord = rows.First(r => r.GetAttribute("aria-label").Equals("Data", StringComparison.OrdinalIgnoreCase));
-                    var checkBoxField = firstRecord.FindElements(By.XPath("div[contains(@role,'gridcell')]")).FirstOrDefault();
+                    var checkBoxField = firstRecord.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells])).FirstOrDefault();
                     driver.DoubleClick(checkBoxField);
 
                     driver.WaitForTransaction();
                 }
                 else
                     throw new NotFoundException($"{subgridName} subgrid not found");
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SelectLookup(LookupItem control)
+        {
+            return this.Execute(GetOptions($"Set Lookup Field {control.Name}"), driver =>
+            {
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.FieldLookupButton].Replace("[NAME]", control.Name))))
+                {
+                    var lookupButton = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FieldLookupButton].Replace("[NAME]", control.Name)));
+
+                    lookupButton.Hover(driver);
+
+                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SearchButtonIcon])).Click(true);
+                }
+                else
+                    throw new NotFoundException($"Lookup field {control.Name} not found");
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        #endregion
+
+        #region Lookup 
+        internal BrowserCommandResult<bool> SelectLookupRelatedEntity(string entityName)
+        {
+            //Click the Related Entity on the Lookup Flyout
+            return this.Execute(GetOptions($"Select Lookup Related Entity {entityName}"), driver =>
+            {
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.RelatedEntityLabel].Replace("[NAME]", entityName))))
+                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.RelatedEntityLabel].Replace("[NAME]", entityName))).Click(true);
+                else
+                    throw new NotFoundException($"Lookup Entity {entityName} not found");
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SwitchLookupView(string viewName)
+        {
+            return this.Execute(GetOptions($"Select Lookup View {viewName}"), driver =>
+            {
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.ChangeViewButton])))
+                {
+                    //Click Change View 
+                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.ChangeViewButton])).Click(true);
+
+                    driver.WaitForTransaction();
+
+                    //Click View Requested 
+                    var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.ViewRows]));
+                    if (rows.Any(x => x.Text.Equals(viewName, StringComparison.OrdinalIgnoreCase)))
+                        rows.First(x => x.Text.Equals(viewName, StringComparison.OrdinalIgnoreCase)).Click(true);
+                    else
+                        throw new NotFoundException($"View {viewName} not found");
+                }
+
+                else
+                    throw new NotFoundException("Lookup menu not visible");
+
+                driver.WaitForTransaction();
+                return true;
+            });
+
+            return true;
+        }
+
+        internal BrowserCommandResult<bool> OpenLookupRecord(int index)
+        {
+            return this.Execute(GetOptions("Select Lookup Record"), driver =>
+            {
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows])))
+                {
+                    var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows]));
+
+                    if (rows.Count > 0)
+                        rows.FirstOrDefault().Click(true);
+                }
+                else
+                    throw new NotFoundException("No rows found");
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SelectLookupNewButton()
+        {
+            return this.Execute(GetOptions("Click New Lookup Button"), driver =>
+            {
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.NewButton])))
+                {
+                    var newButton = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.NewButton]));
+
+                    if (newButton.GetAttribute("disabled") == null)
+                        driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.NewButton])).Click();
+                    else
+                        throw new ElementNotInteractableException("New button is not enabled.  If this is a mulit-entity lookup, please use SelectRelatedEntity first.");
+                }
+                else
+                    throw new NotFoundException("New button not found.");
+
+                driver.WaitForTransaction();
 
                 return true;
             });
