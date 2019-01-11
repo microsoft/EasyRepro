@@ -90,6 +90,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Tab = "Entity_Tab";
             public static string SubTab = "Entity_SubTab";
             public static string EntityFooter = "Entity_Footer";
+            public static string SubGridTitle = "Entity_SubGridTitle";
+            public static string SubGridContents = "Entity_SubGridContents";
 
         }
 
@@ -253,6 +255,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_FieldControlDateTimeInputUCI","//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
             { "Entity_LookupResultsDropdown", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
             { "Entity_Footer", "//div[contains(@id,'footerWrapper')]" },
+            { "Entity_SubGridTitle", "//div[contains(text(), '[NAME]')]"},
+            { "Entity_SubGridContents", "//div[contains(text(), '[NAME]')]/parent::div/parent::div/parent::div"},
 			
                         
             //CommandBar
