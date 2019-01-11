@@ -69,6 +69,7 @@
     <Compile Include="Elements\Dialog.cs" />
     <Compile Include="Elements\Entity.cs" />
     <Compile Include="Elements\GlobalSearch.cs" />
+    <Compile Include="Elements\Lookup.cs" />
     <Compile Include="Elements\Grid.cs" />
     <Compile Include="Elements\QuickCreate.cs" />
     <Compile Include="Elements\OnlineLogin.cs" />

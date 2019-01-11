@@ -1928,6 +1928,117 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> SelectLookup(LookupItem control)
+        {
+            //To do: Add AppElementReferences 
+            return this.Execute(GetOptions($"Set Lookup Field {control.Name}"), driver =>
+            {
+                if (driver.HasElement(By.XPath("//button[contains(@data-id,'[NAME]_search')]".Replace("[NAME]", control.Name))))
+                {
+                    var lookupButton = driver.FindElement(By.XPath("//button[contains(@data-id,'[NAME]_search')]".Replace("[NAME]", control.Name)));
+
+                    lookupButton.Hover(driver);
+
+                    driver.FindElement(By.XPath("//span[contains(@data-id,'microsoftIcon_searchButton')]")).Click(true);
+                }
+                else
+                    throw new NotFoundException($"Lookup field {control.Name} not found");
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        #endregion
+
+        #region Lookup 
+        internal BrowserCommandResult<bool> SelectLookupRelatedEntity(string entityName)
+        {
+            return this.Execute(GetOptions($"Select Lookup Related Entity {entityName}"), driver =>
+            {
+                if (driver.HasElement(By.XPath("//li[contains(@title,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]".Replace("[NAME]", entityName))))
+                    driver.FindElement(By.XPath("//li[contains(@title,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]".Replace("[NAME]", entityName))).Click(true);
+                else
+                    throw new NotFoundException($"Lookup Entity {entityName} not found");
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SwitchLookupView(string viewName)
+        {
+            return this.Execute(GetOptions($"Select Lookup View {viewName}"), driver =>
+            {
+                if (driver.HasElement(By.XPath("//button[contains(@data-id,'changeViewBtn')]")))
+                {
+                    //Click Change View 
+                    driver.FindElement(By.XPath("//button[contains(@data-id,'changeViewBtn')]")).Click(true);
+
+                    driver.WaitForTransaction();
+
+                    //Click View Requested 
+                    var rows = driver.FindElements(By.XPath("//li[contains(@data-id,'viewLineContainer')]"));
+                    if (rows.Any(x => x.Text.Equals(viewName, StringComparison.OrdinalIgnoreCase)))
+                        rows.First(x => x.Text.Equals(viewName, StringComparison.OrdinalIgnoreCase)).Click(true);
+                    else
+                        throw new NotFoundException($"View {viewName} not found");
+                }
+
+                else
+                    throw new NotFoundException("Lookup menu not visible");
+
+                driver.WaitForTransaction();
+                return true;
+            });
+
+            return true;
+        }
+
+        internal BrowserCommandResult<bool> OpenLookupRecord(int index)
+        {
+            return this.Execute(GetOptions("Select Lookup Record"), driver =>
+            {
+                if (driver.HasElement(By.XPath("//li[contains(@data-id,'LookupResultsDropdown') and contains(@data-id,'resultsContainer')]")))
+                {
+                    var rows = driver.FindElements(By.XPath("//li[contains(@data-id,'LookupResultsDropdown') and contains(@data-id,'resultsContainer')]"));
+
+                    if (rows.Count > 0)
+                        rows.FirstOrDefault().Click(true);
+                }
+                else
+                    throw new NotFoundException("No rows found");
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SelectLookupNewButton()
+        {
+            return this.Execute(GetOptions("Click New Lookup Button"), driver =>
+            {
+                if (driver.HasElement(By.XPath("//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]")))
+                {
+                    var newButton = driver.FindElement(By.XPath("//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]"));
+
+                    if (newButton.GetAttribute("disabled") == null)
+                        driver.FindElement(By.XPath("//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]")).Click();
+                    else
+                        throw new ElementNotInteractableException("New button is not enabled.  If this is a mulit-entity lookup, please use SelectRelatedEntity first.");
+                }
+                else
+                    throw new NotFoundException("New button not found.");
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
         #endregion
 
         #region Timeline

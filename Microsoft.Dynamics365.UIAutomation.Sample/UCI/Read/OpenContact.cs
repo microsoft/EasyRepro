@@ -86,5 +86,62 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(3000);
             }
         }
+
+        [TestMethod]
+        public void UCITestLookupSearch()
+        {
+            var client = new WebClient(TestSettings.Options);
+
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp("Sales Hub");
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                LookupItem parentCustomerId = new LookupItem { Name = "parentcustomerid" };
+                xrmApp.Entity.SelectLookup(parentCustomerId);
+
+                xrmApp.Lookup.SelectRelatedEntity("Accounts");
+
+                xrmApp.Lookup.SwitchView("My Active Accounts");
+
+                xrmApp.Lookup.OpenRecord(0);
+
+                xrmApp.ThinkTime(3000);
+            }
+        }
+
+        [TestMethod]
+        public void UCITestLookupNew()
+        {
+            var client = new WebClient(TestSettings.Options);
+
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp("Sales Hub");
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                LookupItem parentCustomerId = new LookupItem { Name = "parentcustomerid" };
+                xrmApp.Entity.SelectLookup(parentCustomerId);
+
+                xrmApp.Lookup.SelectRelatedEntity("Accounts");
+
+                xrmApp.Lookup.New();
+
+                xrmApp.ThinkTime(3000);
+
+
+
+            }
+        }
     }
 }
