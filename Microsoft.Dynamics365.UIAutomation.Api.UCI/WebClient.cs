@@ -1884,7 +1884,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 Guid oId = Guid.Empty;
 
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]))) ;
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter])))
                 {
                     var footer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]));
                     var popOutButton = footer.FindElements(By.XPath("//a[contains(@href,'id=')]")).FirstOrDefault();
@@ -1895,6 +1895,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new NotFoundException("Object Id for this record was not found");
 
                 return oId;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SelectSubgridLookup(string subgridName, bool openLookupPage = true)
+        {
+            //To do: Add AppElementReferences
+            return this.Execute(GetOptions($"Set Lookup Value for Subgrid {subgridName}"), driver =>
+            {
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridTitle].Replace("[NAME]", subgridName))))
+                    {
+                    //Find the grid using the grandparent of the label
+                    var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
+
+                    //Find the rows
+                    var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Grid.Rows]));
+
+                    if (rows.Count == 0)
+                        throw new NotFoundException($"No records found for subgrid { subgridName }");
+
+                    //Click the first row
+                    var firstRecord = rows.First(r => r.GetAttribute("aria-label").Equals("Data", StringComparison.OrdinalIgnoreCase));
+                    var checkBoxField = firstRecord.FindElements(By.XPath("div[contains(@role,'gridcell')]")).FirstOrDefault();
+                    driver.DoubleClick(checkBoxField);
+
+                    driver.WaitForTransaction();
+                }
+                else
+                    throw new NotFoundException($"{subgridName} subgrid not found");
+
+                return true;
             });
         }
 
