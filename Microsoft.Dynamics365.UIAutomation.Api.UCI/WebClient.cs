@@ -1916,7 +1916,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     //Click the first row
                     var firstRecord = rows.First(r => r.GetAttribute("aria-label").Equals("Data", StringComparison.OrdinalIgnoreCase));
-                    var checkBoxField = firstRecord.FindElements(By.XPath("div[contains(@role,'gridcell')]")).FirstOrDefault();
+                    var checkBoxField = firstRecord.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells])).FirstOrDefault();
                     driver.DoubleClick(checkBoxField);
 
                     driver.WaitForTransaction();
@@ -1930,16 +1930,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> SelectLookup(LookupItem control)
         {
-            //To do: Add AppElementReferences 
             return this.Execute(GetOptions($"Set Lookup Field {control.Name}"), driver =>
             {
-                if (driver.HasElement(By.XPath("//button[contains(@data-id,'[NAME]_search')]".Replace("[NAME]", control.Name))))
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.FieldLookupButton].Replace("[NAME]", control.Name))))
                 {
-                    var lookupButton = driver.FindElement(By.XPath("//button[contains(@data-id,'[NAME]_search')]".Replace("[NAME]", control.Name)));
+                    var lookupButton = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FieldLookupButton].Replace("[NAME]", control.Name)));
 
                     lookupButton.Hover(driver);
 
-                    driver.FindElement(By.XPath("//span[contains(@data-id,'microsoftIcon_searchButton')]")).Click(true);
+                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SearchButtonIcon])).Click(true);
                 }
                 else
                     throw new NotFoundException($"Lookup field {control.Name} not found");
@@ -1955,10 +1954,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #region Lookup 
         internal BrowserCommandResult<bool> SelectLookupRelatedEntity(string entityName)
         {
+            //Click the Related Entity on the Lookup Flyout
             return this.Execute(GetOptions($"Select Lookup Related Entity {entityName}"), driver =>
             {
-                if (driver.HasElement(By.XPath("//li[contains(@title,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]".Replace("[NAME]", entityName))))
-                    driver.FindElement(By.XPath("//li[contains(@title,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]".Replace("[NAME]", entityName))).Click(true);
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.RelatedEntityLabel].Replace("[NAME]", entityName))))
+                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.RelatedEntityLabel].Replace("[NAME]", entityName))).Click(true);
                 else
                     throw new NotFoundException($"Lookup Entity {entityName} not found");
 
@@ -1972,15 +1972,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Select Lookup View {viewName}"), driver =>
             {
-                if (driver.HasElement(By.XPath("//button[contains(@data-id,'changeViewBtn')]")))
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.ChangeViewButton])))
                 {
                     //Click Change View 
-                    driver.FindElement(By.XPath("//button[contains(@data-id,'changeViewBtn')]")).Click(true);
+                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.ChangeViewButton])).Click(true);
 
                     driver.WaitForTransaction();
 
                     //Click View Requested 
-                    var rows = driver.FindElements(By.XPath("//li[contains(@data-id,'viewLineContainer')]"));
+                    var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.ViewRows]));
                     if (rows.Any(x => x.Text.Equals(viewName, StringComparison.OrdinalIgnoreCase)))
                         rows.First(x => x.Text.Equals(viewName, StringComparison.OrdinalIgnoreCase)).Click(true);
                     else
@@ -2001,9 +2001,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions("Select Lookup Record"), driver =>
             {
-                if (driver.HasElement(By.XPath("//li[contains(@data-id,'LookupResultsDropdown') and contains(@data-id,'resultsContainer')]")))
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows])))
                 {
-                    var rows = driver.FindElements(By.XPath("//li[contains(@data-id,'LookupResultsDropdown') and contains(@data-id,'resultsContainer')]"));
+                    var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows]));
 
                     if (rows.Count > 0)
                         rows.FirstOrDefault().Click(true);
@@ -2021,12 +2021,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions("Click New Lookup Button"), driver =>
             {
-                if (driver.HasElement(By.XPath("//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]")))
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.NewButton])))
                 {
-                    var newButton = driver.FindElement(By.XPath("//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]"));
+                    var newButton = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.NewButton]));
 
                     if (newButton.GetAttribute("disabled") == null)
-                        driver.FindElement(By.XPath("//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]")).Click();
+                        driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.NewButton])).Click();
                     else
                         throw new ElementNotInteractableException("New button is not enabled.  If this is a mulit-entity lookup, please use SelectRelatedEntity first.");
                 }

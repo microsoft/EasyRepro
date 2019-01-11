@@ -25,7 +25,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
-                xrmApp.Navigation.OpenApp("UCI");
+                xrmApp.Navigation.OpenApp("Sales Hub");
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
 
@@ -35,6 +35,29 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 
             }
             
+        }
+
+        [TestMethod]
+        public void UCITestActiveOpportunityLookupAccount()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp("Sales Hub");
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                LookupItem parentAccountId = new LookupItem { Name = "parentaccountid" };
+                xrmApp.Entity.SelectLookup(parentAccountId);
+
+                xrmApp.ThinkTime(1000);
+                xrmApp.Lookup.OpenRecord(0);
+
+            }
         }
     }
 }

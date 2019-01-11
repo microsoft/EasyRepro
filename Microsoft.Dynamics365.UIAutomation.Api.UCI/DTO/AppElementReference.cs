@@ -92,7 +92,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EntityFooter = "Entity_Footer";
             public static string SubGridTitle = "Entity_SubGridTitle";
             public static string SubGridContents = "Entity_SubGridContents";
-
+            public static string SubGridCells = "Entity_SubGridCells";
+            public static string FieldLookupButton = "Entity_FieldLookupButton";
+            public static string SearchButtonIcon = "Entity_SearchButtonIcon";
         }
 
         public static class CommandBar
@@ -170,6 +172,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 		public static class QuickCreate
         {
             public static string SaveButton = "QuickCreate_SaveButton";
+        }
+
+        public static class Lookup
+        {
+            public static string RelatedEntityLabel = "Lookup_RelatedEntityLabel";
+            public static string ChangeViewButton = "Lookup_ChangeViewButton";
+            public static string ViewRows = "Lookup_ViewRows";
+            public static string LookupResultRows = "Lookup_ResultRows";
+            public static string NewButton = "Lookup_NewButton";
         }
     }
 
@@ -257,6 +268,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Footer", "//div[contains(@id,'footerWrapper')]" },
             { "Entity_SubGridTitle", "//div[contains(text(), '[NAME]')]"},
             { "Entity_SubGridContents", "//div[contains(text(), '[NAME]')]/parent::div/parent::div/parent::div"},
+            { "Entity_SubGridCells","div[contains(@role,'gridcell')]"},
+            { "Entity_FieldLookupButton","//button[contains(@data-id,'[NAME]_search')]" },
+            { "Entity_SearchButtonIcon", "//span[contains(@data-id,'microsoftIcon_searchButton')]" },
 			
                         
             //CommandBar
@@ -316,7 +330,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SwitchProcessDialogOK"       , "//button[contains(@data-id,'ok_id')]"},
             { "SwitchProcess_Container" , "//section[contains(@id, 'popupContainer')]" },
 			//QuickCreate 
-            { "QuickCreate_SaveButton" , "//button[contains(@id,'quickCreateSaveBtn')]" }
+            { "QuickCreate_SaveButton" , "//button[contains(@id,'quickCreateSaveBtn')]" },
+
+            //Lookup
+            { "Lookup_RelatedEntityLabel", "//li[contains(@title,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]" },
+            { "Lookup_ChangeViewButton", "//button[contains(@data-id,'changeViewBtn')]"},
+            { "Lookup_ViewRows", "//li[contains(@data-id,'viewLineContainer')]"},
+            { "Lookup_ResultRows", "//li[contains(@data-id,'LookupResultsDropdown') and contains(@data-id,'resultsContainer')]"},
+            { "Lookup_NewButton", "//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]" }
         };
     }
 
