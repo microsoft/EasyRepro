@@ -5,7 +5,7 @@ using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Collections.Generic;
 using System.Security;
-
+using OpenQA.Selenium;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
@@ -37,6 +37,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             //   d.ClickWhenAvailable(By.Id("submitButton"), new TimeSpan(0, 0, 2));
             //   d.WaitForPageToLoad();
             //--------------------------------------------------------------------------------------
+        }
+
+        public void ADFSLoginActionTest(LoginRedirectEventArgs args)
+
+        {
+            //Login Page details go here.  You will need to find out the id of the password field on the form as well as the submit button. 
+            //You will also need to add a reference to the Selenium Webdriver to use the base driver. 
+            //Example
+
+            var d = args.Driver;
+
+            d.FindElement(By.Id("passwordInput")).SendKeys(args.Password.ToUnsecureString());
+            d.ClickWhenAvailable(By.Id("submitButton"), new TimeSpan(0, 0, 2));
+
+            //Insert any additional code as required for the SSO scenario
+
+            //Wait for CRM Page to load
+            d.WaitUntilVisible(By.XPath(Elements.Xpath[Api.Reference.Login.CrmMainPage])
+                , new TimeSpan(0, 0, 60),
+            e =>
+            {
+                e.WaitForPageToLoad();
+                e.SwitchTo().Frame(0);
+                e.WaitForPageToLoad();
+            },
+                f => { throw new Exception("Login page failed."); });
+
         }
     }
 }
