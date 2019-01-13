@@ -26,15 +26,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
-                xrmApp.Navigation.OpenApp("UCI");
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
                 xrmApp.CommandBar.ClickCommand("New");
 
-                var randomString = GenerateString(10);
-
-                xrmApp.Entity.SetValue("name", ("Test Account Creation" + " " + randomString));
+                xrmApp.Entity.SetValue("name", ("Test Account Creation" + " " + TestSettings.GetRandomString(5,10)));
 
                 var accountName = xrmApp.Entity.GetValue("name");
 
@@ -57,18 +55,5 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
 
         }
-
-        public static string GenerateString(int length = 5)
-        {
-            Random random = new Random();
-            string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-            StringBuilder result = new StringBuilder(length);
-            for (int i = 0; i < length; i++)
-            {
-                result.Append(characters[random.Next(characters.Length)]);
-            }
-            return result.ToString();
-        }
-
     }
 }

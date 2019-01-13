@@ -25,7 +25,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
-                xrmApp.Navigation.OpenApp("UCI");
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
                 xrmApp.Navigation.OpenSubArea("Service", "Cases");
 

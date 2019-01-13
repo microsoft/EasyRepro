@@ -26,7 +26,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
-                xrmApp.Navigation.OpenApp("UCI");
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
                 xrmApp.Navigation.OpenSubArea("Service", "Cases");
 
@@ -34,7 +34,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.ThinkTime(5000);
 
-                xrmApp.Entity.SetValue("title", "Test Case Creation");
+                xrmApp.Entity.SetValue("title", TestSettings.GetRandomString(5,10));
+
+                LookupItem customer = new LookupItem { Name = "customerid", Value = "John Doe" };
+                xrmApp.Entity.SetValue(customer);
 
                 xrmApp.Entity.Save();
             }

@@ -1350,7 +1350,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"SaveQuickCreate"), driver =>
             {
-                var save = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.SaveButton]),
+                var save = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.SaveAndCloseButton]),
                     "Quick Create Save Button is not available");
                 save?.Click(true);
 				
