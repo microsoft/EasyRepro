@@ -124,5 +124,45 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.SelectLookup(control);
         }
+
+        public string GetHeaderValue(LookupItem control)
+        {
+            return _client.GetHeaderValue(control);
+        }
+
+        public string GetHeaderValue(OptionSet control)
+        {
+            return _client.GetHeaderValue(control);
+        }
+
+        public string GetHeaderValue(string control)
+        {
+            return _client.GetHeaderValue(control);
+        }
+
+        public MultiValueOptionSet GetHeaderValue(MultiValueOptionSet control)
+        {
+            return _client.GetHeaderValue(control);
+        }
+
+        public void SetHeaderValue(string field, string value)
+        {
+            _client.SetHeaderValue(field, value);
+        }
+
+        public void SetHeaderValue(LookupItem control)
+        {
+            _client.SetHeaderValue(control);
+        }
+
+        public void SetHeaderValue(MultiValueOptionSet control)
+        {
+            _client.SetHeaderValue(control);
+        }
+
+        public void SetHeaderValue(OptionSet control)
+        {
+            _client.SetHeaderValue(control);
+        }
     }   
 }

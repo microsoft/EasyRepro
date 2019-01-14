@@ -1290,6 +1290,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     throw new InvalidOperationException($"No record with the index '{index}' exists.");
                 }
+
+                driver.WaitForTransaction();
                 return true;
             });
         }
@@ -1878,6 +1880,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        /// <summary>
+        /// Returns the ObjectId of the entity
+        /// </summary>
+        /// <returns>Guid of the Entity</returns>
         internal BrowserCommandResult<Guid> GetObjectId(int thinkTime = Constants.DefaultThinkTime)
         {
             return this.Execute(GetOptions($"Get Object Id"), driver =>
@@ -1898,9 +1904,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        /// <summary>
+        /// Opens the first record of a subgrid (if a record exists)
+        /// </summary>
+        /// <param name="subgridName">Label of the subgrid on the entity form</param>
         internal BrowserCommandResult<bool> SelectSubgridLookup(string subgridName, bool openLookupPage = true)
         {
-            //To do: Add AppElementReferences
             return this.Execute(GetOptions($"Set Lookup Value for Subgrid {subgridName}"), driver =>
             {
                 if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridTitle].Replace("[NAME]", subgridName))))
@@ -1924,15 +1933,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         throw new NotFoundException($"No rows found in {subgridName} subgrid");
                 }
                 else
-                    throw new NotFoundException($"{subgridName} subgrid not found");
+                    throw new NotFoundException($"{subgridName} subgrid not found. Subgrid names are case sensitive.  Please make sure casing is the same.");
 
                 return true;
             });
         }
 
+        /// <summary>
+        /// Click the magnifying glass icon for the lookup control supplied
+        /// </summary>
+        /// <param name="control">The LookupItem field on the form</param>
+        /// <returns></returns>
         internal BrowserCommandResult<bool> SelectLookup(LookupItem control)
         {
-            return this.Execute(GetOptions($"Set Lookup Field {control.Name}"), driver =>
+            return this.Execute(GetOptions($"Select Lookup Field {control.Name}"), driver =>
             {
                 if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.FieldLookupButton].Replace("[NAME]", control.Name))))
                 {
@@ -1946,6 +1960,102 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new NotFoundException($"Lookup field {control.Name} not found");
 
                 driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<string> GetHeaderValue(LookupItem control)
+        {
+            return this.Execute(GetOptions($"Get Header Value {control.Name}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
+                    throw new NotFoundException("Unable to find header on the form");
+
+                return GetValue(control);
+            });
+        }
+
+        internal BrowserCommandResult<string> GetHeaderValue(string control)
+        {
+            return this.Execute(GetOptions($"Get Header Value {control}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
+                    throw new NotFoundException("Unable to find header on the form");
+
+                return GetValue(control);
+            });
+        }
+
+        internal BrowserCommandResult<MultiValueOptionSet> GetHeaderValue(MultiValueOptionSet control)
+        {
+            return this.Execute(GetOptions($"Get Header Value {control.Name}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
+                    throw new NotFoundException("Unable to find header on the form");
+
+                return GetValue(control);
+            });
+        }
+
+        internal BrowserCommandResult<string> GetHeaderValue(OptionSet control)
+        {
+            return this.Execute(GetOptions($"Get Header Value {control}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
+                    throw new NotFoundException("Unable to find header on the form");
+
+                return GetValue(control);
+            });
+        }
+
+        internal BrowserCommandResult<bool> SetHeaderValue(string field, string value)
+        {
+            return this.Execute(GetOptions($"Set Header Value {field}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
+                    throw new NotFoundException("Unable to find header on the form");
+
+                SetValue(field, value);
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SetHeaderValue(LookupItem control)
+        {
+            return this.Execute(GetOptions($"Set Header Value {control.Name}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
+                    throw new NotFoundException("Unable to find header on the form");
+
+                SetValue(control);
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SetHeaderValue(MultiValueOptionSet control)
+        {
+            return this.Execute(GetOptions($"Set Header Value {control.Name}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
+                    throw new NotFoundException("Unable to find header on the form");
+
+                SetValue(control);
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SetHeaderValue(OptionSet control)
+        {
+            return this.Execute(GetOptions($"Set Header Value {control.Name}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
+                    throw new NotFoundException("Unable to find header on the form");
+
+                SetValue(control);
 
                 return true;
             });
@@ -2629,7 +2739,43 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> BPFPin(string stageName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            return this.Execute(GetOptions($"Select Stage: {stageName}"), driver =>
+            {
+                //Click the BPF Stage
+                SelectStage(stageName, 0);
+                driver.WaitForTransaction();
 
+                //Pin the Stage
+                if (driver.HasElement(By.XPath("//button[contains(@id,'stageDockModeButton')]")))
+                    driver.FindElement(By.XPath("//button[contains(@id,'stageDockModeButton')]")).Click();
+                else
+                    throw new NotFoundException($"Pin button for stage {stageName} not found.");
+
+                driver.WaitForTransaction();
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> BPFClose(string stageName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            return this.Execute(GetOptions($"Select Stage: {stageName}"), driver =>
+            {
+                //Click the BPF Stage
+                SelectStage(stageName, 0);
+                driver.WaitForTransaction();
+
+                //Pin the Stage
+                if (driver.HasElement(By.XPath("//button[contains(@id,'stageContentClose')]")))
+                    driver.FindElement(By.XPath("//button[contains(@id,'stageContentClose')]")).Click();
+                else
+                    throw new NotFoundException($"Pin button for stage {stageName} not found.");
+
+                driver.WaitForTransaction();
+                return true;
+            });
+        }
 
         #endregion
 
@@ -2748,6 +2894,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
         #endregion
+
         #region Dashboard
         internal BrowserCommandResult<bool> SelectDashboard(string dashboardName, int thinkTime = Constants.DefaultThinkTime)
         {

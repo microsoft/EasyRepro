@@ -95,6 +95,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SubGridCells = "Entity_SubGridCells";
             public static string FieldLookupButton = "Entity_FieldLookupButton";
             public static string SearchButtonIcon = "Entity_SearchButtonIcon";
+            public static string EntityHeader = "Entity_Header";
         }
 
         public static class CommandBar
@@ -272,6 +273,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SubGridCells","div[contains(@role,'gridcell')]"},
             { "Entity_FieldLookupButton","//button[contains(@data-id,'[NAME]_search')]" },
             { "Entity_SearchButtonIcon", "//span[contains(@data-id,'microsoftIcon_searchButton')]" },
+            { "Entity_Header", "//div[contains(@data-id,'form-header')]"},
 			
                         
             //CommandBar

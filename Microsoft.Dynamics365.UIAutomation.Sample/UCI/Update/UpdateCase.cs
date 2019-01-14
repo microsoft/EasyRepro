@@ -38,5 +38,29 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
             
         }
+
+        [TestMethod]
+        public void UCITestUpdateActiveCaseSetHeaderValues()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Cases");
+
+                xrmApp.RelatedGrid.OpenGridRow(0);
+
+                OptionSet priorityCode = new OptionSet() { Name = "prioritycode", Value="Low" };
+                xrmApp.Entity.SetHeaderValue(priorityCode);
+
+                xrmApp.Entity.Save();
+
+                xrmApp.ThinkTime(2000);
+
+            }
+        }
     }
 }
