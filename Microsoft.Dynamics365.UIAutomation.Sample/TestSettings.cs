@@ -78,7 +78,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             }
             return (new string(str));
         }
-
     }
 
     public static class UCIAppName

@@ -61,7 +61,50 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.ThinkTime(1000);
             }
+        }
 
+        [TestMethod]
+        public void UCITestPinBPFStage()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Leads");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                xrmApp.BusinessProcessFlow.SelectStage("Qualify");
+
+                xrmApp.BusinessProcessFlow.Pin("Qualify");
+
+                xrmApp.ThinkTime(500);
+            }
+        }
+
+        [TestMethod]
+        public void UCITestCloseBPFStage()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Leads");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                xrmApp.BusinessProcessFlow.SelectStage("Qualify");
+
+                xrmApp.BusinessProcessFlow.Close("Qualify");
+
+                xrmApp.ThinkTime(500);
+            }
         }
     }
 }

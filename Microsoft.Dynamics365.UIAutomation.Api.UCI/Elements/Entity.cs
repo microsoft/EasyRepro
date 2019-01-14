@@ -111,6 +111,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.GetObjectId();
         }
 
+        /// <summary>
+        /// Opens the first record of a subgrid (if a record exists)
+        /// </summary>
+        /// <param name="subgridName">Label of the subgrid on the entity form</param>
         public void SelectSubgridLookup(string subgridName, bool openLookupPage = true)
         {
             _client.SelectSubgridLookup(subgridName, openLookupPage);

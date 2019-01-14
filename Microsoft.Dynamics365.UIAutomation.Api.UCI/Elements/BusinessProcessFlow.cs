@@ -65,6 +65,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.SetValue(control, index);
         }
+
         public void SetValue(string field, DateTime date, string format = "MM dd yyyy")
         {
             _client.SetValue(field, date, format);
@@ -73,6 +74,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public void SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
             _client.SetValue(option, removeExistingValues);
+        }
+
+        /// <summary>
+        /// Pins the Business Process Flow Stage to the right side of the window
+        /// </summary>
+        /// <param name="stageName">The name of the Business Process Flow Stage</param>
+        public void Pin(string stageName)
+        {
+            _client.BPFPin(stageName);
+        }
+
+        /// <summary>
+        /// Clicks the "X" button in the Business Process Flow flyout menu for the Stage provided
+        /// </summary>
+        /// <param name="stageName">Name of the business process flow stage</param>
+        public void Close(string stageName)
+        {
+            _client.BPFClose(stageName);
         }
     }
 }
