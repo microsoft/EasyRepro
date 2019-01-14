@@ -25,7 +25,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
-                xrmApp.Navigation.OpenApp("UCI");
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Leads");
 
@@ -33,7 +33,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.ThinkTime(3000);
 
-                xrmApp.Entity.SetValue("subject", "Test Lead");
+                xrmApp.Entity.SetValue("subject", TestSettings.GetRandomString(10,15));
 
                 xrmApp.Entity.Save();
 
@@ -49,7 +49,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
-                xrmApp.Navigation.OpenApp("Sales Hub");
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Leads");
 
@@ -61,7 +61,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 LookupItem contact = new LookupItem();
                 contact.Name = "parentcontactid";
-                contact.Value = "Alexandra Martin";
+                contact.Value = "EasyRepro";
 
                 xrmApp.BusinessProcessFlow.SelectStage("Qualify");
 

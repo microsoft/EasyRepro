@@ -25,13 +25,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
-                xrmApp.Navigation.OpenApp("UCI");
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
                 xrmApp.Grid.OpenRecord(0);
 
-                xrmApp.Entity.SetValue("name", "Test Account Name");
+                xrmApp.Entity.SetValue("name", TestSettings.GetRandomString(10,15));
 
                 xrmApp.Entity.Save();
 

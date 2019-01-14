@@ -172,6 +172,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 		public static class QuickCreate
         {
             public static string SaveButton = "QuickCreate_SaveButton";
+            public static string SaveAndCloseButton = "QuickCreate_SaveAndCloseButton";
         }
 
         public static class Lookup
@@ -329,8 +330,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_ActiveProcessGridControlContainer"       , "//div[contains(@data-lp-id,'activeProcessGridControlContainer')]"},
             { "Entity_SwitchProcessDialogOK"       , "//button[contains(@data-id,'ok_id')]"},
             { "SwitchProcess_Container" , "//section[contains(@id, 'popupContainer')]" },
-			//QuickCreate 
+			
+            //QuickCreate 
             { "QuickCreate_SaveButton" , "//button[contains(@id,'quickCreateSaveBtn')]" },
+            { "QuickCreate_SaveAndCloseButton", "//button[contains(@id,'quickCreateSaveAndCloseBtn')]"},
 
             //Lookup
             { "Lookup_RelatedEntityLabel", "//li[contains(@title,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]" },
@@ -348,6 +351,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         Redirect
     }
 }
+
 
 
 

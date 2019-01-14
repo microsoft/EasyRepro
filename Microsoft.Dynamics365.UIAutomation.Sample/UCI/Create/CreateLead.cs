@@ -25,7 +25,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
-                xrmApp.Navigation.OpenApp("UCI");
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Leads");
 
@@ -33,9 +33,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.ThinkTime(5000);
 
-                xrmApp.Entity.SetValue("subject", "Test Lead Creation");
-                xrmApp.Entity.SetValue("firstname", "John");
-                xrmApp.Entity.SetValue("lastname", "Doe");
+                xrmApp.Entity.SetValue("subject", TestSettings.GetRandomString(5,15));
+                xrmApp.Entity.SetValue("firstname", TestSettings.GetRandomFirstName());
+                xrmApp.Entity.SetValue("lastname", TestSettings.GetRandomLastName());
 
                 xrmApp.Entity.Save();
 
