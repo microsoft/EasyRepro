@@ -143,5 +143,29 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
             }
         }
+
+        [TestMethod]
+        public void UCITestOpenContactRetrieveHeaderValues()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Contacts");
+
+                xrmApp.RelatedGrid.OpenGridRow(0);
+
+                LookupItem ownerId = new LookupItem() { Name = "ownerid" };
+                string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
+
+                string emailAddress = xrmApp.Entity.GetHeaderValue("emailaddress1");
+
+                xrmApp.ThinkTime(2000);
+
+            }
+        }
     }
 }
