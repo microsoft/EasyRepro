@@ -68,10 +68,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
-                //xrmApp.Grid.SwitchView("My Active Accounts");
                 xrmApp.Grid.OpenRecord(0);
                 xrmApp.ThinkTime(500);
-                xrmApp.Entity.SetValue(new LookupItem { Name = "primarycontactid", Value = "Margaret" });
+
+                xrmApp.Entity.SetValue(new LookupItem { Name = "primarycontactid", Value = "Test" });
                 xrmApp.ThinkTime(500);
             }
         }

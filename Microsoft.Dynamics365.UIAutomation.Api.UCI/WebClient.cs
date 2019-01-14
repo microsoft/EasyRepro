@@ -1911,15 +1911,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     //Find the rows
                     var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Grid.Rows]));
 
-                    if (rows.Count == 0)
-                        throw new NotFoundException($"No records found for subgrid { subgridName }");
-
                     //Click the first row
-                    var firstRecord = rows.First(r => r.GetAttribute("aria-label").Equals("Data", StringComparison.OrdinalIgnoreCase));
-                    var checkBoxField = firstRecord.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells])).FirstOrDefault();
-                    driver.DoubleClick(checkBoxField);
+                    if (rows.Any(r => r.GetAttribute("aria-label").Equals("Data", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        var firstRecord = rows.First(r => r.GetAttribute("aria-label").Equals("Data", StringComparison.OrdinalIgnoreCase));
+                        var checkBoxField = firstRecord.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells])).FirstOrDefault();
+                        driver.DoubleClick(checkBoxField);
 
-                    driver.WaitForTransaction();
+                        driver.WaitForTransaction();
+                    }
+                    else
+                        throw new NotFoundException($"No rows found in {subgridName} subgrid");
                 }
                 else
                     throw new NotFoundException($"{subgridName} subgrid not found");
