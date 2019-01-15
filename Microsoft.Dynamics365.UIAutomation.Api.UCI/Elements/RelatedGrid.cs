@@ -18,5 +18,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenGridRow(index);
         }
+
+        public void ClickCommand(string name, string subName = null)
+        {
+            _client.ClickRelatedCommand(name, subName);
+        }
     }
 }
