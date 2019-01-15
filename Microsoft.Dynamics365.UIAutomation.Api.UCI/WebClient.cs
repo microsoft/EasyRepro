@@ -815,7 +815,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             this.Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions($"Set Value"), driver =>
+            return this.Execute(GetOptions($"Click Command"), driver =>
             {
                 bool success = false;
                 IWebElement ribbon = null;
@@ -1292,6 +1292,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 driver.WaitForTransaction();
+                return true;
+            });
+        }
+
+        public BrowserCommandResult<bool> ClickRelatedCommand(string name, string subName = null)
+        {
+            return this.Execute(GetOptions("Open Grid Item"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
+                    throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
+
+            driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
+                //driver.FindElement(By.XPath("//button[contains(., '[NAME]') and contains(@data-id,'SubGridAssociated')]".Replace("[NAME]", name))).Click(true);
+
+                driver.WaitForTransaction();
+
+                if(subName != null)
+                {
+                    if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
+                        throw new NotFoundException($"{subName} button not found");
+
+                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+                    //driver.FindElement(By.XPath("//button[contains(., '[NAME]')]".Replace("[NAME]", subName))).Click(true);
+
+                    driver.WaitForTransaction();
+                }
                 return true;
             });
         }
@@ -2398,6 +2424,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     ClickTab(AppElements.Xpath[AppReference.Entity.SubTab], subTabName);
                 }
 
+                driver.WaitForTransaction();
                 return true;
             });
         }

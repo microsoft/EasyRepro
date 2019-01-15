@@ -170,6 +170,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string CancelButton = "Dialog_CancelButton";
             public static string SwitchProcessContainer = "Dialog_SwitchProcessContainer";
         }
+
 		public static class QuickCreate
         {
             public static string SaveButton = "QuickCreate_SaveButton";
@@ -183,6 +184,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string ViewRows = "Lookup_ViewRows";
             public static string LookupResultRows = "Lookup_ResultRows";
             public static string NewButton = "Lookup_NewButton";
+        }
+
+        public static class Related
+        {
+            public static string CommandBarButton = "Related_CommandBarButton";
+            public static string CommandBarSubButton = "Related_CommandBarSubButton";
         }
     }
 
@@ -316,6 +323,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_DateTimeFieldContainer", "//input[contains(@data-id, \'[NAME].fieldControl-date-time-input\')]" },
             { "BPF_FieldControlDateTimeInputUCI","//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
 
+            //Related Grid
+            { "Related_CommandBarButton", "//button[contains(., '[NAME]') and contains(@data-id,'SubGridAssociated')]"},
+            { "Related_CommandBarSubButton" ,"//button[contains(., '[NAME]')]"},
 
             //Dialogs
             { "AssignDialog_ToggleField" , "//label[contains(@data-id,'rdoMe_id.fieldControl-checkbox-inner-first')]" },
