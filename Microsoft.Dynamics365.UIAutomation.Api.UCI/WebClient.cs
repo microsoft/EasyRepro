@@ -2064,6 +2064,40 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #endregion
 
         #region Lookup 
+        internal BrowserCommandResult<bool> OpenLookupRecord(int index)
+        {
+            return this.Execute(GetOptions("Select Lookup Record"), driver =>
+            {
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows])))
+                {
+                    var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows]));
+
+                    if (rows.Count > 0)
+                        rows.FirstOrDefault().Click(true);
+                }
+                else
+                    throw new NotFoundException("No rows found");
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SearchLookupField(LookupItem control, string searchCriteria)
+        {
+            return this.Execute(GetOptions("Select Lookup Record"), driver =>
+            {
+                //Click in the field and enter values
+                control.Value = searchCriteria;
+                SetValue(control);
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
         internal BrowserCommandResult<bool> SelectLookupRelatedEntity(string entityName)
         {
             //Click the Related Entity on the Lookup Flyout
@@ -2107,26 +2141,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
 
             return true;
-        }
-
-        internal BrowserCommandResult<bool> OpenLookupRecord(int index)
-        {
-            return this.Execute(GetOptions("Select Lookup Record"), driver =>
-            {
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows])))
-                {
-                    var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows]));
-
-                    if (rows.Count > 0)
-                        rows.FirstOrDefault().Click(true);
-                }
-                else
-                    throw new NotFoundException("No rows found");
-
-                driver.WaitForTransaction();
-
-                return true;
-            });
         }
 
         internal BrowserCommandResult<bool> SelectLookupNewButton()

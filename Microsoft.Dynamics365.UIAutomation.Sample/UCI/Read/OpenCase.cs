@@ -27,7 +27,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
                 xrmApp.Navigation.OpenSubArea("Service", "Cases");
-                
+
                 xrmApp.Grid.Search("Contacted");
 
                 xrmApp.Grid.OpenRecord(0);
@@ -41,13 +41,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             using (var xrmApp = new XrmApp(client))
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
-                
-                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
-                /* need to write methods to open related grid view prior to opening the row  then call theme here*/
-                xrmApp.ThinkTime(3000);
-                xrmApp.RelatedGrid.OpenGridRow(0);
-                xrmApp.ThinkTime(2000);
 
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Cases");
+
+                /* need to write methods to open related grid view prior to opening the row  then call theme here*/
+                xrmApp.Grid.OpenRecord(0);
             }
         }
 

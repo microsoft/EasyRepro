@@ -13,13 +13,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client = client;
         }
 
-        public void SwitchView(string viewName)
-        {
-            _client.SwitchLookupView(viewName);
-        }
         public void OpenRecord(int index)
         {
             _client.OpenLookupRecord(index);
+        }
+
+        public void New()
+        {
+            _client.SelectLookupNewButton();
+        }
+
+        public void Search(LookupItem control, string searchCriteria)
+        {
+            _client.SearchLookupField(control, searchCriteria);
         }
 
         public void SelectRelatedEntity(string entityLabel)
@@ -27,9 +33,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.SelectLookupRelatedEntity(entityLabel);
         }
 
-        public void New()
+        public void SwitchView(string viewName)
         {
-            _client.SelectLookupNewButton();
+            _client.SwitchLookupView(viewName);
         }
 
     }
