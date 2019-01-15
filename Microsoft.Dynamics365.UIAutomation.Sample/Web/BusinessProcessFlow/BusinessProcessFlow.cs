@@ -60,19 +60,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.ThinkTime(3000);
 
-                xrmBrowser.BusinessProcessFlow.PreviousStage();
+                xrmBrowser.BusinessProcessFlow.NextStage();
 
                 xrmBrowser.ThinkTime(3000);
 
-                xrmBrowser.BusinessProcessFlow.Hide();
-
-                xrmBrowser.ThinkTime(3000);
-
-                xrmBrowser.BusinessProcessFlow.SelectStage(0, 4000);
+                xrmBrowser.BusinessProcessFlow.Finish();
 
                 xrmBrowser.ThinkTime(3000);
             }
         }
+
         [TestMethod]
         public void WEBTestBusinessProcessFlowNextStage()
         {
@@ -91,6 +88,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
             }
         }
+
         [TestMethod]
         public void WEBTestBusinessProcessFlowPreviousStage()
         {
@@ -111,6 +109,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
             }
         }
+
         [TestMethod]
         public void WEBTestBusinessProcessFlowHide()
         {
@@ -149,7 +148,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 xrmBrowser.BusinessProcessFlow.SelectStage(0);
             }
         }
-
 
         [TestMethod]
         public void WEBTestBusinessProcessFlowSetActive()

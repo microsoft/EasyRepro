@@ -132,8 +132,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 if (driver.FindElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.SetActive])).GetAttribute("class").Contains("hidden"))
                     throw new Exception("The Business Process is already Active");
-                
+
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.SetActive]));
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// If the BPF is at the end of the final stage, finishes the BPF.
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.BusinessProcessFlow.Finish();</example>
+        public BrowserCommandResult<bool> Finish(int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute("Finish BPF", driver =>
+            {
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.Finish])))
+                    throw new Exception("Business Process Flow Finish Element does not exist");
+
+                if (driver.FindElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.Finish])).GetAttribute("class").Contains("hidden"))
+                    throw new Exception("The Business Process is already finished");
+
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.Finish]));
+
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.FinishedLabel]));
+
+                if (!driver.FindElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.Finish])).GetAttribute("class").Contains("hidden"))
+                    throw new Exception("The finish operation did not complete as expected.");
 
                 return true;
             });

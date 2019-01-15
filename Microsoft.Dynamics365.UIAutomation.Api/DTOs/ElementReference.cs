@@ -14,6 +14,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "BPF_PreviousStage"   , "id(\"stageBackActionContainer\")/div"},
             { "BPF_Hide"            , "id(\"processControlCollapseButton\")" },
             { "BPF_SetActive"       , "id(\"stageSetActiveActionContainer\")" },
+            { "BPF_Finish"       , "id(\"stageFinishActionContainer\")" },
+            { "BPF_FinishedLabel"       , "//div[@class=\"finishLabelContainer\"]" },
             { "BPF_SelectStage"     , "id(\"stage_[STAGENUM]\")/div[2]/div/div/div/span" },
             { "BPF_Ok"     , "id(\"SwitchProcess-Select\")" },
 
@@ -391,6 +393,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string PreviousStage = "BPF_PreviousStage";
             public static string Hide = "BPF_Hide";
             public static string SetActive = "BPF_SetActive";
+            public static string Finish = "BPF_Finish";
+            public static string FinishedLabel = "BPF_FinishedLabel";
             public static string SelectStage = "BPF_SelectStage";
             public static string Ok = "BPF_Ok";
         }
