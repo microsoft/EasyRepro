@@ -32,13 +32,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Grid.Search("orb");
 
                 xrmApp.Grid.OpenRecord(0);
-                
+
             }
-            
+
         }
 
         [TestMethod]
-        public void UCITestActiveOpportunityLookupAccount()
+        public void UCITestOpenOpportunityLookupAccount()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
@@ -57,6 +57,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(1000);
                 xrmApp.Lookup.OpenRecord(0);
 
+            }
+        }
+
+        [TestMethod]
+        public void UCITestOpenOpportunitySearchLookupAccount()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                LookupItem parentAccountId = new LookupItem { Name = "parentaccountid" };
+                xrmApp.Lookup.Search(parentAccountId, "Test");
+
+                xrmApp.ThinkTime(1000);
             }
         }
     }
