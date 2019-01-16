@@ -49,7 +49,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                     commandBarButton.Click(true);
 
                     // Verify the Cancel button is now available
-                    var cancelButton = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.CancelSolutionCheckerButton]));
+                    var cancelButton = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.CancelSolutionCheckerButton]));
 
                     // Check to confirm Cancel button was found
                     if (cancelButton == null)
