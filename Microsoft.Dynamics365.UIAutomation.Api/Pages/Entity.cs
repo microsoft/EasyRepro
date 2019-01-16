@@ -199,6 +199,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
+        /// Returns the GUID for the current entity record. 
+        /// </summary>
+        /// <param name="name">The name of the tab.</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Entity.GetTabState("Details");</example>
+        public BrowserCommandResult<string> GetRecordGuid(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Get GUID for the Current Record"), driver =>
+            {
+                SwitchToContentFrame();
+
+                var recordGuid = driver.ExecuteScript("return Xrm.Page.data.entity.getId();").ToString(); ;
+
+                return Guid.Parse(recordGuid).ToString();
+            });
+        }
+
+        /// <summary>
         /// Returns the state of the tab, either Expanded or Collapsed. 
         /// </summary>
         /// <param name="name">The name of the tab.</param>
@@ -208,7 +228,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions($"SelectTab: {name}"), driver =>
+            return this.Execute(GetOptions($"Get State for Tab: {name}"), driver =>
             {
                 if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
                 {
