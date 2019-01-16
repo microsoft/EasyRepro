@@ -18,6 +18,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "BPF_FinishedLabel"       , "//div[@class=\"finishLabelContainer\"]" },
             { "BPF_SelectStage"     , "id(\"stage_[STAGENUM]\")/div[2]/div/div/div/span" },
             { "BPF_Ok"     , "id(\"SwitchProcess-Select\")" },
+            { "BPF_TextFieldContainer"     , "//div[@id=\"header_process_[NAME]\"]" },
+            { "BPF_CheckboxFieldContainer"     , "//div[@id=\"header_process_[NAME]\"]" },
+            { "BPF_OptionSetFieldContainer"     , "//div[@id=\"header_process_[NAME]\"]" },
+            { "BPF_LookupFieldContainer"     , "//div[@id=\"header_process_[NAME]\"]" },
+            { "BPF_DateFieldContainer"     , "//div[@id=\"header_process_[NAME]\"]" },
 
             //Dialogs
             { "Dialog_Header"       , "id(\"dialogHeaderTitle\")"},
@@ -397,6 +402,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string FinishedLabel = "BPF_FinishedLabel";
             public static string SelectStage = "BPF_SelectStage";
             public static string Ok = "BPF_Ok";
+            public static string TextFieldContainer = "BPF_TextFieldContainer";
+            public static string CheckboxFieldContainer = "BPF_CheckboxFieldContainer";
+            public static string OptionSetFieldContainer = "BPF_OptionSetFieldContainer";
+            public static string LookupFieldContainer = "BPF_LookupFieldContainer";
+            public static string DateFieldContainer = "BPF_DateFieldContainer";
         }
 
         public static class Dialogs
