@@ -65,5 +65,41 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
             }
         }
+
+        [TestMethod]
+        public void UCITestUpdateClearFields()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Contacts");
+
+                xrmApp.RelatedGrid.OpenGridRow(0);
+
+                xrmApp.Entity.ClearValue("telephone1");
+
+                LookupItem account = new LookupItem() { Name = "parentcustomerid" };
+                xrmApp.Entity.ClearValue(account);
+
+                OptionSet preferredContact = new OptionSet() { Name = "preferredcontactmethodcode" };
+                xrmApp.Entity.ClearValue(preferredContact);
+                
+                xrmApp.Entity.SetValue("telephone1", "555-555-5555");
+
+                preferredContact.Value = "Email";
+                xrmApp.Entity.SetValue(preferredContact);
+
+                xrmApp.Entity.Save();
+
+                
+
+                xrmApp.ThinkTime(2000);
+
+            }
+        }
     }
 }

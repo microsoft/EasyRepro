@@ -19,7 +19,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             PrivateMode = true,
             FireEvents = false,
             Headless = false,
-            UserAgent = false
+            UserAgent = false,
+            DefaultThinkTime = 2000
         };
 
         public static string GetRandomFirstName()

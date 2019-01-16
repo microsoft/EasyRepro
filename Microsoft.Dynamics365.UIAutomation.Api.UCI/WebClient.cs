@@ -184,7 +184,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #endregion
 
         #region Navigation
-        internal BrowserCommandResult<bool> OpenApp(string appName,int thinkTime = Constants.DefaultThinkTime)
+        internal BrowserCommandResult<bool> OpenApp(string appName, int thinkTime = Constants.DefaultThinkTime)
         {
             this.Browser.ThinkTime(thinkTime);
 
@@ -963,7 +963,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.Form]));
-                //driver.WaitForPageToLoad();
+                
                 driver.WaitForTransaction();
 
                 return true;
@@ -1664,102 +1664,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-        internal BrowserCommandResult<string> GetValue(string field)
-        {
-            return this.Execute(GetOptions($"Get Value"), driver =>
-            {
-                string text = string.Empty;
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
-
-                if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
-                {
-                    var input = fieldContainer.FindElement(By.TagName("input"));
-                    if (input != null)
-                    {
-                        IWebElement fieldValue = input.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldValue].Replace("[NAME]", field)));
-                        text = fieldValue.GetAttribute("value").ToString();
-                    }
-                }
-                else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
-                {
-                    text = fieldContainer.FindElement(By.TagName("textarea")).GetAttribute(field);
-                }
-                else
-                {
-                    throw new Exception($"Field with name {field} does not exist.");
-                }
-
-                return text;
-            });
-        }
-
-        /// <summary>
-        /// Gets the value of a Lookup.
-        /// </summary>
-        /// <param name="control">The lookup field name of the lookup.</param>
-        /// <example>xrmApp.Entity.GetValue(new Lookup { Name = "primarycontactid" });</example>
-        public BrowserCommandResult<string> GetValue(LookupItem control)
-        {
-            return this.Execute($"Get Lookup Value: {control.Name}", driver =>
-            {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
-
-                string lookupValue = string.Empty;
-                try
-                {
-                    if (fieldContainer.FindElements(By.TagName("input")).Any())
-                    {
-                        lookupValue = fieldContainer.FindElement(By.TagName("input")).GetAttribute("value");
-                    }
-                    else if(fieldContainer.FindElements(By.XPath(".//label")).Any())
-                    {
-                        var label = fieldContainer.FindElement(By.XPath(".//label"));
-                        lookupValue = fieldContainer.FindElement(By.XPath(".//label")).GetAttribute("innerText");
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"Field: {control.Name} Does not exist");
-                    }
-                }
-                catch (Exception exp)
-                {
-                    throw new InvalidOperationException($"Field: {control.Name} Does not exist",exp);
-                }
-
-                return lookupValue;
-            });
-        }
-
-        /// <summary>
-        /// Gets the value of a picklist.
-        /// </summary>
-        /// <param name="option">The option you want to set.</param>
-        /// <example>xrmBrowser.Entity.GetValue(new OptionSet { Name = "preferredcontactmethodcode"}); </example>
-        internal BrowserCommandResult<string> GetValue(OptionSet option)
-        {
-            return this.Execute($"Get Value: {option.Name}", driver =>
-            {
-                var text = string.Empty;
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
-
-                if (fieldContainer.FindElements(By.TagName("select")).Count > 0)
-                {
-                    var select = fieldContainer.FindElement(By.TagName("select"));
-                    var options = select.FindElements(By.TagName("option"));
-                    foreach (var op in options)
-                    {
-                        if (!op.Selected) continue;
-                        text = op.Text;
-                        break;
-                    }
-                }else
-                {
-                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
-                }
-                return text;
-               
-            });
-        }
 
         /// <summary>
         /// Sets/Removes the value from the multselect type control
@@ -1871,6 +1775,104 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     divElements.First().Click(true);
                 }
                 return true;
+            });
+        }
+
+        internal BrowserCommandResult<string> GetValue(string field)
+        {
+            return this.Execute(GetOptions($"Get Value"), driver =>
+            {
+                string text = string.Empty;
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
+
+                if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
+                {
+                    var input = fieldContainer.FindElement(By.TagName("input"));
+                    if (input != null)
+                    {
+                        IWebElement fieldValue = input.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldValue].Replace("[NAME]", field)));
+                        text = fieldValue.GetAttribute("value").ToString();
+                    }
+                }
+                else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
+                {
+                    text = fieldContainer.FindElement(By.TagName("textarea")).GetAttribute(field);
+                }
+                else
+                {
+                    throw new Exception($"Field with name {field} does not exist.");
+                }
+
+                return text;
+            });
+        }
+
+        /// <summary>
+        /// Gets the value of a Lookup.
+        /// </summary>
+        /// <param name="control">The lookup field name of the lookup.</param>
+        /// <example>xrmApp.Entity.GetValue(new Lookup { Name = "primarycontactid" });</example>
+        public BrowserCommandResult<string> GetValue(LookupItem control)
+        {
+            return this.Execute($"Get Lookup Value: {control.Name}", driver =>
+            {
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
+
+                string lookupValue = string.Empty;
+                try
+                {
+                    if (fieldContainer.FindElements(By.TagName("input")).Any())
+                    {
+                        lookupValue = fieldContainer.FindElement(By.TagName("input")).GetAttribute("value");
+                    }
+                    else if (fieldContainer.FindElements(By.XPath(".//label")).Any())
+                    {
+                        var label = fieldContainer.FindElement(By.XPath(".//label"));
+                        lookupValue = fieldContainer.FindElement(By.XPath(".//label")).GetAttribute("innerText");
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Field: {control.Name} Does not exist");
+                    }
+                }
+                catch (Exception exp)
+                {
+                    throw new InvalidOperationException($"Field: {control.Name} Does not exist", exp);
+                }
+
+                return lookupValue;
+            });
+        }
+
+        /// <summary>
+        /// Gets the value of a picklist.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
+        /// <example>xrmBrowser.Entity.GetValue(new OptionSet { Name = "preferredcontactmethodcode"}); </example>
+        internal BrowserCommandResult<string> GetValue(OptionSet option)
+        {
+            return this.Execute($"Get Value: {option.Name}", driver =>
+            {
+                var text = string.Empty;
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
+
+                if (fieldContainer.FindElements(By.TagName("select")).Count > 0)
+                {
+                    var select = fieldContainer.FindElement(By.TagName("select"));
+                    var options = select.FindElements(By.TagName("option"));
+                    foreach (var op in options)
+                    {
+                        if (!op.Selected) continue;
+                        text = op.Text;
+                        break;
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+                }
+                return text;
+
             });
         }
 
@@ -2138,6 +2140,56 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new NotFoundException("Unable to find header on the form");
 
                 SetValue(control);
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> ClearValue(string fieldName)
+        {
+            return this.Execute(GetOptions($"Clear Field {fieldName}"), driver =>
+            {
+                SetValue(fieldName, String.Empty);
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> ClearValue(LookupItem control)
+        {
+            return this.Execute(GetOptions($"Clear Field {control.Name}"), driver =>
+            {
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
+
+                if (fieldContainer.FindElements(By.TagName("input")).Count == 0)
+                {
+                    var existingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", control.Name)));
+                    existingLookupValue.Hover(driver);
+
+                    var deleteExistingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
+                    deleteExistingLookupValue.Click();
+                }
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> ClearValue(OptionSet control)
+        {
+            return this.Execute(GetOptions($"Clear Field {control.Name}"), driver =>
+            {
+                control.Value = "-1";
+                SetValue(control);
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> ClearValue(MultiValueOptionSet control)
+        {
+            return this.Execute(GetOptions($"Clear Field {control.Name}"), driver =>
+            {
+                RemoveMultiOptions(control);
 
                 return true;
             });
@@ -3019,4 +3071,3 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
     }
 }
-
