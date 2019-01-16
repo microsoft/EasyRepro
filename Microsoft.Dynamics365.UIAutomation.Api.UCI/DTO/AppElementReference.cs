@@ -93,6 +93,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SubGridTitle = "Entity_SubGridTitle";
             public static string SubGridContents = "Entity_SubGridContents";
             public static string SubGridCells = "Entity_SubGridCells";
+            public static string SubGridRows = "Entity_SubGridRows";
+            public static string SubGridHeaders = "Entity_SubGridHeaders";
+            public static string SubGridRecordCheckbox = "Entity_SubGridRecordCheckbox";
             public static string FieldLookupButton = "Entity_FieldLookupButton";
             public static string SearchButtonIcon = "Entity_SearchButtonIcon";
             public static string EntityHeader = "Entity_Header";
@@ -277,7 +280,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Footer", "//div[contains(@id,'footerWrapper')]" },
             { "Entity_SubGridTitle", "//div[contains(text(), '[NAME]')]"},
             { "Entity_SubGridContents", "//div[contains(text(), '[NAME]')]/parent::div/parent::div/parent::div"},
-            { "Entity_SubGridCells","div[contains(@role,'gridcell')]"},
+            { "Entity_SubGridCells",".//div[contains(@role,'gridcell')]"},
+            { "Entity_SubGridRows",".//div[contains(@class,'wj-row')]"},
+            { "Entity_SubGridHeaders",".//div[contains(@class,'grid-header-text')]"},
+            { "Entity_SubGridRecordCheckbox","//div[contains(@data-id,'cell-[INDEX]-1')]"},
             { "Entity_FieldLookupButton","//button[contains(@data-id,'[NAME]_search')]" },
             { "Entity_SearchButtonIcon", "//span[contains(@data-id,'microsoftIcon_searchButton')]" },
             { "Entity_Header", "//div[contains(@data-id,'form-header')]"},

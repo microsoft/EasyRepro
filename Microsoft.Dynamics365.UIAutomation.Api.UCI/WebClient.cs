@@ -1930,38 +1930,90 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        /// <summary>
-        /// Opens the first record of a subgrid (if a record exists)
-        /// </summary>
-        /// <param name="subgridName">Label of the subgrid on the entity form</param>
-        internal BrowserCommandResult<bool> SelectSubgridLookup(string subgridName, bool openLookupPage = true)
+        internal BrowserCommandResult<List<GridItem>> GetSubGridItems(string subgridName)
         {
-            return this.Execute(GetOptions($"Set Lookup Value for Subgrid {subgridName}"), driver =>
+            return this.Execute(GetOptions($"Get Subgrid Items for Subgrid {subgridName}"), driver =>
             {
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridTitle].Replace("[NAME]", subgridName))))
-                    {
-                    //Find the grid using the grandparent of the label
-                    var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
+                List<GridItem> subGridRows = new List<GridItem>();
 
-                    //Find the rows
-                    var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Grid.Rows]));
-
-                    //Click the first row
-                    if (rows.Any(r => r.GetAttribute("aria-label").Equals("Data", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        var firstRecord = rows.First(r => r.GetAttribute("aria-label").Equals("Data", StringComparison.OrdinalIgnoreCase));
-                        var checkBoxField = firstRecord.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells])).FirstOrDefault();
-                        driver.DoubleClick(checkBoxField);
-
-                        driver.WaitForTransaction();
-                    }
-                    else
-                        throw new NotFoundException($"No rows found in {subgridName} subgrid");
-                }
-                else
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridTitle].Replace("[NAME]", subgridName))))
                     throw new NotFoundException($"{subgridName} subgrid not found. Subgrid names are case sensitive.  Please make sure casing is the same.");
 
+                //Find the subgrid contents
+                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
+
+                //Find the columns
+                List<string> columns = new List<string>();
+
+                var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeaders]));
+
+                foreach(IWebElement headerCell in headerCells)
+                {
+                    columns.Add(headerCell.Text);
+                }
+
+                //Find the rows
+                var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRows]));
+
+                //Process each row
+                foreach (IWebElement row in rows)
+                {
+                    List<string> cellValues = new List<string>();
+                    GridItem item = new GridItem();
+
+                    //Get the entityId and entity Type
+                    if (row.GetAttribute("data-lp-id") != null)
+                    {
+                        var rowAttributes = row.GetAttribute("data-lp-id").Split('|');
+                        item.Id = Guid.Parse(rowAttributes[3]);
+                        item.EntityName = rowAttributes[4];
+                    }
+
+                    var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
+
+                    if (cells.Count > 0)
+                    {
+                        foreach (IWebElement thisCell in cells)
+                            cellValues.Add(thisCell.Text);
+
+                        for(int i = 0; i < columns.Count; i++)
+                        {
+                            //The first cell is always a checkbox for the record.  Ignore the checkbox.
+                            item[columns[i]] = cellValues[i+1];
+                        }
+
+                        subGridRows.Add(item);
+                    }
+                }
+
+                return subGridRows;
+            });
+        }
+
+        internal BrowserCommandResult<bool> OpenSubGridRecord(string subgridName, int index = 0)
+        {
+            return this.Execute(GetOptions($"Open Subgrid record for subgrid { subgridName}"), driver =>
+            {
+                List<GridItem> rows = GetSubGridItems(subgridName);
+
+                //cell-0 is the checkbox for each record
+                var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString())));
+                driver.DoubleClick(checkBox);
+
+                driver.WaitForTransaction();
+
                 return true;
+
+            });
+        }
+
+        internal BrowserCommandResult<int> GetSubGridItemsCount(string subgridName)
+        {
+            return this.Execute(GetOptions($"Get Subgrid Items Count for subgrid { subgridName}"), driver =>
+            {
+                List<GridItem> rows = GetSubGridItems(subgridName);
+                return rows.Count;
+
             });
         }
 

@@ -120,7 +120,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.OpenRecord(0);
 
-                xrmApp.Entity.SelectSubgridLookup("CONTACTS");
+                xrmApp.Entity.GetSubGridItems("CONTACTS");
 
                 xrmApp.ThinkTime(3000);
             }
