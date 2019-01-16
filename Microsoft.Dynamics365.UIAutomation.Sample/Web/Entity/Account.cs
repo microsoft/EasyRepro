@@ -4,6 +4,7 @@
 namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
 
     [TestClass]
     public class TestAccount : TestBase
@@ -20,7 +21,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
         public void WEBTestCollapseTab()
         {
             if (!HasData) return;
-            XrmTestBrowser.Entity.CollapseTab("Summary");
+
+            var tabState = XrmTestBrowser.Entity.GetTabState("Summary");
+
+            if (tabState.Value != "Collapsed")
+                XrmTestBrowser.Entity.CollapseTab("Summary");
+
+
             XrmTestBrowser.ThinkTime(5000);
         }
 
@@ -69,8 +76,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
         public void WEBTestExpandTab()
         {
             if (!HasData) return;
-            XrmTestBrowser.Entity.CollapseTab("Summary");
-            XrmTestBrowser.Entity.ExpandTab("Summary");
+
+            var tabState = XrmTestBrowser.Entity.GetTabState("Scheduling");
+
+            if (tabState != "Expanded")
+                XrmTestBrowser.Entity.ExpandTab("Scheduling");
         }
 
         [TestMethod]
