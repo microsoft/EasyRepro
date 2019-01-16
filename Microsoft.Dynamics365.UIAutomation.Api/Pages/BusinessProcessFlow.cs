@@ -74,6 +74,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Hides the Business Process flow UI.
         /// </summary>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.BusinessProcessFlow.Hide();</example>
         public BrowserCommandResult<bool> Hide(int thinkTime = Constants.DefaultThinkTime)
         {
             this.Browser.ThinkTime(thinkTime);
@@ -377,7 +378,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="field">The field id or name.</param>
         /// <param name="date">DateTime value.</param>
-        /// <example> xrmBrowser.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
+        /// <example> xrmBrowser.BusinessProcessFlow.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
         public new BrowserCommandResult<bool> SetValue(string field, DateTime date)
         {
             //return this.Execute($"Set Value: {field}", SetValue, field, date);
