@@ -30,5 +30,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
             XrmTestBrowser.Entity.NavigateDown();
             XrmTestBrowser.ThinkTime(5000);
         }
+
+        [TestMethod]
+        public void WEBTestGetRecordGuid()
+        {
+            XrmTestBrowser.Grid.OpenRecord(0);
+            var recordGuid = XrmTestBrowser.Entity.GetRecordGuid().Value;
+            XrmTestBrowser.ThinkTime(5000);
+        }
     }
 }
