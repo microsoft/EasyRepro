@@ -45,6 +45,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool Headless { get; set; }
         public bool UserAgent { get; set; }
         public string UserAgentValue { get; set; }
+        public int DefaultThinkTime { get; set; }
 
         public virtual ChromeOptions ToChrome()
         {

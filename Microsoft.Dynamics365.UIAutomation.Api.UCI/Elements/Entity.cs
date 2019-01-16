@@ -174,5 +174,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.SetHeaderValue(control);
         }
+
+        public void ClearValue(string field)
+        {
+            _client.ClearValue(field);
+        }
+
+        public void ClearValue(LookupItem control)
+        {
+            _client.ClearValue(control);
+        }
+
+        public void ClearValue(OptionSet control)
+        {
+            _client.ClearValue(control);
+        }
+
+        public void ClearValue(MultiValueOptionSet control)
+        {
+            _client.ClearValue(control);
+        }
     }   
 }
