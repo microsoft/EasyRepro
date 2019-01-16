@@ -12,8 +12,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 {
     [TestClass]
     public class BusinessProcessFlow
-    {
-       
+    {       
         private readonly SecureString  _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
         private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
@@ -60,19 +59,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.ThinkTime(3000);
 
-                xrmBrowser.BusinessProcessFlow.PreviousStage();
+                xrmBrowser.BusinessProcessFlow.NextStage();
 
                 xrmBrowser.ThinkTime(3000);
 
-                xrmBrowser.BusinessProcessFlow.Hide();
-
-                xrmBrowser.ThinkTime(3000);
-
-                xrmBrowser.BusinessProcessFlow.SelectStage(0, 4000);
+                xrmBrowser.BusinessProcessFlow.Finish();
 
                 xrmBrowser.ThinkTime(3000);
             }
         }
+
         [TestMethod]
         public void WEBTestBusinessProcessFlowNextStage()
         {
@@ -91,6 +87,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
             }
         }
+
         [TestMethod]
         public void WEBTestBusinessProcessFlowPreviousStage()
         {
@@ -111,6 +108,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
             }
         }
+
         [TestMethod]
         public void WEBTestBusinessProcessFlowHide()
         {
@@ -150,7 +148,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
             }
         }
 
-
         [TestMethod]
         public void WEBTestBusinessProcessFlowSetActive()
         {
@@ -172,6 +169,99 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 xrmBrowser.BusinessProcessFlow.SetActive();
             }
         }
+
+        [TestMethod]
+        public void WEBTestLeadToOpportunityBPFSetValue()
+        {
+            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
+            {
+                xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
+
+                //xrmBrowser.GuidedHelp.CloseGuidedHelp(5000);
+
+                xrmBrowser.Navigation.OpenSubArea("Sales", "Leads");
+
+                xrmBrowser.Grid.SwitchView("Open Leads");
+
+                xrmBrowser.CommandBar.ClickCommand("New");
+
+                List<Field> fields = new List<Field>
+                {
+                    new Field() {Id = "firstname", Value = "Test"},
+                    new Field() {Id = "lastname", Value = "Lead"}
+                };
+
+                xrmBrowser.ThinkTime(2000);
+
+                xrmBrowser.Entity.SetValue("subject", "Test API Lead BPF");
+                xrmBrowser.Entity.SetValue(new CompositeControl() { Id = "fullname", Fields = fields });
+                xrmBrowser.Entity.SetValue("mobilephone", "555-555-5555");
+                xrmBrowser.Entity.SetValue("description", "Test lead creation with API commands");
+
+                xrmBrowser.ThinkTime(2000);
+
+                xrmBrowser.BusinessProcessFlow.SetValue(new LookupItem { Name = "parentaccountid", Value = "Adventure Works (sample)" });
+
+                xrmBrowser.ThinkTime(2000);
+
+                var lookupValue = xrmBrowser.BusinessProcessFlow.GetValue(new LookupItem { Name = "parentaccountid" });
+
+                // Set Value of a Textbox field in a Business Process Flow
+                xrmBrowser.BusinessProcessFlow.SetValue("Description", "Test description value in BPF");
+
+                xrmBrowser.ThinkTime(2000);
+
+                var textValue = xrmBrowser.BusinessProcessFlow.GetValue("description");
+
+                xrmBrowser.BusinessProcessFlow.SetValue(new OptionSet { Name = "purchaseprocess", Value = "Committee" });
+
+                xrmBrowser.ThinkTime(2000);
+
+                var optionValue = xrmBrowser.BusinessProcessFlow.GetValue(new OptionSet { Name = "purchaseprocess" });             
+
+                xrmBrowser.CommandBar.ClickCommand("Save");
+
+                xrmBrowser.ThinkTime(2000);
+
+                xrmBrowser.CommandBar.ClickCommand("Qualify");
+
+                xrmBrowser.Dialogs.QualifyLead(true, 4000);
+
+                xrmBrowser.ThinkTime(10000);
+
+                xrmBrowser.BusinessProcessFlow.PreviousStage();
+
+                xrmBrowser.ThinkTime(2000);
+
+                xrmBrowser.BusinessProcessFlow.NextStage(0,2000);
+
+                xrmBrowser.ThinkTime(2000);
+
+                // Set Value on a TwoOption field in a Business Process Flow
+                xrmBrowser.BusinessProcessFlow.SetValue("identifycustomercontacts", true);
+
+                xrmBrowser.ThinkTime(1000);
+
+                var checkBoxValue = xrmBrowser.BusinessProcessFlow.GetValue("identifycustomercontacts", true);
+
+                xrmBrowser.BusinessProcessFlow.NextStage();
+
+                xrmBrowser.ThinkTime(2000);
+
+                xrmBrowser.BusinessProcessFlow.NextStage();
+
+                xrmBrowser.ThinkTime(2000);
+
+                xrmBrowser.BusinessProcessFlow.SetValue("finaldecisiondate", DateTime.Parse("01/15/2019"));
+
+                xrmBrowser.BusinessProcessFlow.Finish();
+
+                xrmBrowser.BusinessProcessFlow.Hide();
+
+                xrmBrowser.ThinkTime(3000);
+            }
+        }
+
 
     }
 }

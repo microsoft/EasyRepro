@@ -341,7 +341,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click();
 
                     var dialogName = $"Dialog_{control.Name}_IMenu";
-                    var dialog = driver.FindElement(By.Id(dialogName));
+                    var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
 
                     var dialogItems = OpenDialog(dialog).Value;
 
@@ -978,7 +978,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click();
 
                     var dialogName = $"Dialog_{field}_IMenu";
-                    var dialog = driver.FindElement(By.Id(dialogName));
+                    var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
 
                     var dialogItems = OpenDialog(dialog).Value;
 
@@ -1015,7 +1015,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     lookupIcon.Click();
 
                     var dialogName = $"Dialog_{field}_IMenu";
-                    var dialog = driver.FindElement(By.Id(dialogName));
+                    var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
 
                     var dialogItems = OpenDialog(dialog).Value;
 
@@ -1065,7 +1065,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                         Browser.ThinkTime(1000);
                         var dialogName = $"Dialog_{field}_IMenu";
-                        var dialog = driver.FindElement(By.Id(dialogName));
+                        var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
 
                         var dialogItems = OpenDialog(dialog).Value;
 

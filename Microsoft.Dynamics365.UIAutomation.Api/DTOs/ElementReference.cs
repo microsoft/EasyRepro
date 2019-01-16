@@ -11,11 +11,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             //Business Process Flow
             { "BPF_NextStage"       , "id(\"stageAdvanceActionContainer\")/div"},
+            { "BPF_NextStageMenu"       , "id(\"stageNavigateActionContainer\")/div"},
+            { "BPF_NextStageMenuOptions"       , "//div[@class=\"navigateMenuSection\"]"},
             { "BPF_PreviousStage"   , "id(\"stageBackActionContainer\")/div"},
             { "BPF_Hide"            , "id(\"processControlCollapseButton\")" },
             { "BPF_SetActive"       , "id(\"stageSetActiveActionContainer\")" },
+            { "BPF_Finish"       , "id(\"stageFinishActionContainer\")" },
+            { "BPF_FinishedLabel"       , "//div[@class=\"finishLabelContainer\"]" },
             { "BPF_SelectStage"     , "id(\"stage_[STAGENUM]\")/div[2]/div/div/div/span" },
             { "BPF_Ok"     , "id(\"SwitchProcess-Select\")" },
+            { "BPF_TextFieldContainer"     , "//div[@id=\"header_process_[NAME]\"]" },
+            { "BPF_CheckboxFieldContainer"     , "//div[@id=\"header_process_[NAME]\"]" },
+            { "BPF_OptionSetFieldContainer"     , "//div[@id=\"header_process_[NAME]\"]" },
+            { "BPF_LookupFieldContainer"     , "//div[@id=\"header_process_[NAME]\"]" },
+            { "BPF_DateFieldContainer"     , "//div[@id=\"header_process_[NAME]\"]" },
 
             //Dialogs
             { "Dialog_Header"       , "id(\"dialogHeaderTitle\")"},
@@ -388,11 +397,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public static class BusinessProcessFlow
         {
             public static string NextStage = "BPF_NextStage";
+            public static string NextStageMenu = "BPF_NextStageMenu";
+            public static string NextStageMenuOptions = "BPF_NextStageMenuOptions";
             public static string PreviousStage = "BPF_PreviousStage";
             public static string Hide = "BPF_Hide";
             public static string SetActive = "BPF_SetActive";
+            public static string Finish = "BPF_Finish";
+            public static string FinishedLabel = "BPF_FinishedLabel";
             public static string SelectStage = "BPF_SelectStage";
             public static string Ok = "BPF_Ok";
+            public static string TextFieldContainer = "BPF_TextFieldContainer";
+            public static string CheckboxFieldContainer = "BPF_CheckboxFieldContainer";
+            public static string OptionSetFieldContainer = "BPF_OptionSetFieldContainer";
+            public static string LookupFieldContainer = "BPF_LookupFieldContainer";
+            public static string DateFieldContainer = "BPF_DateFieldContainer";
         }
 
         public static class Dialogs
