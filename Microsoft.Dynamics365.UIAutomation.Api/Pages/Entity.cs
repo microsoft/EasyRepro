@@ -199,6 +199,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
+        /// Returns the state of the tab, either Expanded or Collapsed. 
+        /// </summary>
+        /// <param name="name">The name of the tab.</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Entity.GetTabState("Details");</example>
+        public BrowserCommandResult<string> GetTabState(string name, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"SelectTab: {name}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
+                {
+                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
+                }
+                var tab = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name)));
+                var tabState = "";
+
+                if (!tab.GetAttribute("title").Contains("Collapse"))
+                    tabState = "Collapsed";
+                else if (!tab.GetAttribute("title").Contains("Expand"))
+                    tabState = "Expanded";
+                else
+                    throw new InvalidOperationException("Unexpected tab state. Tab state should be either Collapsed or Expanded");
+
+                return tabState;
+            });
+        }
+
+        /// <summary>
         /// Collapses the Tab on a CRM Entity form.
         /// </summary>
         /// <param name="name">The name of the Tab.</param>
