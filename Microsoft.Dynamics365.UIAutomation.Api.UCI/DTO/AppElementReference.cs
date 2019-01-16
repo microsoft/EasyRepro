@@ -283,7 +283,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SubGridCells",".//div[contains(@role,'gridcell')]"},
             { "Entity_SubGridRows",".//div[contains(@class,'wj-row')]"},
             { "Entity_SubGridHeaders",".//div[contains(@class,'grid-header-text')]"},
-            { "Entity_SubGridRecordCheckbox","//div[contains(@data-id,'cell-[INDEX]-1')]"},
+            { "Entity_SubGridRecordCheckbox","//div[contains(@data-id,'cell-[INDEX]-1') and contains(@data-lp-id,'[NAME]')]"},
             { "Entity_FieldLookupButton","//button[contains(@data-id,'[NAME]_search')]" },
             { "Entity_SearchButtonIcon", "//span[contains(@data-id,'microsoftIcon_searchButton')]" },
             { "Entity_Header", "//div[contains(@data-id,'form-header')]"},

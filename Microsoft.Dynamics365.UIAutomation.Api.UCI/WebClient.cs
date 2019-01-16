@@ -1994,16 +1994,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Open Subgrid record for subgrid { subgridName}"), driver =>
             {
-                List<GridItem> rows = GetSubGridItems(subgridName);
+                //Find the Grid
+                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
+
+                //Get the GridName
+                string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_",String.Empty);
 
                 //cell-0 is the checkbox for each record
-                var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString())));
+                var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
+
                 driver.DoubleClick(checkBox);
 
                 driver.WaitForTransaction();
 
                 return true;
-
             });
         }
 
