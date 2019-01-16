@@ -177,7 +177,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
             {
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
 
-                xrmBrowser.GuidedHelp.CloseGuidedHelp(5000);
+                //xrmBrowser.GuidedHelp.CloseGuidedHelp(5000);
 
                 xrmBrowser.Navigation.OpenSubArea("Sales", "Leads");
 
@@ -204,12 +204,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.ThinkTime(2000);
 
+                var lookupValue = xrmBrowser.BusinessProcessFlow.GetValue(new LookupItem { Name = "parentaccountid" });
+
                 // Set Value of a Textbox field in a Business Process Flow
                 xrmBrowser.BusinessProcessFlow.SetValue("Description", "Test description value in BPF");
 
                 xrmBrowser.ThinkTime(2000);
 
+                var textValue = xrmBrowser.BusinessProcessFlow.GetValue("description");
+
                 xrmBrowser.BusinessProcessFlow.SetValue(new OptionSet { Name = "purchaseprocess", Value = "Committee" });
+
+                xrmBrowser.ThinkTime(2000);
+
+                var optionValue = xrmBrowser.BusinessProcessFlow.GetValue(new OptionSet { Name = "purchaseprocess" });             
 
                 xrmBrowser.CommandBar.ClickCommand("Save");
 
@@ -224,9 +232,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 // Set Value on a TwoOption field in a Business Process Flow
                 xrmBrowser.BusinessProcessFlow.SetValue("identifycustomercontacts", true);
 
-                xrmBrowser.BusinessProcessFlow.NextStage();
+                xrmBrowser.ThinkTime(1000);
 
-                xrmBrowser.BusinessProcessFlow.SetValue()
+                var checkBoxValue = xrmBrowser.BusinessProcessFlow.GetValue("identifycustomercontacts", true);
+
+                xrmBrowser.BusinessProcessFlow.NextStage();
 
                 xrmBrowser.ThinkTime(2000);
 

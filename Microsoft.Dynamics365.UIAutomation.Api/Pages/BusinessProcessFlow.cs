@@ -255,7 +255,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmBrowser.BusinessProcessFlow.SetValue("creditonhold",true);</example>
         public new BrowserCommandResult<bool> SetValue(string field, bool check)
         {
-            //return this.Execute($"Set Value: {field}", SetValue, field, check);
             return this.Execute(GetOptions($"Set Checkbox/TwoOption Value for BPF: {field}"), driver =>
             {
                 if (driver.HasElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.CheckboxFieldContainer].Replace("[NAME]", field.ToLower()))))
@@ -343,9 +342,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     lookupInput.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click(true);
 
                     var dialogName = $"Dialog_header_process_{control.Name}_IMenu";
-                    var dialog = driver.FindElement(By.Id(dialogName));
+
+                    var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
 
                     var dialogItems = OpenDialog(dialog).Value;
+
 
                     if (control.Value != null)
                     {
@@ -354,7 +355,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                             throw new InvalidOperationException($"List does not contain value {control.Value}.");
 
                         var dialogItem = dialogItems.Where(x => x.Title.ToLower() == control.Value.ToLower()).First();
+
+                        dialogItem.Element.Hover(driver,true);
                         dialogItem.Element.Click(true);
+
 
                     }
                     else
@@ -363,7 +367,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                             throw new InvalidOperationException($"List does not have {control.Index + 1} items.");
 
                         var dialogItem = dialogItems[control.Index];
+
+                        dialogItem.Element.Hover(driver, true);
                         dialogItem.Element.Click(true);
+
                     }
                 }
                 else
@@ -549,6 +556,214 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     throw new InvalidOperationException($"Field: {field} Does not exist");
                 */
                 return true;
+            });
+        }
+
+        /// <summary>
+        /// Gets the value of a Text/Description field in a Business Process Flow.
+        /// </summary>
+        /// <param name="field">The field id.</param>
+        /// <returns>The value</returns>
+        /// <example>xrmBrowser.BusinessProcessFlow.GetValue("mobilephone");</example>
+        public new BrowserCommandResult<string> GetValue(string field)
+        {
+            return this.Execute($"Get Text Field Value from BPF: {field}", driver =>
+            {
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.TextFieldContainer].Replace("[NAME]", field.ToLower())));
+
+                string text = string.Empty;
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.TextFieldContainer].Replace("[NAME]", field.ToLower()))))
+                {
+                    var fieldElement = driver.FindElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.TextFieldContainer].Replace("[NAME]", field.ToLower())));
+
+                    if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
+                    {
+                        text = fieldElement.FindElement(By.TagName("textarea")).GetAttribute("value");
+                    }
+                    else
+                    {
+                        text = fieldElement.FindElement(By.TagName("input")).GetAttribute("value");
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Unable to locate field '{field}' in the Business Process Flow. Please verify the field exists and try again.");
+
+                return text;
+            });
+        }
+
+        /// <summary>
+        /// Placeholder: Gets the value of a Field.
+        /// </summary>
+        /// <param name="field">The field .</param>
+        /// <returns>The value</returns>
+        public new BrowserCommandResult<string> GetValue(Field field)
+        {
+            return this.Execute($"Get Value: {field.Name}", driver =>
+            {
+                var text = string.Empty;
+
+                /*
+                driver.WaitUntilVisible(By.Id(field.Id));
+
+                if (driver.HasElement(By.Id(field.Id)))
+                {
+                    var fieldElement = driver.ClickWhenAvailable(By.Id(field.Id));
+
+                    //Check to see if focus is on field already
+                    if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
+                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
+                    else
+                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
+
+
+                    if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
+                    {
+                        fieldElement.FindElement(By.TagName("textarea")).GetAttribute("value");
+                    }
+                    else
+                    {
+                        fieldElement.FindElement(By.TagName("input")).GetAttribute("value");
+                    }
+
+                }
+                else
+                    throw new InvalidOperationException($"Field: {field} Does not exist");
+                */
+                return text;
+            });
+        }
+
+        /// <summary>
+        /// Placeholder: CompositeControls are not currently supported in BPFs.
+        /// </summary>
+        /// <param name="control">The Composite control values you want to set.</param>
+        /// <example>xrmBrowser.BusinessProcessFlow.GetValue(new CompositeControl() { Id = "fullname", Fields = fields });</example>
+        public new BrowserCommandResult<string> GetValue(CompositeControl control)
+        {
+            return this.Execute($"Get Conposite Control Value: {control.Id}", driver =>
+            {
+                string text = string.Empty;
+
+                /*
+                driver.WaitUntilVisible(By.Id(control.Id));
+
+                driver.ClickWhenAvailable(By.Id(control.Id));
+
+                if (driver.HasElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut])))
+                {
+                    var compcntrl =
+                        driver.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut]));
+
+                    foreach (var field in control.Fields)
+                    {
+                        compcntrl.FindElement(By.Id(Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
+
+                        var result = compcntrl.FindElements(By.TagName("input"))
+                            .ToList()
+                            .FirstOrDefault(i => i.GetAttribute("id").Contains(field.Id));
+                        text += result.GetAttribute("value");
+                    }
+
+                    compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.Confirm])).Click();
+                }
+                else
+                    throw new InvalidOperationException($"Composite Control: {control.Id} Does not exist");
+                */
+                return text;
+            });
+        }
+
+        /// <summary>
+        /// Gets the value of an option set / picklist in a Business Process Flow.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
+        /// <example>xrmBrowser.BusinessProcessFlow.GetValue(new OptionSet { Name = "preferredcontactmethodcode"}); </example>
+        public new BrowserCommandResult<string> GetValue(OptionSet option)
+        {
+            return this.Execute($"Get OptionSet Value for BPF: {option.Name}", driver =>
+            {
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.OptionSetFieldContainer].Replace("[NAME]", option.Name.ToLower())));
+
+                string text = string.Empty;
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.OptionSetFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
+                {
+                    var input = driver.FindElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.OptionSetFieldContainer].Replace("[NAME]", option.Name.ToLower())));
+                    text = input.Text;
+                }
+                else
+                    throw new InvalidOperationException($"Unable to locate OptionSet '{option.Name}' in the Business Process Flow. Please verify the OptionSet exists and try again.");
+
+                return text;
+            });
+        }
+
+        /// <summary>
+        /// Gets the value of a Lookup in a Business Process Flow.
+        /// </summary>
+        /// <param name="control">The lookup field name, value or index of the lookup.</param>
+        /// <example>xrmBrowser.BusinessProcessFlow.GetValue(new Lookup { Name = "primarycontactid" });</example>
+        public new BrowserCommandResult<string> GetValue(LookupItem control)
+        {
+            return this.Execute($"Get Lookup Value in BPF: {control.Name}", driver =>
+            {
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.LookupFieldContainer].Replace("[NAME]", control.Name.ToLower())));
+
+                string lookupValue = string.Empty;
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.LookupFieldContainer].Replace("[NAME]", control.Name.ToLower()))))
+                {
+                    var input = driver.FindElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.LookupFieldContainer].Replace("[NAME]", control.Name.ToLower())));
+                    lookupValue = input.Text;
+                }
+                else
+                    throw new InvalidOperationException($"Unable to locate Lookup '{control.Name}' in the Business Process Flow. Please verify the Lookup exists and try again.");
+
+                return lookupValue;
+            });
+        }
+
+        /// <summary>
+        /// Gets the value of a Checkbox/TwoOption field in a Business Process Flow.
+        /// </summary>
+        /// <param name="field">Field schema name</param>
+        /// <param name="check">If set to <c>true</c> [check].</param>
+        /// <example>xrmBrowser.BusinessProcessFlow.GetValue("creditonhold",true);</example>
+        public new BrowserCommandResult<bool> GetValue(string field, bool check)
+        {
+
+            return this.Execute(GetOptions($"Get Checkbox/TwoOption Value for BPF: {field}"), driver =>
+            {
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.CheckboxFieldContainer].Replace("[NAME]", field.ToLower()))))
+                {
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.CheckboxFieldContainer].Replace("[NAME]", field.ToLower())));
+                    var select = fieldElement;
+                    var text = "";
+
+                    if (fieldElement.FindElements(By.TagName("label")).Count > 0)
+                    {
+                        var label = fieldElement.FindElement(By.TagName("label"));                    
+                        text = label.Text;
+                    }
+
+                    if (fieldElement.TagName != "select")
+                        select = fieldElement.FindElement(By.TagName("select"));
+
+                    var options = select.FindElements(By.TagName("option"));
+
+                    foreach (var op in options)
+                    {
+                        if (op.Text.ToLower() == text.ToLower() || op.GetAttribute("title").ToLower() == text.ToLower())
+                        {
+                            var value = Convert.ToInt32(op.GetAttribute("value"));
+
+                            check = Convert.ToBoolean(value);
+                        }
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Unable to locate field '{field}' in the Business Process Flow. Please verify the field exists and try again.");
+
+                return check;
             });
         }
 
