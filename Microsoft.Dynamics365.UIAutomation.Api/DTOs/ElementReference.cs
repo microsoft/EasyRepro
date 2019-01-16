@@ -11,6 +11,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             //Business Process Flow
             { "BPF_NextStage"       , "id(\"stageAdvanceActionContainer\")/div"},
+            { "BPF_NextStageMenu"       , "id(\"stageNavigateActionContainer\")/div"},
+            { "BPF_NextStageMenuOptions"       , "//div[@class=\"navigateMenuSection\"]"},
             { "BPF_PreviousStage"   , "id(\"stageBackActionContainer\")/div"},
             { "BPF_Hide"            , "id(\"processControlCollapseButton\")" },
             { "BPF_SetActive"       , "id(\"stageSetActiveActionContainer\")" },
@@ -395,6 +397,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public static class BusinessProcessFlow
         {
             public static string NextStage = "BPF_NextStage";
+            public static string NextStageMenu = "BPF_NextStageMenu";
+            public static string NextStageMenuOptions = "BPF_NextStageMenuOptions";
             public static string PreviousStage = "BPF_PreviousStage";
             public static string Hide = "BPF_Hide";
             public static string SetActive = "BPF_SetActive";

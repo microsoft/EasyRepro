@@ -229,6 +229,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.ThinkTime(10000);
 
+                xrmBrowser.BusinessProcessFlow.PreviousStage();
+
+                xrmBrowser.ThinkTime(2000);
+
+                xrmBrowser.BusinessProcessFlow.NextStage(0,2000);
+
+                xrmBrowser.ThinkTime(2000);
+
                 // Set Value on a TwoOption field in a Business Process Flow
                 xrmBrowser.BusinessProcessFlow.SetValue("identifycustomercontacts", true);
 
@@ -248,6 +256,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.BusinessProcessFlow.Finish();
 
+                xrmBrowser.BusinessProcessFlow.Hide();
 
                 xrmBrowser.ThinkTime(3000);
             }

@@ -4,6 +4,7 @@
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
@@ -42,6 +43,43 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     throw new Exception("Business Process Flow Next Stage Element is not enabled");
 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.NextStage]));
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Moves to the Next stage in the Business Process Flow.
+        /// Useful when the 'Next Stage' button prompts to choose an entity value
+        /// </summary>
+        /// <param name="index">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.BusinessProcessFlow.NextStage();</example>
+        public BrowserCommandResult<bool> NextStage([System.ComponentModel.DataAnnotations.Range(0, 9)]int index, int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute("Next Stage", driver =>
+            {
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.NextStageMenu])))
+                    throw new Exception("Business Process Flow Next Stage Element does not exist");
+
+                if (driver.FindElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.NextStageMenu])).GetAttribute("class").Contains("disabled"))
+                    throw new Exception("Business Process Flow Next Stage Element is not enabled");
+
+                driver.FindElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.NextStageMenu])).Click(true);
+
+                //div class=navigateMenuSection
+
+                var recordMenu = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.NextStageMenuOptions]));
+
+                var records = NextStageGetRecords(recordMenu).Value;
+
+                if (records.Count < index)
+                    throw new InvalidOperationException($"Next Stage Record List does not have {index + 1} items.");
+
+                var recordItem = records[index];
+                recordItem.Element.Click(true);
 
                 return true;
             });
@@ -767,5 +805,30 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
+        /// <summary>
+        /// Gets records from the BPF Next Stage Menu
+        /// </summary>
+        /// <param name="dialog"></param>
+        internal BrowserCommandResult<List<ListItem>> NextStageGetRecords(IWebElement dialog)
+        {
+            var list = new List<ListItem>();
+            var dialogItems = dialog.FindElements(By.TagName("div"));
+
+            foreach (var dialogItem in dialogItems)
+            {
+                if (dialogItem.GetAttribute("class") != null && dialogItem.GetAttribute("class").Contains("navigateMenuItem"))
+                {
+                        var title = dialogItem.Text;
+
+                        list.Add(new ListItem()
+                        {
+                            Title = title,
+                            Element = dialogItem
+                        });                    
+                }
+            }
+
+            return list;
+        }
     }
 }
