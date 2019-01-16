@@ -511,5 +511,46 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
+        /// <summary>
+        /// Placeholder: Sets the value of a Field.
+        /// </summary>
+        /// <param name="field">The field .</param>
+        public new BrowserCommandResult<bool> SetValue(Field field)
+        {
+            return this.Execute(GetOptions($"Set Value: {field.Name}"), driver =>
+            {
+                /*
+                driver.WaitUntilVisible(By.Id(field.Id));
+
+                if (driver.HasElement(By.Id(field.Id)))
+                {
+                    var fieldElement = driver.ClickWhenAvailable(By.Id(field.Id));
+
+                    //Check to see if focus is on field already
+                    if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
+                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
+                    else
+                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
+
+
+                    if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
+                    {
+                        fieldElement.FindElement(By.TagName("textarea")).Clear();
+                        fieldElement.FindElement(By.TagName("textarea")).SendKeys(field.Value);
+                    }
+                    else
+                    {
+                        fieldElement.FindElement(By.TagName("input")).Clear();
+                        fieldElement.FindElement(By.TagName("input")).SendKeys(field.Value);
+                    }
+
+                }
+                else
+                    throw new InvalidOperationException($"Field: {field} Does not exist");
+                */
+                return true;
+            });
+        }
+
     }
 }

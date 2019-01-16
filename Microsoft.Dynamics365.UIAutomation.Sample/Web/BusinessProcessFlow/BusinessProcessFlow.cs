@@ -226,6 +226,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.BusinessProcessFlow.NextStage();
 
+                xrmBrowser.BusinessProcessFlow.SetValue()
+
                 xrmBrowser.ThinkTime(2000);
 
                 xrmBrowser.BusinessProcessFlow.NextStage();
