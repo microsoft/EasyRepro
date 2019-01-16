@@ -81,6 +81,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
             if (tabState != "Expanded")
                 XrmTestBrowser.Entity.ExpandTab("Scheduling");
+
+            XrmTestBrowser.ThinkTime(5000);
         }
 
         [TestMethod]
