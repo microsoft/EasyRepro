@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -74,14 +75,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.Save();
             _client.HandleSaveDialog();
         }
+
         public void Delete()
         {
             _client.Delete();
         }
+
         public void Assign(string userOrTeam)
         {
             _client.Assign(userOrTeam);
         }
+
         public void SwitchProcess(string processToSwitchTo)
         {
             _client.SwitchProcess(processToSwitchTo);
@@ -111,13 +115,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.GetObjectId();
         }
 
-        /// <summary>
-        /// Opens the first record of a subgrid (if a record exists)
-        /// </summary>
-        /// <param name="subgridName">Label of the subgrid on the entity form</param>
-        public void SelectSubgridLookup(string subgridName, bool openLookupPage = true)
+        public List<GridItem> GetSubGridItems(string subgridName)
         {
-            _client.SelectSubgridLookup(subgridName, openLookupPage);
+            return _client.GetSubGridItems(subgridName);
+        }
+
+        public void OpenSubGridRecord(string subgridName, int index = 0)
+        {
+            _client.OpenSubGridRecord(subgridName, index);
+        }
+
+        public int GetSubGridItemsCount(string subgridName)
+        {
+            return _client.GetSubGridItemsCount(subgridName);
         }
 
         public void SelectLookup(LookupItem control)

@@ -6,6 +6,7 @@ using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Security;
+using System.Collections.Generic;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
@@ -81,9 +82,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.OpenRecord(0);
 
-                xrmApp.Entity.SelectSubgridLookup("RECENT OPPORTUNITIES");
+                List<GridItem> rows = xrmApp.Entity.GetSubGridItems("RECENT OPPORTUNITIES");
 
-                xrmApp.ThinkTime(3000);
+                int rowCount = xrmApp.Entity.GetSubGridItemsCount("RECENT CASES");
+
+                xrmApp.Entity.OpenSubGridRecord("RECENT OPPORTUNITIES", 0);
+
+                xrmApp.ThinkTime(500);
             }
         }
 
