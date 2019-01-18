@@ -5,6 +5,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 {
     using Microsoft.Dynamics365.UIAutomation.Api;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
 
     [TestClass]
     public class Entity : TestBase
@@ -37,6 +41,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
         {
             XrmTestBrowser.Grid.OpenRecord(0);
             var recordGuid = XrmTestBrowser.Entity.GetRecordGuid().Value;
+            XrmTestBrowser.ThinkTime(5000);
+        }
+
+        [TestMethod]
+        public void WEBTestSetGetClearCompositeValues()
+        {
+            XrmTestBrowser.CommandBar.ClickCommand("New");
+
+            List<Field> fields = new List<Field>
+                {
+                    new Field() {Id = "firstname", Value = "EasyRepro"},
+                    new Field() {Id = "lastname", Value = "Entity Test"}
+                };
+
+            XrmTestBrowser.Entity.SetValue(new CompositeControl { Id = "fullname", Fields = fields}); //Composite Field
+            var fullNameValue = XrmTestBrowser.Entity.GetValue(new CompositeControl { Id = "fullname", Fields = fields }).Value; //Composite Field
+            var fullNameTest = string.Join(" ", fields.Select(x => x.Value).ToArray());
+            Assert.IsTrue(fullNameValue.Equals(fullNameTest));
+            
+            // The code below is an example of using ClearValue on a CompositeControl 
+            // In this example, one of the fields is required and as a result we cannot clear the composite field.
+            // Throw exception on the test to alert this issue
+
+            // XrmTestBrowser.Entity.ClearValue(new CompositeControl { Id = "fullname", Fields = fields }); //Composite Required Field Example --> EXCEPTION
+
             XrmTestBrowser.ThinkTime(5000);
         }
 

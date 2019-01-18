@@ -543,16 +543,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (driver.HasElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut])))
                 {
                     var compcntrl =
-                        driver.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut]));
+                        driver.WaitUntilAvailable(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut]));
 
                     foreach (var field in control.Fields)
                     {
-                        compcntrl.FindElement(By.Id(Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
+                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click(true);
 
                         var result = compcntrl.FindElements(By.TagName("input"))
                             .ToList()
                             .FirstOrDefault(i => i.GetAttribute("id").Contains(field.Id));
-                        text += result.GetAttribute("value");
+                        text += result.GetAttribute("value") + " ";
                     }
 
                     compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.Confirm])).Click();
@@ -560,7 +560,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 else
                     throw new InvalidOperationException($"Composite Control: {control.Id} Does not exist");
 
-                return text;
+                return text.TrimEnd(' ');
             });
         }
 
@@ -939,8 +939,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public BrowserCommandResult<bool> ClearValue(CompositeControl control)
         {
             return this.Execute(GetOptions($"Clear Conposite Control Value: {control.Id}"), driver =>
-            {
-                /*
+            {                
                 driver.WaitUntilVisible(By.Id(control.Id));
 
                 if (!driver.HasElement(By.Id(control.Id)))
@@ -955,23 +954,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     foreach (var field in control.Fields)
                     {
-                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
+                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click(true);
 
                         var result = compcntrl.FindElements(By.TagName("input"))
                             .ToList()
                             .FirstOrDefault(i => i.GetAttribute("id").Contains(field.Id));
 
-                        //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
-                        driver.ExecuteScript("document.getElementById('" + result?.GetAttribute("id") + "').value = ''");
-                        result?.SendKeys(field.Value);
+                        result?.Clear();
+                        result?.SendKeys(Keys.Tab);
+
+                        if (compcntrl.IsVisible(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id + "_warnSpan")))
+                        {
+                            throw new InvalidOperationException($"The field {field.Id} has displayed a warning and cannot be cleared.");
+                        }
                     }
 
                     compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.Confirm])).Click();
+
                 }
                 else
                     throw new InvalidOperationException($"Composite Control: {control.Id} Does not exist");
-
-                */
+                
                 return true;
             });
         }
