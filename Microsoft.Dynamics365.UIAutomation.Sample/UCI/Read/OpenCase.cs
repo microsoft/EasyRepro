@@ -63,6 +63,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Service", "Cases");
 
+                xrmApp.Grid.SwitchView("Active Cases");
+
                 xrmApp.Grid.OpenRecord(0);
 
                 LookupItem ownerId = new LookupItem() { Name = "ownerid" };

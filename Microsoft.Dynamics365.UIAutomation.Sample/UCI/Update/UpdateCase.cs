@@ -29,6 +29,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Service", "Cases");
 
+                xrmApp.Grid.SwitchView("Active Cases");
+
                 xrmApp.Grid.OpenRecord(0);
 
                 xrmApp.Entity.SetValue("description", TestSettings.GetRandomString(10,15));
@@ -50,6 +52,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
                 xrmApp.Navigation.OpenSubArea("Service", "Cases");
+
+                xrmApp.Grid.SwitchView("Active Cases");
 
                 xrmApp.RelatedGrid.OpenGridRow(0);
 

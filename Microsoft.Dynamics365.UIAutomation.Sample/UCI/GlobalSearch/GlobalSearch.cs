@@ -30,9 +30,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.GlobalSearch.Search("Test");
 
-                xrmApp.GlobalSearch.FilterWith("Activity");
+                xrmApp.GlobalSearch.FilterWith("Account");
 
-                 xrmApp.GlobalSearch.OpenRecord("activitypointer", 0);
+                 xrmApp.GlobalSearch.OpenRecord("account", 0);
             }
         }
     }
