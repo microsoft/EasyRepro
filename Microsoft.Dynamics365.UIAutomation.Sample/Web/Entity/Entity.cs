@@ -38,5 +38,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
             var recordGuid = XrmTestBrowser.Entity.GetRecordGuid().Value;
             XrmTestBrowser.ThinkTime(5000);
         }
+
+        [TestMethod]
+        public void WEBTestClearRecordValues()
+        {
+            XrmTestBrowser.Grid.OpenRecord(0);
+
+            //XrmTestBrowser.Entity.SetValue("") //Text Field
+            //XrmTestBrowser.Entity.ClearValue(""); //Text field
+
+            XrmTestBrowser.ThinkTime(5000);
+        }
     }
 }
