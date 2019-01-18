@@ -95,7 +95,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example> xrmBrowser.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
         public BrowserCommandResult<bool> SetValue(string field, DateTime date)
         {
-            //return this.Execute($"Set Value: {field}", SetValue, field, date);
             return this.Execute(GetOptions($"Set Value: {field}"), driver =>
             {
                 if (driver.HasElement(By.Id(field)))
@@ -138,7 +137,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example> xrmBrowser.Entity.SetValue(new DateTimeControl { Name = "birthdate", Value =  DateTime.Parse("11/1/1980")});</example>
         public BrowserCommandResult<bool> SetValue(DateTimeControl date)
         {
-            //return this.Execute($"Set Value: {field}", SetValue, field, date);
             return this.Execute(GetOptions($"Set DateTime Value: {date.Name}"), driver =>
             {
                 if (driver.HasElement(By.Id(date.Name)))
@@ -181,8 +179,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmBrowser.Entity.SetValue("name", "Test API Account");</example>
         public BrowserCommandResult<bool> SetValue(string field, string value)
         {
-            //return this.Execute($"Set Value: {field}", SetValue, field, value);
-            var returnval = this.Execute(GetOptions($"Set Value: {field}"), driver =>
+            var returnval = this.Execute(GetOptions($"Set Text Field Value: {field}"), driver =>
             {
                 if (driver.HasElement(By.Id(field)))
                 {
@@ -235,53 +232,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Sets the value of a Field on an Entity form.
-        /// </summary>
-        /// <param name="field">The field .</param>
-        public BrowserCommandResult<bool> SetValue(Field field)
-        {
-            return this.Execute(GetOptions($"Set Value: {field.Name}"), driver =>
-            {
-                driver.WaitUntilVisible(By.Id(field.Id));
-
-                if (driver.HasElement(By.Id(field.Id)))
-                {
-                    var fieldElement = driver.ClickWhenAvailable(By.Id(field.Id));
-
-                    //Check to see if focus is on field already
-                    if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
-                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
-                    else
-                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
-
-
-                    if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
-                    {
-                        fieldElement.FindElement(By.TagName("textarea")).Clear();
-                        fieldElement.FindElement(By.TagName("textarea")).SendKeys(field.Value);
-                    }
-                    else
-                    {
-                        fieldElement.FindElement(By.TagName("input")).Clear();
-                        fieldElement.FindElement(By.TagName("input")).SendKeys(field.Value);
-                    }
-
-                }
-                else
-                    throw new InvalidOperationException($"Field: {field} Does not exist");
-
-                return true;
-            });
-        }
-
-        /// <summary>
         /// Sets the value of a picklist on an Entity form.
         /// </summary>
         /// <param name="option">The option you want to set.</param>
         /// <example>xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
         public BrowserCommandResult<bool> SetValue(OptionSet option)
         {
-            return this.Execute(GetOptions($"Set Value: {option.Name}"), driver =>
+            return this.Execute(GetOptions($"Set OptionSet Value: {option.Name}"), driver =>
             {
                 driver.WaitUntilVisible(By.Id(option.Name));
 
@@ -312,10 +269,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Sets the value of a multi-value picklist on an Entity form.
         /// </summary>
         /// <param name="option">The option you want to set.</param>
-        /// <example>xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
+        /// <example>xrmBrowser.Entity.SetValue(new MultiValueOptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
         public BrowserCommandResult<bool> SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
-            return this.Execute(GetOptions($"Set Value: {option.Name}"), driver =>
+            return this.Execute(GetOptions($"Set MultiValueOptionSet Value: {option.Name}"), driver =>
             {
                 driver.WaitUntilVisible(By.Id(option.Name));
 
@@ -358,10 +315,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Sets the value of a Composite control on an Entity form.
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
-        /// <example>xrmBrowser.Entity.SetValue(new CompositeControl() {Id = "fullname", Fields = fields});</example>
+        /// <example>xrmBrowser.Entity.SetValue(new CompositeControl {Id = "fullname", Fields = fields});</example>
         public BrowserCommandResult<bool> SetValue(CompositeControl control)
         {
-            return this.Execute(GetOptions($"Set Conposite Control Value: {control.Id}"), driver =>
+            return this.Execute(GetOptions($"Set ConpositeControl Value: {control.Id}"), driver =>
             {
                 driver.WaitUntilVisible(By.Id(control.Id));
 
@@ -401,7 +358,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Sets the value of a Lookup on an Entity form.
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
-        /// <example>xrmBrowser.Entity.SetValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
+        /// <example>xrmBrowser.Entity.SetValue(new Lookup { Name = "primarycontactid", Value = "Rene Valdes (sample)" });</example>
         public BrowserCommandResult<bool> SetValue(LookupItem control)
         {
             return this.Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
@@ -457,7 +414,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmBrowser.Entity.GetValue("mobilephone");</example>
         public BrowserCommandResult<string> GetValue(string field)
         {
-            return this.Execute($"Get Value: {field}", driver =>
+            return this.Execute($"Get Text Field Value: {field}", driver =>
             {
                 driver.WaitUntilVisible(By.Id(field));
 
@@ -485,54 +442,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Gets the value of a Field on an Entity form.
-        /// </summary>
-        /// <param name="field">The field .</param>
-        /// <returns>The value</returns>
-        public BrowserCommandResult<bool> GetValue(Field field)
-        {
-            return this.Execute($"Get Value: {field.Name}", driver =>
-            {
-                var text = string.Empty;
-
-                driver.WaitUntilVisible(By.Id(field.Id));
-
-                if (driver.HasElement(By.Id(field.Id)))
-                {
-                    var fieldElement = driver.ClickWhenAvailable(By.Id(field.Id));
-
-                    //Check to see if focus is on field already
-                    if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
-                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
-                    else
-                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
-
-
-                    if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
-                    {
-                        fieldElement.FindElement(By.TagName("textarea")).GetAttribute("value");
-                    }
-                    else
-                    {
-                        fieldElement.FindElement(By.TagName("input")).GetAttribute("value");
-                    }
-
-                }
-                else
-                    throw new InvalidOperationException($"Field: {field} Does not exist");
-
-                return true;
-            });
-        }
-
-        /// <summary>
         /// Gets the value of a Composite control.
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
-        /// <example>xrmBrowser.Entity.GetValue(new CompositeControl() { Id = "fullname", Fields = fields });</example>
+        /// <example>xrmBrowser.Entity.GetValue(new CompositeControl { Id = "fullname", Fields = fields });</example>
         public BrowserCommandResult<string> GetValue(CompositeControl control)
         {
-            return this.Execute($"Get Conposite Control Value: {control.Id}", driver =>
+            return this.Execute($"Get ConpositeControl Value: {control.Id}", driver =>
             {
                 string text = string.Empty;
 
@@ -571,7 +487,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmBrowser.Entity.GetValue(new OptionSet { Name = "preferredcontactmethodcode"}); </example>
         public BrowserCommandResult<string> GetValue(OptionSet option)
         {
-            return this.Execute($"Get Value: {option.Name}", driver =>
+            return this.Execute($"Get OptionSet Value: {option.Name}", driver =>
             {
                 driver.WaitUntilVisible(By.Id(option.Name));
                 string text = string.Empty;
@@ -618,7 +534,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example> xrmBrowser.Entity.GetValue(new DateTime {Name = "birthdate"));</example>
         public BrowserCommandResult<string> GetValue(DateTimeControl date)
         {
-            //return this.Execute($"Set Value: {field}", SetValue, field, date);
             return this.Execute(GetOptions($"Get DateTime Value: {date.Name}"), driver =>
             {
                 string dateValue = "";
@@ -648,7 +563,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmBrowser.Entity.GetValue(new TwoOption {Name="creditonhold"});</example>
         public BrowserCommandResult<bool> GetValue(TwoOption option)
         {
-            return this.Execute(GetOptions($"Get Checkbox/TwoOption Value on an Entity form: {option.Name}"), driver =>
+            return this.Execute(GetOptions($"Get Checkbox/TwoOption Value: {option.Name}"), driver =>
             {
                 bool check = false;
 
@@ -694,7 +609,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmBrowser.Entity.ClearValue("firstname", "Test");</example>
         public BrowserCommandResult<bool> ClearValue(string field)
         {
-            return this.Execute(GetOptions($"Set Text field Value: {field}"), driver =>
+            return this.Execute(GetOptions($"Clear Text Field Value: {field}"), driver =>
             {
                 if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer].Replace("[NAME]", field.ToLower()))))
                 {
@@ -888,7 +803,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmBrowser.Entity.ClearValue(new OptionSet { Name = "preferredcontactmethodcode"});</example>
         public BrowserCommandResult<bool> ClearValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
-            return this.Execute(GetOptions($"Clear Value: {option.Name}"), driver =>
+            return this.Execute(GetOptions($"Clear MultiValueOptionSet Value: {option.Name}"), driver =>
             {
 
                 /*
@@ -935,10 +850,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Placeholder: CompositeControls are not currently supported in BPFs.
         /// </summary>
         /// <param name="control">The Composite control values you want to clear.</param>
-        /// <example>xrmBrowser.Entity.ClearValue(new CompositeControl() {Id = "fullname"});</example>
+        /// <example>xrmBrowser.Entity.ClearValue(new CompositeControl {Id = "fullname"});</example>
         public BrowserCommandResult<bool> ClearValue(CompositeControl control)
         {
-            return this.Execute(GetOptions($"Clear Conposite Control Value: {control.Id}"), driver =>
+            return this.Execute(GetOptions($"Clear ConpositeControl Value: {control.Id}"), driver =>
             {                
                 driver.WaitUntilVisible(By.Id(control.Id));
 
@@ -975,47 +890,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 else
                     throw new InvalidOperationException($"Composite Control: {control.Id} Does not exist");
                 
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Placeholder: Clears the value of a Field.
-        /// </summary>
-        /// <param name="field">The field .</param>
-        public BrowserCommandResult<bool> ClearValue(Field field)
-        {
-            return this.Execute(GetOptions($"Clear Value: {field.Name}"), driver =>
-            {
-                /*
-                driver.WaitUntilVisible(By.Id(field.Id));
-
-                if (driver.HasElement(By.Id(field.Id)))
-                {
-                    var fieldElement = driver.ClickWhenAvailable(By.Id(field.Id));
-
-                    //Check to see if focus is on field already
-                    if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
-                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
-                    else
-                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
-
-
-                    if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
-                    {
-                        fieldElement.FindElement(By.TagName("textarea")).Clear();
-                        fieldElement.FindElement(By.TagName("textarea")).SendKeys(field.Value);
-                    }
-                    else
-                    {
-                        fieldElement.FindElement(By.TagName("input")).Clear();
-                        fieldElement.FindElement(By.TagName("input")).SendKeys(field.Value);
-                    }
-
-                }
-                else
-                    throw new InvalidOperationException($"Field: {field} Does not exist");
-                */
                 return true;
             });
         }
