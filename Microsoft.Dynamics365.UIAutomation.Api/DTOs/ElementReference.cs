@@ -25,6 +25,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "BPF_OptionSetFieldContainer"     , "//div[@id=\"header_process_[NAME]\"]" },
             { "BPF_LookupFieldContainer"     , "//div[@id=\"header_process_[NAME]\"]" },
             { "BPF_DateFieldContainer"     , "//div[@id=\"header_process_[NAME]\"]" },
+            { "BPF_DateFieldInput"     , "//input[@id=\"header_process_[NAME]_iDateInput\"]" },
+            { "BPF_GetLookupSearchIcon"     , "//div[@id=\"header_process_[NAME]_lookupSearchIconDiv\"]" },
 
             //Dialogs
             { "Dialog_Header"       , "id(\"dialogHeaderTitle\")"},
@@ -134,6 +136,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Entity_SelectFormSection",  "id(\"FormSecNavigationControl-Icon\")"}, //GitHub Issue 56
             { "Entity_TabId"       , "//a/*[contains(text(),'[NAME]')]/parent::a"}, //GitHub Issue 124
             { "Entity_FieldContainer"       , "//div[contains(@id,'[NAME]')]"},
+            { "Entity_TextFieldContainer"     , "//div[@id=\"[NAME]\"]" },
+            { "Entity_CheckboxFieldContainer"     , "//div[@id=\"[NAME]\"]" },
+            { "Entity_OptionSetFieldContainer"     , "//div[@id=\"[NAME]\"]" },
+            { "Entity_LookupFieldContainer"     , "//div[@id=\"[NAME]\"]" },
+            { "Entity_DateFieldContainer"     , "//div[@id=\"[NAME]\"]" },
+            { "Entity_DateFieldInput"     , "//input[@id=\"[NAME]_iDateInput\"]" },
+            { "Entity_GetLookupSearchIcon"     , "//div[@id=\"[NAME]_lookupSearchIconDiv\"]" },
 
             //Related MenuItems
             { "Related_Popout",                 "//li[contains(@data-id,\"tablist-tab_related\")]" },
@@ -224,7 +233,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "LookUp_SavedQuerySelector", "id(\"crmGrid_SavedQuerySelector\")"},
             { "LookUp_DialogCancel", "id(\"cmdDialogCancel\")"},
             { "LookUp_New", "id(\"btnNew\")"},
-            { "LookUp_Remove", "id(\"btnRemove\")"},
+            { "LookUp_Remove", "id(\"btnRemoveValue\")"},
             { "LookUp_Add", "id(\"btnAdd\")"},
             { "LookUp_Begin", "id(\"butBegin\")"},
 
@@ -411,6 +420,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string OptionSetFieldContainer = "BPF_OptionSetFieldContainer";
             public static string LookupFieldContainer = "BPF_LookupFieldContainer";
             public static string DateFieldContainer = "BPF_DateFieldContainer";
+            public static string DateFieldInput = "BPF_DateFieldInput";
+            public static string GetLookupSearchIcon = "BPF_GetLookupSearchIcon";
         }
 
         public static class Dialogs
@@ -611,6 +622,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string LookupRender = "Entity_LookupRenderClass";
             public static string Popout = "Entity_PopoutClass";
             public static string FieldContainer = "Entity_FieldContainer";
+            public static string TextFieldContainer = "Entity_TextFieldContainer";
+            public static string CheckboxFieldContainer = "Entity_CheckboxFieldContainer";
+            public static string OptionSetFieldContainer = "Entity_OptionSetFieldContainer";
+            public static string LookupFieldContainer = "Entity_LookupFieldContainer";
+            public static string DateFieldContainer = "Entity_DateFieldContainer";
+            public static string DateFieldInput = "Entity_DateFieldInput";
+            public static string GetLookupSearchIcon = "Entity_GetLookupSearchIcon";
         }
         public static class MenuRelated
         {

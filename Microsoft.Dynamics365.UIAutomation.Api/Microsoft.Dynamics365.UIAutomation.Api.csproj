@@ -68,6 +68,8 @@
     <Compile Include="Controls\Field.cs" />
     <Compile Include="Controls\LookupItem.cs" />
     <Compile Include="Controls\MultiValueOptionSet.cs" />
+    <Compile Include="Controls\DateTimeControl.cs" />
+    <Compile Include="Controls\TwoOption.cs" />
     <Compile Include="Controls\OptionSet.cs" />
     <Compile Include="DTOs\PerformanceNavigationTiming.cs" />
     <Compile Include="DTOs\PerformanceResource.cs" />

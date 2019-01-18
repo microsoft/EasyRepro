@@ -27,7 +27,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Sets the value of a Checkbox field.
+        /// DEPRECATED: Sets the value of a Checkbox field.
+        /// Please use the new TwoOption method ==> SetValue(TwoOption option)
         /// </summary>
         /// <param name="field">Field name or ID.</param>
         /// <param name="check">If set to <c>true</c> [check].</param>
@@ -56,7 +57,38 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Sets the value of a Date Field.
+        /// Sets the value of a TwoOption / Checkbox field on an Entity form.
+        /// </summary>
+        /// <param name="option">Field name or ID.</param>
+        /// <example>xrmBrowser.Entity.SetValue(new TwoOption{ Name = "creditonhold"});</example>
+        public BrowserCommandResult<bool> SetValue(TwoOption option)
+        {
+            return this.Execute(GetOptions($"Set TwoOption Value: {option.Name}"), driver =>
+            {
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
+                {
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
+
+                    if (fieldElement.FindElements(By.TagName("label")).Count > 0)
+                    {
+                        var label = fieldElement.FindElement(By.TagName("label"));
+
+                        if (label.Text != option.Value)
+                        {
+                            fieldElement.Click(true);
+                        }
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// DEPRECATED: Sets the value of a Date Field.
+        /// Please use the new DateTimeControl method ==> SetValue(DateTimeControl date)
         /// </summary>
         /// <param name="field">The field id or name.</param>
         /// <param name="date">DateTime value.</param>
@@ -99,7 +131,50 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Sets the value of a Text/Description field.
+        /// Sets the value of a Date Field on an Entity form.
+        /// </summary>
+        /// <param name="field">The field id or name.</param>
+        /// <param name="date">DateTime value.</param>
+        /// <example> xrmBrowser.Entity.SetValue(new DateTimeControl { Name = "birthdate", Value =  DateTime.Parse("11/1/1980")});</example>
+        public BrowserCommandResult<bool> SetValue(DateTimeControl date)
+        {
+            //return this.Execute($"Set Value: {field}", SetValue, field, date);
+            return this.Execute(GetOptions($"Set DateTime Value: {date.Name}"), driver =>
+            {
+                if (driver.HasElement(By.Id(date.Name)))
+                {
+                    var fieldElement = driver.ClickWhenAvailable(By.Id(date.Name));
+
+                    //Check to see if focus is on field already
+                    if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
+                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
+                    else
+                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
+
+                    var input = fieldElement.FindElement(By.TagName("input"));
+
+                    if (input.GetAttribute("value").Length > 0)
+                    {
+                        input.Clear();
+                        fieldElement.Click();
+                        input.SendKeys(date.Value.ToShortDateString());
+                        input.SendKeys(Keys.Enter);
+                    }
+                    else
+                    {
+                        input.SendKeys(date.Value.ToShortDateString());
+                        input.SendKeys(Keys.Enter);
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Field: {date.Name} Does not exist");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Sets the value of a Text/Description field on an Entity form.
         /// </summary>
         /// <param name="field">The field id.</param>
         /// <param name="value">The value.</param>
@@ -141,12 +216,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         fieldElement.Clear();
                         fieldElement.SendKeys(value);
+                        fieldElement.SendKeys(Keys.Tab);
                     }
                     else
                     {
                         //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
                         //driver.ExecuteScript("Xrm.Page.getAttribute('" + field + "').setValue('')");
                         fieldElement.FindElement(By.TagName("input")).SendKeys(value, true);
+                        fieldElement.SendKeys(Keys.Tab);
                     }
                 }
                 else
@@ -158,7 +235,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Sets the value of a Field.
+        /// Sets the value of a Field on an Entity form.
         /// </summary>
         /// <param name="field">The field .</param>
         public BrowserCommandResult<bool> SetValue(Field field)
@@ -198,7 +275,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Sets the value of a picklist.
+        /// Sets the value of a picklist on an Entity form.
         /// </summary>
         /// <param name="option">The option you want to set.</param>
         /// <example>xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
@@ -232,7 +309,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Sets the value of a multi-value picklist.
+        /// Sets the value of a multi-value picklist on an Entity form.
         /// </summary>
         /// <param name="option">The option you want to set.</param>
         /// <example>xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
@@ -278,7 +355,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Sets the value of a Composite control.
+        /// Sets the value of a Composite control on an Entity form.
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
         /// <example>xrmBrowser.Entity.SetValue(new CompositeControl() {Id = "fullname", Fields = fields});</example>
@@ -321,7 +398,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Sets the value of a Lookup.
+        /// Sets the value of a Lookup on an Entity form.
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmBrowser.Entity.SetValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
@@ -373,7 +450,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Gets the value of a Text/Description field.
+        /// Gets the value of a Text/Description field on an Entity form.
         /// </summary>
         /// <param name="field">The field id.</param>
         /// <returns>The value</returns>
@@ -408,7 +485,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Gets the value of a Field.
+        /// Gets the value of a Field on an Entity form.
         /// </summary>
         /// <param name="field">The field .</param>
         /// <returns>The value</returns>
@@ -466,16 +543,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (driver.HasElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut])))
                 {
                     var compcntrl =
-                        driver.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut]));
+                        driver.WaitUntilAvailable(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut]));
 
                     foreach (var field in control.Fields)
                     {
-                        compcntrl.FindElement(By.Id(Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
+                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click(true);
 
                         var result = compcntrl.FindElements(By.TagName("input"))
                             .ToList()
                             .FirstOrDefault(i => i.GetAttribute("id").Contains(field.Id));
-                        text += result.GetAttribute("value");
+                        text += result.GetAttribute("value") + " ";
                     }
 
                     compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.Confirm])).Click();
@@ -483,12 +560,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 else
                     throw new InvalidOperationException($"Composite Control: {control.Id} Does not exist");
 
-                return text;
+                return text.TrimEnd(' ');
             });
         }
 
         /// <summary>
-        /// Gets the value of a picklist.
+        /// Gets the value of a picklist on an Entity form
         /// </summary>
         /// <param name="option">The option you want to set.</param>
         /// <example>xrmBrowser.Entity.GetValue(new OptionSet { Name = "preferredcontactmethodcode"}); </example>
@@ -511,7 +588,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Gets the value of a Lookup.
+        /// Gets the value of a Lookup on an Entity form.
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmBrowser.Entity.GetValue(new Lookup { Name = "primarycontactid" });</example>
@@ -531,6 +608,415 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     throw new InvalidOperationException($"Field: {control.Name} Does not exist");
 
                 return lookupValue;
+            });
+        }
+
+        /// <summary>
+        /// Gets the value of a DateTime field on an entity form.
+        /// </summary>
+        /// <param name="date">DateTime value.</param>
+        /// <example> xrmBrowser.Entity.GetValue(new DateTime {Name = "birthdate"));</example>
+        public BrowserCommandResult<string> GetValue(DateTimeControl date)
+        {
+            //return this.Execute($"Set Value: {field}", SetValue, field, date);
+            return this.Execute(GetOptions($"Get DateTime Value: {date.Name}"), driver =>
+            {
+                string dateValue = "";
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer].Replace("[NAME]", date.Name.ToLower()))))
+                {
+
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer].Replace("[NAME]", date.Name.ToLower())));
+
+                    // Check whether the DateTime field has an existing value
+                    if (fieldElement.FindElements(By.TagName("label")).Count > 0)
+                    {
+                        var label = fieldElement.FindElement(By.TagName("label"));
+                        dateValue = label.Text;
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Unable to locate DateTime field '{date.Name}' in the Business Process Flow. Please verify the DateTime field exists and try again.");
+
+                return dateValue;
+            });
+        }
+
+        /// <summary>
+        /// Gets the value of a Checkbox/TwoOption field in an Entity form.
+        /// </summary>
+        /// <param name="option">The TwoOption field you want to set</param>
+        /// <example>xrmBrowser.Entity.GetValue(new TwoOption {Name="creditonhold"});</example>
+        public BrowserCommandResult<bool> GetValue(TwoOption option)
+        {
+            return this.Execute(GetOptions($"Get Checkbox/TwoOption Value on an Entity form: {option.Name}"), driver =>
+            {
+                bool check = false;
+
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
+                {
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
+                    var select = fieldElement;
+                    var text = "";
+
+
+                    if (fieldElement.FindElements(By.TagName("label")).Count > 0)
+                    {
+                        var label = fieldElement.FindElement(By.TagName("label"));
+                        text = label.Text;
+                    }
+
+                    if (fieldElement.TagName != "select")
+                        select = fieldElement.FindElement(By.TagName("select"));
+
+                    var options = select.FindElements(By.TagName("option"));
+
+                    foreach (var op in options)
+                    {
+                        if (op.Text.ToLower() == text.ToLower() || op.GetAttribute("title").ToLower() == text.ToLower())
+                        {
+                            var value = Convert.ToInt32(op.GetAttribute("value"));
+
+                            check = Convert.ToBoolean(value);
+                        }
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Unable to locate TwoOption field '{option.Name}' on the form. Please verify the TwoOption field exists and try again.");
+
+                return check;
+            });
+        }
+
+        /// <summary>
+        /// Clears the value of a Text field on an Entity form
+        /// </summary>
+        /// <param name="field">The field</param>
+        /// <example>xrmBrowser.Entity.ClearValue("firstname", "Test");</example>
+        public BrowserCommandResult<bool> ClearValue(string field)
+        {
+            return this.Execute(GetOptions($"Set Text field Value: {field}"), driver =>
+            {
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer].Replace("[NAME]", field.ToLower()))))
+                {
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer].Replace("[NAME]", field.ToLower())));
+
+                    fieldElement.Click(true);
+
+                    if (fieldElement.FindElements(By.TagName("input")).Count > 0)
+                    {
+                        fieldElement.FindElement(By.TagName("input")).Clear();
+                    }
+                    else if (fieldElement.TagName == "textarea")
+                    {
+                        fieldElement.Clear();
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Unable to locate field '{field}' on the form. Please verify the field exists and try again.");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Clears the value of a Checkbox/TwoOption field on an Entity form
+        /// </summary>
+        /// <param name="option">The TwoOption field you want to set</param>
+        /// <example>xrmBrowser.Entity.ClearValue(new TwoOption{ Name = "creditonhold"});</example>
+        public BrowserCommandResult<bool> ClearValue(TwoOption option)
+        {
+            return this.Execute(GetOptions($"Clear Checkbox/TwoOption Value: {option.Name}"), driver =>
+            {
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
+                {
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
+
+                    if (fieldElement.FindElements(By.TagName("label")).Count > 0)
+                    {
+                        var select = fieldElement;
+                        var label = fieldElement.FindElement(By.TagName("label")).Text;
+
+                        if (fieldElement.TagName != "select")
+                            select = fieldElement.FindElement(By.TagName("select"));
+
+                        var options = select.FindElements(By.TagName("option"));
+
+                        foreach (var op in options)
+                        {
+                            if (((op.Text.ToLower() != label.ToLower() || op.GetAttribute("title").ToLower() != label.ToLower()) && op.GetAttribute("value") == "0"))
+                            {
+                                fieldElement.Click(true);
+                            }
+                        }
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Unable to locate TwoOption field '{option.Name}' on the form. Please verify the TwoOption field exists and try again.");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Clears the value of an option set / picklist on an Entity form
+        /// </summary>
+        /// <param name="option">The option you want to clear.</param>
+        /// <example>xrmBrowser.Entity.ClearValue(new OptionSet { Name = "preferredcontactmethodcode"});</example>
+        public BrowserCommandResult<bool> ClearValue(OptionSet option)
+        {
+            return this.Execute(GetOptions($"Clear OptionSet Value: {option.Name}"), driver =>
+            {
+
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
+                {
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
+                    var select = fieldElement;
+
+                    if (fieldElement.TagName != "select")
+                        select = fieldElement.FindElement(By.TagName("select"));
+
+                    var options = select.FindElements(By.TagName("option"));
+
+                    foreach (var op in options)
+                    {
+                        if (op.GetAttribute("value") == "")
+                        {
+                            fieldElement.Click(true);
+                            op.Click(true);
+                        }
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Unable to locate OptionSet '{option.Name}' on the form. Please verify the OptionSet exists and try again.");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Clears the value of a Lookup on an Entity form
+        /// </summary>
+        /// <param name="control">The lookup field name, value or index of the lookup.</param>
+        /// <example>xrmBrowser.Entity.ClearValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
+        public BrowserCommandResult<bool> ClearValue(LookupItem control)
+        {
+            return this.Execute(GetOptions($"Clear Lookup Value: {control.Name}"), driver =>
+            {
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer].Replace("[NAME]", control.Name.ToLower()))))
+                {
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer].Replace("[NAME]", control.Name.ToLower())));
+
+                    if (fieldElement.Text != "")
+                    {
+                        fieldElement.Hover(driver, true);
+
+                        if (fieldElement.FindElement(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name.ToLower()))) == null)
+                            throw new InvalidOperationException($"Field: {control.Name} is not Lookup control");
+
+                        driver.Manage().Window.Maximize();
+                        var lookupSearch = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name.ToLower())));
+
+                        if (!lookupSearch.Displayed)
+                        {
+                            driver.Manage().Window.Minimize();
+                            driver.Manage().Window.Maximize();
+                            fieldElement.Hover(driver, true);
+                            lookupSearch = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name.ToLower())));
+                        }
+
+                        lookupSearch.Click(true);
+
+                        var dialogName = $"Dialog_{control.Name}_IMenu";
+                        var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
+
+                        var dialogItems = OpenDialog(dialog).Value;
+
+                        if (dialogItems.Any())
+                        {
+                            var dialogItem = dialogItems.Last();
+                            dialogItem.Element.Click();
+                        }
+
+                        SwitchToDialog();
+
+                        driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.LookUp.Remove])).Click(true);
+
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Unable to locate Lookup '{control.Name}' on the form. Please verify the Lookup exists and try again.");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Clears the value of a DateTime field on an Entity form.
+        /// </summary>
+        /// <param name="date">DateTime value.</param>
+        /// <example> xrmBrowser.Entity.ClearValue(new DateTime {Name = "birthdate"}));</example>
+        public BrowserCommandResult<bool> ClearValue(DateTimeControl date)
+        {
+            return this.Execute(GetOptions($"Clear DateTime Field: {date.Name}"), driver =>
+            {
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer].Replace("[NAME]", date.Name.ToLower()))))
+                {
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer].Replace("[NAME]", date.Name.ToLower())));
+
+                    // Check whether the DateTime field has an existing value
+                    if (fieldElement.GetAttribute("title") != "Select to enter data")
+                    {
+                        fieldElement.Click(true);
+                        var fieldInput = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.DateFieldInput].Replace("[NAME]", date.Name.ToLower())));
+                        // Clear any existing values
+                        fieldInput.Clear();
+                        fieldElement.Click(true);
+                        fieldElement.SendKeys(Keys.Enter);
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Unable to locate DateTime field '{date.Name}' on the form. Please verify the DateTime field exists and try again.");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Placeholder: MultiValueOptionSets are not currently supported in BPFs.
+        /// </summary>
+        /// <param name="option">The option you want to clear.</param>
+        /// <example>xrmBrowser.Entity.ClearValue(new OptionSet { Name = "preferredcontactmethodcode"});</example>
+        public BrowserCommandResult<bool> ClearValue(MultiValueOptionSet option, bool removeExistingValues = false)
+        {
+            return this.Execute(GetOptions($"Clear Value: {option.Name}"), driver =>
+            {
+
+                /*
+                driver.WaitUntilVisible(By.Id(option.Name));
+
+                if (driver.HasElement(By.Id(option.Name)))
+                {
+                    var container = driver.ClickWhenAvailable(By.Id(option.Name));
+
+                    if (removeExistingValues)
+                    {
+                        //Remove Existing Values
+                        var values = container.FindElements(By.ClassName(Elements.CssClass[Reference.SetValue.MultiSelectPicklistDeleteClass]));
+                        foreach (var value in values)
+                            value.Click(true);
+                    }
+
+                    var input = container.FindElement(By.TagName("input"));
+                    input.Click();
+                    input.SendKeys(" ");
+
+                    var options = container.FindElements(By.TagName("li"));
+
+                    foreach (var op in options)
+                    {
+                        var label = op.FindElement(By.TagName("label"));
+
+                        if (option.Values.Contains(op.Text) || option.Values.Contains(op.GetAttribute("value")) || option.Values.Contains(label.GetAttribute("title")))
+                            op.Click(true);
+                    }
+
+                    container.Click();
+                }
+                else
+                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+
+                */
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Placeholder: CompositeControls are not currently supported in BPFs.
+        /// </summary>
+        /// <param name="control">The Composite control values you want to clear.</param>
+        /// <example>xrmBrowser.Entity.ClearValue(new CompositeControl() {Id = "fullname"});</example>
+        public BrowserCommandResult<bool> ClearValue(CompositeControl control)
+        {
+            return this.Execute(GetOptions($"Clear Conposite Control Value: {control.Id}"), driver =>
+            {                
+                driver.WaitUntilVisible(By.Id(control.Id));
+
+                if (!driver.HasElement(By.Id(control.Id)))
+                    return false;
+
+                driver.ClickWhenAvailable(By.Id(control.Id));
+
+                if (driver.HasElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut])))
+                {
+                    var compcntrl =
+                        driver.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut]));
+
+                    foreach (var field in control.Fields)
+                    {
+                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click(true);
+
+                        var result = compcntrl.FindElements(By.TagName("input"))
+                            .ToList()
+                            .FirstOrDefault(i => i.GetAttribute("id").Contains(field.Id));
+
+                        result?.Clear();
+                        result?.SendKeys(Keys.Tab);
+
+                        if (compcntrl.IsVisible(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id + "_warnSpan")))
+                        {
+                            throw new InvalidOperationException($"The field {field.Id} has displayed a warning and cannot be cleared.");
+                        }
+                    }
+
+                    compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.Confirm])).Click();
+
+                }
+                else
+                    throw new InvalidOperationException($"Composite Control: {control.Id} Does not exist");
+                
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Placeholder: Clears the value of a Field.
+        /// </summary>
+        /// <param name="field">The field .</param>
+        public BrowserCommandResult<bool> ClearValue(Field field)
+        {
+            return this.Execute(GetOptions($"Clear Value: {field.Name}"), driver =>
+            {
+                /*
+                driver.WaitUntilVisible(By.Id(field.Id));
+
+                if (driver.HasElement(By.Id(field.Id)))
+                {
+                    var fieldElement = driver.ClickWhenAvailable(By.Id(field.Id));
+
+                    //Check to see if focus is on field already
+                    if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
+                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
+                    else
+                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
+
+
+                    if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
+                    {
+                        fieldElement.FindElement(By.TagName("textarea")).Clear();
+                        fieldElement.FindElement(By.TagName("textarea")).SendKeys(field.Value);
+                    }
+                    else
+                    {
+                        fieldElement.FindElement(By.TagName("input")).Clear();
+                        fieldElement.FindElement(By.TagName("input")).SendKeys(field.Value);
+                    }
+
+                }
+                else
+                    throw new InvalidOperationException($"Field: {field} Does not exist");
+                */
+                return true;
             });
         }
 
