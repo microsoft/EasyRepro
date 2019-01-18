@@ -29,6 +29,183 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         private readonly string _navigateUpCssSelector = "img.recnav-up.ms-crm-ImageStrip-Up_Enabled_proxy";
 
         /// <summary>
+        /// Click add button of subgridName
+        /// </summary>
+        /// <param name="subgridName">The SubgridName</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Entity.ClickSubgridAddButton("Stakeholders");</example>
+        public BrowserCommandResult<bool> ClickSubgridAddButton(string subgridName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Click add button of {subgridName}"), driver =>
+            {
+                driver.FindElement(By.Id($"{subgridName}_addImageButton"))?.Click();
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Click GridView button of subgridName
+        /// </summary>
+        /// <param name="subgridName">The subgridName</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        public BrowserCommandResult<bool> ClickSubgridGridViewButton(string subgridName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Click GridView button of {subgridName}"), driver =>
+            {
+                driver.FindElement(By.Id($"{subgridName}_openAssociatedGridViewImageButton"))?.Click();
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Closes the current entity record you are on.
+        /// </summary>
+        /// <example>xrmBrowser.Entity.CloseEntity();</example>
+        public BrowserCommandResult<bool> CloseEntity(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Close Entity"), driver =>
+            {
+                SwitchToDefault();
+
+                var filter = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.Close]),
+                    "Close Buttton is not available");
+
+                filter?.Click();
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Collapses the Tab on a CRM Entity form.
+        /// </summary>
+        /// <param name="name">The name of the Tab.</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Entity.CollapseTab("Summary");</example>
+        public BrowserCommandResult<bool> CollapseTab(string name, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Collapse Tab: {name}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
+                {
+                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
+                }
+                var tab = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name)));
+
+                if (tab.GetAttribute("title").Contains("Collapse"))
+                    tab?.Click();
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Dismiss the Alert If Present
+        /// </summary>
+        /// <param name="stay"></param>
+        public BrowserCommandResult<bool> DismissAlertIfPresent(bool stay = false)
+        {
+
+            return this.Execute(GetOptions("Dismiss Confirm Save Alert"), driver =>
+            {
+                if (driver.AlertIsPresent())
+                {
+                    if (stay)
+                        driver.SwitchTo().Alert().Dismiss();
+                    else
+                        driver.SwitchTo().Alert().Accept();
+                }
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Expands the Tab on a CRM Entity form.
+        /// </summary>
+        /// <param name="name">The name of the Tab.</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Entity.ExpandTab("Summary");</example>
+        public BrowserCommandResult<bool> ExpandTab(string name, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Expand Tab: {name}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
+                {
+                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
+                }
+                var tab = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name)));
+
+                if (tab.GetAttribute("title").Contains("Expand"))
+                    tab?.Click();
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Returns the GUID for the current entity record. 
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Entity.GetRecordGuid();</example>
+        public BrowserCommandResult<string> GetRecordGuid(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Get GUID for the Current Record"), driver =>
+            {
+                SwitchToContentFrame();
+
+                var recordGuid = driver.ExecuteScript("return Xrm.Page.data.entity.getId();").ToString(); ;
+
+                return Guid.Parse(recordGuid).ToString();
+            });
+        }
+
+
+        /// <summary>
+        /// Returns the state of the tab, either Expanded or Collapsed. 
+        /// </summary>
+        /// <param name="name">The name of the tab.</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Entity.GetTabState("Details");</example>
+        public BrowserCommandResult<string> GetTabState(string name, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Get State for Tab: {name}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
+                {
+                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
+                }
+                var tab = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name)));
+                var tabState = "";
+
+                if (!tab.GetAttribute("title").Contains("Collapse"))
+                    tabState = "Collapsed";
+                else if (!tab.GetAttribute("title").Contains("Expand"))
+                    tabState = "Expanded";
+                else
+                    throw new InvalidOperationException("Unexpected tab state. Tab state should be either Collapsed or Expanded");
+
+                return tabState;
+            });
+        }
+
+        /// <summary>
         /// Opens the Entity
         /// </summary>
         /// <param name="entityName">The Entity Name you want to open</param>
@@ -44,35 +221,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var uri = new Uri(this.Browser.Driver.Url);
                 var link = $"{uri.Scheme}://{uri.Authority}/main.aspx?etn={entityName}&pagetype=entityrecord&id=%7B{id:D}%7D";
                 return OpenEntity(new Uri(link)).Value;
-            });
-        }
-
-        /// <summary>
-        /// Opens the Entity
-        /// </summary>
-        /// <param name="uri">The uri</param>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        public BrowserCommandResult<bool> OpenEntity(Uri uri, int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Open: {uri}"), driver =>
-            {
-
-                driver.Navigate().GoToUrl(uri);
-
-                DismissAlertIfPresent();
-
-                // driver.WaitFor(d => d.ExecuteScript(XrmPerformanceCenterPage.GetAllMarkersJavascriptCommand).ToString().Contains("AllSubgridsLoaded"));
-                SwitchToContent();
-                driver.WaitForPageToLoad();
-                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
-                                            new TimeSpan(0, 0, 30),
-                                            null,
-                                            d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
-                                        );
-
-                return true;
             });
         }
 
@@ -129,6 +277,101 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
+        /// Opens the Entity
+        /// </summary>
+        /// <param name="uri">The uri</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        public BrowserCommandResult<bool> OpenEntity(Uri uri, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Open: {uri}"), driver =>
+            {
+
+                driver.Navigate().GoToUrl(uri);
+
+                DismissAlertIfPresent();
+
+                // driver.WaitFor(d => d.ExecuteScript(XrmPerformanceCenterPage.GetAllMarkersJavascriptCommand).ToString().Contains("AllSubgridsLoaded"));
+                SwitchToContent();
+                driver.WaitForPageToLoad();
+                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
+                                            new TimeSpan(0, 0, 30),
+                                            null,
+                                            d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
+                                        );
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Popout the form
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Entity.Popout();</example>
+        public BrowserCommandResult<bool> Popout(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Popout"), driver =>
+            {
+                SwitchToDefault();
+                driver.ClickWhenAvailable(By.ClassName(Elements.CssClass[Reference.Entity.Popout]));
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Saves the specified entity record.
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Entity.Save();</example>
+        public BrowserCommandResult<bool> Save(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Save Entity"), driver =>
+            {
+                var save = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.Save]),
+                    "Save Buttton is not available");
+
+                save?.Click();
+
+                driver.WaitUntilVisible(By.Id("titlefooter_statuscontrol"));
+
+                // Wait until the footer is not equal to 'saving', indicating save is complete or failed
+                driver.WaitFor(x => x.FindElement(By.Id("titlefooter_statuscontrol")).Text != "saving", new TimeSpan(0, 2, 0));
+
+                var footerText = driver.FindElement(By.Id("titlefooter_statuscontrol")).Text;
+
+                // Initilize inlineDialogError for general error dialog scenarios
+                // Errors could include Business Process Error, Generic SQL Error, etc...
+                bool inlineDialogError = false;
+
+                if (String.IsNullOrEmpty(footerText))
+                {
+                    driver.SwitchTo().DefaultContent();
+                    inlineDialogError = driver.FindElement(By.Id("InlineDialog_Iframe")).Displayed;
+                }
+
+                if (inlineDialogError)
+                {
+                    driver.SwitchTo().Frame("InlineDialog_Iframe");
+                    footerText = driver.FindElement(By.Id("ErrorMessage")).Text;
+                }
+
+                if (!string.IsNullOrEmpty(footerText))
+                {
+                    throw new InvalidOperationException(footerText);
+                }
+
+                return true;
+            });
+        }
+
+        /// <summary>
         /// Selects the Form
         /// </summary>
         /// <param name="name">The name of the form</param>
@@ -171,182 +414,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 return true;
 
-            });
-        }
-
-        /// <summary>
-        /// Selects the tab and clicks. If the tab is expanded it will collapse it. If the tab is collapsed it will expand it. 
-        /// </summary>
-        /// <param name="name">The name of the tab.</param>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Entity.SelectTab("Details");</example>
-        public BrowserCommandResult<bool> SelectTab(string name, int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"SelectTab: {name}"), driver =>
-            {
-                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
-                {
-                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
-                }
-                var tab = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name)));
-
-                tab?.Click();
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Returns the GUID for the current entity record. 
-        /// </summary>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Entity.GetRecordGuid();</example>
-        public BrowserCommandResult<string> GetRecordGuid(int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions("Get GUID for the Current Record"), driver =>
-            {
-                SwitchToContentFrame();
-
-                var recordGuid = driver.ExecuteScript("return Xrm.Page.data.entity.getId();").ToString(); ;
-
-                return Guid.Parse(recordGuid).ToString();
-            });
-        }
-
-        /// <summary>
-        /// Returns the state of the tab, either Expanded or Collapsed. 
-        /// </summary>
-        /// <param name="name">The name of the tab.</param>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Entity.GetTabState("Details");</example>
-        public BrowserCommandResult<string> GetTabState(string name, int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Get State for Tab: {name}"), driver =>
-            {
-                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
-                {
-                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
-                }
-                var tab = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name)));
-                var tabState = "";
-
-                if (!tab.GetAttribute("title").Contains("Collapse"))
-                    tabState = "Collapsed";
-                else if (!tab.GetAttribute("title").Contains("Expand"))
-                    tabState = "Expanded";
-                else
-                    throw new InvalidOperationException("Unexpected tab state. Tab state should be either Collapsed or Expanded");
-
-                return tabState;
-            });
-        }
-
-        /// <summary>
-        /// Collapses the Tab on a CRM Entity form.
-        /// </summary>
-        /// <param name="name">The name of the Tab.</param>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Entity.CollapseTab("Summary");</example>
-        public BrowserCommandResult<bool> CollapseTab(string name, int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Collapse Tab: {name}"), driver =>
-            {
-                if(!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
-                {
-                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
-                }
-                var tab = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]",name)));
-
-                if (tab.GetAttribute("title").Contains("Collapse"))
-                    tab?.Click();
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Expands the Tab on a CRM Entity form.
-        /// </summary>
-        /// <param name="name">The name of the Tab.</param>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Entity.ExpandTab("Summary");</example>
-        public BrowserCommandResult<bool> ExpandTab(string name, int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Expand Tab: {name}"), driver =>
-            {
-                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
-                {
-                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
-                }
-                var tab = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name)));
-
-                if (tab.GetAttribute("title").Contains("Expand"))
-                    tab?.Click();
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Popout the form
-        /// </summary>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Entity.Popout();</example>
-        public BrowserCommandResult<bool> Popout(int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Popout"), driver =>
-            {
-                SwitchToDefault();
-                driver.ClickWhenAvailable(By.ClassName(Elements.CssClass[Reference.Entity.Popout]));
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Click add button of subgridName
-        /// </summary>
-        /// <param name="subgridName">The SubgridName</param>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Entity.ClickSubgridAddButton("Stakeholders");</example>
-        public BrowserCommandResult<bool> ClickSubgridAddButton(string subgridName, int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Click add button of {subgridName}"), driver =>
-            {
-                driver.FindElement(By.Id($"{subgridName}_addImageButton"))?.Click();
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Click GridView button of subgridName
-        /// </summary>
-        /// <param name="subgridName">The subgridName</param>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        public BrowserCommandResult<bool> ClickSubgridGridViewButton(string subgridName, int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Click GridView button of {subgridName}"), driver =>
-            {
-                driver.FindElement(By.Id($"{subgridName}_openAssociatedGridViewImageButton"))?.Click();
-
-                return true;
             });
         }
 
@@ -459,90 +526,335 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Closes the current entity record you are on.
+        /// Selects the tab and clicks. If the tab is expanded it will collapse it. If the tab is collapsed it will expand it. 
         /// </summary>
-        /// <example>xrmBrowser.Entity.CloseEntity();</example>
-        public BrowserCommandResult<bool> CloseEntity(int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions("Close Entity"), driver =>
-            {
-                SwitchToDefault();
-
-                var filter = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.Close]),
-                    "Close Buttton is not available");
-
-                filter?.Click();
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Saves the specified entity record.
-        /// </summary>
+        /// <param name="name">The name of the tab.</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Entity.Save();</example>
-        public BrowserCommandResult<bool> Save(int thinkTime = Constants.DefaultThinkTime)
+        /// <example>xrmBrowser.Entity.SelectTab("Details");</example>
+        public BrowserCommandResult<bool> SelectTab(string name, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions("Save Entity"), driver =>
+            return this.Execute(GetOptions($"SelectTab: {name}"), driver =>
             {
-                var save = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.Save]),
-                    "Save Buttton is not available");
-
-                save?.Click();
-
-                driver.WaitUntilVisible(By.Id("titlefooter_statuscontrol"));
-
-                // Wait until the footer is not equal to 'saving', indicating save is complete or failed
-                driver.WaitFor(x => x.FindElement(By.Id("titlefooter_statuscontrol")).Text != "saving", new TimeSpan(0,2,0));               
-
-                var footerText = driver.FindElement(By.Id("titlefooter_statuscontrol")).Text;
-
-                // Initilize inlineDialogError for general error dialog scenarios
-                // Errors could include Business Process Error, Generic SQL Error, etc...
-                bool inlineDialogError = false;
-
-                if (String.IsNullOrEmpty(footerText))
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
                 {
-                    driver.SwitchTo().DefaultContent();
-                    inlineDialogError = driver.FindElement(By.Id("InlineDialog_Iframe")).Displayed;
+                    throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
                 }
+                var tab = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name)));
 
-                if (inlineDialogError)
-                {
-                    driver.SwitchTo().Frame("InlineDialog_Iframe");
-                    footerText = driver.FindElement(By.Id("ErrorMessage")).Text;
-                }
-
-                if (!string.IsNullOrEmpty(footerText))
-                {
-                    throw new InvalidOperationException(footerText);
-                }
+                tab?.Click();
 
                 return true;
             });
         }
 
         /// <summary>
-        /// Dismiss the Alert If Present
+        /// Sets the value of a TwoOption / Checkbox field on an Entity header.
         /// </summary>
-        /// <param name="stay"></param>
-        public BrowserCommandResult<bool> DismissAlertIfPresent(bool stay = false)
+        /// <param name="option">Field name or ID.</param>
+        /// <example>xrmBrowser.Entity.SetHeaderValue(new TwoOption{ Name = "creditonhold"});</example>
+        public BrowserCommandResult<bool> SetHeaderValue(TwoOption option)
         {
-
-            return this.Execute(GetOptions("Dismiss Confirm Save Alert"), driver =>
+            return this.Execute(GetOptions($"Set TwoOption Header Value: {option.Name}"), driver =>
             {
-                if (driver.AlertIsPresent())
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
                 {
-                    if (stay)
-                        driver.SwitchTo().Alert().Dismiss();
-                    else
-                        driver.SwitchTo().Alert().Accept();
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
+
+                    if (fieldElement.FindElements(By.TagName("label")).Count > 0)
+                    {
+                        var label = fieldElement.FindElement(By.TagName("label"));
+
+                        if (label.Text != option.Value)
+                        {
+                            fieldElement.Click(true);
+                        }
+                    }
                 }
+                else
+                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+
+                return true;
+            });
+        }
+
+
+
+        /// <summary>
+        /// Sets the value of a Date Field on an Entity header.
+        /// </summary>
+        /// <param name="field">The field id or name.</param>
+        /// <param name="date">DateTime value.</param>
+        /// <example> xrmBrowser.Entity.SetHeaderValue(new DateTimeControl { Name = "birthdate", Value =  DateTime.Parse("11/1/1980")});</example>
+        public BrowserCommandResult<bool> SetHeaderValue(DateTimeControl date)
+        {
+            //return this.Execute($"Set Value: {field}", SetValue, field, date);
+            return this.Execute(GetOptions($"Set DateTime Header Value: {date.Name}"), driver =>
+            {
+                if (driver.HasElement(By.Id(date.Name)))
+                {
+                    var fieldElement = driver.ClickWhenAvailable(By.Id(date.Name));
+
+                    //Check to see if focus is on field already
+                    if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
+                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
+                    else
+                        fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
+
+                    var input = fieldElement.FindElement(By.TagName("input"));
+
+                    if (input.GetAttribute("value").Length > 0)
+                    {
+                        input.Clear();
+                        fieldElement.Click();
+                        input.SendKeys(date.Value.ToShortDateString());
+                        input.SendKeys(Keys.Enter);
+                    }
+                    else
+                    {
+                        input.SendKeys(date.Value.ToShortDateString());
+                        input.SendKeys(Keys.Enter);
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Field: {date.Name} Does not exist");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Sets the value of a Text/Description field on an Entity header.
+        /// </summary>
+        /// <param name="field">The field id.</param>
+        /// <param name="value">The value.</param>
+        /// <example>xrmBrowser.Entity.SetHeaderValue("name", "Test API Account");</example>
+        public BrowserCommandResult<bool> SetHeaderValue(string field, string value)
+        {
+            //return this.Execute($"Set Value: {field}", SetValue, field, value);
+            var returnval = this.Execute(GetOptions($"Set Text Field Header Value: {field}"), driver =>
+            {
+                if (driver.HasElement(By.Id(field)))
+                {
+                    driver.WaitUntilVisible(By.Id(field));
+
+                    var fieldElement = driver.FindElement(By.Id(field));
+                    if (fieldElement.IsVisible(By.TagName("a")))
+                    {
+                        IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+                        var element = fieldElement.FindElement(By.TagName("a"));
+                        js.ExecuteScript("arguments[0].setAttribute('style', 'pointer-events: none; cursor: default')", element);
+                    }
+                    fieldElement.Click();
+
+                    try
+                    {
+                        //Check to see if focus is on field already
+                        if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
+                            fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
+                        else
+                            fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
+                    }
+                    catch (NoSuchElementException) { }
+
+                    if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
+                    {
+                        fieldElement.FindElement(By.TagName("textarea")).Clear();
+                        fieldElement.FindElement(By.TagName("textarea")).SendKeys(value);
+                    }
+                    else if (fieldElement.TagName == "textarea")
+                    {
+                        fieldElement.Clear();
+                        fieldElement.SendKeys(value);
+                        fieldElement.SendKeys(Keys.Tab);
+                    }
+                    else
+                    {
+                        //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
+                        //driver.ExecuteScript("Xrm.Page.getAttribute('" + field + "').setValue('')");
+                        fieldElement.FindElement(By.TagName("input")).SendKeys(value, true);
+                        fieldElement.SendKeys(Keys.Tab);
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Field: {field} Does not exist");
+
+                return true;
+            });
+            return returnval;
+        }
+
+        /// <summary>
+        /// Sets the value of a picklist on an Entity header.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
+        /// <example>xrmBrowser.Entity.SetHeaderValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
+        public BrowserCommandResult<bool> SetHeaderValue(OptionSet option)
+        {
+            return this.Execute(GetOptions($"Set OptionSet Header Value: {option.Name}"), driver =>
+            {
+                driver.WaitUntilVisible(By.Id(option.Name));
+
+                if (driver.HasElement(By.Id(option.Name)))
+                {
+                    var input = driver.ClickWhenAvailable(By.Id(option.Name));
+                    var select = input;
+
+                    if (input.TagName != "select")
+                        select = input.FindElement(By.TagName("select"));
+
+                    var options = select.FindElements(By.TagName("option"));
+
+                    foreach (var op in options)
+                    {
+                        if (op.Text == option.Value || op.GetAttribute("value") == option.Value)
+                            op.Click();
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Sets the value of a multi-value picklist on an Entity header.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
+        /// <example>xrmBrowser.Entity.SetHeaderValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
+        public BrowserCommandResult<bool> SetHeaderValue(MultiValueOptionSet option, bool removeExistingValues = false)
+        {
+            return this.Execute(GetOptions($"Set MultiOptionSet Header Value: {option.Name}"), driver =>
+            {
+                driver.WaitUntilVisible(By.Id(option.Name));
+
+                if (driver.HasElement(By.Id(option.Name)))
+                {
+                    var container = driver.ClickWhenAvailable(By.Id(option.Name));
+
+                    if (removeExistingValues)
+                    {
+                        //Remove Existing Values
+                        var values = container.FindElements(By.ClassName(Elements.CssClass[Reference.SetValue.MultiSelectPicklistDeleteClass]));
+                        foreach (var value in values)
+                            value.Click(true);
+                    }
+
+                    var input = container.FindElement(By.TagName("input"));
+                    input.Click();
+                    input.SendKeys(" ");
+
+                    var options = container.FindElements(By.TagName("li"));
+
+                    foreach (var op in options)
+                    {
+                        var label = op.FindElement(By.TagName("label"));
+
+                        if (option.Values.Contains(op.Text) || option.Values.Contains(op.GetAttribute("value")) || option.Values.Contains(label.GetAttribute("title")))
+                            op.Click(true);
+                    }
+
+                    container.Click();
+                }
+                else
+                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Sets the value of a Composite control on an Entity header.
+        /// </summary>
+        /// <param name="control">The Composite control values you want to set.</param>
+        /// <example>xrmBrowser.Entity.SetHeaderValue(new CompositeControl() {Id = "fullname", Fields = fields});</example>
+        public BrowserCommandResult<bool> SetHeaderValue(CompositeControl control)
+        {
+            return this.Execute(GetOptions($"Set ConpositeControl Header Value: {control.Id}"), driver =>
+            {
+                driver.WaitUntilVisible(By.Id(control.Id));
+
+                if (!driver.HasElement(By.Id(control.Id)))
+                    return false;
+
+                driver.ClickWhenAvailable(By.Id(control.Id));
+
+                if (driver.HasElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut])))
+                {
+                    var compcntrl =
+                        driver.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut]));
+
+                    foreach (var field in control.Fields)
+                    {
+                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
+
+                        var result = compcntrl.FindElements(By.TagName("input"))
+                            .ToList()
+                            .FirstOrDefault(i => i.GetAttribute("id").Contains(field.Id));
+
+                        //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
+                        driver.ExecuteScript("document.getElementById('" + result?.GetAttribute("id") + "').value = ''");
+                        result?.SendKeys(field.Value);
+                    }
+
+                    compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.Confirm])).Click();
+                }
+                else
+                    throw new InvalidOperationException($"Composite Control: {control.Id} Does not exist");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Sets the value of a Lookup on an Entity header.
+        /// </summary>
+        /// <param name="control">The lookup field name, value or index of the lookup.</param>
+        /// <example>xrmBrowser.Entity.SetHeaderValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
+        public BrowserCommandResult<bool> SetHeaderValue(LookupItem control)
+        {
+            return this.Execute(GetOptions($"Set Lookup Header Value: {control.Name}"), driver =>
+            {
+                if (driver.HasElement(By.Id(control.Name)))
+                {
+                    driver.WaitUntilVisible(By.Id(control.Name));
+
+                    var input = driver.ClickWhenAvailable(By.Id(control.Name));
+
+                    if (input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])) == null)
+                        throw new InvalidOperationException($"Field: {control.Name} is not lookup");
+
+                    input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click();
+
+                    var dialogName = $"Dialog_{control.Name}_IMenu";
+                    var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
+
+                    var dialogItems = OpenDialog(dialog).Value;
+
+
+                    if (control.Value != null)
+                    {
+
+                        if (!dialogItems.Exists(x => x.Title == control.Value))
+                            throw new InvalidOperationException($"List does not have {control.Value}.");
+
+                        var dialogItem = dialogItems.Where(x => x.Title == control.Value).First();
+                        dialogItem.Element.Click();
+
+                    }
+                    else
+                    {
+                        if (dialogItems.Count < control.Index)
+                            throw new InvalidOperationException($"List does not have {control.Index + 1} items.");
+
+                        var dialogItem = dialogItems[control.Index];
+                        dialogItem.Element.Click();
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Field: {control.Name} Does not exist");
 
                 return true;
             });
