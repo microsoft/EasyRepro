@@ -284,7 +284,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 catch (NullReferenceException)
                 {
                     var areas = OpenMenuFallback(area).Value;
-
+                    
                     if (!areas.ContainsKey(area))
                     {
                         // In this scenario - 
@@ -514,11 +514,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 		internal BrowserCommandResult<bool> QuickCreate(string entityName, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
+
             return this.Execute(GetOptions($"Quick Create: {entityName}"), driver =>
             {
+                //Click the + button in the ribbon
                 var quickCreateButton = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.QuickCreateButton]));
                 quickCreateButton.Click(true);
 
+                //Find the entity name in the list
                 var entityMenuList = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.QuickCreateMenuList]));
                 var entityMenuItems = entityMenuList.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.QuickCreateMenuItems]));
                 var entitybutton = entityMenuItems.FirstOrDefault(e => e.Text.Contains(entityName, StringComparison.OrdinalIgnoreCase));
@@ -526,6 +529,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (entitybutton == null)
                     throw new Exception(String.Format("{0} not found in Quick Create list.", entityName));
 
+                //Click the entity name
                 entitybutton.Click(true);
 				driver.WaitForTransaction();
 
@@ -637,39 +641,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         //Pick the User from the list
                         driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogUserTeamLookupResults]));
-                        //Remove this line
-                        driver.WaitUntilVisible(By.XPath("//label[text()='[NAME]']".Replace("[NAME]", userOrTeamName)));
 
-                        //WaitUntilVisible is too fast, adding a wait to allow CRM to catch up.  This needs to be removed.
-                        Browser.ThinkTime(5000);
+                        driver.WaitForTransaction();
+
                         var container = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogUserTeamLookupResults]));
                         var records = container.FindElements(By.TagName("li"));
                         foreach (var record in records)
                         {
                             if (record.Text.StartsWith(userOrTeamName, StringComparison.OrdinalIgnoreCase))
-                            {
-                                try
-                                {
-                                    record.Click();
-                                    break;
-                                }
-                                catch (StaleElementReferenceException)
-                                {
-                                    continue;
-                                }
-                            }
+                                record.Click(true);
                         }
                     }
 
                     //Click Assign
-                    var buttonToClick = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogOKButton]));
-                    try
-                    {
-                        buttonToClick.Click();
-                    }
-                    catch (StaleElementReferenceException)
-                    {
-                    }
+                    var okButton = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogOKButton]));
+                    okButton.Click(true);
+
                 }
                 return true;
             });
@@ -734,14 +721,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Validate Save"), driver =>
             {
                 //Is it Duplicate Detection?
-                if(driver.HasElement(By.XPath("//div[contains(@data-id,'ManageDuplicates')]")))
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionWindowMarker])))
                 {
-                    //Select the first record in the grid
-                    driver.FindElements(By.XPath("//div[contains(@class,'data-selectable')]"))[0].Click();
+                    if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionGridRows])))
+                    {
+                        //Select the first record in the grid
+                        driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionGridRows]))[0].Click(true);
 
-                    //Click Ignore and Save
-                    driver.FindElement(By.XPath("//button[contains(@data-id,'ignore_save')]")).Click();
-                    //driver.FindElement(By.XPath("//button[contains(@data-id,'close_dialog')]")).Click();
+                        //Click Ignore and Save
+                        driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionIgnoreAndSaveButton])).Click(true);
+                    }
 
                 }
 
@@ -831,14 +820,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     success = false;
                 }
 
-                try
+                if (ribbon == null)
                 {
-                    ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid]));
-                    success = true;
-                }
-                catch(Exception)
-                {
-                    success = false;
+                    try
+                    {
+                        ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid]));
+                        success = true;
+                    }
+                    catch (Exception)
+                    {
+                        success = false;
+                    }
                 }
 
                 var items = ribbon.FindElements(By.TagName("li"));
@@ -2038,6 +2030,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     lookupButton.Hover(driver);
 
+                    driver.WaitForTransaction();
+
                     driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SearchButtonIcon])).Click(true);
                 }
                 else
@@ -2359,16 +2353,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Assign Entity"), driver =>
             {
                 var assignBtn = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.Assign]),
-    "Assign Button is not available");
+                    "Assign Button is not available");
 
                 assignBtn?.Click();
                 AssignDialog(Dialogs.AssignTo.User, userOrTeamToAssign);
 
                 return true;
             });
-            //Add the User or Team to the field
-
-            //Click the Assign Button on the dialog
         }
         internal BrowserCommandResult<bool> SwitchProcess(string processToSwitchTo, int thinkTime = Constants.DefaultThinkTime)
         {

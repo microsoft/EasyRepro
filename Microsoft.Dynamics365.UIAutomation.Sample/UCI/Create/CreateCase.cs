@@ -36,7 +36,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Entity.SetValue("title", TestSettings.GetRandomString(5,10));
 
-                LookupItem customer = new LookupItem { Name = "customerid", Value = "John Doe" };
+                LookupItem customer = new LookupItem { Name = "customerid", Value = "Test Lead" };
                 xrmApp.Entity.SetValue(customer);
 
                 xrmApp.Entity.Save();

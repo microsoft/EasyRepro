@@ -99,6 +99,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string FieldLookupButton = "Entity_FieldLookupButton";
             public static string SearchButtonIcon = "Entity_SearchButtonIcon";
             public static string EntityHeader = "Entity_Header";
+            public static string DuplicateDetectionWindowMarker = "Entity_DuplicateDetectionWindowMarker";
+            public static string DuplicateDetectionGridRows = "Entity_DuplicateDetectionGridRows";
+            public static string DuplicateDetectionIgnoreAndSaveButton = "Entity_DuplicateDetectionIgnoreAndSaveButton";
+
         }
 
         public static class CommandBar
@@ -287,6 +291,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_FieldLookupButton","//button[contains(@data-id,'[NAME]_search')]" },
             { "Entity_SearchButtonIcon", "//span[contains(@data-id,'microsoftIcon_searchButton')]" },
             { "Entity_Header", "//div[contains(@data-id,'form-header')]"},
+            { "Entity_DuplicateDetectionWindowMarker","//div[contains(@data-id,'ManageDuplicates')]"},
+            { "Entity_DuplicateDetectionGridRows", "//div[contains(@class,'data-selectable')]" },
+            { "Entity_DuplicateDetectionIgnoreAndSaveButton", "//button[contains(@data-id,'ignore_save')]"},
 			
                         
             //CommandBar
@@ -295,7 +302,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Cmd_MoreCommandsMenu"       , "//*[@id=\"__flyoutRootNode\"]"},
 
             //GlobalSearch
-            { "Search_Button"       , "//div[@id=\"categorizedSearchHeader\"]//button[@aria-label=\"Search\"]" },
+            { "Search_Button"       , "//div[@id=\"categorizedSearchHeader\"]//button[contains(@data-id,'search-submit-button')]" },
             { "Search_Text"       , "//input[@aria-label=\"Search box\"]" },
             { "Search_Filter"       , "//select[@aria-label=\"Filter with\"]"},
             { "Search_Container"    , "//div[@id=\"searchResultList\"]"},
