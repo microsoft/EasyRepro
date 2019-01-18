@@ -63,25 +63,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmBrowser.Entity.SetValue(new TwoOption{ Name = "creditonhold"});</example>
         public BrowserCommandResult<bool> SetValue(TwoOption option)
         {
-            //return this.Execute($"Set Value: {field}", SetValue, field, check);
             return this.Execute(GetOptions($"Set TwoOption Value: {option.Name}"), driver =>
             {
                 if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
                 {
                     var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
-                    var select = fieldElement;
 
-                    if (fieldElement.TagName != "select")
-                        select = fieldElement.FindElement(By.TagName("select"));
-
-                    var options = select.FindElements(By.TagName("option"));
-
-                    foreach (var op in options)
+                    if (fieldElement.FindElements(By.TagName("label")).Count > 0)
                     {
-                        if (op.Text.ToLower() == option.Value.ToLower() || op.GetAttribute("title").ToLower() == option.Value.ToLower())
+                        var label = fieldElement.FindElement(By.TagName("label"));
+
+                        if (label.Text != option.Value)
                         {
                             fieldElement.Click(true);
-                            op.Click(true);
                         }
                     }
                 }
@@ -222,12 +216,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         fieldElement.Clear();
                         fieldElement.SendKeys(value);
+                        fieldElement.SendKeys(Keys.Tab);
                     }
                     else
                     {
                         //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
                         //driver.ExecuteScript("Xrm.Page.getAttribute('" + field + "').setValue('')");
                         fieldElement.FindElement(By.TagName("input")).SendKeys(value, true);
+                        fieldElement.SendKeys(Keys.Tab);
                     }
                 }
                 else
@@ -704,11 +700,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 {
                     var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer].Replace("[NAME]", field.ToLower())));
 
-                    fieldElement.Click();
+                    fieldElement.Click(true);
 
-                    if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
+                    if (fieldElement.FindElements(By.TagName("input")).Count > 0)
                     {
-                        fieldElement.FindElement(By.TagName("textarea")).Clear();
+                        fieldElement.FindElement(By.TagName("input")).Clear();
                     }
                     else if (fieldElement.TagName == "textarea")
                     {
@@ -830,7 +826,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                         lookupSearch.Click(true);
 
-                        var dialogName = $"Dialog_header_process_{control.Name}_IMenu";
+                        var dialogName = $"Dialog_{control.Name}_IMenu";
                         var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
 
                         var dialogItems = OpenDialog(dialog).Value;
