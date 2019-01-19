@@ -12,6 +12,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client = client;
         }
+        /// <summary>
+        /// Selects the Dashboard provided
+        /// </summary>
+        /// <param name="dashboardName">Name of the dashboard to select</param>
         public void SelectDashboard(string dashboardName)
         {
             _client.SelectDashboard(dashboardName);

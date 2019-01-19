@@ -45,7 +45,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions("Login"), this.Login, orgUri, username, password, redirectAction);
         }
-        
+
         private LoginResult Login(IWebDriver driver, Uri uri, SecureString username, SecureString password,
             Action<LoginRedirectEventArgs> redirectAction)
         {
@@ -226,7 +226,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 area = area.ToLowerString();
                 subarea = subarea.ToLowerString();
 
-               var areas = OpenAreas(area).Value;
+                var areas = OpenAreas(area).Value;
 
                 //Added for Bug
                 IWebElement menuItem = null;
@@ -284,7 +284,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 catch (NullReferenceException)
                 {
                     var areas = OpenMenuFallback(area).Value;
-                    
+
                     if (!areas.ContainsKey(area))
                     {
                         // In this scenario - 
@@ -307,7 +307,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaButton]));
 
                 driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaMenu]),
-                                            new TimeSpan(0,0,2),
+                                            new TimeSpan(0, 0, 2),
                                             d =>
                                             {
                                                 var menu = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaMenu]));
@@ -363,12 +363,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     var singleItem = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapSingleArea].Replace("[NAME]", area)));
 
-                    char[] trimCharacters = { '', '\r', '\n', '', '', ''};
+                    char[] trimCharacters = { '', '\r', '\n', '', '', '' };
 
                     dictionary.Add(singleItem.Text.Trim(trimCharacters).ToLowerString(), singleItem);
 
                 }
-                
+
                 return dictionary;
             });
         }
@@ -389,19 +389,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
 
                 var menuContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaContainer]));
-                
+
                 var subItems = menuContainer.FindElements(By.TagName("li"));
 
                 foreach (var subItem in subItems)
                 {
-                        // Check 'Id' attribute, NULL value == Group Header
-                        if(!String.IsNullOrEmpty(subItem.GetAttribute("Id")))
-                    {              
+                    // Check 'Id' attribute, NULL value == Group Header
+                    if (!String.IsNullOrEmpty(subItem.GetAttribute("Id")))
+                    {
                         // Filter out duplicate entity keys - click the first one in the list
-                        if(!dictionary.ContainsKey(subItem.Text.ToLowerString()))
-                                dictionary.Add(subItem.Text.ToLowerString(), subItem);
+                        if (!dictionary.ContainsKey(subItem.Text.ToLowerString()))
+                            dictionary.Add(subItem.Text.ToLowerString(), subItem);
                     }
-                        
+
                 }
 
                 return dictionary;
@@ -413,7 +413,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Open " + command + " " + dataId), driver =>
             {
                 var cmdButtonBar = AppElements.Xpath[AppReference.Navigation.SettingsLauncherBar].Replace("[NAME]", command);
-                var cmdLauncher  = AppElements.Xpath[AppReference.Navigation.SettingsLauncher].Replace("[NAME]", command);
+                var cmdLauncher = AppElements.Xpath[AppReference.Navigation.SettingsLauncher].Replace("[NAME]", command);
 
                 if (!driver.IsVisible(By.XPath(cmdLauncher)))
                 {
@@ -501,7 +501,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Quick Launch: {toolTip}"), driver =>
             {
                 driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Navigation.QuickLaunchMenu]));
-                
+
                 //Text could be in the crumb bar.  Find the Quick launch bar buttons and click that one.
                 var buttons = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.QuickLaunchMenu]));
                 var launchButton = buttons.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.QuickLaunchButton].Replace("[NAME]", toolTip)));
@@ -510,8 +510,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-		
-		internal BrowserCommandResult<bool> QuickCreate(string entityName, int thinkTime = Constants.DefaultThinkTime)
+
+        internal BrowserCommandResult<bool> QuickCreate(string entityName, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
 
@@ -531,11 +531,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 //Click the entity name
                 entitybutton.Click(true);
-				driver.WaitForTransaction();
+                driver.WaitForTransaction();
 
                 return true;
             });
-		}
+        }
 
         #endregion
 
@@ -730,9 +730,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         //Click Ignore and Save
                         driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionIgnoreAndSaveButton])).Click(true);
+                        driver.WaitForTransaction();
                     }
-
                 }
+
+                //Is it an Error?
+                if (driver.HasElement(By.XPath("//div[contains(@data-id,'errorDialogdialog')]")))
+                {
+                    var errorDialog = driver.FindElement(By.XPath("//div[contains(@data-id,'errorDialogdialog')]"));
+
+                    var errorDetails = errorDialog.FindElement(By.XPath(".//*[contains(@data-id,'errorDialog_subtitle')]"));
+
+                    if (!String.IsNullOrEmpty(errorDetails.Text))
+                        throw new InvalidOperationException(errorDetails.Text);
+                }
+
 
                 return true;
             });
@@ -815,7 +827,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]));
                     success = true;
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     success = false;
                 }
@@ -835,7 +847,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 var items = ribbon.FindElements(By.TagName("li"));
 
-                IWebElement button; 
+                IWebElement button;
 
                 button = subname == "" ? items.FirstOrDefault(x => x.GetAttribute("aria-label") == name) : items.FirstOrDefault(x => x.GetAttribute("aria-label") == name + " More Commands");
 
@@ -852,11 +864,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     var submenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.MoreCommandsMenu]));
 
-                    var subbutton = submenu.FindElements(By.TagName("button")).FirstOrDefault(x=>x.Text==subname);
+                    var subbutton = submenu.FindElements(By.TagName("button")).FirstOrDefault(x => x.Text == subname);
 
                     if (subbutton != null)
                     {
-                        subbutton.Click();
+                        subbutton.Click(true);
                     }
                     else
                         throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
@@ -938,7 +950,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var control = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
 
                 var rows = driver.FindElements(By.ClassName("wj-row"));
-                
+
                 //TODO: The grid only has a small subset of records. Need to load them all
                 foreach (var row in rows)
                 {
@@ -955,7 +967,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.Form]));
-                
+
                 driver.WaitForTransaction();
 
                 return true;
@@ -1009,7 +1021,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 var rows = driver.FindElements(By.ClassName("wj-row"));
                 var columnGroup = driver.FindElement(By.ClassName("wj-colheaders"));
-                
+
                 foreach (var row in rows)
                 {
                     if (!string.IsNullOrEmpty(row.GetAttribute("data-lp-id")) && !string.IsNullOrEmpty(row.GetAttribute("role")))
@@ -1242,7 +1254,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Sort by {columnName}"), driver =>
             {
                 var sortCol = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.GridSortColumn].Replace("[COLNAME]", columnName)));
-                
+
                 if (sortCol == null)
                     throw new InvalidOperationException($"Column: {columnName} Does not exist");
                 else
@@ -1295,12 +1307,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
                     throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
 
-            driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
+                driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
                 //driver.FindElement(By.XPath("//button[contains(., '[NAME]') and contains(@data-id,'SubGridAssociated')]".Replace("[NAME]", name))).Click(true);
 
                 driver.WaitForTransaction();
 
-                if(subName != null)
+                if (subName != null)
                 {
                     if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
                         throw new NotFoundException($"{subName} button not found");
@@ -1363,8 +1375,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-		
-		internal BrowserCommandResult<bool> SaveQuickCreate(int thinkTime = Constants.DefaultThinkTime)
+
+        internal BrowserCommandResult<bool> SaveQuickCreate(int thinkTime = Constants.DefaultThinkTime)
         {
             this.Browser.ThinkTime(thinkTime);
 
@@ -1373,8 +1385,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var save = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.SaveAndCloseButton]),
                     "Quick Create Save Button is not available");
                 save?.Click(true);
-				
-				driver.WaitForTransaction();
+
+                driver.WaitForTransaction();
 
                 return true;
             });
@@ -1491,7 +1503,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     var existingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", control.Name)));
                     existingLookupValue.Hover(driver);
-                    
+
                     var deleteExistingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
                     deleteExistingLookupValue.Click();
                 }
@@ -1508,7 +1520,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         this.ThinkTime(1000);
                         input.Click();
                     }
-                 }
+                }
 
                 if (control.Value != null && control.Value != "")
                 {
@@ -1535,7 +1547,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     if (lookupResults.Count > 0)
                     {
-                        if (index +1 > lookupResults.Count)
+                        if (index + 1 > lookupResults.Count)
                             throw new InvalidOperationException($"Recently Viewed list does not contain {index + 1} records. Please provide an index value less than {lookupResults.Count}");
 
                         var lookupResult = lookupResults[index];
@@ -1624,7 +1636,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Set Value: {field}"), driver =>
             {
-                var dateField = AppElements.Xpath[AppReference.Entity.FieldControlDateTimeInputUCI].Replace("[FIELD]",field);
+                var dateField = AppElements.Xpath[AppReference.Entity.FieldControlDateTimeInputUCI].Replace("[FIELD]", field);
 
                 if (driver.HasElement(By.XPath(dateField)))
                 {
@@ -1667,7 +1679,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Set Value: {option.Name}"), driver =>
             {
-                if(removeExistingValues)
+                if (removeExistingValues)
                 {
                     RemoveMultiOptions(option);
                 }
@@ -1762,7 +1774,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", Elements.ElementId[option.Name])));
                 xpath = AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", Elements.ElementId[option.Name]);
                 var divElements = driver.FindElements(By.XPath(xpath));
-                if(divElements.Any())
+                if (divElements.Any())
                 {
                     divElements.First().Click(true);
                 }
@@ -1891,7 +1903,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecordLabel].Replace("[NAME]", Elements.ElementId[option.Name]);
                 var labelItems = driver.FindElements(By.XPath(xpath));
-                if(labelItems.Any())
+                if (labelItems.Any())
                 {
                     returnValue.Values = labelItems.Select(x => x.Text).ToArray();
                 }
@@ -1941,7 +1953,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeaders]));
 
-                foreach(IWebElement headerCell in headerCells)
+                foreach (IWebElement headerCell in headerCells)
                 {
                     columns.Add(headerCell.Text);
                 }
@@ -1970,10 +1982,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         foreach (IWebElement thisCell in cells)
                             cellValues.Add(thisCell.Text);
 
-                        for(int i = 0; i < columns.Count; i++)
+                        for (int i = 0; i < columns.Count; i++)
                         {
                             //The first cell is always a checkbox for the record.  Ignore the checkbox.
-                            item[columns[i]] = cellValues[i+1];
+                            item[columns[i]] = cellValues[i + 1];
                         }
 
                         subGridRows.Add(item);
@@ -1992,7 +2004,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
 
                 //Get the GridName
-                string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_",String.Empty);
+                string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", String.Empty);
 
                 //cell-0 is the checkbox for each record
                 var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
@@ -2380,7 +2392,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         d => { throw new InvalidOperationException("The Switch Process Button is not available."); }
                             );
                 }
-                catch(StaleElementReferenceException)
+                catch (StaleElementReferenceException)
                 {
                     Console.WriteLine("ignoring stale element exceptions");
                 }
@@ -2496,7 +2508,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 return ClickButton(By.XPath(fieldNameXpath));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new InvalidOperationException($"Field: {fieldNameXpath} with Does not exist", e);
             }
@@ -2554,7 +2566,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute($"Open Timeline Add Post Popout", driver =>
             {
                 var inputbox = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[fieldName]));
-                if (expectedTagName.Equals(inputbox.TagName,StringComparison.InvariantCultureIgnoreCase))
+                if (expectedTagName.Equals(inputbox.TagName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     inputbox.Click();
                     inputbox.Clear();
@@ -2708,7 +2720,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         this.Browser.ThinkTime(250);
                         fieldElement.SendKeys(Keys.Backspace);
                         this.Browser.ThinkTime(250);
-                        fieldElement.SendKeys(date.ToString(format),true);
+                        fieldElement.SendKeys(date.ToString(format), true);
                         this.Browser.ThinkTime(500);
                         fieldElement.SendKeys(Keys.Tab);
                         this.Browser.ThinkTime(250);
@@ -2757,7 +2769,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     //Click the Label of the Process Stage if found
                     foreach (var label in labels)
                     {
-                        if(label.Text.Equals(stageName,StringComparison.OrdinalIgnoreCase))
+                        if (label.Text.Equals(stageName, StringComparison.OrdinalIgnoreCase))
                         {
                             label.Click();
                         }
@@ -2765,11 +2777,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 var flyoutFooterControls = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.Flyout_UCI]));
-                
+
                 foreach (var control in flyoutFooterControls)
                 {
                     //If there's a field to enter, fill it out
-                    if(businessProcessFlowField != null)
+                    if (businessProcessFlowField != null)
                     {
                         var bpfField = control.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFieldName].Replace("[NAME]", businessProcessFlowField.Name)));
 
@@ -2787,7 +2799,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var nextButton = control.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStageButton]));
                     nextButton.Click();
                 }
-               
+
                 return true;
             });
         }
@@ -3010,7 +3022,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                                         null,
                                         d => { throw new InvalidOperationException("Search Results is not available"); });
 
-                                
+
                 var resultsContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Container]));
 
                 var entityContainer = resultsContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.EntityContainer].Replace("[NAME]", entity)));
