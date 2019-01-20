@@ -13,11 +13,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client = client;
         }
 
+        /// <summary>
+        /// Sets the value of a field in the quick create form
+        /// </summary>
+        /// <param name="field">Schema name of the field</param>
+        /// <param name="value">Value of the field</param>
         public void SetValue(string field, string value)
         {
             _client.SetValue(field, value);
         }
 
+        /// <summary>
+        /// Click the Save button on the quick create form
+        /// </summary>
         public void Save()
         {
             _client.SaveQuickCreate();
