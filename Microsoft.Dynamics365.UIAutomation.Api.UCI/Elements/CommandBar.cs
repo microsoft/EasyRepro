@@ -13,6 +13,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client = client;
         }
 
+        /// <summary>
+        /// Clicks command on the command bar
+        /// </summary>
+        /// <param name="name">Name of button to click</param>
+        /// <param name="subname">Name of button on submenu to click</param>
         public void ClickCommand(string name, string subname = "", bool moreCommands = false)
         {
             _client.ClickCommand(name, subname, moreCommands);
