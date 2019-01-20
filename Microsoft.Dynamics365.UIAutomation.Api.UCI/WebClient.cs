@@ -1308,7 +1308,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
 
                 driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
-                //driver.FindElement(By.XPath("//button[contains(., '[NAME]') and contains(@data-id,'SubGridAssociated')]".Replace("[NAME]", name))).Click(true);
 
                 driver.WaitForTransaction();
 
@@ -1318,7 +1317,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         throw new NotFoundException($"{subName} button not found");
 
                     driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
-                    //driver.FindElement(By.XPath("//button[contains(., '[NAME]')]".Replace("[NAME]", subName))).Click(true);
 
                     driver.WaitForTransaction();
                 }
