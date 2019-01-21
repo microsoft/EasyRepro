@@ -46,32 +46,40 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
         [TestMethod]
         public void WEBTestSetHeaderValues()
-        {
+        {            
+            OpenEntity("Sales", "Accounts", "Active Accounts");
             XrmTestBrowser.Grid.OpenRecord(0); // Account
 
             XrmTestBrowser.Entity.SetHeaderValue("numberofemployees", "5000"); // Text Field
-            //var getNumberOfEmployees = XrmTestBrowser.Entity.GetHeaderValue("numberofemployees");
-            //XrmTestBrowser.Entity.ClearHeaderValue("numberofemployees");
+            var getNumberOfEmployees = XrmTestBrowser.Entity.GetHeaderValue("numberofemployees").Value;
+            XrmTestBrowser.Entity.ClearHeaderValue("numberofemployees");
 
-            XrmTestBrowser.Entity.SetHeaderValue(new LookupItem { Name = "owner", Index = 0 }); // Lookup Field
-            //var getOwner = XrmTestBrowser.Entity.GetHeaderValue(new LookupItem { Name = "owner"}); // Lookup Field
-            //XrmTestBrowser.Entity.ClearHeaderValue(new LookupItem { Name = "owner"}); // Lookup Field
+            //XrmTestBrowser.Entity.ClearHeaderValue(new LookupItem { Name = "ownerid"}); // Lookup Field
+            //XrmTestBrowser.Entity.SetHeaderValue(new LookupItem { Name = "ownerid", Index = 0 }); // Lookup Field
+            //var getOwner = XrmTestBrowser.Entity.GetHeaderValue(new LookupItem { Name = "ownerid"}).Value; // Lookup Field
 
-            OpenEntity("Sales", "Leads", "All Leads");
+            XrmTestBrowser.Entity.Save();
+
+            OpenEntity("Sales", "Leads", "Open Leads");
 
             XrmTestBrowser.Grid.OpenRecord(0); // Lead
 
+            XrmTestBrowser.Entity.ClearHeaderValue(new OptionSet { Name = "leadsourcecode"}); // OptionSet Field
             XrmTestBrowser.Entity.SetHeaderValue(new OptionSet { Name = "leadsourcecode", Value = "Advertisement" }); // OptionSet Field
-            //var getLeadSourceCode = XrmTestBrowser.Entity.GetHeaderValue(new OptionSet { Name = "leadsourcecode"}); // OptionSet Field
-            //XrmTestBrowser.Entity.ClearHeaderValue(new OptionSet { Name = "leadsourcecode"}); // OptionSet Field
+            var getLeadSourceCode = XrmTestBrowser.Entity.GetHeaderValue(new OptionSet { Name = "leadsourcecode"}).Value; // OptionSet Field
+
+            XrmTestBrowser.Entity.Save();
+            
 
             OpenEntity("Sales", "Opportunities", "All Opportunities");
 
             XrmTestBrowser.Grid.OpenRecord(0); // Opportunity
 
             XrmTestBrowser.Entity.SetHeaderValue(new DateTimeControl { Name = "estimatedclosedate", Value = DateTime.Parse("06/15/2019") }); // DateTime Field
-            //var getEstCloseDate = XrmTestBrowser.Entity.GetHeaderValue(new DateTimeControl { Name = "estimatedclosedate"}); // DateTime Field
-            //XrmTestBrowser.Entity.ClearHeaderValue(new DateTimeControl { Name = "estimatedclosedate"}); // DateTime Field
+            var getEstCloseDate = XrmTestBrowser.Entity.GetHeaderValue(new DateTimeControl { Name = "estimatedclosedate"}).Value; // DateTime Field
+            XrmTestBrowser.Entity.ClearHeaderValue(new DateTimeControl { Name = "estimatedclosedate"}); // DateTime Field
+
+            XrmTestBrowser.Entity.Save();
 
             XrmTestBrowser.ThinkTime(5000);
         }

@@ -147,37 +147,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Sets the value of a Field.
-        /// </summary>
-        /// <param name="field">The field .</param>
-        public new BrowserCommandResult<bool> SetValue(Field field)
-        {
-            return this.Execute(GetOptions(""), driver =>
-            {
-                if (driver.HasElement(By.Id(field.Id)))
-                {
-                    var input = driver.ClickWhenAvailable(By.Id(field.Id));
-
-                    //Check to see if focus is on field already
-                    if (input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
-                        input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
-                    else
-                        input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
-
-                    if (input.FindElements(By.TagName("textarea")).Count > 0)
-                        input.FindElement(By.TagName("textarea")).SendKeys(field.Value);
-                    else
-                        input.FindElement(By.TagName("input")).SendKeys(field.Value);
-
-                }
-                else
-                    throw new InvalidOperationException($"Field: {field} Does not exist");
-
-                return true;
-            });
-        }
-
-        /// <summary>
         /// Sets the value of a picklist.
         /// </summary>
         /// <param name="option">The option you want to set.</param>

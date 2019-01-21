@@ -37,23 +37,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute(GetOptions($"Clear Text Field Header Value: {field}"), driver =>
             {
-                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer].Replace("[NAME]", field.ToLower()))))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer_Header].Replace("[NAME]", field.ToLower()))))
                 {
-                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer].Replace("[NAME]", field.ToLower())));
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer_Header].Replace("[NAME]", field.ToLower())));
 
                     fieldElement.Click(true);
 
                     if (fieldElement.FindElements(By.TagName("input")).Count > 0)
                     {
                         fieldElement.FindElement(By.TagName("input")).Clear();
+                        fieldElement.SendKeys(Keys.Tab);
                     }
                     else if (fieldElement.TagName == "textarea")
                     {
                         fieldElement.Clear();
+                        fieldElement.SendKeys(Keys.Tab);
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Unable to locate field '{field}' on the form. Please verify the field exists and try again.");
+                    throw new InvalidOperationException($"Unable to locate field '{field}' in the header. Please verify the field exists and try again.");
 
                 return true;
             });
@@ -68,9 +70,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute(GetOptions($"Clear Checkbox/TwoOption Header Value: {option.Name}"), driver =>
             {
-                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower()))))
                 {
-                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower())));
 
                     if (fieldElement.FindElements(By.TagName("label")).Count > 0)
                     {
@@ -92,7 +94,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Unable to locate TwoOption field '{option.Name}' on the form. Please verify the TwoOption field exists and try again.");
+                    throw new InvalidOperationException($"Unable to locate TwoOption field '{option.Name}' in the header. Please verify the TwoOption field exists and try again.");
 
                 return true;
             });
@@ -108,9 +110,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return this.Execute(GetOptions($"Clear OptionSet Header Value: {option.Name}"), driver =>
             {
 
-                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer_Header].Replace("[NAME]", option.Name.ToLower()))))
                 {
-                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer_Header].Replace("[NAME]", option.Name.ToLower())));
                     var select = fieldElement;
 
                     if (fieldElement.TagName != "select")
@@ -128,7 +130,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Unable to locate OptionSet '{option.Name}' on the form. Please verify the OptionSet exists and try again.");
+                    throw new InvalidOperationException($"Unable to locate OptionSet '{option.Name}' in the header. Please verify the OptionSet exists and try again.");
 
                 return true;
             });
@@ -143,31 +145,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute(GetOptions($"Clear Lookup Header Value: {control.Name}"), driver =>
             {
-                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer].Replace("[NAME]", control.Name.ToLower()))))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer_Header].Replace("[NAME]", control.Name.ToLower()))))
                 {
-                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer].Replace("[NAME]", control.Name.ToLower())));
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer_Header].Replace("[NAME]", control.Name.ToLower())));
 
                     if (fieldElement.Text != "")
                     {
                         fieldElement.Hover(driver, true);
 
-                        if (fieldElement.FindElement(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name.ToLower()))) == null)
+                        if (fieldElement.FindElement(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon_Header].Replace("[NAME]", control.Name.ToLower()))) == null)
                             throw new InvalidOperationException($"Field: {control.Name} is not Lookup control");
 
                         driver.Manage().Window.Maximize();
-                        var lookupSearch = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name.ToLower())));
+                        var lookupSearch = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon_Header].Replace("[NAME]", control.Name.ToLower())));
 
                         if (!lookupSearch.Displayed)
                         {
                             driver.Manage().Window.Minimize();
                             driver.Manage().Window.Maximize();
                             fieldElement.Hover(driver, true);
-                            lookupSearch = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name.ToLower())));
+                            lookupSearch = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon_Header].Replace("[NAME]", control.Name.ToLower())));
                         }
 
                         lookupSearch.Click(true);
 
-                        var dialogName = $"Dialog_{control.Name}_IMenu";
+                        var dialogName = $"Dialog_header_{control.Name}_IMenu";
                         var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
 
                         var dialogItems = OpenDialog(dialog).Value;
@@ -185,7 +187,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Unable to locate Lookup '{control.Name}' on the form. Please verify the Lookup exists and try again.");
+                    throw new InvalidOperationException($"Unable to locate Lookup '{control.Name}' in the header. Please verify the Lookup exists and try again.");
 
                 return true;
             });
@@ -200,15 +202,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute(GetOptions($"Clear DateTime Header Field: {date.Name}"), driver =>
             {
-                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer].Replace("[NAME]", date.Name.ToLower()))))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer_Header].Replace("[NAME]", date.Name.ToLower()))))
                 {
-                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer].Replace("[NAME]", date.Name.ToLower())));
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer_Header].Replace("[NAME]", date.Name.ToLower())));
 
                     // Check whether the DateTime field has an existing value
                     if (fieldElement.GetAttribute("title") != "Select to enter data")
                     {
                         fieldElement.Click(true);
-                        var fieldInput = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.DateFieldInput].Replace("[NAME]", date.Name.ToLower())));
+                        var fieldInput = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.DateFieldInput_Header].Replace("[NAME]", date.Name.ToLower())));
                         // Clear any existing values
                         fieldInput.Clear();
                         fieldElement.Click(true);
@@ -216,7 +218,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Unable to locate DateTime field '{date.Name}' on the form. Please verify the DateTime field exists and try again.");
+                    throw new InvalidOperationException($"Unable to locate DateTime field '{date.Name}' in the header. Please verify the DateTime field exists and try again.");
 
                 return true;
             });
@@ -457,13 +459,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute($"Get Text Field Header Value: {field}", driver =>
             {
-                driver.WaitUntilVisible(By.Id(field));
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer_Header].Replace("[NAME]", field.ToLower())));
 
                 string text = string.Empty;
-                if (driver.HasElement(By.Id(field)))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer_Header].Replace("[NAME]", field.ToLower()))))
                 {
-                    driver.WaitUntilVisible(By.Id(field));
-                    var fieldElement = driver.FindElement(By.Id(field));
+                    var fieldElement = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer_Header].Replace("[NAME]", field.ToLower())));
 
                     if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
                     {
@@ -472,18 +473,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     else
                     {
                         text = fieldElement.FindElement(By.TagName("input")).GetAttribute("value");
-
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Field: {field} Does not exist");
+                    throw new InvalidOperationException($"Unable to locate field '{field}' in the header. Please verify the field exists and try again.");
 
                 return text;
             });
         }
 
         /// <summary>
-        /// Gets the value of a Composite control on an Entity header.
+        /// PLACEHOLDER: Gets the value of a Composite control on an Entity header.
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
         /// <example>xrmBrowser.Entity.GetHeaderValue(new CompositeControl() { Id = "fullname", Fields = fields });</example>
@@ -530,15 +530,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute($"Get OptionSet Header Value: {option.Name}", driver =>
             {
-                driver.WaitUntilVisible(By.Id(option.Name));
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer_Header].Replace("[NAME]", option.Name.ToLower())));
+
                 string text = string.Empty;
-                if (driver.HasElement(By.Id(option.Name)))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer_Header].Replace("[NAME]", option.Name.ToLower()))))
                 {
-                    var input = driver.FindElement(By.Id(option.Name));
+                    var input = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer_Header].Replace("[NAME]", option.Name.ToLower())));
                     text = input.Text;
                 }
                 else
-                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+                    throw new InvalidOperationException($"Unable to locate OptionSet '{option.Name}' in the header. Please verify the OptionSet exists and try again.");
 
                 return text;
             });
@@ -553,16 +554,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute($"Get Lookup Header Value: {control.Name}", driver =>
             {
-                driver.WaitUntilVisible(By.Id(control.Name));
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer_Header].Replace("[NAME]", control.Name.ToLower())));
 
                 string lookupValue = string.Empty;
-                if (driver.HasElement(By.Id(control.Name)))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer_Header].Replace("[NAME]", control.Name.ToLower()))))
                 {
-                    var input = driver.FindElement(By.Id(control.Name));
+                    var input = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer_Header].Replace("[NAME]", control.Name.ToLower())));
                     lookupValue = input.Text;
                 }
                 else
-                    throw new InvalidOperationException($"Field: {control.Name} Does not exist");
+                    throw new InvalidOperationException($"Unable to locate Lookup '{control.Name}' in the header. Please verify the Lookup exists and try again.");
 
                 return lookupValue;
             });
@@ -578,10 +579,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return this.Execute(GetOptions($"Get DateTime Header Value: {date.Name}"), driver =>
             {
                 string dateValue = "";
-                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer].Replace("[NAME]", date.Name.ToLower()))))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer_Header].Replace("[NAME]", date.Name.ToLower()))))
                 {
 
-                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer].Replace("[NAME]", date.Name.ToLower())));
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer_Header].Replace("[NAME]", date.Name.ToLower())));
 
                     // Check whether the DateTime field has an existing value
                     if (fieldElement.FindElements(By.TagName("label")).Count > 0)
@@ -591,7 +592,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Unable to locate DateTime field '{date.Name}' in the Business Process Flow. Please verify the DateTime field exists and try again.");
+                    throw new InvalidOperationException($"Unable to locate DateTime field '{date.Name}' in the header. Please verify the DateTime field exists and try again.");
 
                 return dateValue;
             });
@@ -608,9 +609,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 bool check = false;
 
-                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower()))))
                 {
-                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower())));
                     var select = fieldElement;
                     var text = "";
 
@@ -637,7 +638,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Unable to locate TwoOption field '{option.Name}' on the form. Please verify the TwoOption field exists and try again.");
+                    throw new InvalidOperationException($"Unable to locate TwoOption field '{option.Name}' in the header. Please verify the TwoOption field exists and try again.");
 
                 return check;
             });
@@ -1046,9 +1047,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute(GetOptions($"Set TwoOption Header Value: {option.Name}"), driver =>
             {
-                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower()))))
                 {
-                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower())));
 
                     if (fieldElement.FindElements(By.TagName("label")).Count > 0)
                     {
@@ -1061,13 +1062,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+                    throw new InvalidOperationException($"Unable to locate TwoOption field '{option.Name}' in the header. Please verify the TwoOption field exists and try again.");
 
                 return true;
             });
         }
-
-
 
         /// <summary>
         /// Sets the value of a Date Field on an Entity header.
@@ -1077,12 +1076,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example> xrmBrowser.Entity.SetHeaderValue(new DateTimeControl { Name = "birthdate", Value =  DateTime.Parse("11/1/1980")});</example>
         public BrowserCommandResult<bool> SetHeaderValue(DateTimeControl date)
         {
-            //return this.Execute($"Set Value: {field}", SetValue, field, date);
             return this.Execute(GetOptions($"Set DateTime Header Value: {date.Name}"), driver =>
             {
-                if (driver.HasElement(By.Id(date.Name)))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer_Header].Replace("[NAME]", date.Name.ToLower()))))
                 {
-                    var fieldElement = driver.ClickWhenAvailable(By.Id(date.Name));
+                    var fieldElement = driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.DateFieldContainer_Header].Replace("[NAME]", date.Name.ToLower())));
 
                     //Check to see if focus is on field already
                     if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
@@ -1106,7 +1104,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Field: {date.Name} Does not exist");
+                    throw new InvalidOperationException($"Unable to locate DateTime field '{date.Name}' in the header. Please verify the DateTime field exists and try again.");
 
                 return true;
             });
@@ -1120,31 +1118,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmBrowser.Entity.SetHeaderValue("name", "Test API Account");</example>
         public BrowserCommandResult<bool> SetHeaderValue(string field, string value)
         {
-            //return this.Execute($"Set Value: {field}", SetValue, field, value);
             var returnval = this.Execute(GetOptions($"Set Text Field Header Value: {field}"), driver =>
             {
-                if (driver.HasElement(By.Id(field)))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer_Header].Replace("[NAME]", field.ToLower()))))
                 {
-                    driver.WaitUntilVisible(By.Id(field));
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer_Header].Replace("[NAME]", field.ToLower())));
 
-                    var fieldElement = driver.FindElement(By.Id(field));
-                    if (fieldElement.IsVisible(By.TagName("a")))
-                    {
-                        IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
-                        var element = fieldElement.FindElement(By.TagName("a"));
-                        js.ExecuteScript("arguments[0].setAttribute('style', 'pointer-events: none; cursor: default')", element);
-                    }
                     fieldElement.Click();
-
-                    try
-                    {
-                        //Check to see if focus is on field already
-                        if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
-                            fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
-                        else
-                            fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
-                    }
-                    catch (NoSuchElementException) { }
 
                     if (fieldElement.FindElements(By.TagName("textarea")).Count > 0)
                     {
@@ -1155,18 +1135,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         fieldElement.Clear();
                         fieldElement.SendKeys(value);
-                        fieldElement.SendKeys(Keys.Tab);
                     }
                     else
                     {
-                        //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
-                        //driver.ExecuteScript("Xrm.Page.getAttribute('" + field + "').setValue('')");
+                        fieldElement.FindElement(By.TagName("input")).Clear();
                         fieldElement.FindElement(By.TagName("input")).SendKeys(value, true);
                         fieldElement.SendKeys(Keys.Tab);
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Field: {field} Does not exist");
+                    throw new InvalidOperationException($"Unable to locate field '{field}' in the header. Please verify the field exists and try again.");
 
                 return true;
             });
@@ -1182,36 +1160,37 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute(GetOptions($"Set OptionSet Header Value: {option.Name}"), driver =>
             {
-                driver.WaitUntilVisible(By.Id(option.Name));
-
-                if (driver.HasElement(By.Id(option.Name)))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer_Header].Replace("[NAME]", option.Name.ToLower()))))
                 {
-                    var input = driver.ClickWhenAvailable(By.Id(option.Name));
-                    var select = input;
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer_Header].Replace("[NAME]", option.Name.ToLower())));
+                    var select = fieldElement;
 
-                    if (input.TagName != "select")
-                        select = input.FindElement(By.TagName("select"));
+                    if (fieldElement.TagName != "select")
+                        select = fieldElement.FindElement(By.TagName("select"));
 
                     var options = select.FindElements(By.TagName("option"));
 
                     foreach (var op in options)
                     {
-                        if (op.Text == option.Value || op.GetAttribute("value") == option.Value)
-                            op.Click();
+                        if (op.Text.ToLower() == option.Value.ToLower() || op.GetAttribute("title").ToLower() == option.Value.ToLower())
+                        {
+                            fieldElement.Click(true);
+                            op.Click(true);
+                        }
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+                    throw new InvalidOperationException($"Unable to locate OptionSet '{option.Name}' in the header. Please verify the OptionSet exists and try again.");
 
                 return true;
             });
         }
 
         /// <summary>
-        /// Sets the value of a multi-value picklist on an Entity header.
+        /// PLACEHOLDER: Sets the value of a multi-value picklist on an Entity header.
         /// </summary>
         /// <param name="option">The option you want to set.</param>
-        /// <example>xrmBrowser.Entity.SetHeaderValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
+        /// <example>xrmBrowser.Entity.SetHeaderValue(new MultiValueOptionSet { });</example>
         public BrowserCommandResult<bool> SetHeaderValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
             return this.Execute(GetOptions($"Set MultiOptionSet Header Value: {option.Name}"), driver =>
@@ -1254,10 +1233,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Sets the value of a Composite control on an Entity header.
+        /// PLACEHOLDER: Sets the value of a Composite control on an Entity header.
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
-        /// <example>xrmBrowser.Entity.SetHeaderValue(new CompositeControl() {Id = "fullname", Fields = fields});</example>
+        /// <example>xrmBrowser.Entity.SetHeaderValue(new CompositeControl {Id = "fullname", Fields = fields});</example>
         public BrowserCommandResult<bool> SetHeaderValue(CompositeControl control)
         {
             return this.Execute(GetOptions($"Set ConpositeControl Header Value: {control.Id}"), driver =>
@@ -1305,18 +1284,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute(GetOptions($"Set Lookup Header Value: {control.Name}"), driver =>
             {
-                if (driver.HasElement(By.Id(control.Name)))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer_Header].Replace("[NAME]", control.Name.ToLower()))))
                 {
-                    driver.WaitUntilVisible(By.Id(control.Name));
+                    driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer_Header].Replace("[NAME]", control.Name.ToLower())));
 
-                    var input = driver.ClickWhenAvailable(By.Id(control.Name));
+                    var lookupInput = driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer_Header].Replace("[NAME]", control.Name.ToLower())));
 
-                    if (input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])) == null)
-                        throw new InvalidOperationException($"Field: {control.Name} is not lookup");
+                    if (lookupInput.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])) == null)
+                        throw new InvalidOperationException($"Field: {control.Name} is not Lookup control");
 
-                    input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click();
+                    lookupInput.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click(true);
 
-                    var dialogName = $"Dialog_{control.Name}_IMenu";
+                    var dialogName = $"Dialog_header_{control.Name}_IMenu";
+
                     var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
 
                     var dialogItems = OpenDialog(dialog).Value;
@@ -1325,11 +1305,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     if (control.Value != null)
                     {
 
-                        if (!dialogItems.Exists(x => x.Title == control.Value))
-                            throw new InvalidOperationException($"List does not have {control.Value}.");
+                        if (!dialogItems.Exists(x => x.Title.ToLower() == control.Value.ToLower()))
+                            throw new InvalidOperationException($"List does not contain value {control.Value}.");
 
-                        var dialogItem = dialogItems.Where(x => x.Title == control.Value).First();
-                        dialogItem.Element.Click();
+                        var dialogItem = dialogItems.Where(x => x.Title.ToLower() == control.Value.ToLower()).First();
+
+                        dialogItem.Element.Hover(driver, true);
+                        dialogItem.Element.Click(true);
+
 
                     }
                     else
@@ -1338,11 +1321,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                             throw new InvalidOperationException($"List does not have {control.Index + 1} items.");
 
                         var dialogItem = dialogItems[control.Index];
-                        dialogItem.Element.Click();
+
+                        dialogItem.Element.Hover(driver, true);
+                        dialogItem.Element.Click(true);
+
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Field: {control.Name} Does not exist");
+                    throw new InvalidOperationException($"Unable to locate Lookup '{control.Name}' in the header. Please verify the Lookup exists and try again.");
 
                 return true;
             });

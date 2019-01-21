@@ -143,6 +143,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Entity_DateFieldContainer"     , "//div[@id=\"[NAME]\"]" },
             { "Entity_DateFieldInput"     , "//input[@id=\"[NAME]_iDateInput\"]" },
             { "Entity_GetLookupSearchIcon"     , "//div[@id=\"[NAME]_lookupSearchIconDiv\"]" },
+            { "Entity_Header_TextFieldContainer"     , "//div[@id=\"header_[NAME]\"]" },
+            { "Entity_Header_CheckboxFieldContainer"     , "//div[@id=\"header_[NAME]\"]" },
+            { "Entity_Header_OptionSetFieldContainer"     , "//div[@id=\"header_[NAME]\"]" },
+            { "Entity_Header_LookupFieldContainer"     , "//div[@id=\"header_[NAME]\"]" },
+            { "Entity_Header_DateFieldContainer"     , "//div[@id=\"header_[NAME]\"]" },
+            { "Entity_Header_DateFieldInput"     , "//input[@id=\"header_[NAME]_iDateInput\"]" },
+            { "Entity_Header_GetLookupSearchIcon"     , "//div[@id=\"header_[NAME]_lookupSearchIconDiv\"]" },
+
 
             //Related MenuItems
             { "Related_Popout",                 "//li[contains(@data-id,\"tablist-tab_related\")]" },
@@ -629,6 +637,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string DateFieldContainer = "Entity_DateFieldContainer";
             public static string DateFieldInput = "Entity_DateFieldInput";
             public static string GetLookupSearchIcon = "Entity_GetLookupSearchIcon";
+            public static string TextFieldContainer_Header = "Entity_Header_TextFieldContainer";
+            public static string CheckboxFieldContainer_Header = "Entity_Header_CheckboxFieldContainer";
+            public static string OptionSetFieldContainer_Header = "Entity_Header_OptionSetFieldContainer";
+            public static string LookupFieldContainer_Header = "Entity_Header_LookupFieldContainer";
+            public static string DateFieldContainer_Header = "Entity_Header_DateFieldContainer";
+            public static string DateFieldInput_Header = "Entity_Header_DateFieldInput";
+            public static string GetLookupSearchIcon_Header = "Entity_Header_GetLookupSearchIcon";
         }
         public static class MenuRelated
         {

@@ -840,7 +840,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 if (driver.HasElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.OptionSetFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
                 {
-                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.OptionSetFieldContainer].Replace("[NAME]", option.Name.ToLower())));
                     var select = fieldElement;
 
                     if (fieldElement.TagName != "select")
