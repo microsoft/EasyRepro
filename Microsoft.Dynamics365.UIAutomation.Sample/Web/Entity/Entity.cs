@@ -50,9 +50,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
             OpenEntity("Sales", "Accounts", "Active Accounts");
             XrmTestBrowser.Grid.OpenRecord(0); // Account
 
-            XrmTestBrowser.Entity.SetHeaderValue("numberofemployees", "5000"); // Text Field
-            var getNumberOfEmployees = XrmTestBrowser.Entity.GetHeaderValue("numberofemployees").Value;
-            XrmTestBrowser.Entity.ClearHeaderValue("numberofemployees");
+            //XrmTestBrowser.Entity.SetHeaderValue("numberofemployees", "5000"); // Text Field
+            //var getNumberOfEmployees = XrmTestBrowser.Entity.GetHeaderValue("numberofemployees").Value;
+            //XrmTestBrowser.Entity.ClearHeaderValue("numberofemployees");
+
+            XrmTestBrowser.Entity.SelectHeaderLookup(new LookupItem { Name = "ownerid" });
 
             //XrmTestBrowser.Entity.ClearHeaderValue(new LookupItem { Name = "ownerid"}); // Lookup Field
             //XrmTestBrowser.Entity.SetHeaderValue(new LookupItem { Name = "ownerid", Index = 0 }); // Lookup Field
