@@ -635,6 +635,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             if (input != null)
                             {
                                 input.Click();
+
+                                driver.WaitForTransaction();
+
                                 input.SendKeys(userOrTeamName, true);
                             }
                         }
@@ -1918,17 +1921,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Get Object Id"), driver =>
             {
-                Guid oId = Guid.Empty;
+                var objectId = driver.ExecuteScript("return Xrm.Page.data.entity.getId();");
 
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter])))
-                {
-                    var footer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]));
-                    var popOutButton = footer.FindElements(By.XPath("//a[contains(@href,'id=')]")).FirstOrDefault();
-                    oId = Guid.Parse(HttpUtility.ParseQueryString(popOutButton.GetAttribute("href"))["id"]);
-                }
-
-                if (oId == Guid.Empty)
-                    throw new NotFoundException("Object Id for this record was not found");
+                Guid oId;
+                if (!Guid.TryParse(objectId.ToString(), out oId))
+                    throw new NotFoundException("Unable to retrieve object Id for this entity");
 
                 return oId;
             });
