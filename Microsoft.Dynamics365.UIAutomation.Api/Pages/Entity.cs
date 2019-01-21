@@ -35,7 +35,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmBrowser.Entity.ClearHeaderValue("firstname", "Test");</example>
         public BrowserCommandResult<bool> ClearHeaderValue(string field)
         {
-            return this.Execute(GetOptions($"Set Text Field Header Value: {field}"), driver =>
+            return this.Execute(GetOptions($"Clear Text Field Header Value: {field}"), driver =>
             {
                 if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.TextFieldContainer].Replace("[NAME]", field.ToLower()))))
                 {
@@ -330,7 +330,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions($"Click add button of {subgridName}"), driver =>
+            return this.Execute(GetOptions($"Click add button of subgrid: {subgridName}"), driver =>
             {
                 driver.FindElement(By.Id($"{subgridName}_addImageButton"))?.Click();
 
@@ -347,7 +347,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions($"Click GridView button of {subgridName}"), driver =>
+            return this.Execute(GetOptions($"Click GridView button of subgrid: {subgridName}"), driver =>
             {
                 driver.FindElement(By.Id($"{subgridName}_openAssociatedGridViewImageButton"))?.Click();
 
@@ -575,7 +575,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example> xrmBrowser.Entity.GetHeaderValue(new DateTime {Name = "birthdate"));</example>
         public BrowserCommandResult<string> GetHeaderValue(DateTimeControl date)
         {
-            //return this.Execute($"Set Value: {field}", SetValue, field, date);
             return this.Execute(GetOptions($"Get DateTime Header Value: {date.Name}"), driver =>
             {
                 string dateValue = "";
@@ -649,7 +648,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
         /// <example>xrmBrowser.Entity.GetRecordGuid();</example>
-        public BrowserCommandResult<string> GetRecordGuid(int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<Guid> GetRecordGuid(int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
 
@@ -659,7 +658,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 var recordGuid = driver.ExecuteScript("return Xrm.Page.data.entity.getId();").ToString(); ;
 
-                return Guid.Parse(recordGuid).ToString();
+                return Guid.Parse(recordGuid);
             });
         }
 
@@ -795,7 +794,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Popout the form
+        /// Popout the Entity form
         /// </summary>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
         /// <example>xrmBrowser.Entity.Popout();</example>
@@ -803,7 +802,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions($"Popout"), driver =>
+            return this.Execute(GetOptions($"Popout Entity Form"), driver =>
             {
                 SwitchToDefault();
                 driver.ClickWhenAvailable(By.ClassName(Elements.CssClass[Reference.Entity.Popout]));
@@ -861,7 +860,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Selects the Form
+        /// Selects the Desired Entity Form
         /// </summary>
         /// <param name="name">The name of the form</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
@@ -870,7 +869,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions($"SelectForm: {name}"), driver =>
+            return this.Execute(GetOptions($"Change Entity Form: {name}"), driver =>
             { 
                 var form = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.SelectForm]) ,"The Select Form option is not available.");
                 form.Click();
@@ -893,7 +892,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions($"SelectFormSection: {name}"), driver =>
+            return this.Execute(GetOptions($"Select Form Section: {name}"), driver =>
             {
                 var form = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.SelectFormSection]), "The Select Form Section option is not available.");
                 form.Click();
