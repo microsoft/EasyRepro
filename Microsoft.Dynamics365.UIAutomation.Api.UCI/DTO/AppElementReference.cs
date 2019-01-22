@@ -156,6 +156,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string BooleanFieldContainer = "BPF_BooleanFieldContainer";
             public static string DateTimeFieldContainer = "BPF_DateTimeFieldContainer";
             public static string FieldControlDateTimeInputUCI = "BPF_FieldControlDateTimeInputUCI";
+            public static string PinStageButton = "BPF_PinStageButton";
+            public static string CloseStageButton = "BPF_CloseStageButton";
         }
         public static class Dialogs
         {
@@ -335,6 +337,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_BooleanFieldContainer", "//input[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-toggle\')]" },
             { "BPF_DateTimeFieldContainer", "//input[contains(@data-id, \'[NAME].fieldControl-date-time-input\')]" },
             { "BPF_FieldControlDateTimeInputUCI","//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
+            { "BPF_PinStageButton","//button[contains(@id,'stageDockModeButton')]"},
+            { "BPF_CloseStageButton","//button[contains(@id,'stageContentClose')]"},
 
             //Related Grid
             { "Related_CommandBarButton", "//button[contains(., '[NAME]') and contains(@data-id,'SubGridAssociated')]"},

@@ -899,17 +899,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     d => { d.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.ViewSelector])); },
                     d => { throw new Exception("Unable to click the View Picker"); });
 
-                //driver.WaitUntilVisible(By.ClassName(AppElements.Xpath[AppReference.Grid.ViewSelector]),
-                //    new TimeSpan(0, 0, 20),
-                //    null,
-                //    d =>
-                //    {
-                //        //Fix for Firefox not clicking the element in the event above. Issue with the driver. 
-                //        d.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.ViewSelector]));
-                //        driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Grid.ViewSelector]), new TimeSpan(0, 0, 3), null, e => { throw new Exception("View Picker menu is not avilable"); });
-
-                //    });
-
                 var viewContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.ViewContainer]));
                 var viewItems = viewContainer.FindElements(By.TagName("li"));
 
@@ -1002,7 +991,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             this.Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions($"Search"), driver =>
+            return this.Execute(GetOptions($"Clear Search"), driver =>
             {
                 driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Grid.QuickFind]));
 
@@ -1305,7 +1294,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public BrowserCommandResult<bool> ClickRelatedCommand(string name, string subName = null)
         {
-            return this.Execute(GetOptions("Open Grid Item"), driver =>
+            return this.Execute(GetOptions("Click Related Tab Command"), driver =>
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
                     throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
@@ -1574,7 +1563,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
         public BrowserCommandResult<bool> SetValue(OptionSet option)
         {
-            return this.Execute(GetOptions($"Set Value: {option.Name}"), driver =>
+            return this.Execute(GetOptions($"Set OptionSet Value: {option.Name}"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
 
@@ -1605,7 +1594,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
         public BrowserCommandResult<bool> SetValue(BooleanItem option)
         {
-            return this.Execute(GetOptions($"Set Value: {option.Name}"), driver =>
+            return this.Execute(GetOptions($"Set BooleanItem Value: {option.Name}"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
                 if (option.Value)
@@ -1678,7 +1667,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <returns>True on success</returns>
         internal BrowserCommandResult<bool> SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
-            return this.Execute(GetOptions($"Set Value: {option.Name}"), driver =>
+            return this.Execute(GetOptions($"Set MultiValueOptionSet Value: {option.Name}"), driver =>
             {
                 if (removeExistingValues)
                 {
@@ -1856,7 +1845,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmBrowser.Entity.GetValue(new OptionSet { Name = "preferredcontactmethodcode"}); </example>
         internal BrowserCommandResult<string> GetValue(OptionSet option)
         {
-            return this.Execute($"Get Value: {option.Name}", driver =>
+            return this.Execute($"Get OptionSet Value: {option.Name}", driver =>
             {
                 var text = string.Empty;
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
@@ -2052,7 +2041,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<string> GetHeaderValue(LookupItem control)
         {
-            return this.Execute(GetOptions($"Get Header Value {control.Name}"), driver =>
+            return this.Execute(GetOptions($"Get Header LookupItem Value {control.Name}"), driver =>
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
@@ -2074,7 +2063,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<MultiValueOptionSet> GetHeaderValue(MultiValueOptionSet control)
         {
-            return this.Execute(GetOptions($"Get Header Value {control.Name}"), driver =>
+            return this.Execute(GetOptions($"Get Header MultiValueOptionSet Value {control.Name}"), driver =>
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
@@ -2085,7 +2074,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<string> GetHeaderValue(OptionSet control)
         {
-            return this.Execute(GetOptions($"Get Header Value {control}"), driver =>
+            return this.Execute(GetOptions($"Get Header OptionSet Value {control}"), driver =>
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
@@ -2109,7 +2098,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> SetHeaderValue(LookupItem control)
         {
-            return this.Execute(GetOptions($"Set Header Value {control.Name}"), driver =>
+            return this.Execute(GetOptions($"Set Header LookupItem Value {control.Name}"), driver =>
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
@@ -2122,7 +2111,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> SetHeaderValue(MultiValueOptionSet control)
         {
-            return this.Execute(GetOptions($"Set Header Value {control.Name}"), driver =>
+            return this.Execute(GetOptions($"Set Header MultiValueOptionSet Value {control.Name}"), driver =>
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
@@ -2135,7 +2124,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> SetHeaderValue(OptionSet control)
         {
-            return this.Execute(GetOptions($"Set Header Value {control.Name}"), driver =>
+            return this.Execute(GetOptions($"Set Header OptionSet Value {control.Name}"), driver =>
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
@@ -2221,7 +2210,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> SearchLookupField(LookupItem control, string searchCriteria)
         {
-            return this.Execute(GetOptions("Select Lookup Record"), driver =>
+            return this.Execute(GetOptions("Search Lookup Record"), driver =>
             {
                 //Click in the field and enter values
                 control.Value = searchCriteria;
@@ -2558,7 +2547,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <returns>True on success, Exception on failure to invoke any action</returns>
         internal BrowserCommandResult<bool> SetValue(string fieldName, string value, string expectedTagName)
         {
-            return this.Execute($"Open Timeline Add Post Popout", driver =>
+            return this.Execute($"SetValue (Generic)", driver =>
             {
                 var inputbox = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[fieldName]));
                 if (expectedTagName.Equals(inputbox.TagName, StringComparison.InvariantCultureIgnoreCase))
@@ -2587,7 +2576,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.BusinessProcessFlow.SetValue("firstname", "Test");</example>
         internal BrowserCommandResult<bool> BPFSetValue(string field, string value)
         {
-            return this.Execute(GetOptions($"Set Value"), driver =>
+            return this.Execute(GetOptions($"Set BPF Value"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.TextFieldContainer].Replace("[NAME]", field)));
 
@@ -2888,15 +2877,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> BPFPin(string stageName, int thinkTime = Constants.DefaultThinkTime)
         {
-            return this.Execute(GetOptions($"Select Stage: {stageName}"), driver =>
+            return this.Execute(GetOptions($"Pin BPF: {stageName}"), driver =>
             {
                 //Click the BPF Stage
                 SelectStage(stageName, 0);
                 driver.WaitForTransaction();
 
                 //Pin the Stage
-                if (driver.HasElement(By.XPath("//button[contains(@id,'stageDockModeButton')]")))
-                    driver.FindElement(By.XPath("//button[contains(@id,'stageDockModeButton')]")).Click();
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.PinStageButton])))
+                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.PinStageButton])).Click();
                 else
                     throw new NotFoundException($"Pin button for stage {stageName} not found.");
 
@@ -2907,17 +2896,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> BPFClose(string stageName, int thinkTime = Constants.DefaultThinkTime)
         {
-            return this.Execute(GetOptions($"Select Stage: {stageName}"), driver =>
+            return this.Execute(GetOptions($"Close BPF: {stageName}"), driver =>
             {
                 //Click the BPF Stage
                 SelectStage(stageName, 0);
                 driver.WaitForTransaction();
 
                 //Pin the Stage
-                if (driver.HasElement(By.XPath("//button[contains(@id,'stageContentClose')]")))
-                    driver.FindElement(By.XPath("//button[contains(@id,'stageContentClose')]")).Click();
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.CloseStageButton])))
+                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.CloseStageButton])).Click(true);
                 else
-                    throw new NotFoundException($"Pin button for stage {stageName} not found.");
+                    throw new NotFoundException($"Close button for stage {stageName} not found.");
 
                 driver.WaitForTransaction();
                 return true;
