@@ -18,5 +18,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenGridRow(index);
         }
+
+        public void OpenEditableGridRow(string entity,int index)
+        {
+            _client.OpenEditableGridRow(entity,index);
+        }
     }
 }

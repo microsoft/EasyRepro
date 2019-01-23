@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Dynamics365.UIAutomation.Api", "Microsoft.Dynamics365.UIAutomation.Api\Microsoft.Dynamics365.UIAutomation.Api.csproj", "{DFE2C141-F1AA-4D4B-8DF8-0FB93023CF45}"
 EndProject
@@ -10,6 +10,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Dynamics365.UIAutomation.Sample", "Microsoft.Dynamics365.UIAutomation.Sample\Microsoft.Dynamics365.UIAutomation.Sample.csproj", "{A075B87E-DCA5-4A2A-909B-932E2F5F98B4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Dynamics365.UIAutomation.Api.UCI", "Microsoft.Dynamics365.UIAutomation.Api.UCI\Microsoft.Dynamics365.UIAutomation.Api.UCI.csproj", "{AFCB5BB5-4512-4019-A911-5D56CFF4F3D0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A6EC34BB-EC6E-4D3A-B02E-D45B2B7408C4}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,5 +50,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7FC9040B-D5FA-49B5-96E0-A408AEA7FEC4}
 	EndGlobalSection
 EndGlobal

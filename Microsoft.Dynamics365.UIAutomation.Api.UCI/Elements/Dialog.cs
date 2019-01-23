@@ -14,6 +14,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client = client;
         }
 
+        public bool ClickOkIfErrorDialogWindowExists()
+        {
+            return _client.ClickOkIfErrorDialogWindowExists();
+        }
         public bool CloseWarningDialog()
         {
             return _client.CloseWarningDialog();

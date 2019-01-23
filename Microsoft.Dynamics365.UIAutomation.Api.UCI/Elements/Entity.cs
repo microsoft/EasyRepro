@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using OpenQA.Selenium;
 using System;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
@@ -12,6 +13,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public Entity(WebClient client) : base()
         {
             _client = client;
+        }
+
+        public void TakeWindowScreenShot(string path, ScreenshotImageFormat fileFormat)
+        {
+
+            _client.TakeWindowScreenShot(path, fileFormat);
         }
 
         public void OpenEntity(string entityname, Guid id)
@@ -62,6 +69,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public string GetValue(OptionSet optionSet)
         {
             return _client.GetValue(optionSet);
+        }
+
+        public bool ValidateFieldExists(string field)
+        {
+            return _client.ValidateFieldExists(field);
         }
 
         public bool ValidateFieldMandatory(string field)
@@ -120,5 +132,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.NavigateBrowserback();
         }
+
+        public string GetHeaderTitle()
+        {
+            return _client.GetHeaderTitle();
+        }
+
+        public void SetHeaderValue(OptionSet optionSet)
+        {
+            _client.SetHeaderValue(optionSet);
+        }
+
+        //public void SelectRowOnRelatedEditableGrid()
+        //{
+        //    _client.OpenGridRow(0);
+        //}
     }   
 }

@@ -57,7 +57,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SubArea = "Grid_SubArea";
         }
 
-        public static class Entity
+        public static class EditableGrid
+        {
+            public static string Container = "EditabelGrid_Container";
+            public static string CellContainer = "EditableGrid_CellContainer";
+        }
+
+            public static class Entity
         {
             public static string Form = "Entity_FormContainer";
             public static string Save = "Entity_Save";
@@ -89,10 +95,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string TabList = "Entity_TabList";
             public static string MoreTabList = "Entity_TabListMore";
             public static string Tab = "Entity_Tab";
+            public static string TabDropDown = "Entity_TabDropDown";
             public static string SubTab = "Entity_SubTab";
             public static string TextFieldNotificationAlert = "Entity_TextFieldNotificationAlert";
             public static string TextFieldLocked = "Entity_TextFieldLocked";
-
+            public static string HeaderTitle = "Entity_HeaderTitle";
+            public static string HeaderTextFieldContainer = "Entity_HeaderTextFieldContainer";
+            public static string HeaderOptionFlyout = "Entity_HeaderOptionSetFlyout";
+            public static string TextFieldLabel = "Entity_TextFieldLabel";
         }
 
         public static class CommandBar
@@ -227,6 +237,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Grid_ViewContainer"   , "//ul[contains(@id,'ViewSelector')]" },
             { "Grid_SubArea"   , "//*[contains(@data-id,'[NAME]')]"},
             
+            //Editable Grid
+            { "EditabelGrid_Container"       , "//div[@aria-label='Editable Grid'][contains(@data-lp-id,'[NAME]')]"},
+            { "EditableGrid_CellContainer"    ,"//div[@role='row'][@aria-label='Data']"},
 
             //Entity
             { "Entity_Assign"       , "//button[contains(@data-id,'Assign')]"},
@@ -255,6 +268,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_TabList", "//ul[@id=\"tablist\"]" },
             {"Entity_TabListMore","//ul[@id=\"tablist\"]//li[@data-id=\"tab_more\"]" },
             { "Entity_Tab", "//li[@title=\"{0}\"]" },
+            { "Entity_TabDropDown", "//div[@id=\"__flyoutRootNode\"]//li[text()=\"{0}\"]" },
             { "Entity_SubTab", "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]" },
             { "Entity_FieldControlDateTimeInput","//input[contains(@id,'[FIELD].fieldControl-date-time-input')]" },
             { "Entity_FieldControlDateTimeInputUCI","//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
@@ -263,6 +277,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //{ "Entity_TextFieldNotificationAlert", "//*[contains(@data-id, \'[NAME]-error-message\')]" },
             { "Entity_TextFieldNotificationAlert", "//*[contains(@data-id, \'[NAME]-required-icon\')]" },
             {"Entity_TextFieldLocked","//*[contains(@data-id, \'[NAME]-locked-icon\')]" },
+            {"Entity_HeaderTitle","//div[@data-lp-id=\"form-header-title\"]//h1[@data-id=\"header_title\"]" },
+            {"Entity_HeaderTextFieldContainer","//*[contains(@data-id, \'header_[NAME].fieldControl\')]" },
+            {"Entity_HeaderOptionSetFlyout","//div[@data-id=\"header_[NAME].fieldControl|__flyoutRootNode\"]//li[@data-text=\"[Value]\"]" },
+            {"Entity_TextFieldLabel","//label[contains(@id,\'[NAME]-field-label\')]" },
                         
             //CommandBar
             { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
@@ -321,8 +339,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_ActiveProcessGridControlContainer"       , "//div[contains(@data-lp-id,'activeProcessGridControlContainer')]"},
             { "Entity_SwitchProcessDialogOK"       , "//button[contains(@data-id,'ok_id')]"},
             { "SwitchProcess_Container" , "//section[contains(@id, 'popupContainer')]" },
-			//QuickCreate 
-            { "QuickCreate_SaveButton" , "//button[contains(@id,'quickCreateSaveBtn')]" }
+            //QuickCreate 
+            //{ "QuickCreate_SaveButton" , "//button[contains(@id,'quickCreateSaveBtn')]" }
+            {"QuickCreate_SaveButton","//button[contains(@id,'quickCreateSaveAndCloseBtn')]" }
         };
     }
 

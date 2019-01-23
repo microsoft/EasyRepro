@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using OpenQA.Selenium;
 using System;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
@@ -14,9 +15,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client = client;
         }
 
+        public void TakeWindowScreenShot(string path, ScreenshotImageFormat fileFormat)
+        {
+
+            _client.TakeWindowScreenShot(path, fileFormat);
+        }
         public void SetValue(string field, string value)
         {
             _client.SetValue(field, value);
+        }
+
+        public bool CheckQuickCreateFormVisible()
+        {
+            bool quickCreateExists = false;
+            quickCreateExists = _client.CheckQuickCreateFormVisible();
+            return quickCreateExists;
         }
 
         public void SetValue(LookupItem control, int index = 0)

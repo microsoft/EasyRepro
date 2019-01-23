@@ -5,6 +5,7 @@ using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security;
 using System.Threading;
@@ -402,6 +403,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #endregion
 
         #region Dialogs
+        internal bool ClickOkIfErrorDialogWindowExists()
+        {
+            return this.Execute(GetOptions($"Close Error Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (inlineDialog)
+                {
+                    if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Dialogs.ErrorDialog])))
+                    {
+                        var dialogFooter = driver.FindElement(By.XPath(Elements.Xpath[Reference.Dialogs.ErrorDialog]));
+
+                        if (
+                            !(dialogFooter?.FindElements(By.XPath(Elements.Xpath[Reference.Dialogs.ErrorDialogOkButton])).Count >
+                              0)) return true;
+                        var closeBtn = dialogFooter.FindElement(By.XPath(Elements.Xpath[Reference.Dialogs.ErrorDialogOkButton]));
+                        closeBtn.Click();
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+
         internal bool SwitchToDialog(int frameIndex = 0)
         {
             var index = "";
@@ -843,11 +870,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 bool success = false;
                 IWebElement ribbon = null;
+                bool buttonfound = false;
+                ReadOnlyCollection<IWebElement> ribbonList = null;
 
                 //Try to click the command bar from inside an entity record.  If that fails, try to click the Command Bar from within a Grid.
                 try
                 {
-                    ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerSubrid]));
+                    ribbonList = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerSubrid]));
                     success = true;
                 }
                 catch (Exception)
@@ -855,25 +884,35 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     success = false;
                 }
 
-                try
+                //try
+                //{
+                //    ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerSubrid]));
+                //    success = true;
+                //}
+                //catch (Exception)
+                //{
+                //    success = false;
+                //}
+
+                foreach (IWebElement ribbon1 in ribbonList)
                 {
-                    ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerSubrid]));
-                    success = true;
+                    var items = ribbon1.FindElements(By.TagName("li"));
+
+                    IWebElement button;
+
+                    button = subname == "" ? items.FirstOrDefault(x => x.GetAttribute("aria-label") == name) : items.FirstOrDefault(x => x.GetAttribute("aria-label") == name + " More Commands");
+
+                    if (button != null)
+                    {
+                        button.Click();
+                        buttonfound = true;
+                        break;
+                    }
                 }
-                catch (Exception)
+
+                if(buttonfound)
                 {
-                    success = false;
-                }
 
-                var items = ribbon.FindElements(By.TagName("li"));
-
-                IWebElement button;
-
-                button = subname == "" ? items.FirstOrDefault(x => x.GetAttribute("aria-label") == name) : items.FirstOrDefault(x => x.GetAttribute("aria-label") == name + " More Commands");
-
-                if (button != null)
-                {
-                    button.Click();
                 }
                 else
                 {
@@ -1296,6 +1335,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
+        public BrowserCommandResult<bool> OpenEditableGridRow(string entityvalue,int index, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Open Grid Item"), driver =>
+            {
+                var grid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.EditableGrid.Container].Replace("[NAME]", entityvalue)));
+                var gridCellContainer = grid.FindElements(By.XPath(AppElements.Xpath[AppReference.EditableGrid.CellContainer]));
+                var rowCount = gridCellContainer.Count.ToString();
+                var count = 0;
+
+                if (rowCount == null || !int.TryParse(rowCount, out count) || count <= 0) return true;
+                var link =
+                    gridCellContainer[0].FindElement(
+                        By.XPath("//div[@role='gridcell'][@header-row-number='" + index + "']"));///following::div
+
+                if (link != null)
+                {
+                    link.Click();
+                }
+                else
+                {
+                    throw new InvalidOperationException($"No record with the index '{index}' exists.");
+                }
+                return true;
+            });
+        }
         #endregion
 
         #region Entity
@@ -1363,6 +1430,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> CheckQuickCreateFormVisible()
+        {
+            return this.Execute(GetOptions($"CheckQuickCreateFormVisible"), driver =>
+            {
+                return driver.HasElement(By.Id("quickCreateRoot"));
+            });
+        }
+
         /// <summary>
         /// Open record set and navigate record index.
         /// This method supersedes Navigate Up and Navigate Down outside of UCI 
@@ -1421,6 +1496,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
+        
 
         /// <summary>
         /// Set Value
@@ -1642,6 +1719,41 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Sets the value of a picklist.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
+        /// <example>xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
+        public BrowserCommandResult<bool> SetHeaderValue(OptionSet option)
+        {
+            return this.Execute(GetOptions($"Set Value: {option.Name}"), driver =>
+            {
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderTextFieldContainer].Replace("[NAME]", option.Name)));
+
+                fieldContainer.Click();
+
+                var optionValue = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderOptionFlyout].Replace("[NAME]", option.Name).Replace("[Value]",option.Value)));
+                optionValue.Click();
+                //if (fieldContainer.FindElements(By.TagName("select")).Count > 0)
+                //{
+                //    var select = fieldContainer.FindElement(By.TagName("select"));
+                //    var options = select.FindElements(By.TagName("option"));
+
+                //    foreach (var op in options)
+                //    {
+                //        if (op.Text != option.Value && op.GetAttribute("value") != option.Value) continue;
+                //        op.Click();
+                //        break;
+                //    }
+                //}
+                //else
+                //{
+                //    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+                //}
+                return true;
+            });
+        }
+
+        /// <summary>
         /// Sets the value of a Boolean Item.
         /// </summary>
         /// <param name="option">The option you want to set.</param>
@@ -1690,7 +1802,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         //fieldElement.Click();
                         //fieldElement.SendKeys(date.ToString(format));
-                        //fieldElement.SendKeys(Keys.Enter);
+                        //fieldElement.SendKeys(Keys.Tab);
 
                         fieldElement.Click();
                         fieldElement.SendKeys(Keys.Backspace);
@@ -1951,6 +2063,29 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 return returnValue;
+            });
+        }
+
+        internal BrowserCommandResult<bool> ValidateFieldExists(string field)
+        {
+            return this.Execute(GetOptions($"Check Field Exists"), driver =>
+            {
+                try
+                {
+                    var fieldContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLabel].Replace("[NAME]", field)));
+                    //if (fieldContainer.Text == "A required field cannot be empty.")
+                    //    return true;
+                    //else
+                    //    return false;
+                    if (fieldContainer != null)
+                        return true;
+                    else
+                        return false;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
             });
         }
 
@@ -2244,11 +2379,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             this.Browser.Navigate(NavigationOperation.NavigateBack);
         }
 
+        internal string GetHeaderTitle()
+        {
+            if (this.Browser.Driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderTitle])))
+            {
+                return(this.Browser.Driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderTitle])).Text);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
+        public void TakeWindowScreenShot(string path, ScreenshotImageFormat fileFormat)
+        {
+
+            this.Browser.Driver.TakeScreenshot().SaveAsFile(path, fileFormat);
+        }
+
         internal void ClickTab(string xpath, string name)
         {
             if (this.Browser.Driver.HasElement(By.XPath(String.Format(xpath, name))))
             {
                 this.Browser.Driver.FindElement(By.XPath(String.Format(xpath, name))).Click(true);
+            }
+            else if (this.Browser.Driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabList])))
+            {
+                this.Browser.Driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabList])).Click();
+                this.Browser.Driver.FindElement(By.XPath(String.Format(AppElements.Xpath[AppReference.Entity.TabDropDown], name))).Click();
             }
             else
             {
