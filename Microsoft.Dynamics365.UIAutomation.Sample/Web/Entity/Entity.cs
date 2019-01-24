@@ -45,7 +45,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
         }
 
         [TestMethod]
-        public void WEBTestSetHeaderValues()
+        public void WEBTestClearSetGetHeaderValues()
         {            
             OpenEntity("Sales", "Accounts", "Active Accounts");
             XrmTestBrowser.Grid.OpenRecord(0); // Account
@@ -82,6 +82,47 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
             XrmTestBrowser.Entity.ClearHeaderValue(new DateTimeControl { Name = "estimatedclosedate"}); // DateTime Field
 
             XrmTestBrowser.Entity.Save();
+
+            XrmTestBrowser.ThinkTime(5000);
+        }
+
+        [TestMethod]
+        public void WEBTestGetFooterValues()
+        {
+            OpenEntity("Sales", "Accounts", "Active Accounts");
+            XrmTestBrowser.Grid.OpenRecord(0); // Account
+
+            var getStateCode = XrmTestBrowser.Entity.GetFooterValue(new OptionSet { Name = "statecode" }).Value; // OptionSet Field
+
+            OpenEntity("Sales", "Leads", "Open Leads");
+
+            XrmTestBrowser.Grid.OpenRecord(0); // Lead
+
+            var getLeadStatus = XrmTestBrowser.Entity.GetFooterValue(new OptionSet { Name = "statecode" }).Value; // OptionSet Field
+            Assert.AreEqual("Open", getLeadStatus);
+
+            XrmTestBrowser.CommandBar.ClickCommand("Qualify");
+
+            XrmTestBrowser.Dialogs.QualifyLead(true, 4000);
+
+            XrmTestBrowser.ThinkTime(5000);
+
+            XrmTestBrowser.BusinessProcessFlow.PreviousStage();
+
+            XrmTestBrowser.ThinkTime(5000);
+            getLeadStatus = XrmTestBrowser.Entity.GetFooterValue(new OptionSet { Name = "statecode" }).Value; // OptionSet Field
+
+            XrmTestBrowser.ThinkTime(2000);
+            Assert.AreEqual("Qualified", getLeadStatus);
+
+            OpenEntity("Settings", "Security");
+
+            XrmTestBrowser.Administration.OpenFeature("Users");
+
+            XrmTestBrowser.Grid.OpenRecord(0);
+
+            var getUserRecordStatus = XrmTestBrowser.Entity.GetFooterValue(new OptionSet { Name = "isdisabled" }).Value; // OptionSet Field
+            Assert.AreEqual("Enabled", getUserRecordStatus);
 
             XrmTestBrowser.ThinkTime(5000);
         }
