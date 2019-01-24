@@ -102,6 +102,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string DuplicateDetectionWindowMarker = "Entity_DuplicateDetectionWindowMarker";
             public static string DuplicateDetectionGridRows = "Entity_DuplicateDetectionGridRows";
             public static string DuplicateDetectionIgnoreAndSaveButton = "Entity_DuplicateDetectionIgnoreAndSaveButton";
+            public static string FooterStatusValue = "Entity_FooterStatusField";
 
         }
 
@@ -151,6 +152,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string NextStage_UCI = "BPF_NextStage_UCI";
             public static string Flyout_UCI = "BPF_Flyout_UCI";
             public static string NextStageButton = "BPF_NextStageButton_UCI";
+            public static string SetActiveButton = "BPF_SetActiveButton";
             public static string BusinessProcessFlowFieldName = "BPF_FieldName_UCI";
             public static string TextFieldContainer = "BPF_TextFieldContainer";
             public static string BooleanFieldContainer = "BPF_BooleanFieldContainer";
@@ -268,7 +270,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_TextFieldContainer", "//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
             { "Entity_TextFieldValue", "//input[contains(@data-id, \'[NAME].fieldControl\')]" },
             { "Entity_TextFieldLookup", "//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
-            { "Entity_TextFieldLookupMenu", "//div[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_tabContainer')]" },
+            { "Entity_TextFieldLookupMenu", "//div[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]') and contains(@data-id,'tabContainer')]" },
             { "Entity_LookupFieldDeleteExistingValue", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]" },
             { "Entity_LookupFieldHoverExistingValue", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList')]" },
             { "Entity_TextFieldLookupFieldContainer", "//*[contains(@data-id, '[NAME].fieldControl-Lookup_[NAME]')]" },
@@ -296,6 +298,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_DuplicateDetectionWindowMarker","//div[contains(@data-id,'ManageDuplicates')]"},
             { "Entity_DuplicateDetectionGridRows", "//div[contains(@class,'data-selectable')]" },
             { "Entity_DuplicateDetectionIgnoreAndSaveButton", "//button[contains(@data-id,'ignore_save')]"},
+            { "Entity_FooterStatusField",".//span[contains(@role,'status')]"},
 			
                         
             //CommandBar
@@ -332,6 +335,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_NextStage_UCI"     , "//li[contains(@id,'processHeaderStage')]" },
             { "BPF_Flyout_UCI"     , "//div[contains(@id,'businessProcessFlowFlyoutHeaderContainer')]" },
             { "BPF_NextStageButton_UCI"     , "//button[contains(@data-id,'nextButtonContainer')]" },
+            { "BPF_SetActiveButton", "//button[contains(@data-id,'setActiveButton')]" },
             { "BPF_FieldName_UCI"     , "//input[contains(@id,'[NAME]')]" },
             { "BPF_TextFieldContainer", "//div[contains(@data-lp-id, \'header_process_[NAME]\')]" },
             { "BPF_BooleanFieldContainer", "//input[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-toggle\')]" },

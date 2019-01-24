@@ -1507,10 +1507,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         input.Click(true);
                         input.SendKeys(control.Value, true);
-                        this.ThinkTime(1000);
                         input.Click();
                     }
                 }
+
+                driver.WaitForTransaction();
 
                 if (control.Value != null && control.Value != "")
                 {
@@ -2080,6 +2081,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new NotFoundException("Unable to find header on the form");
 
                 return GetValue(control);
+            });
+        }
+
+        internal BrowserCommandResult<string> GetStatusFromFooter()
+        {
+            return this.Execute(GetOptions($"Get Status value from footer"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter])))
+                    throw new NotFoundException("Unable to find footer on the form");
+
+                var footer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]));
+
+                var status = footer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FooterStatusValue]));
+
+                if (String.IsNullOrEmpty(status.Text))
+                    return "unknown";
+
+                return status.Text;
+                
             });
         }
 
@@ -2810,7 +2830,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                 }
 
-                this.Browser.ThinkTime(thinkTime);
+                driver.WaitForTransaction();
 
                 return true;
             });
@@ -2822,55 +2842,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Set Active Stage: {stageName}"), driver =>
             {
-
-                if (stageName != "")
+                if (!String.IsNullOrEmpty(stageName))
                 {
-                    // StageName was passed in, attempt to open the desired stage
+                    SelectStage(stageName);
+
+                    if (!driver.HasElement(By.XPath("//button[contains(@data-id,'setActiveButton')]")))
+                        throw new NotFoundException($"Unable to find the Set Active button. Please verify the stage name { stageName } is correct.");
+
+                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.SetActiveButton])).Click(true);
+
+                    driver.WaitForTransaction();
                 }
 
-                /*
-                    //Find the Business Process Stages
-                    var processStages = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStage_UCI]));
-
-                    foreach (var processStage in processStages)
-                    {
-                        var labels = processStage.FindElements(By.TagName("label"));
-
-                        //Click the Label of the Process Stage if found
-                        foreach (var label in labels)
-                        {
-                            if (label.Text.Equals(stageName, StringComparison.OrdinalIgnoreCase))
-                            {
-                                label.Click();
-                            }
-                        }
-                    }
-
-                    var flyoutFooterControls = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.Flyout_UCI]));
-
-                    foreach (var control in flyoutFooterControls)
-                    {
-                        //If there's a field to enter, fill it out
-                        if (businessProcessFlowField != null)
-                        {
-                            var bpfField = control.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFieldName].Replace("[NAME]", businessProcessFlowField.Name)));
-
-                            if (bpfField != null)
-                            {
-                                bpfField.Click();
-                                for (int i = 0; i < businessProcessFlowField.Value.Length; i++)
-                                {
-                                    bpfField.SendKeys(businessProcessFlowField.Value.Substring(i, 1));
-                                }
-                            }
-                        }
-
-                        //Click the Next Stage Button
-                        var nextButton = control.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStageButton]));
-                        nextButton.Click();
-                    }
-
-                */
                 return true;
             });
         }

@@ -55,9 +55,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 LookupItem account = new LookupItem() { Name = "parentaccountid" };
 
                 xrmApp.BusinessProcessFlow.SelectStage("Qualify");
+
                 string contactName = xrmApp.BusinessProcessFlow.GetValue(contact);
                 string acctName = xrmApp.BusinessProcessFlow.GetValue(account);
                 string budgetAmt = xrmApp.BusinessProcessFlow.GetValue("budgetamount");
+
+                string status = xrmApp.Entity.GetFooterStatusValue();
 
                 xrmApp.ThinkTime(1000);
             }

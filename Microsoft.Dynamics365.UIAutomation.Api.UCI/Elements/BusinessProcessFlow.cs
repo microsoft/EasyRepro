@@ -48,7 +48,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="stageName">Name of the business process flow stage</param>
         public void SetActive(string stageName = "")
         {
-            // This makes the assumption that SelectStage() has already been called
             _client.SetActive(stageName);
         }
 

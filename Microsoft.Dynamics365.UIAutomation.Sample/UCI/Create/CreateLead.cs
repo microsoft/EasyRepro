@@ -34,8 +34,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(5000);
 
                 xrmApp.Entity.SetValue("subject", TestSettings.GetRandomString(5,15));
-                xrmApp.Entity.SetValue("firstname", TestSettings.GetRandomFirstName());
-                xrmApp.Entity.SetValue("lastname", TestSettings.GetRandomLastName());
+                xrmApp.Entity.SetValue("firstname", TestSettings.GetRandomString(5,10));
+                xrmApp.Entity.SetValue("lastname", TestSettings.GetRandomString(5,10));
 
                 xrmApp.Entity.Save();
 

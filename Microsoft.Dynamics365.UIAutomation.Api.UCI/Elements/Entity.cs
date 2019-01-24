@@ -79,6 +79,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Gets the value of the status from the footer
+        /// </summary>
+        /// <returns>Status of the entity record</returns>
+        public string GetFooterStatusValue()
+        {
+            return _client.GetStatusFromFooter();
+        }
+
+        /// <summary>
         /// Gets the value of a LookupItem from the header
         /// </summary>
         /// <param name="control">The lookup field name of the lookup.</param>

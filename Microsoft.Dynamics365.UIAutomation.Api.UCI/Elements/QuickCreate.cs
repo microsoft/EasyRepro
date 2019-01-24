@@ -24,6 +24,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Sets the value of a LookupItem field in the quick create form
+        /// </summary>
+        /// <param name="control">LookupItem of the field to set</param>
+        public void SetValue(LookupItem control)
+        {
+            _client.SetValue(control);
+        }
+
+        /// <summary>
         /// Click the Save button on the quick create form
         /// </summary>
         public void Save()

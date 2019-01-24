@@ -27,9 +27,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 
                 xrmApp.Navigation.QuickCreate("contact");
                 
-                xrmApp.QuickCreate.SetValue("firstname", TestSettings.GetRandomFirstName());
+                xrmApp.QuickCreate.SetValue("firstname", TestSettings.GetRandomString(5,10));
                 
-                xrmApp.QuickCreate.SetValue("lastname", TestSettings.GetRandomLastName());
+                xrmApp.QuickCreate.SetValue("lastname", TestSettings.GetRandomString(5,10));
+
+                xrmApp.QuickCreate.SetValue(new LookupItem() { Name = "parentcustomerid", Value="Test" });
                 
                 xrmApp.QuickCreate.Save();
                 
