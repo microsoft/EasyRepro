@@ -186,6 +186,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             public static string SaveButton = "QuickCreate_SaveButton";
             public static string SaveAndCloseButton = "QuickCreate_SaveAndCloseButton";
+            public static string CancelButton = "QuickCreate_CancelButton";
         }
 
         public static class Lookup
@@ -367,6 +368,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //QuickCreate 
             { "QuickCreate_SaveButton" , "//button[contains(@id,'quickCreateSaveBtn')]" },
             { "QuickCreate_SaveAndCloseButton", "//button[contains(@id,'quickCreateSaveAndCloseBtn')]"},
+            { "QuickCreate_CancelButton", "//button[contains(@id,'quickCreateCancelBtn')]"},
 
             //Lookup
             { "Lookup_RelatedEntityLabel", "//li[contains(@title,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]" },

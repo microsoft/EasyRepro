@@ -1318,6 +1318,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #endregion
 
         #region Entity
+
+        internal BrowserCommandResult<bool> CancelQuickCreate(int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Cancel Quick Create"), driver =>
+            {
+                var save = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.CancelButton]),
+                    "Quick Create Cancel Button is not available");
+                save?.Click(true);
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
         /// <summary>
         /// Open Entity
         /// </summary>

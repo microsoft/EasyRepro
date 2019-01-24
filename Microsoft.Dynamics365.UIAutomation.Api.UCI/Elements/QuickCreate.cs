@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using System;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -11,6 +12,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public QuickCreate(WebClient client) : base()
         {
             _client = client;
+        }
+
+        /// <summary>
+        /// Click the Cancel button on the quick create form
+        /// </summary>
+        public void Cancel()
+        {
+            _client.CancelQuickCreate();
         }
 
         /// <summary>
@@ -30,6 +39,45 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public void SetValue(LookupItem control)
         {
             _client.SetValue(control);
+        }
+
+        /// <summary>
+        /// Sets the value of a picklist.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
+        public void SetValue(OptionSet optionSet)
+        {
+            _client.SetValue(optionSet);
+        }
+
+        /// <summary>
+        /// Sets the value of a Boolean Item.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
+        public void SetValue(BooleanItem optionSet)
+        {
+            _client.SetValue(optionSet);
+        }
+
+        /// <summary>
+        /// Sets the value of a Date Field.
+        /// </summary>
+        /// <param name="field">The field id or name.</param>
+        /// <param name="date">DateTime value.</param>
+        /// <param name="format">DateTime format</param>
+        public void SetValue(string field, DateTime date, string format = "MM dd yyyy")
+        {
+            _client.SetValue(field, date, format);
+        }
+
+        /// <summary>
+        /// Sets/Removes the value from the multselect type control
+        /// </summary>
+        /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be set/removed</param>
+        /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
+        public void SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
+        {
+            _client.SetValue(option, removeExistingValues);
         }
 
         /// <summary>
