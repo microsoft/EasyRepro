@@ -26,114 +26,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             SwitchToDefault();
         }
 
-        public BrowserCommandResult<bool> OpenHomePage(int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            //TODO: Implement HomePage logic
-            throw new NotImplementedException();
-        }
-
-
-        /// <summary>
-        /// Opens the Menu
-        /// </summary>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        public BrowserCommandResult<Dictionary<string, IWebElement>> OpenMenu(int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions("Open Menu Menu"), driver =>
-            {
-                var dictionary = new Dictionary<string, IWebElement>();
-
-                var topItem = driver.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.TopLevelItem])).FirstOrDefault();
-                topItem?.FindElement(By.Name(Elements.Name[Reference.Navigation.HomeTab])).Click();
-
-              //  driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.HomeTab]));
-
-                Thread.Sleep(1000);
-
-                var element = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ActionGroup]));
-                var subItems = element.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.ActionButtonContainer]));
-
-                foreach (var subItem in subItems)
-                {
-                    dictionary.Add(subItem.GetAttribute("title").ToLowerString(), subItem);
-                }
-
-                return dictionary;
-            });
-        }
-
-        /// <summary>
-        /// Opens the Sub Area
-        /// </summary>
-        /// <param name="area">The area you want to open</param>
-        /// <param name="subArea">The subarea you want to open</param>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Navigation.OpenSubArea("Sales", "Opportunities");</example>
-        public BrowserCommandResult<bool> OpenSubArea(string area, string subArea, int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($": {area} > {subArea}"), driver =>
-            {
-                area = area.ToLower();
-                subArea = subArea.ToLower();
-
-                var areas = OpenMenu().Value;
-
-                if (!areas.ContainsKey(area))
-                {
-                    throw new InvalidOperationException($"No area with the name '{area}' exists.");
-                }
-
-                var subAreas = OpenSubMenu(areas[area]).Value;
-
-                if (!subAreas.ContainsKey(subArea))
-                {
-                    throw new InvalidOperationException($"No subarea with the name '{subArea}' exists inside of '{area}'.");
-                }
-
-                subAreas[subArea].Click();
-
-                SwitchToContent();
-                driver.WaitForPageToLoad();
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Opens the Related Menu
-        /// </summary>
-        /// <param name="relatedArea">The Related area</param>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Navigation.OpenRelated("Cases");</example>
-        public BrowserCommandResult<bool> OpenRelated(string relatedArea, int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions("Open Related Menu"), driver =>
-            {
-                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.TabNode]));
-
-                var element = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ActionGroup]));
-                var subItems = element.FindElements(By.ClassName("nav-rowBody"));
-
-                var related = subItems.Where(x => x.Text == relatedArea).FirstOrDefault();
-                if (related == null)
-                {
-                    throw new InvalidOperationException($"No relatedarea with the name '{relatedArea}' exists.");
-                }
-
-                Browser.ActiveFrameId = related.GetAttribute("id").Replace("Node_nav", "area");
-                related?.Click();
-
-                return true;
-            });
-        }
         /// <summary>
         /// Global Search
         /// </summary>
@@ -170,6 +62,41 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 return true;
             });
         }
+
+        /// <summary>
+        /// Opens About from navigation bar
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.OpenAbout();</example>
+        public BrowserCommandResult<bool> OpenAbout(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Open About"), driver =>
+            {
+                OpenSettingsOption(driver, Elements.Xpath[Reference.Navigation.About]);
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Opens the Admin Portal
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.OpenAdminPortal();</example>
+        public BrowserCommandResult<bool> OpenAdminPortal(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Open Admin Portal"), driver =>
+            {
+                driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.AdminPortal]))?.Click();
+
+                return true;
+            });
+        }
+
         /// <summary>
         /// Open the Advanced Find
         /// </summary>
@@ -189,57 +116,80 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 return true;
             });
         }
+
         /// <summary>
-        /// Open Quick Create
+        /// Open Apps for Dynamics
         /// </summary>
-        /// <param name="entity">The entity name</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Navigation.QuickCreate("Account");</example>
-        public BrowserCommandResult<bool> QuickCreate(string entity, int thinkTime = Constants.DefaultThinkTime)
+        /// <example>xrmBrowser.Navigation.OpenAppsForDynamicsCRM();</example>
+        public BrowserCommandResult<bool> OpenAppsForDynamicsCRM(int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions($"Open Quick Create"), driver =>
+            return this.Execute(GetOptions($"Open Apps for Dynamics"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.GlobalCreate]));
+                OpenSettingsOption(driver, Elements.Xpath[Reference.Navigation.AppsForCRM]);
 
-                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.QuickCreate.EntityContainer]), new TimeSpan(0,0,2));
+                return true;
+            });
+        }
 
-                var area = driver.FindElement(By.XPath(Elements.Xpath[Reference.QuickCreate.EntityContainer]));
-                var items = area.FindElements(By.TagName("a"));
+        /// <summary>
+        /// Opens the Guided Help
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.OpenGuidedHelp();</example>
+        public BrowserCommandResult<bool> OpenGuidedHelp(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
 
-                var item = items.FirstOrDefault(x => x.Text == entity);
+            return this.Execute(GetOptions($"Open Guided Help"), driver =>
+            {
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.GuidedHelp]));
 
-                if(item == null)
+                return true;
+            });
+        }
+
+        public BrowserCommandResult<bool> OpenHomePage(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            //TODO: Implement HomePage logic
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Opens the Menu
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        public BrowserCommandResult<Dictionary<string, IWebElement>> OpenMenu(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Open Menu Menu"), driver =>
+            {
+                var dictionary = new Dictionary<string, IWebElement>();
+
+                var topItem = driver.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.TopLevelItem])).FirstOrDefault();
+                topItem?.FindElement(By.Name(Elements.Name[Reference.Navigation.HomeTab])).Click();
+
+                //  driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.HomeTab]));
+
+                Thread.Sleep(1000);
+
+                var element = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ActionGroup]));
+                var subItems = element.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.ActionButtonContainer]));
+
+                foreach (var subItem in subItems)
                 {
-                    throw new InvalidOperationException($"No Entity with the name '{entity}' exists inside QuickCreate.");
+                    dictionary.Add(subItem.GetAttribute("title").ToLowerString(), subItem);
                 }
 
-                item.Click(true);
-
-                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.QuickCreate.Container]));
-
-                return true;
+                return dictionary;
             });
         }
-        /// <summary>
-        /// SignOut
-        /// </summary>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Navigation.SignOut();</example>
-        public BrowserCommandResult<bool> SignOut(int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions($"SignOut"), driver =>
-            {
-                var userInfo = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.UserInfo]));
-                userInfo?.Click();
-                var signOut = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.SignOut]));
-                signOut?.Click();
-                return true;
-            });
-        }
         public BrowserCommandResult<List<Link>> OpenMruMenu(int thinkTime = Constants.DefaultThinkTime)
         {
             return this.Execute(GetOptions("Open MRU Menu"), driver =>
@@ -271,40 +221,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Opens the Guided Help
-        /// </summary>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Navigation.OpenGuidedHelp();</example>
-        public BrowserCommandResult<bool> OpenGuidedHelp(int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Open Guided Help"), driver =>
-            {
-                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.GuidedHelp]));
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Opens the Admin Portal
-        /// </summary>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Navigation.OpenAdminPortal();</example>
-        public BrowserCommandResult<bool> OpenAdminPortal(int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Open Admin Portal"), driver =>
-            {
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.AdminPortal]))?.Click();
-
-                return true;
-            });
-        }
-
-        /// <summary>
         /// Opens the Options
         /// </summary>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
@@ -316,74 +232,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return this.Execute(GetOptions($"Open Options"), driver =>
             {
                 OpenSettingsOption(driver, Elements.Xpath[Reference.Navigation.Options]);
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Opens the Print Preview
-        /// </summary>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Navigation.OpenPrintPreview();</example>
-        public BrowserCommandResult<bool> OpenPrintPreview(int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Open PrintPreview"), driver =>
-            {
-                OpenSettingsOption(driver, Elements.Xpath[Reference.Navigation.PrintPreview]);
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Open Apps for Dynamics
-        /// </summary>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Navigation.OpenAppsForDynamicsCRM();</example>
-        public BrowserCommandResult<bool> OpenAppsForDynamicsCRM(int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Open Apps for Dynamics"), driver =>
-            {
-                OpenSettingsOption(driver, Elements.Xpath[Reference.Navigation.AppsForCRM]);
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Opens Welcome Screen from navigation bar
-        /// </summary>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Navigation.OpenWelcomeScreen();</example>
-        public BrowserCommandResult<bool> OpenWelcomeScreen(int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Open Welcome Screen"), driver =>
-            {
-                OpenSettingsOption(driver, Elements.Xpath[Reference.Navigation.WelcomeScreen]);
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Opens About from navigation bar
-        /// </summary>
-        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Navigation.OpenAbout();</example>
-        public BrowserCommandResult<bool> OpenAbout(int thinkTime = Constants.DefaultThinkTime)
-        {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Open About"), driver =>
-            {
-                OpenSettingsOption(driver, Elements.Xpath[Reference.Navigation.About]);
 
                 return true;
             });
@@ -407,6 +255,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
+        /// Opens the Print Preview
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.OpenPrintPreview();</example>
+        public BrowserCommandResult<bool> OpenPrintPreview(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Open PrintPreview"), driver =>
+            {
+                OpenSettingsOption(driver, Elements.Xpath[Reference.Navigation.PrintPreview]);
+
+                return true;
+            });
+        }
+
+        /// <summary>
         /// Opens the Privacy Statement
         /// </summary>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
@@ -423,31 +288,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
-        internal BrowserCommandResult<Dictionary<string, IWebElement>> OpenSubMenu(IWebElement area)
+        /// <summary>
+        /// Opens the Related Menu
+        /// </summary>
+        /// <param name="relatedArea">The Related area</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.OpenRelated("Cases");</example>
+        public BrowserCommandResult<bool> OpenRelated(string relatedArea, int thinkTime = Constants.DefaultThinkTime)
         {
-            return this.Execute(GetOptions($"Open Sub Menu: {area}"), driver =>
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Open Related Menu"), driver =>
             {
-                var dictionary = new Dictionary<string, IWebElement>();
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.TabNode]));
 
-                driver.WaitUntilVisible(By.Id(area.GetAttribute("Id")));
+                var element = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ActionGroup]));
+                var subItems = element.FindElements(By.ClassName("nav-rowBody"));
 
-                area.Click();
-
-                Thread.Sleep(1000);
-
-                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Navigation.SubActionGroupContainer]));
-
-                var subNavElement = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.SubActionGroupContainer]));
-
-                var subItems = subNavElement.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.SubActionElementClass]));
-
-                foreach (var subItem in subItems)
+                var related = subItems.Where(x => x.Text == relatedArea).FirstOrDefault();
+                if (related == null)
                 {
-                    if(!string.IsNullOrEmpty(subItem.Text))
-                    dictionary.Add(subItem.Text.ToLowerString(), subItem);
+                    throw new InvalidOperationException($"No relatedarea with the name '{relatedArea}' exists.");
                 }
 
-                return dictionary;
+                Browser.ActiveFrameId = related.GetAttribute("id").Replace("Node_nav", "area");
+                related?.Click();
+
+                return true;
             });
         }
 
@@ -463,6 +330,143 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             driver.WaitUntilVisible(By.XPath(settingPath));
             driver.ClickWhenAvailable(By.XPath(settingPath));
+        }
+
+        /// <summary>
+        /// Opens the Sub Area
+        /// </summary>
+        /// <param name="area">The area you want to open</param>
+        /// <param name="subArea">The subarea you want to open</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.OpenSubArea("Sales", "Opportunities");</example>
+        public BrowserCommandResult<bool> OpenSubArea(string area, string subArea, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($": {area} > {subArea}"), driver =>
+            {
+                area = area.ToLower();
+                subArea = subArea.ToLower();
+
+                var areas = OpenMenu().Value;
+
+                if (!areas.ContainsKey(area))
+                {
+                    throw new InvalidOperationException($"No area with the name '{area}' exists.");
+                }
+
+                var subAreas = OpenSubMenu(areas[area]).Value;
+
+                if (!subAreas.Any(x => x.Key==subArea))
+                {
+                    throw new InvalidOperationException($"No subarea with the name '{subArea}' exists inside of '{area}'.");
+                }
+
+                subAreas.FirstOrDefault(x => x.Key==subArea).Value.Click(true);
+
+                SwitchToContent();
+                driver.WaitForPageToLoad();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<List<KeyValuePair<string,IWebElement>>> OpenSubMenu(IWebElement area)
+        {
+            return this.Execute(GetOptions($"Open Sub Menu: {area}"), driver =>
+            {
+                var list = new List<KeyValuePair<string, IWebElement>>();
+
+                driver.WaitUntilVisible(By.Id(area.GetAttribute("Id")));
+
+                area.Click();
+
+                Thread.Sleep(1000);
+
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Navigation.SubActionGroupContainer]));
+
+                var subNavElement = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.SubActionGroupContainer]));
+
+                var subItems = subNavElement.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.SubActionElementClass]));
+
+                foreach (var subItem in subItems)
+                {
+                    if (!string.IsNullOrEmpty(subItem.Text))
+                        list.Add(new KeyValuePair<string, IWebElement>(subItem.Text.ToLowerString(), subItem));
+                }
+
+                return list;
+            });
+        }
+
+        /// <summary>
+        /// Opens Welcome Screen from navigation bar
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.OpenWelcomeScreen();</example>
+        public BrowserCommandResult<bool> OpenWelcomeScreen(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Open Welcome Screen"), driver =>
+            {
+                OpenSettingsOption(driver, Elements.Xpath[Reference.Navigation.WelcomeScreen]);
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Open Quick Create
+        /// </summary>
+        /// <param name="entity">The entity name</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.QuickCreate("Account");</example>
+        public BrowserCommandResult<bool> QuickCreate(string entity, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Open Quick Create"), driver =>
+            {
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.GlobalCreate]));
+
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.QuickCreate.EntityContainer]), new TimeSpan(0, 0, 2));
+
+                var area = driver.FindElement(By.XPath(Elements.Xpath[Reference.QuickCreate.EntityContainer]));
+                var items = area.FindElements(By.TagName("a"));
+
+                var item = items.FirstOrDefault(x => x.Text == entity);
+
+                if (item == null)
+                {
+                    throw new InvalidOperationException($"No Entity with the name '{entity}' exists inside QuickCreate.");
+                }
+
+                item.Click(true);
+
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.QuickCreate.Container]));
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// SignOut
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.SignOut();</example>
+        public BrowserCommandResult<bool> SignOut(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"SignOut"), driver =>
+            {
+                var userInfo = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.UserInfo]));
+                userInfo?.Click();
+                var signOut = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.SignOut]));
+                signOut?.Click();
+                return true;
+            });
         }
     }
 }
