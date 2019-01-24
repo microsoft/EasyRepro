@@ -23,13 +23,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
             using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
-                xrmBrowser.GuidedHelp.CloseGuidedHelp();
+                //xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
                 xrmBrowser.ThinkTime(500);
 
                 xrmBrowser.Navigation.GlobalSearch("contoso");
 
-                xrmBrowser.GlobalSearch.Search("Contoso");
+                xrmBrowser.GlobalSearch.Search("Test");
+
+                xrmBrowser.GlobalSearch.OpenRecord("Contacts", 0);
                 xrmBrowser.ThinkTime(4000);
 
 

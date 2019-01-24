@@ -185,7 +185,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Search_Filter"       , "id(\"filterCombo\")"},
             { "Search_Text"       , "id(\"searchTextBox\")"},
             { "Search_Button"       , "id(\"SearchButton\")"},
-            { "Search_Result"       , "id(\"entityDiv_1\")"},
+            { "Search_Result"       , "//*[contains(@id,\"entityDiv\")]"},
             { "Search_Container"       , "id(\"panoramaContainer\")"},
 
             //DashBoard
