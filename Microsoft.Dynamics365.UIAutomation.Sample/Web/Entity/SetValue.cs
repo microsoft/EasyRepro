@@ -108,7 +108,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 xrmBrowser.ThinkTime(5000);
                 xrmBrowser.Grid.OpenRecord(0);
 
-                xrmBrowser.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));
+                xrmBrowser.Entity.SetValue(new DateTimeControl { Name = "birthdate", Value = DateTime.Parse("11/1/1980") });
 
             }
         }

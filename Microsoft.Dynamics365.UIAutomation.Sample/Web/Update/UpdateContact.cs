@@ -40,7 +40,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.Entity.SetValue("emailaddress1", "testUpdate@contoso.com");
                 xrmBrowser.Entity.SetValue("mobilephone", "123-222-4444");
-                xrmBrowser.Entity.SetValue("birthdate", DateTime.Parse("12/2/1984"));
+                xrmBrowser.Entity.SetValue(new DateTimeControl { Name = "birthdate", Value = DateTime.Parse("12/2/1984") });
 
                 xrmBrowser.Entity.Save();
 

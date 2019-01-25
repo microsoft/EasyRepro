@@ -31,7 +31,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="field">The field</param>
         /// <param name="value">The value</param>
         /// <example>xrmBrowser.BusinessProcessFlow.ClearValue("firstname", "Test");</example>
-        public new BrowserCommandResult<bool> ClearValue(string field)
+        public BrowserCommandResult<bool> ClearValue(string field)
         {
             return this.Execute(GetOptions($"Clear BPF Text Field Value: {field}"), driver =>
             {
@@ -62,7 +62,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="option">The TwoOption field you want to set</param>
         /// <example>xrmBrowser.BusinessProcessFlow.ClearValue(new TwoOption{ Name = "creditonhold"});</example>
-        public new BrowserCommandResult<bool> ClearValue(TwoOption option)
+        public BrowserCommandResult<bool> ClearValue(TwoOption option)
         {
             return this.Execute(GetOptions($"Clear BPF Checkbox/TwoOption Value: {option.Name}"), driver =>
             {
@@ -101,7 +101,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="option">The option you want to clear.</param>
         /// <example>xrmBrowser.BusinessProcessFlow.ClearValue(new OptionSet { Name = "preferredcontactmethodcode"});</example>
-        public new BrowserCommandResult<bool> ClearValue(OptionSet option)
+        public BrowserCommandResult<bool> ClearValue(OptionSet option)
         {
             return this.Execute(GetOptions($"Clear BPF OptionSet Value: {option.Name}"), driver =>
             {
@@ -137,7 +137,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmBrowser.BusinessProcessFlow.ClearValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
-        public new BrowserCommandResult<bool> ClearValue(LookupItem control)
+        public BrowserCommandResult<bool> ClearValue(LookupItem control)
         {
             return this.Execute(GetOptions($"Clear BPF Lookup Value: {control.Name}"), driver =>
             {
@@ -194,7 +194,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="date">DateTime value.</param>
         /// <example> xrmBrowser.BusinessProcessFlow.ClearValue(new DateTime {Name = "birthdate"}));</example>
-        public new BrowserCommandResult<bool> ClearValue(DateTimeControl date)
+        public BrowserCommandResult<bool> ClearValue(DateTimeControl date)
         {
             return this.Execute(GetOptions($"Clear BPF DateTime Field: {date.Name}"), driver =>
             {
@@ -225,7 +225,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="option">The option you want to clear.</param>
         /// <example>xrmBrowser.BusinessProcessFlow.ClearValue(new MultiValueOptionSet { Name = "preferredcontactmethodcode"});</example>
-        public new BrowserCommandResult<bool> ClearValue(MultiValueOptionSet option, bool removeExistingValues = false)
+        public BrowserCommandResult<bool> ClearValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
             return this.Execute(GetOptions($"Clear BPF MultiValueOptionSet Value: {option.Name}"), driver =>
             {
@@ -275,7 +275,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="control">The Composite control values you want to clear.</param>
         /// <example>xrmBrowser.BusinessProcessFlow.ClearValue(new CompositeControl() {Id = "fullname"});</example>
-        public new BrowserCommandResult<bool> ClearValue(CompositeControl control)
+        public BrowserCommandResult<bool> ClearValue(CompositeControl control)
         {
             return this.Execute(GetOptions($"Clear BPF ConpositeControl Value: {control.Id}"), driver =>
             {
@@ -349,7 +349,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="field">The field id.</param>
         /// <returns>The value</returns>
         /// <example>xrmBrowser.BusinessProcessFlow.GetValue("mobilephone");</example>
-        public new BrowserCommandResult<string> GetValue(string field)
+        public BrowserCommandResult<string> GetValue(string field)
         {
             return this.Execute($"Get BPF Text Field Value: {field}", driver =>
             {
@@ -381,7 +381,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
         /// <example>xrmBrowser.BusinessProcessFlow.GetValue(new CompositeControl { Id = "fullname", Fields = fields });</example>
-        public new BrowserCommandResult<string> GetValue(CompositeControl control)
+        public  BrowserCommandResult<string> GetValue(CompositeControl control)
         {
             return this.Execute($"Get BPF CompositeControl Value: {control.Id}", driver =>
             {
@@ -421,7 +421,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="option">The option you want to set.</param>
         /// <example>xrmBrowser.BusinessProcessFlow.GetValue(new OptionSet { Name = "preferredcontactmethodcode"}); </example>
-        public new BrowserCommandResult<string> GetValue(OptionSet option)
+        public BrowserCommandResult<string> GetValue(OptionSet option)
         {
             return this.Execute($"Get BPF OptionSet Value: {option.Name}", driver =>
             {
@@ -445,7 +445,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmBrowser.BusinessProcessFlow.GetValue(new Lookup { Name = "primarycontactid" });</example>
-        public new BrowserCommandResult<string> GetValue(LookupItem control)
+        public BrowserCommandResult<string> GetValue(LookupItem control)
         {
             return this.Execute($"Get BPF Lookup Value: {control.Name}", driver =>
             {
@@ -469,7 +469,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="option">The TwoOption field you want to set</param>
         /// <example>xrmBrowser.BusinessProcessFlow.GetValue(new TwoOption {Name="creditonhold"});</example>
-        public new BrowserCommandResult<bool> GetValue(TwoOption option)
+        public BrowserCommandResult<bool> GetValue(TwoOption option)
         {
 
             return this.Execute(GetOptions($"Get BPF Checkbox/TwoOption Value: {option.Name}"), driver =>
@@ -516,7 +516,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="date">DateTime value.</param>
         /// <example> xrmBrowser.BusinessProcessFlow.GetValue(new DateTime {Name = "birthdate"));</example>
-        public new BrowserCommandResult<string> GetValue(DateTimeControl date)
+        public BrowserCommandResult<string> GetValue(DateTimeControl date)
         {
             return this.Execute(GetOptions($"Get BPF DateTime Value: {date.Name}"), driver =>
             {
