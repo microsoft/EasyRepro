@@ -821,46 +821,49 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Click Command"), driver =>
             {
-                bool success = false;
                 IWebElement ribbon = null;
 
-                //Try to click the command bar from inside an entity record.  If that fails, try to click the Command Bar from within a Grid.
-                try
-                {
+                //Find the button in the CommandBar
+                if(driver.HasElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container])))
                     ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]));
-                    success = true;
-                }
-                catch (Exception)
-                {
-                    success = false;
-                }
 
                 if (ribbon == null)
                 {
-                    try
-                    {
+                    if(driver.HasElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid])))
                         ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid]));
-                        success = true;
-                    }
-                    catch (Exception)
-                    {
-                        success = false;
-                    }
+                    else
+                        throw new InvalidOperationException("Unable to find the ribbon.");
                 }
 
+                //Get the CommandBar buttons
                 var items = ribbon.FindElements(By.TagName("li"));
 
-                IWebElement button;
-
-                button = subname == "" ? items.FirstOrDefault(x => x.GetAttribute("aria-label") == name) : items.FirstOrDefault(x => x.GetAttribute("aria-label") == name + " More Commands");
-
-                if (button != null)
+                //Is the button in the ribbon?
+                if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
                 {
-                    button.Click();
+                    items.FirstOrDefault(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)).Click(true);
+                    driver.WaitForTransaction();
                 }
                 else
                 {
-                    throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
+                    //Is the button in More Commands?
+                    if (items.Any(x => x.GetAttribute("aria-label").Equals("More Commands", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        //Click More Commands
+                        items.FirstOrDefault(x => x.GetAttribute("aria-label").Equals("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                        driver.WaitForTransaction();
+
+                        //Click the button
+                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Button].Replace("[NAME]", name))))
+                        {
+                            driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Button].Replace("[NAME]", name))).Click(true);
+                            driver.WaitForTransaction();
+                        }
+                        else
+                            throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
+                    }
+                    else
+                        throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
                 }
 
                 if (!string.IsNullOrEmpty(subname))

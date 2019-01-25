@@ -111,6 +111,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Container = "Cmd_Container";
             public static string ContainerGrid = "Cmd_ContainerGrid";
             public static string MoreCommandsMenu = "Cmd_MoreCommandsMenu";
+            public static string Button = "Cmd_Button";
         }
 
         public static class Timeline
@@ -306,6 +307,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
             { "Cmd_ContainerGrid"       , "//ul[contains(@data-lp-id,\"commandbar-HomePageGrid\")]"},
             { "Cmd_MoreCommandsMenu"       , "//*[@id=\"__flyoutRootNode\"]"},
+            { "Cmd_Button", "//*[contains(text(),'[NAME]')]"},
 
             //GlobalSearch
             { "Search_Button"       , "//div[@id=\"categorizedSearchHeader\"]//button[contains(@data-id,'search-submit-button')]" },
