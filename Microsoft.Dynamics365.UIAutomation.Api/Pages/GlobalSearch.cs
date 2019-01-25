@@ -90,6 +90,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     throw new InvalidOperationException($"Search Results List does not have {index + 1} items.");
 
                 records[index].Click(true);
+
+                SwitchToContent();
+                driver.WaitForPageToLoad();
                 driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
                     new TimeSpan(0, 0, 60),
                     null,
