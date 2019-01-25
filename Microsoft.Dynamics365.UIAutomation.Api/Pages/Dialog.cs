@@ -57,7 +57,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                                           "The Close Opportunity dialog is not available.");
 
                 SetValue(Elements.ElementId[Reference.Dialogs.CloseOpportunity.ActualRevenueId], revenue.ToString());
-                SetValue(Elements.ElementId[Reference.Dialogs.CloseOpportunity.CloseDateId], closeDate);
+                SetValue(new DateTimeControl { Name = Elements.ElementId[Reference.Dialogs.CloseOpportunity.CloseDateId], Value = closeDate });
                 SetValue(Elements.ElementId[Reference.Dialogs.CloseOpportunity.DescriptionId], description);
 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Dialogs.CloseOpportunity.Ok]));

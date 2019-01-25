@@ -45,7 +45,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 xrmBrowser.Entity.SetValue(new CompositeControl() { Id = "fullname", Fields = fields});
                 xrmBrowser.Entity.SetValue("emailaddress1", "test@contoso.com");
                 xrmBrowser.Entity.SetValue("mobilephone", "555-555-5555");
-                xrmBrowser.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));
+                xrmBrowser.Entity.SetValue(new DateTimeControl { Name = "birthdate", Value = DateTime.Parse("11/1/1980")});
                 xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email"});
 
                 xrmBrowser.CommandBar.ClickCommand("Save");

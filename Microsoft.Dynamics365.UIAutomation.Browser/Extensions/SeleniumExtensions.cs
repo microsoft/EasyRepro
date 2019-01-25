@@ -54,7 +54,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 Actions action = new Actions(driver);
                 action.MoveToElement(Element).Build().Perform();
             }
-            catch (StaleElementReferenceException ex)
+            catch (StaleElementReferenceException)
             {
                 if (!ignoreStaleElementException)
                     throw;
