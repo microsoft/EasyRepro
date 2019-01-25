@@ -640,7 +640,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                 }
                 else
-                    throw new InvalidOperationException($"Unable to locate DateTime field '{date.Name}' in the Business Process Flow. Please verify the DateTime field exists and try again.");
+                    throw new InvalidOperationException($"Unable to locate DateTime field '{date.Name}' on the form. Please verify the DateTime field exists and try again.");
 
                 return dateValue;
             });
@@ -985,7 +985,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// DEPRECATED: Set Lookup Value for the field
+        /// Set Lookup Value for the field
         /// </summary>
         /// <param name="field">The Field</param>
         /// <param name="openLookupPage">The Open Lookup Page</param>
@@ -1075,7 +1075,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute(GetOptions($"Set TwoOption Value: {option.Name}"), driver =>
             {
-                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
                 {
                     var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
 
