@@ -709,11 +709,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         fieldElement.Click();
                         input.SendKeys(date.Value.ToShortDateString());
                         input.SendKeys(Keys.Enter);
+                        input.SendKeys(Keys.Tab);
                     }
                     else
                     {
+                        fieldElement.Click();
                         input.SendKeys(date.Value.ToShortDateString());
                         input.SendKeys(Keys.Enter);
+                        input.SendKeys(Keys.Tab);
                     }
                 }
                 else
@@ -744,10 +747,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.ValueClass])).Click();
 
                     if (input.FindElements(By.TagName("textarea")).Count > 0)
+                    {
                         input.FindElement(By.TagName("textarea")).SendKeys(value);
+                        input.FindElement(By.TagName("textarea")).SendKeys(Keys.Tab);
+                    }
                     else
+                    {
                         input.FindElement(By.TagName("input")).SendKeys(value);
-
+                        input.FindElement(By.TagName("input")).SendKeys(Keys.Tab);
+                    }
                 }
                 else
                     throw new InvalidOperationException($"Field: {field} Does not exist");
