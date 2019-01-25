@@ -190,7 +190,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 if (clicked)
                 {
-                    driver.WaitFor(d => d.ExecuteScript(PerformanceCenter.GetAllMarkersJavascriptCommand).ToString().Contains("AllSubgridsLoaded"));
+                    SwitchToContent();
+                    driver.WaitForPageToLoad();
+                    driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
+                        new TimeSpan(0, 0, 60),
+                        null,
+                        d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
+                    );
 
                     return true;
                 }
