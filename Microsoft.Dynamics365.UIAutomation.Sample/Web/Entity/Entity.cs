@@ -17,7 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
         public override void TestSetup()
         {
             XrmTestBrowser.ThinkTime(500);
-            OpenEntity("Sales", "Contacts", "Active Contacts");
+            //OpenEntity("Sales", "Contacts", "Active Contacts");
         }
 
         [TestMethod]
@@ -43,6 +43,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
             var recordGuid = XrmTestBrowser.Entity.GetRecordGuid().Value;
             XrmTestBrowser.ThinkTime(5000);
         }
+
+        [TestMethod]
+        public void WEBTestFoundPlacesDialog()
+        {
+            OpenEntity("Sales", "Accounts", "Active Accounts");
+            XrmTestBrowser.Grid.OpenRecord(0); // Account
+
+            List<Field> compsiteAddressFields = new List<Field>
+                {
+                    new Field() {Id = "address1_line1", Value = "One Microsoft Way"},
+                    new Field() {Id = "address1_city", Value = "Redmond"},
+                    new Field() {Id = "address1_stateorprovince", Value = "WA"},
+                    new Field() {Id = "address1_postalcode", Value = "98052"},
+                    new Field() {Id = "address1_country", Value = "US"},
+                };
+
+            XrmTestBrowser.Entity.SetValue(new CompositeControl { Id = "address1_composite", Fields = compsiteAddressFields }, true); //Composite Address Field + true (FoundPlaces dialog)
+
+            XrmTestBrowser.ThinkTime(5000);
+        }
+
 
         [TestMethod]
         public void WEBTestClearSetGetHeaderValues()

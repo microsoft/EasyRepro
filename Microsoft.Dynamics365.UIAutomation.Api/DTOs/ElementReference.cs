@@ -56,6 +56,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Dialog_RoleLookupTable",   "id(\"record2roleid_IMenu\")" },
             { "Dialog_WarningFooter" , "//*[@id=\"crmDialogFooter\"]" },
             { "Dialog_WarningCloseButton", "//*[@id=\"butBegin\"]" },
+            { "Dialog_CloseFoundPlaces", "//span[contains(text(), 'Close')]"},
            
 
             //GuidedHelp
@@ -451,6 +452,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string AddConnectionHeader = "Dialog_AddConnectionHeader";
             public static string WarningFooter = "Dialog_WarningFooter";
             public static string WarningCloseButton = "Dialog_WarningCloseButton";
+            public static string CloseFoundPlacesDialog = "Dialog_CloseFoundPlaces";
 
             public static class CloseOpportunity
             {
