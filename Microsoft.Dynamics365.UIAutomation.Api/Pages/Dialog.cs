@@ -66,6 +66,35 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
+        /// <summary>
+        /// Closes the opportunity you are currently working on.
+        /// </summary>
+        /// <param name="index">The address to choose, starting from 1</param>
+        /// <example>xrmBrowser.Dialogs.ChooseFoundPlace(1);</example>
+        public BrowserCommandResult<bool> ChooseFoundPlace(int index, int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+            return this.Execute(GetOptions("Choose Address From Found Places Dialog"), driver =>
+            {
+                SwitchToDialog();
+                var addressSuggestor = driver.FindElement(By.Id("ctrAddressSuggestor"));
+                var suggestedAddresses = addressSuggestor.FindElements(By.TagName("li"));
+
+                if (suggestedAddresses.Count > (index - 1))
+                {
+                    var targetAddress = suggestedAddresses[index - 1].FindElement(By.TagName("a"));
+
+                    targetAddress.Click(true);
+                }
+                else
+                    throw new InvalidOperationException($"Suggested Address List does not have {index} items.");
+
+                SwitchToContentFrame();
+
+                return true;
+            });
+        }
+
         public BrowserCommandResult<bool> AddConnection(string description, string roleName, int thinkTime = Constants.DefaultThinkTime)
         {
             this.Browser.ThinkTime(thinkTime);

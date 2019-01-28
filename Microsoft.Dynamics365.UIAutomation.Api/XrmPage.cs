@@ -205,6 +205,45 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
+        /// Dismiss the Alert If Present
+        /// </summary>
+        /// <param name="stay"></param>
+        public BrowserCommandResult<bool> IsDialogFrameVisible(bool visible = false)
+        {
+
+            return this.Execute(GetOptions("Check If Dialog Frame Is Visible"), driver =>
+            {
+                //try
+                //{
+                    SwitchToDefaultContent();
+                    //driver.FindElement(By.Id("InlineDialog"));
+
+                    //Wait for CRM Page to load
+                    driver.WaitUntilVisible(By.Id("InlineDialog")
+                        , new TimeSpan(0, 0, 5),
+                    e =>
+                    {
+                        visible = true;
+                    },
+                        f => { visible = false; });
+
+                if (visible)
+                {
+                    return true;
+                }
+                else
+                    return false;
+
+                //    return true;
+                //}
+                //catch (NoSuchElementException)
+                //{
+                //    return false;
+                //}
+            });
+        }
+
+        /// <summary>
         /// Nexts the grid on a Grid or Related page.
         /// </summary>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
@@ -838,8 +877,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Sets the value of a Composite control on an Entity form.
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
+        /// <param name="checkForDialog">Check for a dialog, e.g. Found Places </param>
         /// <example>xrmBrowser.Entity.SetValue(new CompositeControl {Id = "fullname", Fields = fields});</example>
-        public BrowserCommandResult<bool> SetValue(CompositeControl control)
+        public BrowserCommandResult<bool> SetValue(CompositeControl control, bool checkForDialog = false, [Range(1, 10)]int index = 1)
         {
             return this.Execute(GetOptions($"Set ConpositeControl Value: {control.Id}"), driver =>
             {
@@ -855,20 +895,83 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     var compcntrl =
                         driver.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut]));
 
+                    // Initialize i, to correspond with current field position in control.Fields
+                    int i = 0;
+
                     foreach (var field in control.Fields)
                     {
-                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click();
+                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click(true);
 
                         var result = compcntrl.FindElements(By.TagName("input"))
                             .ToList()
-                            .FirstOrDefault(i => i.GetAttribute("id").Contains(field.Id));
+                            .FirstOrDefault(x => x.GetAttribute("id").Contains(field.Id));
 
+                        if (checkForDialog)
+                        {
+                            if (IsDialogFrameVisible())
+                            {
+                                if (control.Fields.Count == (i + 1))
+                                {
+                                    SwitchToDialog();
+
+                                    var addressSuggestor = driver.FindElement(By.Id("ctrAddressSuggestor"));
+                                    var suggestedAddresses = addressSuggestor.FindElements(By.TagName("li"));
+
+                                    var targetAddress = suggestedAddresses[(index - 1)].FindElement(By.TagName("a"));
+
+                                    targetAddress.Click(true);
+
+                                    SwitchToContentFrame();
+                                    compcntrl = driver.WaitUntilAvailable(By.Id(control.Id + Elements.ElementId[Reference.SetValue.FlyOut]));
+                                    compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.Confirm])).Click(true);
+                                    return true;
+                                }
+                                else
+                                {
+                                    SwitchToDialog();
+
+                                    var closeFoundPlaces = driver.FindElement(By.XPath(Elements.Xpath[Reference.Dialogs.CloseFoundPlacesDialog]));
+                                    closeFoundPlaces.Click(true);
+                                    SwitchToContentFrame();
+                                }
+
+                            }
+                            else
+                                SwitchToContentFrame();
+                        }
+
+                        driver.WaitUntilAvailable(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id));
+                        compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.CompositionLinkControl] + field.Id)).Click(true);
                         //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
                         driver.ExecuteScript("document.getElementById('" + result?.GetAttribute("id") + "').value = ''");
                         result?.SendKeys(field.Value);
+
+                        i++;
                     }
 
-                    compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.Confirm])).Click();
+                    compcntrl.FindElement(By.Id(control.Id + Elements.ElementId[Reference.SetValue.Confirm])).Click(true);
+
+                    // Repeat this check in the event the Found Places dialog appears after closing the Composite Control for Address
+                    if (checkForDialog)
+                    {
+                        if (IsDialogFrameVisible())
+                        {
+                            if (control.Fields.Count == (i + 1))
+                            {
+                                SwitchToDialog();
+
+                                var addressSuggestor = driver.FindElement(By.Id("ctrAddressSuggestor"));
+                                var suggestedAddresses = addressSuggestor.FindElements(By.TagName("li"));
+
+                                var targetAddress = suggestedAddresses[(index - 1)].FindElement(By.TagName("a"));
+
+                                targetAddress.Click(true);
+
+                                SwitchToContentFrame();
+
+                            }
+                        }
+                    }
                 }
                 else
                     throw new InvalidOperationException($"Composite Control: {control.Id} Does not exist");
