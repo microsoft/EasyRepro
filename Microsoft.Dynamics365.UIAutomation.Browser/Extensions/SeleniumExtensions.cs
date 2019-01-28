@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using Newtonsoft.Json.Linq;
@@ -364,7 +364,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             {
                 WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(maxWaitTimeInSeconds));
 
-                //Checks every 500 ms whether predicate returns true if returns exit otherwise keep trying till it returns ture
+                //Checks every 500 ms whether predicate returns true if returns exit otherwise keep trying till it returns true
                 wait.Until(d => {
 
                     try
