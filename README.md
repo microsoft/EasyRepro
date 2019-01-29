@@ -10,9 +10,10 @@ Microsoft Visual Studio 2015, Microsoft Visual Studio 2017
 
 ### CRM Versions
 Easy Repro supports below CRM Versions	
-- Microsoft Dynamics® CRM Online 2016 8.1 (8.1.1.x) (DB 8.1.1.x)
 - Microsoft Dynamics 365 Online Version 8.2 (8.2.x) (DB 8.2.x) online
 - Microsoft Dynamics 365 Online Version 9.0 (9.0.x) (DB 9.0.x) online
+- Microsoft Dynamics 365 Online Version 9.0.2 (9.0.2) (DB 9.0.2) online
+- Microsoft Dynamics 365 Online Version 9.1 (9.1.x) (DB 9.1.x) online
 
 #### Selenium Webdriver & Support
 Selenium is a set of different software tools each with a different approach to supporting browser automation. These tools are highly flexible, allowing many options for locating and manipulating elements within a browser, and one of its key features is the support for automating multiple browser platforms. This package contains the .NET bindings for the newer, more concise and object-based Selenium WebDriver API, which uses native OS-level events to manipulate the browser, bypassing the JavaScript sandbox, and does not require the Selenium Server to automate the browser.
@@ -20,8 +21,8 @@ Selenium is a set of different software tools each with a different approach to 
 
 | File Name         | Version | Release date   |
 | ------------------|---------|----------------|
-| Selenium.WebDriver| v3.5.1  | April 21, 2017 |
-| Selenium.Support  | v3.5.1  | April 21, 2017 |
+| Selenium.WebDriver| v3.11.2  | April 12, 2018 |
+| Selenium.Support  | v3.11.2  | April 12, 2018 |
 
 ## Coverage #
 ### CRM Functionality Covered
@@ -66,7 +67,7 @@ The Sample project should have NUGET packages added and you just need to build t
   
 | Browser    | WebDriver           | Version           | Release date      |
 | -----------|-------------------- |-----------------  | --------------    |
-| Chrome     | ChromeDriver        |v.2.31.0.0         |  April 4, 2017    |
+| Chrome     | ChromeDriver        |v.2.38.0.0         |  April 21, 2018    |
 | Firefox    | GeckoDriver         |v.0.16.1           |  April 27, 2017   |
 | IE         | IEDriver            |v.3.4              |  April 22, 2017   |
 | Edge       | MicrosoftWebDriver  |v.10.0.15063.0     |  April 18, 2017   |
