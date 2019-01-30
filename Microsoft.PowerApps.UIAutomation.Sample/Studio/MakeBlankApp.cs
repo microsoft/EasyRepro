@@ -50,11 +50,6 @@ namespace Microsoft.PowerApps.UIAutomation.Sample
                 button.ControlProperties.Add(new CanvasControlProperty("Text", "Search"));
                 appCanvas.Canvas.AddControl(button);
 
-                //Upload Telemetry
-                new Telemetry().AzureKey(AZURE_KEY)
-                   .ExecutionId(Guid.NewGuid().ToString())
-                   .TrackEvents(appCanvas.CommandResults);
-
                 appCanvas.ThinkTime(4000);
             }
         }
