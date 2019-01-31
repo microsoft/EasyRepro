@@ -212,10 +212,11 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             ClickCommandButton(name, "");
 
+            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.SubButtonContainer]));
             var subButtonContainer = driver.FindElements(By.XPath(Elements.Xpath[Reference.CommandBar.SubButtonContainer]));
 
             if (subButtonContainer.Count == 0)
-                Console.WriteLine("SubButton container is empty");
+                throw new InvalidOperationException("SubButton container is empty");
 
             var subButtons = subButtonContainer[0].FindElements(By.TagName("button"));
             var sButton = subButtons.FirstOrDefault(b => b.Text.Equals(subButton, StringComparison.OrdinalIgnoreCase));
