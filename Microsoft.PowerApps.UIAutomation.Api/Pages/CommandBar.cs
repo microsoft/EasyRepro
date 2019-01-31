@@ -48,20 +48,31 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                     // Click the 'Solution checker running' button to expose the cancel button
                     commandBarButton.Click(true);
 
-                    // Verify the Cancel button is now available
-                    var cancelButton = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.CancelSolutionCheckerButton]));
+                    var solutionCancellationList = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.CancelSolutionCheckerSolutionList]));
 
-                    // Check to confirm Cancel button was found
-                    if (cancelButton == null)
+                    var solutionCancellationListRows = solutionCancellationList.FindElements(By.ClassName("ms-List-cell"));
+
+                    foreach (var row in solutionCancellationListRows)
                     {
-                        return false;
-                    }
-                    else
-                    {
-                        // Click the cancel button to stop the solution checker run
-                        cancelButton.Click(true);
-                        Browser.ThinkTime(500);
-                    }                   
+                        var rowSpans = row.FindElements(By.TagName("span"));
+
+                        if (rowSpans[1].Text.Equals(solutionName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            var cancelButton = rowSpans[0].FindElement(By.TagName("button"));
+
+                            // Check to confirm Cancel button was found
+                            if (cancelButton == null)
+                            {
+                                return false;
+                            }
+                            else
+                            {
+                                // Click the cancel button to stop the solution checker run
+                                cancelButton.Click(true);
+                                Browser.ThinkTime(500);
+                            }
+                        }
+                    }                 
                 }
 
                 return true;
