@@ -22,21 +22,39 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.CancelQuickCreate();
         }
 
+        /// <summary>
+        /// Gets the value of a field in the quick create form
+        /// </summary>
+        /// <param name="field">Schema name of the field</param>
+        /// <param name="value">Value of the field</param>
         public string GetValue(string field)
         {
             return _client.GetValue(field);
         }
 
+        /// <summary>
+        /// Gets the value of a LookupItem field in the quick create form
+        /// </summary>
+        /// <param name="control">LookupItem of the field to set</param>
         public string GetValue(LookupItem field)
         {
             return _client.GetValue(field);
         }
 
+        /// <summary>
+        /// Gets the value of a picklist.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
         public string GetValue(OptionSet field)
         {
             return _client.GetValue(field);
         }
 
+        /// <summary>
+        /// Gets the value from the multselect type control
+        /// </summary>
+        /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be set/removed</param>
+        /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
         public MultiValueOptionSet GetValue(MultiValueOptionSet field)
         {
             return _client.GetValue(field);
