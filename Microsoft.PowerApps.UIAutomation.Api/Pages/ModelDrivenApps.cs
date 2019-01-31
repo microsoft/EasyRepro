@@ -300,7 +300,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             foreach (var row in solutionNames)
             {
-                if (row.Text.Contains(solutionName, StringComparison.OrdinalIgnoreCase))
+                if (row.Text.Equals(solutionName, StringComparison.OrdinalIgnoreCase))
                 {
                     rowNumber = cnt;
                     break;
