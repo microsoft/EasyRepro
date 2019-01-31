@@ -22,6 +22,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.CancelQuickCreate();
         }
 
+        public string GetValue(string field)
+        {
+            return _client.GetValue(field);
+        }
+
+        public string GetValue(LookupItem field)
+        {
+            return _client.GetValue(field);
+        }
+
+        public string GetValue(OptionSet field)
+        {
+            return _client.GetValue(field);
+        }
+
+        public MultiValueOptionSet GetValue(MultiValueOptionSet field)
+        {
+            return _client.GetValue(field);
+        }
+
         /// <summary>
         /// Sets the value of a field in the quick create form
         /// </summary>
