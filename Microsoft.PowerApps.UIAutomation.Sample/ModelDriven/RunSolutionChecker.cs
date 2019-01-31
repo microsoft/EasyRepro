@@ -128,13 +128,13 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     // Validate that we did not receive an error status
                     if (!solutionCheckStatus.Contains("Results as of"))
                     {
-                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} received instead of 'Results as of ...' ");
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of 'Results as of ...' ");
                     }
 
                     // Validate that new status is not the same as original status pre-processing
                     if (solutionCheckStatus == originalSolutionStatus)
                     {
-                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} has not changed from {originalSolutionStatus}. A failure occurred and was not reported to the message bar. ");
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' has not changed from '{originalSolutionStatus}'. A failure occurred and was not reported to the message bar. ");
                     }
 
                     // Once processing is complete, you must select a different row, and re-select your row in order to make the buttons enabled
@@ -251,13 +251,13 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     // Validate that we did not receive an error status
                     if (!solutionCheckStatus.Contains("Results as of"))
                     {
-                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} received instead of 'Results as of ...' ");
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of 'Results as of ...' ");
                     }
 
                     // Validate that new status is not the same as original status pre-processing
                     if (solutionCheckStatus == originalSolutionStatus)
                     {
-                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} has not changed from {originalSolutionStatus}. A failure occurred and was not reported to the message bar. ");
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' has not changed from '{originalSolutionStatus}'. A failure occurred and was not reported to the message bar. ");
                     }
 
                     // Once processing is complete, you must select a different row, and re-select your row in order to make the buttons enabled
@@ -371,13 +371,13 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     // Validate that we did not receive an error status
                     if (!solutionCheckStatus.Contains("Results as of"))
                     {
-                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} received instead of 'Results as of ...' ");
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of 'Results as of ...' ");
                     }
 
                     // Validate that the cancel was successful and the "new" status is equal to the original starting status
                     if (solutionCheckStatus != originalSolutionStatus)
                     {
-                        throw new ApplicationException($"Unexpected Solution Check Status. Value {solutionCheckStatus} has changed from {originalSolutionStatus}. A failure occurred during cancellation and was not reported to the message bar. ");
+                        throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' has changed from '{originalSolutionStatus}'. A failure occurred during cancellation and was not reported to the message bar. ");
                     }
 
                     appBrowser.ThinkTime(10000);

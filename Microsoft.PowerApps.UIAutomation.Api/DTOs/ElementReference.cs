@@ -70,7 +70,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             //CommandBar
             { "CommandBar_Container","//div[contains(@class,'ba-CommandBar')]"},
-            { "CommandBar_CancelSolutionCheckerButton","//button[contains(@class,'listItemCancelButton')]"},            
+            { "CommandBar_CancelSolutionCheckerButton","//button[contains(@class,'listItemCancelButton')]"},
+            { "CommandBar_CancelSolutionCheckerSolutionList","//div[@class=\"ms-List\" and @role=\"list\"]"},
             { "CommandBar_SubButtonContainer", "//ul[contains(@class,'ms-ContextualMenu')]" },
             { "CommandBar_OverflowContainer", "//div[contains(@class,'ms-OverflowSet-overflowButton')]" },
             { "CommandBar_ContextualMenuList", "//ul[contains(@class,'ms-ContextualMenu-list')]" },
@@ -179,6 +180,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         {
             public static string Container = "CommandBar_Container";
             public static string CancelSolutionCheckerButton = "CommandBar_CancelSolutionCheckerButton";
+            public static string CancelSolutionCheckerSolutionList = "CommandBar_CancelSolutionCheckerSolutionList";
             public static string SubButtonContainer = "CommandBar_SubButtonContainer";
             public static string OverflowContainer = "CommandBar_OverflowContainer";
             public static string ContextualMenuList = "CommandBar_ContextualMenuList";
