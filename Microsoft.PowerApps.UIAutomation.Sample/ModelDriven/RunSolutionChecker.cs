@@ -65,7 +65,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         catch (Exception)
                         {
                             appBrowser.Navigate("about:blank");
-                            if (retryCount == Reference.Login.SignInAttempts - 1)
+                            if (retryCount == Reference.Login.SignInAttempts)
                             {
                                 Console.WriteLine("Login failed after {0} attempts.", retryCount);
                                 throw;
@@ -192,7 +192,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         catch (Exception)
                         {
                             appBrowser.Navigate("about:blank");
-                            if (retryCount == Reference.Login.SignInAttempts - 1)
+                            if (retryCount == Reference.Login.SignInAttempts)
                             {
                                 Console.WriteLine("Login failed after {0} attempts.", retryCount);
                                 throw;
@@ -314,7 +314,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         catch (Exception)
                         {
                             appBrowser.Navigate("about:blank");
-                            if (retryCount == Reference.Login.SignInAttempts - 1)
+                            if (retryCount == Reference.Login.SignInAttempts)
                             {
                                 Console.WriteLine("Login failed after {0} attempts.", retryCount);
                                 throw;

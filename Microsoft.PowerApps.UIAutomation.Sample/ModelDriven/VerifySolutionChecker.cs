@@ -50,8 +50,29 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             {
                 try
                 {
-                    //Login
-                    PerformLogin(appBrowser);
+                    // Login To PowerApps
+                    Console.WriteLine("Performing Login");
+
+                    for (int retryCount = 0; retryCount < Reference.Login.SignInAttempts; retryCount++)
+                    {
+                        try
+                        {
+                            appBrowser.OnlineLogin.Login(_xrmUri, _username.ToSecureString(), _password.ToSecureString());
+                            break;
+                        }
+                        catch (Exception)
+                        {
+                            appBrowser.Navigate("about:blank");
+                            if (retryCount == Reference.Login.SignInAttempts)
+                            {
+                                Console.WriteLine("Login failed after {0} attempts.", retryCount);
+                                throw;
+                            }
+                            Console.WriteLine("Login failed in #{0} attempt.", retryCount);
+                            continue;
+                        }
+                    }
+                    Console.WriteLine("Login Complete");
 
                     //Pick the Org
                     Console.WriteLine($"Changing PowerApps Environment to {_environmentName}");
