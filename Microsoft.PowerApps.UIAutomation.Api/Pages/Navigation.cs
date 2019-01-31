@@ -46,7 +46,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
         public BrowserCommandResult<bool> ChangeEnvironment(string environmentName)
         {
-            return this.Execute(GetOptions("Change Environment"), driver =>
+            return this.Execute(GetOptions($"Change Environment to: {environmentName}"), driver =>
             {
 
             var environmentButton = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ChangeEnvironmentButton]));
