@@ -531,6 +531,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 //Click the entity name
                 entitybutton.Click(true);
+
                 driver.WaitForTransaction();
 
                 return true;

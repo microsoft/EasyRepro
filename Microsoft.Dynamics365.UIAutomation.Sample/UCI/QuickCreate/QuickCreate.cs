@@ -85,6 +85,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.QuickCreate.SetValue("estimatedclosedate", DateTime.Now.AddDays(45), "MM/dd/yyyy");
 
+                string name = xrmApp.QuickCreate.GetValue("name");
+
+                string orderType = xrmApp.QuickCreate.GetValue(new OptionSet() { Name = "msdyn_ordertype" });
+
+                string estimatedCloseDate = xrmApp.QuickCreate.GetValue("estimatedclosedate");
+
+                string parentContact = xrmApp.QuickCreate.GetValue(new LookupItem() { Name = "parentcontactid" });
+
                 xrmApp.QuickCreate.Save();
 
             }
