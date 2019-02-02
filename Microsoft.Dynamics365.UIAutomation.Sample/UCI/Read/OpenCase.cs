@@ -46,8 +46,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Service", "Cases");
 
-                /* need to write methods to open related grid view prior to opening the row  then call theme here*/
                 xrmApp.Grid.OpenRecord(0);
+
+                Field ticketNumber = xrmApp.Entity.GetField("ticketnumber");
+                Field subject = xrmApp.Entity.GetField("subjectid");
+                Field description = xrmApp.Entity.GetField("description");
+                Field mobilePhone = xrmApp.Entity.GetField("mobilephone");
             }
         }
 

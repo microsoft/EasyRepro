@@ -204,6 +204,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string CommandBarButton = "Related_CommandBarButton";
             public static string CommandBarSubButton = "Related_CommandBarSubButton";
         }
+
+        public static class Field
+        {
+            public static string ReadOnly = "Field_ReadOnly";
+        }
     }
 
     public static class AppElements
@@ -350,6 +355,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //Related Grid
             { "Related_CommandBarButton", "//button[contains(., '[NAME]') and contains(@data-id,'SubGridAssociated')]"},
             { "Related_CommandBarSubButton" ,"//button[contains(., '[NAME]')]"},
+
+            //Field
+            {"Field_ReadOnly",".//*[@aria-readonly]" },
 
             //Dialogs
             { "AssignDialog_ToggleField" , "//label[contains(@data-id,'rdoMe_id.fieldControl-checkbox-inner-first')]" },

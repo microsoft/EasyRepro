@@ -78,6 +78,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.Delete();
         }
 
+        public Field GetField(string field)
+        {
+            return _client.GetField(field);
+        }
+
         /// <summary>
         /// Gets the value of the status from the footer
         /// </summary>
