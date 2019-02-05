@@ -59,7 +59,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     element.Click();
                 }
             }
-            catch (StaleElementReferenceException ex)
+            catch (StaleElementReferenceException)
             {
                 if (!ignoreStaleElementException)
                     throw;
@@ -93,7 +93,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 Actions action = new Actions(driver);
                 action.MoveToElement(Element).Build().Perform();
             }
-            catch (StaleElementReferenceException ex)
+            catch (StaleElementReferenceException)
             {
                 if (!ignoreStaleElementException)
                     throw;
@@ -109,7 +109,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 //action.ClickAndHold(Element).MoveByOffset(xOffset, yOffset).Release(Element).Build().Perform();
 
             }
-            catch (StaleElementReferenceException ex)
+            catch (StaleElementReferenceException)
             {
                 if (!ignoreStaleElementException)
                     throw;
@@ -694,7 +694,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
 
             try
-            {
+            {                
                 wait.Until(ExpectedConditions.ElementToBeClickable(by));
 
                 success = true;
