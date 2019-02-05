@@ -3,10 +3,12 @@
 
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 
 namespace Microsoft.PowerApps.UIAutomation.Api
 {
@@ -68,7 +70,33 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                             else
                             {
                                 // Click the cancel button to stop the solution checker run
+                                //add a try/catch here - if element position has shifted we should pull the new location again...
                                 cancelButton.Click(true);
+
+
+                                if (Browser.Options.BrowserType.ToString() == "IE")
+                                    if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.CommandBar.CancelSolutionCheckerSolutionList])))
+                                    {
+                                        //cancelButton = rowSpans[0].FindElement(By.TagName("button"));
+
+                                        //var cancelLocation = cancelButton.Location;
+                                        //cancelButton.Hover(driver, true);
+                                        //cancelButton.Click(true);
+                                        //cancelButton.SendKeys(Keys.Enter);
+
+                                        //new Actions(driver).MoveToElement(cancelButton).Click(cancelButton).Perform();
+
+                                        //new Actions(driver).MoveToElement(cancelButton).MoveByOffset((cancelLocation.X+3), (cancelLocation.Y+3)).Click().Perform();
+
+                                        //IJavaScriptExecutor executor = (IJavaScriptExecutor)driver;
+                                        //cancelButton.SendKeys(Keys.Shift);
+                                        //Thread.Sleep(1000);
+                                        //Browser.ThinkTime(250);
+                                        //executor.ExecuteScript("arguments[0].click();", cancelButton);      
+
+                                        return true;
+                                    }
+
                                 Browser.ThinkTime(500);
                             }
                         }
