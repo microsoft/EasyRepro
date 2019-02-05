@@ -943,7 +943,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Open Grid Record"), driver =>
             {
                 var currentindex = 0;
-                var control = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
+                //var control = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
 
                 var rows = driver.FindElements(By.ClassName("wj-row"));
 
@@ -962,7 +962,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                 }
 
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.Form]));
+                //driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.Form]));
 
                 driver.WaitForTransaction();
 
@@ -1791,6 +1791,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     divElements.First().Click(true);
                 }
                 return true;
+            });
+        }
+
+        internal BrowserCommandResult<Field> GetField(string field)
+        {
+            return this.Execute(GetOptions($"Get Field"), driver =>
+            {
+                Field returnField = new Field(driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field))));
+                returnField.Name = field;
+
+                return returnField;
+
             });
         }
 

@@ -244,11 +244,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return driver.FindElement(By.TagName("body")).Text;
         }
 
+        public static bool HasAttribute(this IWebElement element, string attributeName)
+        {
+            return element.GetAttribute(attributeName) == null ? false : true;
+        }
+
         public static bool HasElement(this IWebDriver driver, By by)
         {
             try
             {
                 return driver.FindElements(by).Count > 0;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
+        }
+
+        public static bool HasElement(this IWebElement element, By by)
+        {
+            try
+            {
+                return element.FindElements(by).Count > 0;
             }
             catch (NoSuchElementException)
             {
