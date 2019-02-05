@@ -81,10 +81,12 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.ThinkTime(1500);
 
                     Console.WriteLine($"Changing PowerApps Environment to {_environmentName}");
-                    appBrowser.Navigation.ChangeEnvironment(_environmentName);
+                    var environmentValidation = appBrowser.Navigation.ChangeEnvironment(_environmentName).Value;
+
+                    Assert.AreEqual(_environmentName, environmentValidation);
 
                     appBrowser.ThinkTime(1500);
-
+                
                     // Click Solutions
                     Console.WriteLine($"Click {_sideBarButton} via Sidebar");
                     appBrowser.SideBar.Navigate(_sideBarButton);
@@ -163,7 +165,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
                     _testContext.AddResultFile(location);
 
-                    Assert.Fail($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+                    throw new InvalidOperationException($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
                 }
 
                 Console.WriteLine("Solution Checker Test Run Complete");
@@ -210,7 +212,9 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.ThinkTime(1500);
 
                     Console.WriteLine($"Changing PowerApps Environment to {_environmentName}");
-                    appBrowser.Navigation.ChangeEnvironment(_environmentName);
+                    var environmentValidation = appBrowser.Navigation.ChangeEnvironment(_environmentName);
+
+                    Assert.AreEqual(_environmentName, environmentValidation);
 
                     appBrowser.ThinkTime(1500);
 
@@ -288,7 +292,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
                     _testContext.AddResultFile(location);
                  
-                    Assert.Fail($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+                    throw new InvalidOperationException($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
                 }
 
                 Console.WriteLine("Solution Checker Test Run Complete");
@@ -333,7 +337,9 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                     //Pick the Org
                     Console.WriteLine($"Changing PowerApps Environment to {_environmentName}");
-                    appBrowser.Navigation.ChangeEnvironment(_environmentName);
+                    var environmentValidation = appBrowser.Navigation.ChangeEnvironment(_environmentName);
+
+                    Assert.AreEqual(_environmentName, environmentValidation);
                     appBrowser.ThinkTime(1500);
 
                     //Click Solutions
@@ -354,7 +360,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
                     _testContext.AddResultFile(location);
 
-                    Assert.Fail($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+                    throw new InvalidOperationException($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
                 }
 
                 Console.WriteLine("Solution Checker Test Run Complete");
@@ -400,7 +406,9 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.ThinkTime(1500);
 
                     Console.WriteLine($"Changing PowerApps Environment to {_environmentName}");
-                    appBrowser.Navigation.ChangeEnvironment(_environmentName);
+                    var environmentValidation = appBrowser.Navigation.ChangeEnvironment(_environmentName);
+
+                    Assert.AreEqual(_environmentName, environmentValidation);
 
                     appBrowser.ThinkTime(1500);
 
@@ -465,7 +473,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
                     _testContext.AddResultFile(location);
 
-                    Assert.Fail($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+                    throw new InvalidOperationException($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
                 }
 
                 Console.WriteLine("Solution Checker Test Run Complete");
