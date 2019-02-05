@@ -48,9 +48,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         {
             return this.Execute(GetOptions($"Change Environment to: {environmentName}"), driver =>
             {
-
                 var chosenEnvironment = "";
-                var environmentButton = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ChangeEnvironmentButton]));
+                var environmentButton = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Navigation.ChangeEnvironmentButton]));
                 var environmentButtonName = environmentButton.FindElements(By.TagName("span"));
                 chosenEnvironment = environmentButtonName[1].Text;
 
