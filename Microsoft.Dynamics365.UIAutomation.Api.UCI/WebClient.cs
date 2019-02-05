@@ -242,7 +242,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                     }
                 }
-                Browser.ThinkTime(500);
+
+                driver.WaitForTransaction();
                 //End Added For Bug
 
                 var subAreas = OpenSubMenu(subarea).Value;
@@ -270,10 +271,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions("Open Unified Interface Area"), driver =>
             {
 
-                try
-                {
-                    var areas = OpenMenu().Value;
+                //9.0.2
+                var areas = OpenMenu().Value;
 
+                if (areas != null)
+                {
                     if (!areas.ContainsKey(area))
                     {
                         throw new InvalidOperationException($"No area with the name '{area}' exists.");
@@ -281,19 +283,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     return areas;
                 }
-                catch (NullReferenceException)
+
+                //9.1
+                areas = OpenMenuFallback(area).Value;
+
+                if (!areas.ContainsKey(area))
                 {
-                    var areas = OpenMenuFallback(area).Value;
-
-                    if (!areas.ContainsKey(area))
-                    {
-                        // In this scenario - 
-                        throw new InvalidOperationException($"No area with the name '{area}' exists.");
-                    }
-
-                    return areas;
-
+                    // In this scenario - 
+                    throw new InvalidOperationException($"No area with the name '{area}' exists.");
                 }
+
+                return areas;
             });
         }
         public BrowserCommandResult<Dictionary<string, IWebElement>> OpenMenu(int thinkTime = Constants.DefaultThinkTime)
@@ -334,39 +334,73 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var dictionary = new Dictionary<string, IWebElement>();
 
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
-
-                bool isVisible = driver.IsVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapAreaMoreButton]));
-
-                if (isVisible)
+                //Make sure the sitemap-launcher is expanded - 9.1
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton])))
                 {
-                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapAreaMoreButton]));
+                    bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton])).GetAttribute("aria-expanded"));
 
-                    driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaMoreMenu]),
-                                           new TimeSpan(0, 0, 2),
-                                           d =>
-                                           {
-                                               var menu = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaMoreMenu]));
-                                               var menuItems = menu.FindElements(By.TagName("li"));
-                                               foreach (var item in menuItems)
-                                               {
-                                                   dictionary.Add(item.Text.ToLowerString(), item);
-                                               }
-                                           },
-                                           e =>
-                                           {
-                                               throw new InvalidOperationException("The Main Menu is not available.");
-                                           });
+                    if (!expanded)
+                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
                 }
-                else
+
+                //Is this the sitemap with enableunifiedinterfaceshellrefresh?
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapSwitcherButton])))
                 {
+                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapSwitcherButton])).Click(true);
 
-                    var singleItem = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapSingleArea].Replace("[NAME]", area)));
+                    driver.WaitForTransaction();
 
-                    char[] trimCharacters = { '', '\r', '\n', '', '', '' };
+                    driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapSwitcherFlyout]),
+                        new TimeSpan(0, 0, 2),
+                        d =>
+                        {
+                            var menu = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapSwitcherFlyout]));
 
-                    dictionary.Add(singleItem.Text.Trim(trimCharacters).ToLowerString(), singleItem);
+                            var menuItems = menu.FindElements(By.TagName("li"));
+                            foreach (var item in menuItems)
+                            {
+                                dictionary.Add(item.Text.ToLowerString(), item);
+                            }
+                        },
+                        e =>
+                        {
+                            throw new InvalidOperationException("The Main Menu is not available.");
+                        });
+                }
 
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapAreaMoreButton])))
+                {
+                    bool isVisible = driver.IsVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapAreaMoreButton]));
+
+                    if (isVisible)
+                    {
+                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapAreaMoreButton]));
+
+                        driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaMoreMenu]),
+                                               new TimeSpan(0, 0, 2),
+                                               d =>
+                                               {
+                                                   var menu = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaMoreMenu]));
+                                                   var menuItems = menu.FindElements(By.TagName("li"));
+                                                   foreach (var item in menuItems)
+                                                   {
+                                                       dictionary.Add(item.Text.ToLowerString(), item);
+                                                   }
+                                               },
+                                               e =>
+                                               {
+                                                   throw new InvalidOperationException("The Main Menu is not available.");
+                                               });
+                    }
+                    else
+                    {
+                        var singleItem = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapSingleArea].Replace("[NAME]", area)));
+
+                        char[] trimCharacters = { '', '\r', '\n', '', '', '' };
+
+                        dictionary.Add(singleItem.Text.Trim(trimCharacters).ToLowerString(), singleItem);
+
+                    }
                 }
 
                 return dictionary;
@@ -378,30 +412,54 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var dictionary = new Dictionary<string, IWebElement>();
 
-                bool isSiteMapLauncherCloseButtonVisible = driver.IsVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherCloseButton]));
-
-                if (isSiteMapLauncherCloseButtonVisible)
+                //Sitemap without enableunifiedinterfaceshellrefresh
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.PinnedSitemapEntity])))
                 {
-                    // Close SiteMap launcher since it is open
-                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherCloseButton]));
-                }
+                    bool isSiteMapLauncherCloseButtonVisible = driver.IsVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherCloseButton]));
 
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
-
-                var menuContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaContainer]));
-
-                var subItems = menuContainer.FindElements(By.TagName("li"));
-
-                foreach (var subItem in subItems)
-                {
-                    // Check 'Id' attribute, NULL value == Group Header
-                    if (!String.IsNullOrEmpty(subItem.GetAttribute("Id")))
+                    if (isSiteMapLauncherCloseButtonVisible)
                     {
-                        // Filter out duplicate entity keys - click the first one in the list
-                        if (!dictionary.ContainsKey(subItem.Text.ToLowerString()))
-                            dictionary.Add(subItem.Text.ToLowerString(), subItem);
+                        // Close SiteMap launcher since it is open
+                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherCloseButton]));
                     }
 
+                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+
+                    var menuContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaContainer]));
+
+                    var subItems = menuContainer.FindElements(By.TagName("li"));
+
+                    foreach (var subItem in subItems)
+                    {
+                        // Check 'Id' attribute, NULL value == Group Header
+                        if (!String.IsNullOrEmpty(subItem.GetAttribute("Id")))
+                        {
+                            // Filter out duplicate entity keys - click the first one in the list
+                            if (!dictionary.ContainsKey(subItem.Text.ToLowerString()))
+                                dictionary.Add(subItem.Text.ToLowerString(), subItem);
+                        }
+                    }
+                }
+
+                else
+                {
+                    //Sitemap with enableunifiedinterfaceshellrefresh enabled
+                    var menuShell = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaContainer]));
+
+                    //The menu is broke into multiple sections. Gather all items.
+                    foreach (IWebElement menuSection in menuShell)
+                    {
+                        var menuItems = menuSection.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapMenuItems]));
+
+                        foreach (var menuItem in menuItems)
+                        {
+                            if (!String.IsNullOrEmpty(menuItem.Text))
+                            {
+                                if (!dictionary.ContainsKey(menuItem.Text.ToLower()))
+                                    dictionary.Add(menuItem.Text.ToLower(), menuItem);
+                            }
+                        }
+                    }
                 }
 
                 return dictionary;
