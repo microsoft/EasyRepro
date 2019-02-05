@@ -212,7 +212,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.ThinkTime(1500);
 
                     Console.WriteLine($"Changing PowerApps Environment to {_environmentName}");
-                    var environmentValidation = appBrowser.Navigation.ChangeEnvironment(_environmentName);
+                    var environmentValidation = appBrowser.Navigation.ChangeEnvironment(_environmentName).Value;
 
                     Assert.AreEqual(_environmentName, environmentValidation);
 
@@ -337,7 +337,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                     //Pick the Org
                     Console.WriteLine($"Changing PowerApps Environment to {_environmentName}");
-                    var environmentValidation = appBrowser.Navigation.ChangeEnvironment(_environmentName);
+                    var environmentValidation = appBrowser.Navigation.ChangeEnvironment(_environmentName).Value;
 
                     Assert.AreEqual(_environmentName, environmentValidation);
                     appBrowser.ThinkTime(1500);
@@ -406,7 +406,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     appBrowser.ThinkTime(1500);
 
                     Console.WriteLine($"Changing PowerApps Environment to {_environmentName}");
-                    var environmentValidation = appBrowser.Navigation.ChangeEnvironment(_environmentName);
+                    var environmentValidation = appBrowser.Navigation.ChangeEnvironment(_environmentName).Value;
 
                     Assert.AreEqual(_environmentName, environmentValidation);
 
