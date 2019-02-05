@@ -44,42 +44,61 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             });
         }
 
-        public BrowserCommandResult<bool> ChangeEnvironment(string environmentName)
+        public BrowserCommandResult<string> ChangeEnvironment(string environmentName)
         {
             return this.Execute(GetOptions($"Change Environment to: {environmentName}"), driver =>
             {
 
-            var environmentButton = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ChangeEnvironmentButton]));
-            environmentButton.Click(true);
+                var chosenEnvironment = "";
+                var environmentButton = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ChangeEnvironmentButton]));
+                var environmentButtonName = environmentButton.FindElements(By.TagName("span"));
+                chosenEnvironment = environmentButtonName[1].Text;
 
-            var environments = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ChangeEnvironmentList]));
-
-            var environmentsList = environments.FindElements(By.TagName("li"));
-
-                if (environmentsList != null)
+                if (chosenEnvironment == environmentName)
                 {
-                    foreach (var environmentListItem in environmentsList)
-                    {
-                        var titleLinks = environmentListItem.FindElements(By.XPath(".//div/div"));
-
-                        if (titleLinks != null && titleLinks.Count > 0)
-                        {
-                            var title = titleLinks[0].GetAttribute("innerText");
-
-                            if (title.ToLower().Contains(environmentName.ToLower()))
-                            {
-                                environmentListItem.Click(true);
-                            }
-                        }
-                    }
+                    return chosenEnvironment;
                 }
                 else
                 {
-                  throw new InvalidOperationException($"Environment List contains no values. Please create an environment via the PowerApps Admin Center.");
+                    environmentButton.Click(true);
+
+                    var environments = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ChangeEnvironmentList]));
+                    var environmentsList = environments.FindElements(By.TagName("li"));
+
+
+                    if (environmentsList != null)
+                    {
+                        var environmentFound = false;
+
+                        foreach (var environmentListItem in environmentsList)
+                        {
+                            var titleLinks = environmentListItem.FindElements(By.XPath(".//div/div"));
+
+                            if (titleLinks != null && titleLinks.Count > 0)
+                            {
+                                var title = titleLinks[0].GetAttribute("innerText");
+
+                                if (title.ToLower().Contains(environmentName.ToLower()))
+                                {
+                                    environmentListItem.Click(true);
+                                    environmentFound = true;                                    
+                                }
+                            }
+                        }
+
+                        if (!environmentFound)
+                            throw new InvalidOperationException($"Environment {environmentName} does not exist in the list of environments. Please verify the environment exists, or that the provided name is correct and try again.");
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Environment List contains no values. Please create an environment via the PowerApps Admin Center.");
+                    }
+
+                    environmentButtonName = environmentButton.FindElements(By.TagName("span"));
+                    chosenEnvironment = environmentButtonName[1].Text;
+
+                    return chosenEnvironment;
                 }
-
-                return true;
-
             });
         }
 
