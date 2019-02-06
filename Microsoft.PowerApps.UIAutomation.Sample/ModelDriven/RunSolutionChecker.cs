@@ -161,6 +161,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
 
                     _resultsDirectory = TestContext.TestResultsDirectory;
+                    Console.WriteLine($"Current results directory location: {_resultsDirectory}");
                     string location = $@"{_resultsDirectory}\RunSolutionCheckerFromCommandBar-{_solutionName}-GenericError.jpeg";
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
@@ -290,6 +291,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
 
                     _resultsDirectory = TestContext.TestResultsDirectory;
+                    Console.WriteLine($"Current results directory location: {_resultsDirectory}");
                     string location = $@"{_resultsDirectory}\RunSolutionCheckerFromGrid-{_solutionName}-GenericError.jpeg";
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
@@ -360,6 +362,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
 
                     _resultsDirectory = TestContext.TestResultsDirectory;
+                    Console.WriteLine($"Current results directory location: {_resultsDirectory}");
                     string location = $@"{_resultsDirectory}\VerifySolutionChecker-{_solutionName}-GenericError.jpeg";
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
@@ -475,6 +478,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
 
                     _resultsDirectory = TestContext.TestResultsDirectory;
+                    Console.WriteLine($"Current results directory location: {_resultsDirectory}");
                     string location = $@"{_resultsDirectory}\CancelSolutionChecker-{_solutionName}-GenericError.jpeg";
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
