@@ -53,7 +53,6 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             {
                 try
                 {
-
                     //Login To PowerApps
                     Console.WriteLine("Performing Login");
 
@@ -160,9 +159,11 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 catch (Exception e)
                 {
                     Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
-                    string location = $@"{_resultsDirectory}\RunSolutionCheckerFromCommandBar-{_solutionName}-GenericError.bmp";
 
-                    appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
+                    _resultsDirectory = TestContext.TestResultsDirectory;
+                    string location = $@"{_resultsDirectory}\RunSolutionCheckerFromCommandBar-{_solutionName}-GenericError.jpeg";
+
+                    appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
                     _testContext.AddResultFile(location);
 
                     throw;
@@ -287,9 +288,11 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 catch (Exception e)
                 {
                     Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
-                    string location = $@"{_resultsDirectory}\RunSolutionCheckerFromGrid-{_solutionName}-GenericError.bmp";
 
-                    appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
+                    _resultsDirectory = TestContext.TestResultsDirectory;
+                    string location = $@"{_resultsDirectory}\RunSolutionCheckerFromGrid-{_solutionName}-GenericError.jpeg";
+
+                    appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
                     _testContext.AddResultFile(location);
 
                     throw;
@@ -355,9 +358,11 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 catch (Exception e)
                 {
                     Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
-                    string location = $@"{_resultsDirectory}\VerifySolutionChecker-{_solutionName}-GenericError.bmp";
 
-                    appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
+                    _resultsDirectory = TestContext.TestResultsDirectory;
+                    string location = $@"{_resultsDirectory}\VerifySolutionChecker-{_solutionName}-GenericError.jpeg";
+
+                    appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
                     _testContext.AddResultFile(location);
 
                     throw;
@@ -468,9 +473,11 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 catch (Exception e)
                 {
                     Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
-                    string location = $@"{_resultsDirectory}\CancelSolutionChecker-{_solutionName}-GenericError.bmp";
 
-                    appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
+                    _resultsDirectory = TestContext.TestResultsDirectory;
+                    string location = $@"{_resultsDirectory}\CancelSolutionChecker-{_solutionName}-GenericError.jpeg";
+
+                    appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
                     _testContext.AddResultFile(location);
 
                     throw;
