@@ -355,7 +355,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 catch (Exception e)
                 {
                     Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
-                    string location = $@"{_resultsDirectory}\VerifySolutionChecker-{_solutionName}-{_browserType}-GenericError.bmp";
+                    string location = $@"{_resultsDirectory}\VerifySolutionChecker-{_solutionName}-GenericError.bmp";
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
                     _testContext.AddResultFile(location);
