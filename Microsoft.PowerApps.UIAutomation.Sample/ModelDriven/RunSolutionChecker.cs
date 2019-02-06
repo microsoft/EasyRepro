@@ -160,12 +160,12 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 catch (Exception e)
                 {
                     Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
-                    string location = $@"{_resultsDirectory}\RunSolutionChecker-{_solutionName}-GenericError.bmp";
+                    string location = $@"{_resultsDirectory}\RunSolutionCheckerFromCommandBar-{_solutionName}-GenericError.bmp";
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
                     _testContext.AddResultFile(location);
 
-                    throw new InvalidOperationException($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+                    throw;
                 }
 
                 Console.WriteLine("Solution Checker Test Run Complete");
@@ -287,12 +287,12 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 catch (Exception e)
                 {
                     Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
-                    string location = $@"{_resultsDirectory}\RunSolutionChecker-{_solutionName}-GenericError.bmp";
+                    string location = $@"{_resultsDirectory}\RunSolutionCheckerFromGrid-{_solutionName}-GenericError.bmp";
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
                     _testContext.AddResultFile(location);
-                 
-                    throw new InvalidOperationException($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+
+                    throw;
                 }
 
                 Console.WriteLine("Solution Checker Test Run Complete");
@@ -355,12 +355,12 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 catch (Exception e)
                 {
                     Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
-                    string location = $@"{_resultsDirectory}\RunSolutionChecker-{_solutionName}-GenericError.bmp";
+                    string location = $@"{_resultsDirectory}\VerifySolutionChecker-{_solutionName}-{_browserType}-GenericError.bmp";
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
                     _testContext.AddResultFile(location);
 
-                    throw new InvalidOperationException($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+                    throw;
                 }
 
                 Console.WriteLine("Solution Checker Test Run Complete");
@@ -468,12 +468,12 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 catch (Exception e)
                 {
                     Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
-                    string location = $@"{_resultsDirectory}\RunSolutionChecker-{_solutionName}-GenericError.bmp";
+                    string location = $@"{_resultsDirectory}\CancelSolutionChecker-{_solutionName}-GenericError.bmp";
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Bmp);
                     _testContext.AddResultFile(location);
 
-                    throw new InvalidOperationException($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+                    throw;
                 }
 
                 Console.WriteLine("Solution Checker Test Run Complete");
