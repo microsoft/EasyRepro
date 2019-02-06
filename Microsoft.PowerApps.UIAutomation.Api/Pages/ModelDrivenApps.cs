@@ -294,6 +294,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         public string GetCurrentStatus(string solutionName)
         {
             var driver = Browser.Driver;
+            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.GridSolutionNameColumn]));
+            
             //Retrieve current status.  XPath was misbehaving trying to traverse rows and columns so we have to cheat.
             var solutionNames = driver.FindElements(By.XPath(Elements.Xpath[Reference.CommandBar.GridSolutionNameColumn]));
             var solutionStatuses = driver.FindElements(By.XPath(Elements.Xpath[Reference.CommandBar.GridSolutionStatusColumn]));
@@ -313,7 +315,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             }
 
             if (rowNumber == -1)
-                Console.WriteLine("Could not find status for this solution");
+                throw new InvalidOperationException($"Could not find status for solution: {solutionName}");
+
             return solutionStatuses[rowNumber].Text;
         }
 
