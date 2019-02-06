@@ -53,8 +53,6 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             {
                 try
                 {
-
-                    throw new InvalidOperationException("test");
                     //Login To PowerApps
                     Console.WriteLine("Performing Login");
 
