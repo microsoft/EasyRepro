@@ -53,6 +53,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             {
                 try
                 {
+
+                    throw new InvalidOperationException("Test Exception for Screenshots");
                     //Login To PowerApps
                     Console.WriteLine("Performing Login");
 
@@ -186,7 +188,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             {
                 try
                 {
-
+                    throw new InvalidOperationException("Test Exception for Screenshots");
                     // Login To PowerApps
                     Console.WriteLine("Performing Login");
 
@@ -316,6 +318,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             {
                 try
                 {
+                    throw new InvalidOperationException("Test Exception for Screenshots");
                     // Login To PowerApps
                     Console.WriteLine("Performing Login");
 
@@ -387,6 +390,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             {
                 try
                 {
+                    throw new InvalidOperationException("Test Exception for Screenshots");
                     // Login To PowerApps
                     Console.WriteLine("Performing Login");
 
