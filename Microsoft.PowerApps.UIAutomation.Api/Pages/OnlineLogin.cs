@@ -144,7 +144,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                         , new TimeSpan(0, 0, 60),
                         e =>
                         {
-                            e.WaitUntilClickable(By.ClassName("ms-FocusZone"),new TimeSpan(0,0,30));
+                            e.WaitUntilClickable(By.ClassName("d365shell-c-groups-menu-toggle"),new TimeSpan(0,0,30));
                             e.WaitForPageToLoad();
                         },
                         f => { throw new Exception("Login page failed."); });
