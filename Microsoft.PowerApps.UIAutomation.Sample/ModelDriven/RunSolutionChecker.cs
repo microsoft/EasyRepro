@@ -61,17 +61,20 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         try
                         {
                             appBrowser.OnlineLogin.Login(_xrmUri, _username.ToSecureString(), _password.ToSecureString());
+                            throw new InvalidOperationException("Testing");
                             break;
                         }
                         catch (Exception)
                         {
-                            appBrowser.Navigate("about:blank");
                             if (retryCount == Reference.Login.SignInAttempts)
                             {
-                                Console.WriteLine("Login failed after {0} attempts.", retryCount);
+                                Console.WriteLine($"Login failed after {retryCount + 1} attempts.");
                                 throw;
                             }
-                            Console.WriteLine("Login failed in #{0} attempt.", retryCount);
+
+                            appBrowser.Navigate("about:blank");
+
+                            Console.WriteLine($"Login failed after attempt #{retryCount+1}.");
                             continue;
                         }
                     }

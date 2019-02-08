@@ -113,6 +113,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(username.ToUnsecureString());
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Tab);
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Enter);
+
                 Thread.Sleep(2000);
 
                     //If expecting redirect then wait for redirect to trigger
