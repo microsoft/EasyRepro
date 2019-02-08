@@ -34,26 +34,25 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             return this.Execute(GetOptions("MakeApp: " + AppName), driver =>
             {
-                //Find the container with the list of apps
-                var container = driver.FindElements(By.ClassName("try-apps-section"))[0];
 
                 //Find the apps on the home page
-                var tiles = container.FindElements(By.ClassName("sample-name"));
+                var tiles = driver.FindElements(By.ClassName("sample-apps-list-tile-container"));
 
                 //Navigate to the requested button
                 foreach (var tile in tiles)
                 {
-                    if(tile.Text == AppName)
+                    var title = tile.FindElement(By.ClassName("content-element"));
+                    if(title.Text.StartsWith(AppName))
                     {
                         //We found our App.  Move up one level to find the right button
                         var parent = tile.FindElement(By.XPath("../.."));
 
                         var button = parent.FindElement(By.TagName("button"));
 
-                        //Hover over the tile
+                        //Hover over the tilcontent-elemente
                         tile.Hover(driver, true);
                         //Click the button
-                        button.Click();
+                        tile.Click();
                     }
                 }
 
