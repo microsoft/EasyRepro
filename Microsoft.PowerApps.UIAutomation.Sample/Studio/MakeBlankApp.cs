@@ -24,15 +24,12 @@ namespace Microsoft.PowerApps.UIAutomation.Sample
                 //Login
                 appCanvas.OnlineLogin.Login(uri, username.ToSecureString(), password.ToSecureString());
 
-
-                //Collapse the SideBar
-                appCanvas.SideBar.ExpandCollapse(8000);
-                                
+                
                 //Click Home
                 appCanvas.SideBar.Navigate("Home");
 
                 //Hover over "Start from blank" and click the button
-                appCanvas.Home.MakeApp("Start from blank");
+                appCanvas.Home.MakeApp("Canvas app from blank");
 
                 //Skip the Welcome Window
                 appCanvas.Canvas.HideStudioWelcome();

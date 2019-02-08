@@ -166,7 +166,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                     ClickRibbon(control.ControlType);
                 }
 
-                driver.WaitUntilVisible(By.XPath("//div[contains(@class, 'contentContainer')]"));
+                driver.WaitUntilVisible(By.XPath("//div[contains(@class, 'canvasContainer')]"));
 
                 //Get list of controls after clicking the button
                 List<IWebElement> after = GetControlsOnCanvas(driver.FindElements(By.XPath("//div[contains(@class, 'canvas')]"))[0]);
@@ -329,16 +329,11 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         {
             List<IWebElement> controlList = new List<IWebElement>();
 
-            var controlsContainer = canvas.FindElements(By.XPath("//div[contains(@class, 'controlContainer')]"))[0];
-            var contentContainer = controlsContainer.FindElements(By.XPath("//div[contains(@class, 'contentContainer')]"));
-            if (contentContainer.Count > 0)
+            var canvasContainer = canvas.FindElements(By.XPath("//div[contains(@class, 'canvasContainer')]"))[0];
+            var controlsContainer = canvasContainer.FindElements(By.XPath("//div[contains(@class, 'adornersContainer')]"));
+            if (controlsContainer.Count > 0)
             {
-                //There's already controls on the Canvas.  If = 0, then this is the first control
-                var controls = controlsContainer.FindElements(By.XPath("//div[@*[contains(name(), 'appmagic-content-control-name')]]"));
-                foreach (var control in controls)
-                {
-                    controlList.Add(control);
-                }
+                controlList.AddRange(controlsContainer.ToList());
             }
 
             return controlList;

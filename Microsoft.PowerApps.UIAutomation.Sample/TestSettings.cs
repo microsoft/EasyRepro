@@ -24,7 +24,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample
 
         public static BrowserOptions Options = new BrowserOptions
         {
-            BrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), Type.ToString()),
+            BrowserType = BrowserType.Chrome,
             PrivateMode = true,
             FireEvents = false,
             Headless = false,
