@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Configuration;
 using System.Security;
+using System.Threading;
 
 namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 {
@@ -49,12 +50,12 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             BrowserOptions options = TestSettings.Options;
             options.BrowserType = _browserType;
 
-            using (var appBrowser = new PowerAppBrowser(TestSettings.Options))
+            using (var appBrowser = new PowerAppBrowser(options))
             {
                 try
                 {
                     //Login To PowerApps
-                    Console.WriteLine("Performing Login");
+                    Console.WriteLine($"Attempting Login to {_xrmUri}");
 
                     for (int retryCount = 0; retryCount < Reference.Login.SignInAttempts; retryCount++)
                     {
@@ -63,18 +64,25 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                             appBrowser.OnlineLogin.Login(_xrmUri, _username.ToSecureString(), _password.ToSecureString());
                             break;
                         }
-                        catch (Exception)
+                        catch (Exception exc)
                         {
-                            appBrowser.Navigate("about:blank");
-                            if (retryCount == Reference.Login.SignInAttempts)
+                            if (retryCount+1 == Reference.Login.SignInAttempts)
                             {
-                                Console.WriteLine("Login failed after {0} attempts.", retryCount);
-                                throw;
+                                // Max Sign-In Attempts reached
+                                Console.WriteLine($"Login failed after {retryCount + 1} attempts.");
+                                throw new InvalidOperationException($"Login failed after {retryCount + 1} attempts. Exception Details: {exc}");
                             }
-                            Console.WriteLine("Login failed in #{0} attempt.", retryCount);
-                            continue;
+                            else
+                            {
+                                // Login exception occurred, navigate away and retry
+                                appBrowser.Navigate("about:blank");
+
+                                Console.WriteLine($"Login failed after attempt #{retryCount + 1}.");
+                                continue;
+                            }
                         }
                     }
+
                     Console.WriteLine("Login Complete");
 
                     appBrowser.ThinkTime(1500);
@@ -182,12 +190,12 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             BrowserOptions options = TestSettings.Options;
             options.BrowserType = _browserType;
 
-            using (var appBrowser = new PowerAppBrowser(TestSettings.Options))
+            using (var appBrowser = new PowerAppBrowser(options))
             {
                 try
                 {
-                    // Login To PowerApps
-                    Console.WriteLine("Performing Login");
+                    //Login To PowerApps
+                    Console.WriteLine($"Attempting Login to {_xrmUri}");
 
                     for (int retryCount = 0; retryCount < Reference.Login.SignInAttempts; retryCount++)
                     {
@@ -196,18 +204,25 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                             appBrowser.OnlineLogin.Login(_xrmUri, _username.ToSecureString(), _password.ToSecureString());
                             break;
                         }
-                        catch (Exception)
+                        catch (Exception exc)
                         {
-                            appBrowser.Navigate("about:blank");
-                            if (retryCount == Reference.Login.SignInAttempts)
+                            if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
-                                Console.WriteLine("Login failed after {0} attempts.", retryCount);
-                                throw;
+                                // Max Sign-In Attempts reached
+                                Console.WriteLine($"Login failed after {retryCount + 1} attempts.");
+                                throw new InvalidOperationException($"Login failed after {retryCount + 1} attempts. Exception Details: {exc}");
                             }
-                            Console.WriteLine("Login failed in #{0} attempt.", retryCount);
-                            continue;
+                            else
+                            {
+                                // Login exception occurred, navigate away and retry
+                                appBrowser.Navigate("about:blank");
+
+                                Console.WriteLine($"Login failed after attempt #{retryCount + 1}.");
+                                continue;
+                            }
                         }
                     }
+
                     Console.WriteLine("Login Complete");
 
                     appBrowser.ThinkTime(1500);
@@ -311,12 +326,12 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             BrowserOptions options = TestSettings.Options;
             options.BrowserType = _browserType;
 
-            using (var appBrowser = new PowerAppBrowser(TestSettings.Options))
+            using (var appBrowser = new PowerAppBrowser(options))
             {
                 try
                 {
-                    // Login To PowerApps
-                    Console.WriteLine("Performing Login");
+                    //Login To PowerApps
+                    Console.WriteLine($"Attempting Login to {_xrmUri}");
 
                     for (int retryCount = 0; retryCount < Reference.Login.SignInAttempts; retryCount++)
                     {
@@ -325,18 +340,25 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                             appBrowser.OnlineLogin.Login(_xrmUri, _username.ToSecureString(), _password.ToSecureString());
                             break;
                         }
-                        catch (Exception)
+                        catch (Exception exc)
                         {
-                            appBrowser.Navigate("about:blank");
-                            if (retryCount == Reference.Login.SignInAttempts)
+                            if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
-                                Console.WriteLine("Login failed after {0} attempts.", retryCount);
-                                throw;
+                                // Max Sign-In Attempts reached
+                                Console.WriteLine($"Login failed after {retryCount + 1} attempts.");
+                                throw new InvalidOperationException($"Login failed after {retryCount + 1} attempts. Exception Details: {exc}");
                             }
-                            Console.WriteLine("Login failed in #{0} attempt.", retryCount);
-                            continue;
+                            else
+                            {
+                                // Login exception occurred, navigate away and retry
+                                appBrowser.Navigate("about:blank");
+
+                                Console.WriteLine($"Login failed after attempt #{retryCount + 1}.");
+                                continue;
+                            }
                         }
                     }
+
                     Console.WriteLine("Login Complete");
 
                     //Pick the Org
@@ -382,12 +404,12 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             BrowserOptions options = TestSettings.Options;
             options.BrowserType = _browserType;
 
-            using (var appBrowser = new PowerAppBrowser(TestSettings.Options))
+            using (var appBrowser = new PowerAppBrowser(options))
             {
                 try
                 {
-                    // Login To PowerApps
-                    Console.WriteLine("Performing Login");
+                    //Login To PowerApps
+                    Console.WriteLine($"Attempting Login to {_xrmUri}");
 
                     for (int retryCount = 0; retryCount < Reference.Login.SignInAttempts; retryCount++)
                     {
@@ -396,18 +418,25 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                             appBrowser.OnlineLogin.Login(_xrmUri, _username.ToSecureString(), _password.ToSecureString());
                             break;
                         }
-                        catch (Exception)
+                        catch (Exception exc)
                         {
-                            appBrowser.Navigate("about:blank");
-                            if (retryCount == Reference.Login.SignInAttempts)
+                            if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
-                                Console.WriteLine("Login failed after {0} attempts.", retryCount);
-                                throw;
+                                // Max Sign-In Attempts reached
+                                Console.WriteLine($"Login failed after {retryCount + 1} attempts.");
+                                throw new InvalidOperationException($"Login failed after {retryCount + 1} attempts. Exception Details: {exc}");
                             }
-                            Console.WriteLine("Login failed in #{0} attempt.", retryCount);
-                            continue;
+                            else
+                            {
+                                // Login exception occurred, navigate away and retry
+                                appBrowser.Navigate("about:blank");
+
+                                Console.WriteLine($"Login failed after attempt #{retryCount + 1}.");
+                                continue;
+                            }
                         }
                     }
+
                     Console.WriteLine("Login Complete");
 
                     appBrowser.ThinkTime(1500);
