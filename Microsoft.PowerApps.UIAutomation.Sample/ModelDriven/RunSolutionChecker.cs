@@ -135,7 +135,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                     if (!string.IsNullOrEmpty(messageBarText))
                     {
-                        throw new ApplicationException(messageBarText);
+                        throw new InvalidOperationException(messageBarText);
                     }
 
                     //Click Solution Checker button and verify the run button and "download results" buttons are grayed out.  Verify Status is running
@@ -153,7 +153,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     // Validate that we did not receive an error status
                     if (!solutionCheckStatus.Contains("Results as of"))
                     {
-                        throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of 'Results as of ...' ");
+                        throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of 'Results as of ...' ");
                     }
 
                     // Validate that new status is not the same as original status pre-processing
@@ -161,7 +161,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     {
                         Console.WriteLine($"Starting Solution Status was: {originalSolutionStatus}");
                         Console.WriteLine($"Ending Solution Status was: {solutionCheckStatus}");
-                        throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' has not changed from '{originalSolutionStatus}'. A failure occurred and was not reported to the message bar. ");
+                        throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' has not changed from '{originalSolutionStatus}'. A failure occurred and was not reported to the message bar. ");
                     }
 
                     // Once processing is complete, you must select a different row, and re-select your row in order to make the buttons enabled
@@ -287,7 +287,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                     if (!string.IsNullOrEmpty(messageBarText))
                     {
-                        throw new ApplicationException(messageBarText);
+                        throw new InvalidOperationException(messageBarText);
                     }
 
                     // Click Solution Checker button and verify the run button and "download results" buttons are grayed out.  Verify Status is running
@@ -305,7 +305,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     // Validate that we did not receive an error status
                     if (!solutionCheckStatus.Contains("Results as of"))
                     {
-                        throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of 'Results as of ...' ");
+                        throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of 'Results as of ...' ");
                     }
 
                     // Validate that new status is not the same as original status pre-processing
@@ -313,7 +313,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     {
                         Console.WriteLine($"Starting Solution Status was: {originalSolutionStatus}");
                         Console.WriteLine($"Ending Solution Status was: {solutionCheckStatus}");
-                        throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' has not changed from '{originalSolutionStatus}'. A failure occurred and was not reported to the message bar. ");
+                        throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' has not changed from '{originalSolutionStatus}'. A failure occurred and was not reported to the message bar. ");
                     }
 
                     // Once processing is complete, you must select a different row, and re-select your row in order to make the buttons enabled
@@ -531,7 +531,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                     if (!string.IsNullOrEmpty(messageBarText))
                     {
-                        throw new ApplicationException(messageBarText);
+                        throw new InvalidOperationException(messageBarText);
                     }
 
                     // Click Solution Checker running button on the right of the command bar
@@ -549,15 +549,15 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         // Validate that we did not receive an error status
                         if (!solutionCheckStatus.Contains("Results as of"))
                         {
-                            throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of 'Results as of ...' ");
+                            throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of 'Results as of ...' ");
                         }
 
-                        // Validate that the cancel was successful and the "new" status is equal to the original starting status
-                        if (solutionCheckStatus != originalSolutionStatus)
+                        // Validate that new status is not the same as original status pre-processing
+                        if (solutionCheckStatus == originalSolutionStatus)
                         {
                             Console.WriteLine($"Starting Solution Status was: {originalSolutionStatus}");
                             Console.WriteLine($"Ending Solution Status was: {solutionCheckStatus}");
-                            throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' has changed from '{originalSolutionStatus}'. A failure occurred during cancellation and was not reported to the message bar. ");
+                            throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' has not changed from '{originalSolutionStatus}'. A failure occurred and was not reported to the message bar. ");
                         }
                     }
 
