@@ -552,8 +552,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                             throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of 'Results as of ...' ");
                         }
 
-                        // Validate that new status is not the same as original status pre-processing
-                        if (solutionCheckStatus == originalSolutionStatus)
+                        // Validate that "new" status is the same as original status pre-cancellation
+                        if (solutionCheckStatus != originalSolutionStatus)
                         {
                             Console.WriteLine($"Starting Solution Status was: {originalSolutionStatus}");
                             Console.WriteLine($"Ending Solution Status was: {solutionCheckStatus}");
