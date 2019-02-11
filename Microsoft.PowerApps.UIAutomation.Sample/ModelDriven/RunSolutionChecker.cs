@@ -68,13 +68,27 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         {
                             if (retryCount+1 == Reference.Login.SignInAttempts)
                             {
+                                // Login exception occurred, take screenshot
+                                _resultsDirectory = TestContext.TestResultsDirectory;
+                                string location = $@"{_resultsDirectory}\RunSolutionCheckerFromCommandBar-{_solutionName}-LoginErrorAttempt{retryCount + 1}.jpeg";
+
+                                appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
+                                _testContext.AddResultFile(location);
+
                                 // Max Sign-In Attempts reached
                                 Console.WriteLine($"Login failed after {retryCount + 1} attempts.");
                                 throw new InvalidOperationException($"Login failed after {retryCount + 1} attempts. Exception Details: {exc}");
                             }
                             else
                             {
-                                // Login exception occurred, navigate away and retry
+                                // Login exception occurred, take screenshot
+                                _resultsDirectory = TestContext.TestResultsDirectory;
+                                string location = $@"{_resultsDirectory}\RunSolutionCheckerFromCommandBar-{_solutionName}-LoginErrorAttempt{retryCount+1}.jpeg";
+
+                                appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
+                                _testContext.AddResultFile(location);
+
+                                //Navigate away and retry
                                 appBrowser.Navigate("about:blank");
 
                                 Console.WriteLine($"Login failed after attempt #{retryCount + 1}.");
@@ -145,6 +159,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     // Validate that new status is not the same as original status pre-processing
                     if (solutionCheckStatus == originalSolutionStatus)
                     {
+                        Console.WriteLine($"Starting Solution Status was: {originalSolutionStatus}");
+                        Console.WriteLine($"Ending Solution Status was: {solutionCheckStatus}");
                         throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' has not changed from '{originalSolutionStatus}'. A failure occurred and was not reported to the message bar. ");
                     }
 
@@ -208,13 +224,27 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         {
                             if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
+                                // Login exception occurred, take screenshot
+                                _resultsDirectory = TestContext.TestResultsDirectory;
+                                string location = $@"{_resultsDirectory}\RunSolutionCheckerFromSolutionsGrid-{_solutionName}-LoginErrorAttempt{retryCount + 1}.jpeg";
+
+                                appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
+                                _testContext.AddResultFile(location);
+
                                 // Max Sign-In Attempts reached
                                 Console.WriteLine($"Login failed after {retryCount + 1} attempts.");
                                 throw new InvalidOperationException($"Login failed after {retryCount + 1} attempts. Exception Details: {exc}");
                             }
                             else
                             {
-                                // Login exception occurred, navigate away and retry
+                                // Login exception occurred, take screenshot
+                                _resultsDirectory = TestContext.TestResultsDirectory;
+                                string location = $@"{_resultsDirectory}\RunSolutionCheckerFromSolutionsGrid-{_solutionName}-LoginErrorAttempt{retryCount + 1}.jpeg";
+
+                                appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
+                                _testContext.AddResultFile(location);
+
+                                //Navigate away and retry
                                 appBrowser.Navigate("about:blank");
 
                                 Console.WriteLine($"Login failed after attempt #{retryCount + 1}.");
@@ -281,6 +311,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     // Validate that new status is not the same as original status pre-processing
                     if (solutionCheckStatus == originalSolutionStatus)
                     {
+                        Console.WriteLine($"Starting Solution Status was: {originalSolutionStatus}");
+                        Console.WriteLine($"Ending Solution Status was: {solutionCheckStatus}");
                         throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' has not changed from '{originalSolutionStatus}'. A failure occurred and was not reported to the message bar. ");
                     }
 
@@ -344,13 +376,27 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         {
                             if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
+                                // Login exception occurred, take screenshot
+                                _resultsDirectory = TestContext.TestResultsDirectory;
+                                string location = $@"{_resultsDirectory}\VerifySolutionChecker-{_solutionName}-LoginErrorAttempt{retryCount + 1}.jpeg";
+
+                                appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
+                                _testContext.AddResultFile(location);
+
                                 // Max Sign-In Attempts reached
                                 Console.WriteLine($"Login failed after {retryCount + 1} attempts.");
                                 throw new InvalidOperationException($"Login failed after {retryCount + 1} attempts. Exception Details: {exc}");
                             }
                             else
                             {
-                                // Login exception occurred, navigate away and retry
+                                // Login exception occurred, take screenshot
+                                _resultsDirectory = TestContext.TestResultsDirectory;
+                                string location = $@"{_resultsDirectory}\VerifySolutionChecker-{_solutionName}-LoginErrorAttempt{retryCount + 1}.jpeg";
+
+                                appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
+                                _testContext.AddResultFile(location);
+
+                                //Navigate away and retry
                                 appBrowser.Navigate("about:blank");
 
                                 Console.WriteLine($"Login failed after attempt #{retryCount + 1}.");
@@ -422,13 +468,27 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         {
                             if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
+                                // Login exception occurred, take screenshot
+                                _resultsDirectory = TestContext.TestResultsDirectory;
+                                string location = $@"{_resultsDirectory}\CancelSolutionCheckerRun-{_solutionName}-LoginErrorAttempt{retryCount + 1}.jpeg";
+
+                                appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
+                                _testContext.AddResultFile(location);
+
                                 // Max Sign-In Attempts reached
                                 Console.WriteLine($"Login failed after {retryCount + 1} attempts.");
                                 throw new InvalidOperationException($"Login failed after {retryCount + 1} attempts. Exception Details: {exc}");
                             }
                             else
                             {
-                                // Login exception occurred, navigate away and retry
+                                // Login exception occurred, take screenshot
+                                _resultsDirectory = TestContext.TestResultsDirectory;
+                                string location = $@"{_resultsDirectory}\CancelSolutionCheckerRun-{_solutionName}-LoginErrorAttempt{retryCount + 1}.jpeg";
+
+                                appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
+                                _testContext.AddResultFile(location);
+
+                                //Navigate away and retry
                                 appBrowser.Navigate("about:blank");
 
                                 Console.WriteLine($"Login failed after attempt #{retryCount + 1}.");
@@ -495,6 +555,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         // Validate that the cancel was successful and the "new" status is equal to the original starting status
                         if (solutionCheckStatus != originalSolutionStatus)
                         {
+                            Console.WriteLine($"Starting Solution Status was: {originalSolutionStatus}");
+                            Console.WriteLine($"Ending Solution Status was: {solutionCheckStatus}");
                             throw new ApplicationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' has changed from '{originalSolutionStatus}'. A failure occurred during cancellation and was not reported to the message bar. ");
                         }
                     }
