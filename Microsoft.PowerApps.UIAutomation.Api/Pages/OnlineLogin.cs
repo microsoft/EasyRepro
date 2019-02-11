@@ -142,13 +142,17 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                     }
 
                     driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.MainPage])
-                        , new TimeSpan(0, 0, 60),
+                        , new TimeSpan(0, 2, 0),
                         e =>
                         {
                             e.WaitUntilClickable(By.ClassName("d365shell-c-groups-menu-toggle"),new TimeSpan(0,0,30));
                             e.WaitForPageToLoad();
                         },
-                        f => { throw new Exception("Login page failed."); });
+                        f => 
+                        {
+                            Console.WriteLine("Login.MainPage failed to load in 2 minutes.");
+                            throw new Exception("Login page failed.");
+                        });
                 }
             }
 
