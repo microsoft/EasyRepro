@@ -150,6 +150,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
 
             this.Driver.TakeScreenshot().SaveAsFile(path, fileFormat);
+            this.ThinkTime(2000);
         }
 
         public T GetPage<T>()

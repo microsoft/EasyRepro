@@ -66,6 +66,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         catch (Exception exc)
                         {
+                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc.Message.ToString()}");
+
                             if (retryCount+1 == Reference.Login.SignInAttempts)
                             {
                                 // Login exception occurred, take screenshot
@@ -222,6 +224,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         catch (Exception exc)
                         {
+                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc.Message.ToString()}");
+
                             if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
                                 // Login exception occurred, take screenshot
@@ -374,6 +378,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         catch (Exception exc)
                         {
+                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc.Message.ToString()}");
+
                             if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
                                 // Login exception occurred, take screenshot
@@ -466,6 +472,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         catch (Exception exc)
                         {
+                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc.Message.ToString()}");
+
                             if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
                                 // Login exception occurred, take screenshot
@@ -580,7 +588,6 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 Console.WriteLine("Solution Checker Test Run Complete");
             }
         }
-
 
     }
 }

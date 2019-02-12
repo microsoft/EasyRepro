@@ -102,8 +102,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             bool online = !(this.OnlineDomains != null && !this.OnlineDomains.Any(d => uri.Host.EndsWith(d)));
             driver.Navigate().GoToUrl(uri);
 
-            if (online)
-            {
+            if (online && !driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.MainPage])))
+            {           
                 if (driver.IsVisible(By.Id("use_another_account_link")))
                     driver.ClickWhenAvailable(By.Id("use_another_account_link"));
 
@@ -145,7 +145,16 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                         , new TimeSpan(0, 2, 0),
                         e =>
                         {
-                            e.WaitUntilClickable(By.ClassName("d365shell-c-groups-menu-toggle"),new TimeSpan(0,0,30));
+                            try
+                            {
+                                e.WaitUntilClickable(By.ClassName("d365shell-c-groups-menu-toggle"), new TimeSpan(0, 0, 30));
+                            }
+                            catch(Exception exc)
+                            {
+                                Console.WriteLine("The Environment Picker did not return clickable");
+                                throw new InvalidOperationException($"The Environment Picker did not return clickable: {exc}");
+                            }
+
                             e.WaitForPageToLoad();
                         },
                         f => 
