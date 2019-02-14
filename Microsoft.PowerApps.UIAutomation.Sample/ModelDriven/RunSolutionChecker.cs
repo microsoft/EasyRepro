@@ -66,7 +66,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         catch (Exception exc)
                         {
-                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc.Message.ToString()}");
+                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc}");
 
                             if (retryCount+1 == Reference.Login.SignInAttempts)
                             {
@@ -224,7 +224,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         catch (Exception exc)
                         {
-                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc.Message.ToString()}");
+                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc}");
 
                             if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
@@ -378,7 +378,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         catch (Exception exc)
                         {
-                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc.Message.ToString()}");
+                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc}");
 
                             if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
@@ -472,7 +472,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         catch (Exception exc)
                         {
-                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc.Message.ToString()}");
+                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc}");
 
                             if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
