@@ -102,45 +102,74 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             bool online = !(this.OnlineDomains != null && !this.OnlineDomains.Any(d => uri.Host.EndsWith(d)));
             driver.Navigate().GoToUrl(uri);
 
-            if (online && !driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.MainPage])))
-            {           
+            if (online)
+            {
                 if (driver.IsVisible(By.Id("use_another_account_link")))
                     driver.ClickWhenAvailable(By.Id("use_another_account_link"));
 
-                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]),
-                    $"The Office 365 sign in page did not return the expected result and the user '{username}' could not be signed in.");
+                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]));
 
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(username.ToUnsecureString());
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Tab);
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Enter);
+                var userIdFieldVisible = driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.UserId]));
+                if (userIdFieldVisible)
+                {
 
-                Thread.Sleep(2000);
+                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(username.ToUnsecureString());
+                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Tab);
+                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Enter);
+
+                    Thread.Sleep(2000);
 
                     //If expecting redirect then wait for redirect to trigger
-                if (redirectAction != null)
-                {
-                    //Wait for redirect to occur.
-                    Thread.Sleep(3000);
+                    if (redirectAction != null)
+                    {
+                        //Wait for redirect to occur.
+                        Thread.Sleep(3000);
 
-                    redirectAction?.Invoke(new LoginRedirectEventArgs(username, password, driver));
+                        redirectAction?.Invoke(new LoginRedirectEventArgs(username, password, driver));
 
-                    redirect = true;
+                        redirect = true;
+                    }
+                    else
+                    {
+                        Thread.Sleep(1000);
+
+                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).SendKeys(password.ToUnsecureString());
+                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).SendKeys(Keys.Tab);
+                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).Submit();
+
+                        Thread.Sleep(1000);
+
+                        if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])))
+                        {
+                            driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]));
+                        }
+
+                        driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.MainPage])
+                            , new TimeSpan(0, 2, 0),
+                            e =>
+                            {
+                                try
+                                {
+                                    e.WaitUntilClickable(By.ClassName("d365shell-c-groups-menu-toggle"), new TimeSpan(0, 0, 30));
+                                }
+                                catch (Exception exc)
+                                {
+                                    Console.WriteLine("The Environment Picker did not return clickable");
+                                    throw new InvalidOperationException($"The Environment Picker did not return clickable: {exc}");
+                                }
+
+                                e.WaitForPageToLoad();
+                            },
+                            f =>
+                            {
+                                Console.WriteLine("Login.MainPage failed to load in 2 minutes.");
+                                throw new Exception("Login page failed.");
+                            });
+                    }
                 }
                 else
                 {
-                    Thread.Sleep(1000);
-
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).SendKeys(password.ToUnsecureString());
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).SendKeys(Keys.Tab);
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).Submit();
-
-                    Thread.Sleep(1000);
-
-                    if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])))
-                    {
-                            driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])); 
-                    }
-
+                    // This scenario should only be hit in the event of a login.microsoftonline.com failure, or a login retry authentication where an authentication token was already retrieved
                     driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.MainPage])
                         , new TimeSpan(0, 2, 0),
                         e =>
@@ -148,8 +177,9 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                             try
                             {
                                 e.WaitUntilClickable(By.ClassName("d365shell-c-groups-menu-toggle"), new TimeSpan(0, 0, 30));
+
                             }
-                            catch(Exception exc)
+                            catch (Exception exc)
                             {
                                 Console.WriteLine("The Environment Picker did not return clickable");
                                 throw new InvalidOperationException($"The Environment Picker did not return clickable: {exc}");
@@ -157,7 +187,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
                             e.WaitForPageToLoad();
                         },
-                        f => 
+                        f =>
                         {
                             Console.WriteLine("Login.MainPage failed to load in 2 minutes.");
                             throw new Exception("Login page failed.");

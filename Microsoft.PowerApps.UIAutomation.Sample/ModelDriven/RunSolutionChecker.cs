@@ -66,7 +66,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         catch (Exception exc)
                         {
-                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc.Message.ToString()}");
+                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc}");
 
                             if (retryCount+1 == Reference.Login.SignInAttempts)
                             {
@@ -224,7 +224,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         catch (Exception exc)
                         {
-                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc.Message.ToString()}");
+                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc}");
 
                             if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
@@ -378,7 +378,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         catch (Exception exc)
                         {
-                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc.Message.ToString()}");
+                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc}");
 
                             if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
@@ -472,7 +472,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         catch (Exception exc)
                         {
-                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc.Message.ToString()}");
+                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc}");
 
                             if (retryCount + 1 == Reference.Login.SignInAttempts)
                             {
@@ -557,7 +557,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         // Validate that we did not receive an error status
                         if (!solutionCheckStatus.Contains("Results as of"))
                         {
-                            throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of 'Results as of ...' ");
+                            throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of '{originalSolutionStatus}' ");
                         }
 
                         // Validate that "new" status is the same as original status pre-cancellation
@@ -565,7 +565,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         {
                             Console.WriteLine($"Starting Solution Status was: {originalSolutionStatus}");
                             Console.WriteLine($"Ending Solution Status was: {solutionCheckStatus}");
-                            throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' has not changed from '{originalSolutionStatus}'. A failure occurred and was not reported to the message bar. ");
+                            throw new InvalidOperationException($"Unexpected Solution Check Status. New Status Value '{solutionCheckStatus}' has changed from original value '{originalSolutionStatus}'.");
                         }
                     }
 
