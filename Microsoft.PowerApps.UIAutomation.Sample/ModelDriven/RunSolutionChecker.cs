@@ -118,8 +118,32 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine("Collapse the sidebar");
                     appBrowser.SideBar.ExpandCollapse();
 
-                    // Get Solution check status value
-                    string originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+                    string originalSolutionStatus = "";
+                    do
+                    {
+                        // Get Solution check status value
+                        // Ensure that when the status is pulled, a refresh has not occurred resulting in a value == ""
+                        originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+
+                        if (originalSolutionStatus.Contains("Running..."))
+                        {
+                            // An unexpected Solution Checker Run exists, we should cancel it, and then grab a new status.
+                            Console.WriteLine($"Cancelling an existing, unexpected Solution Checker run...");
+                            var cancelSuccess = appBrowser.CommandBar.CancelSolutionCheckerRun(_solutionName);
+
+                            if (cancelSuccess)
+                            {
+                                // Cancel should only take a few seconds at most... wait 10 seconds and check status
+                                appBrowser.ThinkTime(10000);
+
+                                originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+                            }
+                            else
+                                throw new InvalidOperationException($"Unexpected Solution Checker Status: '{originalSolutionStatus}'. Cancel Attempt failed.");
+                        }
+
+                    }
+                    while (originalSolutionStatus == "");
 
                     // Highlight Solution Name
                     Console.WriteLine($"Select solution with name: {_solutionName}");
@@ -149,8 +173,14 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine($"Waiting for Solution Checker run to finish");
                     appBrowser.ModelDrivenApps.WaitForProcessingToComplete(_solutionName);
 
-                    // Get solution check status post-processing
-                    string solutionCheckStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+                    string solutionCheckStatus = "";
+                    do
+                    {
+                        // Get solution check status post-processing
+                        // Ensure that when the status is pulled, a refresh has not occurred resulting in a value == ""
+                        solutionCheckStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+                    }
+                    while (solutionCheckStatus == "");
 
                     // Validate that we did not receive an error status
                     if (!solutionCheckStatus.Contains("Results as of"))
@@ -276,8 +306,32 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine("Collapse the sidebar");
                     appBrowser.SideBar.ExpandCollapse();
 
-                    // Get Solution check status value
-                    string originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+                    string originalSolutionStatus = "";
+                    do
+                    {
+                        // Get Solution check status value
+                        // Ensure that when the status is pulled, a refresh has not occurred resulting in a value == ""
+                        originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+
+                        if (originalSolutionStatus.Contains("Running..."))
+                        {
+                            // An unexpected Solution Checker Run exists, we should cancel it, and then grab a new status.
+                            Console.WriteLine($"Cancelling an existing, unexpected Solution Checker run...");
+                            var cancelSuccess = appBrowser.CommandBar.CancelSolutionCheckerRun(_solutionName);
+
+                            if (cancelSuccess)
+                            {
+                                // Cancel should only take a few seconds at most... wait 10 seconds and check status
+                                appBrowser.ThinkTime(10000);
+
+                                originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+                            }
+                            else
+                                throw new InvalidOperationException($"Unexpected Solution Checker Status: '{originalSolutionStatus}'. Cancel Attempt failed.");
+                        }
+
+                    }
+                    while (originalSolutionStatus == "");
 
                     // Click desired grid row, then click Projects Checker button via ... commands in the grid
                     Console.WriteLine($"Click the ... button in Projects grid, click on 'Solution Checker', and then click sub-command 'Run'");
@@ -303,8 +357,14 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine($"Waiting for Solution Checker run to finish");
                     appBrowser.ModelDrivenApps.WaitForProcessingToComplete(_solutionName);
 
-                    // Get solution check status post-processing
-                    string solutionCheckStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+                    string solutionCheckStatus = "";
+                    do
+                    {
+                        // Get solution check status post-processing
+                        // Ensure that when the status is pulled, a refresh has not occurred resulting in a value == ""
+                        solutionCheckStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+                    }
+                    while (solutionCheckStatus == "");
 
                     // Validate that we did not receive an error status
                     if (!solutionCheckStatus.Contains("Results as of"))
@@ -524,49 +584,94 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine("Collapse the sidebar");
                     appBrowser.SideBar.ExpandCollapse();
 
-                    // Get Solution check status value
-                    string originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
-
-                    // Click desired grid row, then click Projects Checker button via ... commands in the grid
-                    Console.WriteLine($"Click the ... button in Projects grid, click on 'Solution Checker', and then click sub-command 'Run'");
-                    appBrowser.ModelDrivenApps.MoreCommands(_solutionName, _commandBarButton, "Run");
-
-                    // Wait 5 seconds
-                    appBrowser.ThinkTime(15000);
-
-                    // Check to confirm the run has not thrown an initial error
-                    string messageBarText = appBrowser.ModelDrivenApps.CheckForErrors();
-
-                    if (!string.IsNullOrEmpty(messageBarText))
+                    string originalSolutionStatus = "";
+                    do
                     {
-                        throw new InvalidOperationException(messageBarText);
+                        // Get Solution check status value
+                        // Ensure that when the status is pulled, a refresh has not occurred resulting in a value == ""
+                        originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
                     }
+                    while (originalSolutionStatus == "");
 
-                    // Click Solution Checker running button on the right of the command bar
-                    Console.WriteLine($"Cancelling Solution Checker run...");
-                    var cancelSuccess = appBrowser.CommandBar.CancelSolutionCheckerRun(_solutionName);
-
-                    // Cancel should only take a few seconds at most... wait 10 seconds and check status
-                    appBrowser.ThinkTime(10000);
-
-                    // Get solution check status post-cancel
-                    string solutionCheckStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
-
-                    if (appBrowser.Options.BrowserType.ToString() != "IE")
+                    // If an existing run did not complete as expected and is still running, we should cancel the previous run so that future tests continue to succeed (this will also act as cancel validation)
+                    if (!originalSolutionStatus.Contains("Running..."))
                     {
-                        // Validate that we did not receive an error status
-                        if (!solutionCheckStatus.Contains("Results as of"))
+
+                        // Click desired grid row, then click Projects Checker button via ... commands in the grid
+                        Console.WriteLine($"Click the ... button in Projects grid, click on 'Solution Checker', and then click sub-command 'Run'");
+                        appBrowser.ModelDrivenApps.MoreCommands(_solutionName, _commandBarButton, "Run");
+
+                        // Wait 5 seconds
+                        appBrowser.ThinkTime(15000);
+
+                        // Check to confirm the run has not thrown an initial error
+                        string messageBarText = appBrowser.ModelDrivenApps.CheckForErrors();
+
+                        if (!string.IsNullOrEmpty(messageBarText))
                         {
-                            throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of '{originalSolutionStatus}' ");
+                            throw new InvalidOperationException(messageBarText);
                         }
 
-                        // Validate that "new" status is the same as original status pre-cancellation
-                        if (solutionCheckStatus != originalSolutionStatus)
+                        // Click Solution Checker running button on the right of the command bar
+                        Console.WriteLine($"Cancelling Solution Checker run...");
+                        var cancelSuccess = appBrowser.CommandBar.CancelSolutionCheckerRun(_solutionName);
+
+                        // Cancel should only take a few seconds at most... wait 10 seconds and check status
+                        appBrowser.ThinkTime(10000);
+
+                        string solutionCheckStatus = "";
+                        do
                         {
-                            Console.WriteLine($"Starting Solution Status was: {originalSolutionStatus}");
-                            Console.WriteLine($"Ending Solution Status was: {solutionCheckStatus}");
-                            throw new InvalidOperationException($"Unexpected Solution Check Status. New Status Value '{solutionCheckStatus}' has changed from original value '{originalSolutionStatus}'.");
+                            // Get solution check status post-processing
+                            // Ensure that when the status is pulled, a refresh has not occurred resulting in a value == ""
+                            solutionCheckStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
                         }
+                        while (solutionCheckStatus == "");
+
+                        if (appBrowser.Options.BrowserType.ToString() != "IE")
+                        {
+                            // Validate that we did not receive an error status
+                            if (!solutionCheckStatus.Contains("Results as of"))
+                            {
+                                throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of '{originalSolutionStatus}' ");
+                            }
+
+                            // Validate that "new" status is the same as original status pre-cancellation
+                            if (solutionCheckStatus != originalSolutionStatus)
+                            {
+                                Console.WriteLine($"Starting Solution Status was: {originalSolutionStatus}");
+                                Console.WriteLine($"Ending Solution Status was: {solutionCheckStatus}");
+                                throw new InvalidOperationException($"Unexpected Solution Check Status. New Status Value '{solutionCheckStatus}' has changed from original value '{originalSolutionStatus}'.");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Click Solution Checker running button on the right of the command bar
+                        Console.WriteLine($"Cancelling Solution Checker run...");
+                        var cancelSuccess = appBrowser.CommandBar.CancelSolutionCheckerRun(_solutionName);
+
+                        // Cancel should only take a few seconds at most... wait 10 seconds and check status
+                        appBrowser.ThinkTime(10000);
+
+                        string solutionCheckStatus = "";
+                        do
+                        {
+                            // Get solution check status post-processing
+                            // Ensure that when the status is pulled, a refresh has not occurred resulting in a value == ""
+                            solutionCheckStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+                        }
+                        while (solutionCheckStatus == "");
+
+                        if (appBrowser.Options.BrowserType.ToString() != "IE")
+                        {
+                            // Validate that we did not receive an error status
+                            if (solutionCheckStatus.Contains("Running..."))
+                            {
+                                throw new InvalidOperationException($"Analysis Cancellation failed - status is still '{solutionCheckStatus}'");
+                            }
+                        }
+
                     }
 
                     appBrowser.ThinkTime(10000);

@@ -272,9 +272,9 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                         if (!thisStatus.Equals(currentStatus) && thisStatus.Contains("Results", StringComparison.OrdinalIgnoreCase))
                             state = true;
                     }
-                    catch (TimeoutException)
+                    catch (TimeoutException timeout)
                     {
-
+                        throw new InvalidOperationException($"Error: Timeout Exception occurred waiting for analysis to complete. {timeout}");
                     }
                     catch (NullReferenceException)
                     {
