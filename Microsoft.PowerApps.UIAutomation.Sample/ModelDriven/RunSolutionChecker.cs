@@ -484,6 +484,9 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     Console.WriteLine($"Click {_sideBarButton} via Sidebar");
                     appBrowser.SideBar.Navigate(_sideBarButton);
 
+                    // Validate that Notification is not present
+                    appBrowser.ModelDrivenApps.CloseNotification();
+
                     Console.WriteLine("Make sure each managed solution does not have the solution checker button in the command bar");
                     appBrowser.ModelDrivenApps.VerifyManagedSolutionsUnavailable(_commandBarButton, 1000);
 
@@ -611,6 +614,10 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         {
                             throw new InvalidOperationException(messageBarText);
                         }
+
+
+                        // Check for a Portal Notification prior to closing (blocks the Cancel button in command bar)
+                        appBrowser.ModelDrivenApps.CloseNotification();
 
                         // Click Solution Checker running button on the right of the command bar
                         Console.WriteLine($"Cancelling Solution Checker run...");

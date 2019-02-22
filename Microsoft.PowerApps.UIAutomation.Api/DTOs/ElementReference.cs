@@ -81,6 +81,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             //ModelDrivenApps
             { "ModelDrivenApps_CellsContainer", "//div[contains(@data-automationid,'DetailsRowCell')]"},
+            { "ModelDrivenApps_NotificationContainer", "//div[@class=\"notification-container\"]"},
             { "ModelDrivenApps_MoreCommandsButton", "../div[contains(@data-automation-key, 'contextualMenu')]"},
             { "ModelDrivenApps_MoreCommandsContainer", "//ul[contains(@class,'ms-ContextualMenu-list')]"},
             { "ModelDrivenApps_SubButtonContainer", "//ul[contains(@class,'ms-ContextualMenu-list')]"},
@@ -191,6 +192,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
         public static class ModelDrivenApps
         {
             public static string CellsContainer = "ModelDrivenApps_CellsContainer";
+            public static string NotificationContainer = "ModelDrivenApps_NotificationContainer";
             public static string MoreCommandsButton = "ModelDrivenApps_MoreCommandsButton";
             public static string MoreCommandsContainer = "ModelDrivenApps_MoreCommandsContainer";
             public static string SubButtonContainer = "ModelDrivenApps_SubButtonContainer";

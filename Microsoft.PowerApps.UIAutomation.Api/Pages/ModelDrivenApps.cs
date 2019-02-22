@@ -48,6 +48,30 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             });
         }
 
+        /// <summary>
+        /// Closes a Notification container if present/> class.
+        /// </summary>
+        public BrowserCommandResult<bool> CloseNotification(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Close Notification"), driver =>
+            {
+                bool isNotificationVisible = driver.IsVisible(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.NotificationContainer]));
+
+                if (isNotificationVisible)
+                {
+                    var notificationContainer = driver.FindElement(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.NotificationContainer]));
+
+                    var innerDiv = notificationContainer.FindElements(By.TagName("div"));
+
+                    innerDiv[0].Click(true);
+                }
+
+                return isNotificationVisible;
+            });
+        }
+
         public BrowserCommandResult<bool> SelectGridRecord(int index, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
