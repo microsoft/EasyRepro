@@ -271,7 +271,14 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             var subButtons = subButtonContainer[1].FindElements(By.TagName("button"));
             var sButton = subButtons.FirstOrDefault(b => b.Text.Equals(subButton, StringComparison.OrdinalIgnoreCase));
 
-            bool.TryParse(sButton.GetAttribute("aria-disabled"), out isDisabled);
+            try
+            {
+                bool.TryParse(sButton.GetAttribute("aria-disabled"), out isDisabled);
+            }
+            catch (Exception exc)
+            {
+                throw new InvalidOperationException($"An error occurred trying to validate that the button '{subButton}' is disabled: {exc}");
+            }
 
             ClickMoreCommandsButton(solutionName, commandName, "");
 
