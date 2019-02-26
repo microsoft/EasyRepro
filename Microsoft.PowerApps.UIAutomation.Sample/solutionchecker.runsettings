@@ -44,10 +44,13 @@
     <Parameter name="OnlinePassword" value="" />
     <Parameter name="OnlineUrl" value="" />
     <Parameter name="SolutionName" value="" />
-    <Parameter name="EnvironmentName" value="" />
-    <Parameter name="SideBarButton" value="" />
-    <Parameter name="CommandBarButton" value="" />
-    <Parameter name="BrowserType" value="" />
+    <Parameter name="EnvironmentName" value=""/>
+    <Parameter name="SideBarButton" value="Solutions" />
+    <Parameter name="CommandBarButton" value="Solution Checker" />
+    <Parameter name="SubButtonRun" value="Run" />
+    <Parameter name="SubButtonDownload" value="Download Results" />
+    <Parameter name="SubButtonView" value="View Results" />
+    <Parameter name="BrowserType" value="Chrome" />
     <Parameter name="ResultsDirectory" value="" />
   </TestRunParameters>
   <!-- Adapter Specific sections -->

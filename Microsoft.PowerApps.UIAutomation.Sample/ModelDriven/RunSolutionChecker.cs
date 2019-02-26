@@ -19,7 +19,11 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
         private static string _environmentName = "";
         private static string _sideBarButton = "";
         private static string _commandBarButton = "";
+        private static string _subButtonRun = "";
+        private static string _subButtonView = "";
+        private static string _subButtonDownload = "";
         private static string _resultsDirectory = "";
+
 
         public TestContext TestContext { get; set; }
 
@@ -36,6 +40,9 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
             _environmentName = _testContext.Properties["EnvironmentName"].ToString();
             _sideBarButton = _testContext.Properties["SideBarButton"].ToString();
             _commandBarButton = _testContext.Properties["CommandBarButton"].ToString();
+            _subButtonRun = _testContext.Properties["SubButtonRun"].ToString();
+            _subButtonView = _testContext.Properties["SubButtonView"].ToString();
+            _subButtonDownload = _testContext.Properties["SubButtonDownload"].ToString();
             _xrmUri = new Uri(_testContext.Properties["OnlineUrl"].ToString());
             _resultsDirectory = _testContext.Properties["ResultsDirectory"].ToString();
             _browserType = (BrowserType)Enum.Parse(typeof(BrowserType), _testContext.Properties["BrowserType"].ToString());
@@ -165,9 +172,10 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     }
 
                     //Click Solution Checker button and verify the run button and "download results" buttons are grayed out.  Verify Status is running
-                    Console.WriteLine($"Verifying that Run and Download Last Results buttons are disabled");
-                    appBrowser.CommandBar.VerifyButtonIsClickable(_commandBarButton, "Run", true);
-                    appBrowser.CommandBar.VerifyButtonIsClickable(_commandBarButton, "Download last results", true);                   
+                    Console.WriteLine($"Verifying that Run, View Results, and Download Results buttons are disabled");
+                    appBrowser.CommandBar.VerifyButtonIsClickable(_commandBarButton, _subButtonRun, true);
+                    appBrowser.CommandBar.VerifyButtonIsClickable(_commandBarButton, _subButtonView, true);
+                    appBrowser.CommandBar.VerifyButtonIsClickable(_commandBarButton, _subButtonDownload, true);                   
 
                     // Wait for processing to complete
                     Console.WriteLine($"Waiting for Solution Checker run to finish");
@@ -206,7 +214,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     if (_browserType.ToString() != "IE")
                     {
                         Console.WriteLine($"Downloading Results for Solution Checker run");
-                        appBrowser.CommandBar.DownloadResults(_solutionName, _commandBarButton);
+                        appBrowser.CommandBar.DownloadResults(_solutionName, _commandBarButton, _subButtonDownload);
                     }
 
                     appBrowser.ThinkTime(10000);
@@ -349,9 +357,10 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     }
 
                     // Click Solution Checker button and verify the run button and "download results" buttons are grayed out.  Verify Status is running
-                    Console.WriteLine($"Verifying that Run and Download Last Results buttons are disabled in the grid");
-                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName , _commandBarButton, "Run", true);
-                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName, _commandBarButton, "Download last results", true);
+                    Console.WriteLine($"Verifying that Run, View Results, and Download Results buttons are disabled in the grid");
+                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName , _commandBarButton, _subButtonRun, true);
+                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName, _commandBarButton, _subButtonView, true);
+                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName, _commandBarButton, _subButtonDownload, true);
 
                     // Wait for processing to complete
                     Console.WriteLine($"Waiting for Solution Checker run to finish");
@@ -390,7 +399,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     if (_browserType.ToString() != "IE")
                     {
                         Console.WriteLine($"Downloading Results for Solution Checker run");
-                        appBrowser.CommandBar.DownloadResults(_solutionName, _commandBarButton);
+                        appBrowser.CommandBar.DownloadResults(_solutionName, _commandBarButton, _subButtonDownload);
                     }
 
                     appBrowser.ThinkTime(10000);
@@ -602,7 +611,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
 
                         // Click desired grid row, then click Projects Checker button via ... commands in the grid
                         Console.WriteLine($"Click the ... button in Projects grid, click on 'Solution Checker', and then click sub-command 'Run'");
-                        appBrowser.ModelDrivenApps.MoreCommands(_solutionName, _commandBarButton, "Run");
+                        appBrowser.ModelDrivenApps.MoreCommands(_solutionName, _commandBarButton, _subButtonRun);
 
                         // Wait 5 seconds
                         appBrowser.ThinkTime(15000);

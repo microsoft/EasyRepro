@@ -139,7 +139,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 return true;
             });
         }
-        public BrowserCommandResult<bool> DownloadResults(string solutionName, string commandBarButton, int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> DownloadResults(string solutionName, string commandBarButton, string subButton, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
 
@@ -153,7 +153,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 if (currentStatus.Contains("Results", StringComparison.OrdinalIgnoreCase))
                 {
                     //Click off the current record and back onto this one before downloading results
-                    ClickCommandButton(commandBarButton, "Download last results");
+                    ClickCommandButton(commandBarButton, subButton);
                 }
 
                 return true;
@@ -260,12 +260,20 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             var subButtons = subButtonContainer[0].FindElements(By.TagName("button"));
             var sButton = subButtons.FirstOrDefault(b => b.Text.Equals(subButton, StringComparison.OrdinalIgnoreCase));
 
-            bool.TryParse(sButton.GetAttribute("aria-disabled"), out isDisabled);
+            try
+            {
+                bool.TryParse(sButton.GetAttribute("aria-disabled"), out isDisabled);
+            }
+            catch (Exception exc)
+            {
+                throw new InvalidOperationException($"An error occurred trying to validate that the button '{subButton}' is disabled: {exc}");
+            }
 
             ClickCommandButton(name, "");
 
             return isDisabled;
         }
+
         internal string GetCurrentStatus(string solutionName)
         {
             var driver = Browser.Driver;
