@@ -994,7 +994,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-        internal BrowserCommandResult<bool> OpenRecord(int index, int thinkTime = Constants.DefaultThinkTime)
+        internal BrowserCommandResult<bool> OpenRecord(int index, int thinkTime = Constants.DefaultThinkTime, bool checkRecord = false)
         {
             this.Browser.ThinkTime(thinkTime);
 
@@ -1012,7 +1012,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         if (currentindex == index)
                         {
-                            row.FindElement(By.TagName("a")).Click();
+                            var tag = checkRecord ? "div" : "a";
+                            row.FindElement(By.TagName(tag)).Click();
                             break;
                         }
 
