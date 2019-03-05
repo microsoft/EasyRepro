@@ -1882,7 +1882,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
                 else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
                 {
-                    text = fieldContainer.FindElement(By.TagName("textarea")).GetAttribute(field);
+                    text = fieldContainer.FindElement(By.TagName("textarea")).GetAttribute("value");
                 }
                 else
                 {
