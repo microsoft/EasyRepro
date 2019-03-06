@@ -132,7 +132,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 bool isDisabled = IsButtonDisabled(name, subButton);
 
                 if(throwExceptionIfVisible && !isDisabled)
-                    throw new InvalidOperationException($"SubButton '{name}' should not be visible.");
+                    throw new InvalidOperationException($"SubButton '{subButton}' should not be visible.");
 
                 return true;
             });
