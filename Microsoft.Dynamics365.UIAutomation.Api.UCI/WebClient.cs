@@ -1587,7 +1587,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         input.Click(true);
                         input.SendKeys(control.Value, true);
-                        input.Click();
+                        input.SendKeys(Keys.Tab);
                     }
                 }
 
