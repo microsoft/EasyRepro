@@ -1590,8 +1590,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                 }
 
-                driver.WaitForTransaction();
-
                
                 if (control.Value != null && control.Value != "")
                 {
