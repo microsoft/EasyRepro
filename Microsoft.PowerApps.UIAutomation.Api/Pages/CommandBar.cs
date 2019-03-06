@@ -125,10 +125,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 return true;
             });
         }
-        public BrowserCommandResult<bool> VerifyButtonIsClickable(string name, string subButton, bool throwExceptionIfVisible, int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> VerifyButtonIsClickable(string name, string subButton, bool throwExceptionIfVisible)
         {
-            Browser.ThinkTime(thinkTime);
-
             return this.Execute(GetOptions("Verify Button is Clickable"), driver =>
             {
                 bool isDisabled = IsButtonDisabled(name, subButton);
@@ -217,13 +215,12 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
 
             button.Click(true);
-
-            Browser.ThinkTime(1500);
             
             //Sub Button
             if (!string.IsNullOrEmpty(subButton))
             {
                 //found = false;
+                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.SubButtonContainer]), new TimeSpan(0, 0, 1));
                 var subButtonContainer = driver.FindElements(By.XPath(Elements.Xpath[Reference.CommandBar.SubButtonContainer]));
                 var subButtons = subButtonContainer[nestedSubContainer].FindElements(By.TagName("button"));
 
@@ -251,7 +248,16 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             ClickCommandButton(name, "");
 
-            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.SubButtonContainer]));
+            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.SubButtonContainer]),
+                new TimeSpan(0, 0, 5),
+                e =>
+                {
+                    Console.WriteLine("Located SubButton Container");
+                },
+                f =>
+                {
+                    throw new InvalidOperationException("Unable to locate SubButton Container within 5 seconds.");
+                });
             var subButtonContainer = driver.FindElements(By.XPath(Elements.Xpath[Reference.CommandBar.SubButtonContainer]));
 
             if (subButtonContainer.Count == 0)
@@ -263,6 +269,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             try
             {
                 bool.TryParse(sButton.GetAttribute("aria-disabled"), out isDisabled);
+                Console.WriteLine($"isDisabled value for {subButton} in the CommandBar is: {isDisabled} ");
             }
             catch (Exception exc)
             {

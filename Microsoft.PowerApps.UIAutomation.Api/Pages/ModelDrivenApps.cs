@@ -185,10 +185,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             });
         }
 
-        public BrowserCommandResult<bool> VerifyButtonIsClickable(string solutionName, string commandName, string subButton, bool throwExceptionIfVisible, int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> VerifyButtonIsClickable(string solutionName, string commandName, string subButton, bool throwExceptionIfVisible)
         {
-            Browser.ThinkTime(thinkTime);
-
             return this.Execute(GetOptions("Verify Button is Clickable"), driver =>
             {
                 bool isDisabled = IsButtonDisabled(solutionName, commandName, subButton);
@@ -206,7 +204,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             //Need to click the <div>, not the <a>.  Selenium FindElements By.XPath misbehaved when trying to break into rows and cells
             //Get a collection of cells and find the cell with the record name
-            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.CellsContainer]));
+            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.CellsContainer]),new TimeSpan(0,0,1));
             var cells = driver.FindElements(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.CellsContainer]));
             var cell = cells.FirstOrDefault(c => c.Text.Equals(solutionName, StringComparison.OrdinalIgnoreCase));
 
@@ -218,7 +216,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             moreCommandsButton.Click(true);
 
             //First Command button
-            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.MoreCommandsContainer]));
+            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.MoreCommandsContainer]),new TimeSpan(0,0,1));
             var moreCommandsContainer = driver.FindElement(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.MoreCommandsContainer]));
             var buttons = moreCommandsContainer.FindElements(By.TagName("button"));
             var button = buttons.FirstOrDefault(b => b.Text.Contains(commandName, StringComparison.OrdinalIgnoreCase));
@@ -228,13 +226,11 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             button.Click(true);
 
-            Browser.ThinkTime(1500);
-
             //Sub Command Button
             if (!string.IsNullOrEmpty(subButton))
             {
                 //found = false;
-                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.SubButtonContainer]));
+                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.SubButtonContainer]),new TimeSpan(0,0,1));
                 var subButtonContainer = driver.FindElements(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.SubButtonContainer]));
                 var subButtons = subButtonContainer[1].FindElements(By.TagName("button"));
 
@@ -262,10 +258,21 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             ClickMoreCommandsButton(solutionName, commandName, "");
 
-            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.SubButtonContainer]));
+            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.SubButtonContainer]),
+                new TimeSpan(0, 0, 5),
+                e =>
+                    {
+                        Console.WriteLine("Located SubButton Container");
+                    },
+                f =>
+                    {
+                        throw new InvalidOperationException("Unable to locate SubButton Container within 5 seconds.");
+                    });
+
             var subButtonContainer = driver.FindElements(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.SubButtonContainer]));
 
-            if (subButtonContainer.Count == 0)
+            // This condition should never be hit. Legacy code.
+            if (subButtonContainer.Count == 0 || subButtonContainer is null)
                 throw new InvalidOperationException("SubButton container is empty");
 
             var subButtons = subButtonContainer[1].FindElements(By.TagName("button"));
@@ -274,6 +281,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             try
             {
                 bool.TryParse(sButton.GetAttribute("aria-disabled"), out isDisabled);
+                Console.WriteLine($"isDisabled value for {subButton} in the solution grid is: {isDisabled} ");
             }
             catch (Exception exc)
             {

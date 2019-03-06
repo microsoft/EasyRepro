@@ -169,13 +169,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     if (!string.IsNullOrEmpty(messageBarText))
                     {
                         throw new InvalidOperationException(messageBarText);
-                    }
-
-                    //Click Solution Checker button and verify the run button and "download results" buttons are grayed out.  Verify Status is running
-                    Console.WriteLine($"Verifying that Run, View Results, and Download Results buttons are disabled");
-                    appBrowser.CommandBar.VerifyButtonIsClickable(_commandBarButton, _subButtonRun, true);
-                    appBrowser.CommandBar.VerifyButtonIsClickable(_commandBarButton, _subButtonView, true);
-                    appBrowser.CommandBar.VerifyButtonIsClickable(_commandBarButton, _subButtonDownload, true);                   
+                    }                
 
                     // Wait for processing to complete
                     Console.WriteLine($"Waiting for Solution Checker run to finish");
@@ -356,12 +350,6 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         throw new InvalidOperationException(messageBarText);
                     }
 
-                    // Click Solution Checker button and verify the run button and "download results" buttons are grayed out.  Verify Status is running
-                    Console.WriteLine($"Verifying that Run, View Results, and Download Results buttons are disabled in the grid");
-                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName , _commandBarButton, _subButtonRun, true);
-                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName, _commandBarButton, _subButtonView, true);
-                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName, _commandBarButton, _subButtonDownload, true);
-
                     // Wait for processing to complete
                     Console.WriteLine($"Waiting for Solution Checker run to finish");
                     appBrowser.ModelDrivenApps.WaitForProcessingToComplete(_solutionName);
@@ -426,7 +414,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
         [TestCategory("SolutionCheckerAutomation")]
         [Priority(1)]
         [TestMethod]
-        public void TestVerifySolutionChecker()
+        public void TestVerifyManagedSolutionsUnavailable()
         {
             BrowserOptions options = TestSettings.Options;
             options.BrowserType = _browserType;
@@ -509,6 +497,162 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                     _resultsDirectory = TestContext.TestResultsDirectory;
                     Console.WriteLine($"Current results directory location: {_resultsDirectory}");
                     string location = $@"{_resultsDirectory}\VerifySolutionChecker-{_solutionName}-GenericError.jpeg";
+
+                    appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
+                    _testContext.AddResultFile(location);
+
+                    throw;
+                }
+
+                Console.WriteLine("Solution Checker Test Run Complete");
+            }
+        }
+
+        [TestCategory("SolutionCheckerAutomation")]
+        [Priority(1)]
+        [TestMethod]
+        public void TestVerifySubButtonsUnavailable()
+        {
+            BrowserOptions options = TestSettings.Options;
+            options.BrowserType = _browserType;
+
+            using (var appBrowser = new PowerAppBrowser(options))
+            {
+                try
+                {
+                    //Login To PowerApps
+                    Console.WriteLine($"Attempting Login to {_xrmUri}");
+
+                    for (int retryCount = 0; retryCount < Reference.Login.SignInAttempts; retryCount++)
+                    {
+                        try
+                        {
+                            appBrowser.OnlineLogin.Login(_xrmUri, _username.ToSecureString(), _password.ToSecureString());
+                            break;
+                        }
+                        catch (Exception exc)
+                        {
+                            Console.WriteLine($"Exception on Attempt #{retryCount + 1}: {exc}");
+
+                            if (retryCount + 1 == Reference.Login.SignInAttempts)
+                            {
+                                // Login exception occurred, take screenshot
+                                _resultsDirectory = TestContext.TestResultsDirectory;
+                                string location = $@"{_resultsDirectory}\CancelSolutionCheckerRun-{_solutionName}-LoginErrorAttempt{retryCount + 1}.jpeg";
+
+                                appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
+                                _testContext.AddResultFile(location);
+
+                                // Max Sign-In Attempts reached
+                                Console.WriteLine($"Login failed after {retryCount + 1} attempts.");
+                                throw new InvalidOperationException($"Login failed after {retryCount + 1} attempts. Exception Details: {exc}");
+                            }
+                            else
+                            {
+                                // Login exception occurred, take screenshot
+                                _resultsDirectory = TestContext.TestResultsDirectory;
+                                string location = $@"{_resultsDirectory}\CancelSolutionCheckerRun-{_solutionName}-LoginErrorAttempt{retryCount + 1}.jpeg";
+
+                                appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
+                                _testContext.AddResultFile(location);
+
+                                //Navigate away and retry
+                                appBrowser.Navigate("about:blank");
+
+                                Console.WriteLine($"Login failed after attempt #{retryCount + 1}.");
+                                continue;
+                            }
+                        }
+                    }
+
+                    Console.WriteLine("Login Complete");
+
+                    appBrowser.ThinkTime(1500);
+
+                    Console.WriteLine($"Changing PowerApps Environment to {_environmentName}");
+                    var environmentValidation = appBrowser.Navigation.ChangeEnvironment(_environmentName).Value;
+
+                    Assert.AreEqual(_environmentName, environmentValidation);
+
+                    appBrowser.ThinkTime(1500);
+
+                    // Click Projects
+                    Console.WriteLine($"Click {_sideBarButton} via Sidebar");
+                    appBrowser.SideBar.Navigate(_sideBarButton);
+
+                    // Collapse the sidebar
+                    Console.WriteLine("Collapse the sidebar");
+                    appBrowser.SideBar.ExpandCollapse();
+
+                    string originalSolutionStatus = "";
+                    do
+                    {
+                        // Get Solution check status value
+                        // Ensure that when the status is pulled, a refresh has not occurred resulting in a value == ""
+                        originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+
+                        if (originalSolutionStatus.Contains("Running..."))
+                        {
+                            // An unexpected Solution Checker Run exists, we should cancel it, and then grab a new status.
+                            Console.WriteLine($"Cancelling an existing, unexpected Solution Checker run...");
+                            var cancelSuccess = appBrowser.CommandBar.CancelSolutionCheckerRun(_solutionName);
+
+                            if (cancelSuccess)
+                            {
+                                // Cancel should only take a few seconds at most... wait 10 seconds and check status
+                                appBrowser.ThinkTime(10000);
+
+                                originalSolutionStatus = appBrowser.ModelDrivenApps.GetCurrentStatus(_solutionName);
+                            }
+                            else
+                                throw new InvalidOperationException($"Unexpected Solution Checker Status: '{originalSolutionStatus}'. Cancel Attempt failed.");
+                        }
+                    }
+                    while (originalSolutionStatus == "");
+
+                    // Click desired grid row, then click Projects Checker button via ... commands in the grid
+                    Console.WriteLine($"Click the ... button in Projects grid, click on 'Solution Checker', and then click sub-command 'Run'");
+                    appBrowser.ModelDrivenApps.MoreCommands(_solutionName, _commandBarButton, "Run");
+
+                    // Wait 10 seconds
+                    appBrowser.ThinkTime(5000);
+
+                    // Check to confirm the run was successful
+                    string messageBarText = appBrowser.ModelDrivenApps.CheckForErrors();
+
+                    if (!string.IsNullOrEmpty(messageBarText))
+                    {
+                        throw new InvalidOperationException(messageBarText);
+                    }
+
+                    // Click Solution Checker button and verify the run button and "download results" buttons are grayed out.  Verify Status is running
+                    Console.WriteLine($"Verifying that Run, View Results, and Download Results buttons are disabled in the grid");
+                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName, _commandBarButton, _subButtonRun, true);
+                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName, _commandBarButton, _subButtonView, true);
+                    appBrowser.ModelDrivenApps.VerifyButtonIsClickable(_solutionName, _commandBarButton, _subButtonDownload, true);
+
+                    // Change grid rows to make sure buttons are still disabled
+                    Console.WriteLine($"Change to Default Solution grid item, then switch back to {_solutionName} solution");
+                    appBrowser.ModelDrivenApps.SelectGridRecord("Default Solution");
+                    appBrowser.ModelDrivenApps.SelectGridRecord(_solutionName);
+
+                    appBrowser.CommandBar.VerifyButtonIsClickable(_commandBarButton, _subButtonRun, true);
+                    appBrowser.CommandBar.VerifyButtonIsClickable(_commandBarButton, _subButtonView, true);
+                    appBrowser.CommandBar.VerifyButtonIsClickable(_commandBarButton, _subButtonDownload, true);
+
+                    // Wait for processing to complete
+                    Console.WriteLine($"Waiting for Solution Checker run to finish");
+                    appBrowser.ModelDrivenApps.WaitForProcessingToComplete(_solutionName);
+
+                    appBrowser.ThinkTime(5000);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"An error occurred during Solution Checker test run for solution {_solutionName}: {e}");
+
+                    _resultsDirectory = TestContext.TestResultsDirectory;
+                    Console.WriteLine($"Current results directory location: {_resultsDirectory}");
+                    string location = $@"{_resultsDirectory}\CancelSolutionChecker-{_solutionName}-GenericError.jpeg";
 
                     appBrowser.TakeWindowScreenShot(location, OpenQA.Selenium.ScreenshotImageFormat.Jpeg);
                     _testContext.AddResultFile(location);
@@ -709,6 +853,5 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 Console.WriteLine("Solution Checker Test Run Complete");
             }
         }
-
     }
 }
