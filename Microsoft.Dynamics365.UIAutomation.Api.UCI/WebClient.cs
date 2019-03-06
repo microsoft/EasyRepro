@@ -1585,7 +1585,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var input = fieldContainer.FindElement(By.TagName("input"));
                     if (input != null)
                     {
-                        input.Click(true);
                         input.SendKeys(control.Value, true);
                         input.SendKeys(Keys.Tab);
                     }
@@ -1593,6 +1592,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 driver.WaitForTransaction();
 
+               
                 if (control.Value != null && control.Value != "")
                 {
                     var flyoutDialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupMenu].Replace("[NAME]", control.Name)));
