@@ -33,6 +33,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Checks / Ticks a record in the grid
+        /// </summary>
+        /// <param name="index">The index of the row to open</param>
+        public void HighLightRecord(int index)
+        {
+            _client.OpenRecord(index, checkRecord: true);
+        }
+
+        /// <summary>
         /// Performs a Quick Find on the grid
         /// </summary>
         /// <param name="searchCriteria">Search term</param>
