@@ -204,7 +204,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             //Need to click the <div>, not the <a>.  Selenium FindElements By.XPath misbehaved when trying to break into rows and cells
             //Get a collection of cells and find the cell with the record name
-            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.CellsContainer]),new TimeSpan(0,0,1));
+            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.CellsContainer]),new TimeSpan(0,0,5));
             var cells = driver.FindElements(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.CellsContainer]));
             var cell = cells.FirstOrDefault(c => c.Text.Equals(solutionName, StringComparison.OrdinalIgnoreCase));
 
@@ -216,7 +216,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             moreCommandsButton.Click(true);
 
             //First Command button
-            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.MoreCommandsContainer]),new TimeSpan(0,0,1));
+            driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.MoreCommandsContainer]));
             var moreCommandsContainer = driver.FindElement(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.MoreCommandsContainer]));
             var buttons = moreCommandsContainer.FindElements(By.TagName("button"));
             var button = buttons.FirstOrDefault(b => b.Text.Contains(commandName, StringComparison.OrdinalIgnoreCase));
@@ -230,7 +230,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             if (!string.IsNullOrEmpty(subButton))
             {
                 //found = false;
-                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.SubButtonContainer]),new TimeSpan(0,0,1));
+                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.SubButtonContainer]),new TimeSpan(0,0,5));
                 var subButtonContainer = driver.FindElements(By.XPath(Elements.Xpath[Reference.ModelDrivenApps.SubButtonContainer]));
                 var subButtons = subButtonContainer[1].FindElements(By.TagName("button"));
 
