@@ -468,5 +468,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 return true;
             });
         }
+        #region Function to Switch to a Window based on the index
+        public BrowserCommandResult<bool> SwitchToAnotherWindow(int index)
+        {
+            return this.Execute(GetOptions("switch handles"), driver =>
+            {
+                System.Collections.ObjectModel.ReadOnlyCollection<string> windowHandles = driver.WindowHandles;
+                string popupHandle = string.Empty;
+
+
+                foreach (string handle in windowHandles)
+                {
+                    if (handle != driver.CurrentWindowHandle)
+                    {
+                        popupHandle = handle; break;
+                    }
+                }
+                driver.SwitchTo().Window(popupHandle);
+
+                return true;
+            });
+        }
+        #endregion
     }
 }
