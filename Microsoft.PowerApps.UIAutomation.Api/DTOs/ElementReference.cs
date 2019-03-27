@@ -61,6 +61,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             { "Navigation_SwitchDesignMode", "//div[contains(@class, 'react-sidebar-mode-switcher')]"},
             { "Navigation_DesignModeButton", "//button[contains(@title, '[NAME]')]"},
             { "Navigation_Sidebar", "//div[contains(@class, 'react-sidebar-app')]"},
+            { "Navigation_ShellSidebar", "//div[contains(@class, 'ba-Sidebar')]"},
 
 
             //SharePoint
@@ -140,6 +141,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             public static string SwitchDesignMode = "Navigation_SwitchDesignMode";
             public static string DesignModeButton = "Navigation_DesignModeButton";
             public static string Sidebar = "Navigation_Sidebar";
+            public static string ShellSidebar = "Navigation_ShellSidebar";
             public static string HomePage = "Navigation_HomePage";
             public static string ChangeEnvironmentButton = "Navigation_ChangeEnvironmentButton";
             public static string ChangeEnvironmentList = "Navigation_ChangeEnvironmentList";

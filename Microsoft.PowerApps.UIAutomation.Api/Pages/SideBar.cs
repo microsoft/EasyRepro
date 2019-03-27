@@ -38,25 +38,51 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             {
                 bool itemExists = false;
 
-                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Navigation.Sidebar]));
+                var legacySidebar = driver.IsVisible(By.XPath(Elements.Xpath[Reference.Navigation.Sidebar]));
 
-                //start with the sidebar html item
-                var sidebar = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.Sidebar]));
-
-                //Get menu items
-                var items = sidebar.FindElements(By.TagName("button"));
-
-                foreach(var item in items)
+                // legacySidebar is true for old portal (non-shell)
+                if (legacySidebar)
                 {
-                    if(item.Text.Contains(menuItem,StringComparison.OrdinalIgnoreCase))
-                    {
-                        item.Click(true);
-                        itemExists = true;
-                        break;
-                    }
-                }
+                    var sidebar = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.Sidebar]));
 
-                if (!itemExists) throw new Exception($"The menu item with name: {menuItem} does not exist.");
+                    //Get menu items
+                    var items = sidebar.FindElements(By.TagName("button"));
+
+                    foreach (var item in items)
+                    {
+                        if (item.Text.Contains(menuItem, StringComparison.OrdinalIgnoreCase))
+                        {
+                            item.Click(true);
+                            itemExists = true;
+                            break;
+                        }
+                    }
+
+                    if (!itemExists) throw new Exception($"The menu item with name: {menuItem} does not exist.");
+                }
+                // legacySidebar is false if on the new Shell portal
+                else if (!legacySidebar)
+                {
+                    var sidebar = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ShellSidebar]));
+
+                    // Items are single areas
+                    var items = sidebar.FindElements(By.TagName("a"));
+                    
+                    // Accordions are areas with a dropdown for further - temp code for future interaction with accordion buttons
+                    var accordionItems = sidebar.FindElements(By.TagName("button"));
+
+                    foreach (var item in items)
+                    {
+                        if (item.Text.Contains(menuItem, StringComparison.OrdinalIgnoreCase))
+                        {
+                            item.Click(true);
+                            itemExists = true;
+                            break;
+                        }
+                    }
+
+                    if (!itemExists) throw new Exception($"The menu item with name: {menuItem} does not exist.");
+                }
 
                 return true;
             });
@@ -109,16 +135,26 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
             return this.Execute(GetOptions("Expand/Collapse the Sidebar"), driver =>
             {
+                var legacySidebar = driver.IsVisible(By.XPath(Elements.Xpath[Reference.Navigation.Sidebar]));
 
-                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Navigation.Sidebar]));
+                // legacySidebar is true for old portal (non-shell)
+                if (legacySidebar)
+                {
+                    var sidebar = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.Sidebar]));
 
-                //start with the sidebar html item
-                var sidebar = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.Sidebar]));
+                    //Get menu items
+                    var items = sidebar.FindElements(By.TagName("button"));
+                    items[0].Click(true);
+                }
+                // legacySidebar is false if on the new Shell portal
+                else if (!legacySidebar)
+                {
+                    var sidebar = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ShellSidebar]));
 
-                //Get menu items
-                var items = sidebar.FindElements(By.TagName("button"));
-
-                items[0].Click(true);
+                    // Get menu items
+                    var items = sidebar.FindElements(By.TagName("button"));
+                    items[0].Click(true);
+                }
 
                 return true;
             });
