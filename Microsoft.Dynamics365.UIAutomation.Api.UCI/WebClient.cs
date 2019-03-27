@@ -193,24 +193,53 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 driver.SwitchTo().DefaultContent();
 
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuButton]));
+                //Handle left hand Nav
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuButton])))
+                {
+                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuButton]));
 
-                var container = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuContainer]));
+                    var container = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuContainer]));
 
-                var buttons = container.FindElements(By.TagName("button"));
+                    var buttons = container.FindElements(By.TagName("button"));
 
-                var button = buttons.FirstOrDefault(x => x.Text.Trim() == appName);
+                    var button = buttons.FirstOrDefault(x => x.Text.Trim() == appName);
 
-                if (button != null)
-                    button.Click(true);
+                    if (button != null)
+                        button.Click(true);
+                    else
+                        throw new InvalidOperationException($"App Name {appName} not found.");
+
+                    driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
+                    driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+                    driver.WaitForPageToLoad();
+
+                    driver.WaitForTransaction();
+                }
+
+                //Handle main.aspx?ForcUCI=1
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer])))
+                {
+                    var j = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]));
+                    j.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
+
+                    driver.WaitForTransaction();
+
+                }
                 else
-                    throw new InvalidOperationException($"App Name {appName} not found.");
+                {
+                    //Switch to frame 0
+                    driver.SwitchTo().Frame(0);
 
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
-                driver.WaitForPageToLoad();
+                    if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer])))
+                    {
+                        var j = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]));
+                        j.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
 
-                driver.WaitForTransaction();
+                        driver.WaitForTransaction();
+                    }
+                    else
+                        throw new InvalidOperationException($"App Name {appName} not found.");
+                }
 
                 return true;
             });
