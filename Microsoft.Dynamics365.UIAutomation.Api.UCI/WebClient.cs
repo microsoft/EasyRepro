@@ -214,13 +214,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     driver.WaitForPageToLoad();
 
                     driver.WaitForTransaction();
+
+                    return true;
                 }
 
                 //Handle main.aspx?ForcUCI=1
                 if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer])))
                 {
-                    var j = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]));
-                    j.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
+                    var tileContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]));
+                    tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
 
                     driver.WaitForTransaction();
 
@@ -232,8 +234,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer])))
                     {
-                        var j = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]));
-                        j.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
+                        var tileContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]));
+                        tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
 
                         driver.WaitForTransaction();
                     }
