@@ -110,9 +110,11 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]));
 
                 var userIdFieldVisible = driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.UserId]));
+                Console.WriteLine($"Value of userIdFieldVisible: {userIdFieldVisible}");
+
                 if (userIdFieldVisible)
                 {
-
+                    Console.WriteLine("UserID field is visible. Proceeding with login.");
                     driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(username.ToUnsecureString());
                     driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Tab);
                     driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Enter);
@@ -169,6 +171,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 }
                 else
                 {
+                    Console.WriteLine("UserID field is not visible. This should indicate a previous main page load failure.");
                     // This scenario should only be hit in the event of a login.microsoftonline.com failure, or a login retry authentication where an authentication token was already retrieved
                     driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.MainPage])
                         , new TimeSpan(0, 2, 0),
