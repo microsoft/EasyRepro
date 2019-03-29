@@ -107,14 +107,14 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 if (driver.IsVisible(By.Id("use_another_account_link")))
                     driver.ClickWhenAvailable(By.Id("use_another_account_link"));
 
-                try
-                {
-                    driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]));
-                }
-                catch
+                // Attempt to locate the UserId field
+                var userIdField = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]));
+
+                // Known Issue: Hosted Agent unable to identify UserId field. Check NULL and try to refresh the page.
+                if (userIdField is null)
                 {
                     driver.Navigate().Refresh();
-                    driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]));
+                    userIdField = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]));
                 }
 
                 var userIdFieldVisible = driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.UserId]));
