@@ -27,7 +27,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample
             BrowserType = BrowserType.Chrome,
             PrivateMode = true,
             FireEvents = false,
-            Headless = true,
+            Headless = false,
             UserAgent = false
         };
     }
