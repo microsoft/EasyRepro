@@ -113,6 +113,8 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                 // Known Issue: Hosted Agent unable to identify UserId field. Check NULL and try to refresh the page.
                 if (userIdField is null)
                 {
+                    driver.Manage().Window.Minimize();
+                    driver.Manage().Window.Maximize();
                     driver.Navigate().Refresh();
                     userIdField = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]));
                 }
