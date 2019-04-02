@@ -5,6 +5,7 @@ using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Security;
 using System.Threading;
@@ -1441,10 +1442,45 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Open: {entityName} {id}"), driver =>
             {
-                var uri = new Uri(this.Browser.Driver.Url);
-                var link = $"{uri.Scheme}://{uri.Authority}/main.aspx?etn={entityName}&pagetype=entityrecord&id=%7B{id:D}%7D";
+                //retrieve the appId from the current Uri
+                string appId = HttpUtility.ParseQueryString(new Uri(driver.Url).Query).Get("appid");
 
-                driver.Navigate().GoToUrl(uri);
+                Guid guid = Guid.Empty;
+
+                if (!Guid.TryParse(appId, out guid))
+                    throw new InvalidOperationException("Unable to determine the appid for UCI");
+
+                //https:///main.aspx?appid=98d1cf55-fc47-e911-a97c-000d3ae05a70&pagetype=entityrecord&etn=lead&id=ed975ea3-531c-e511-80d8-3863bb3ce2c8
+                var uri = new Uri(this.Browser.Driver.Url);
+                var link = $"{uri.Scheme}://{uri.Authority}/main.aspx?appid={appId}&pagetype=entityrecord&etn={entityName}&id=%7B{id:D}%7D";
+
+                driver.Navigate().GoToUrl(link);
+
+                //SwitchToContent();
+                driver.WaitForPageToLoad();
+                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
+                    new TimeSpan(0, 0, 30),
+                    null,
+                    d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
+                );
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Open Entity
+        /// </summary>
+        /// <param name="entityUri">The Uri of the entity</param>
+        /// <param name="thinkTime">The think time</param>
+        internal BrowserCommandResult<bool> OpenEntity(Uri entityUri, int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Open: {entityUri.AbsoluteUri}"), driver =>
+            {
+
+                driver.Navigate().GoToUrl(entityUri.AbsoluteUri);
 
                 //SwitchToContent();
                 driver.WaitForPageToLoad();
