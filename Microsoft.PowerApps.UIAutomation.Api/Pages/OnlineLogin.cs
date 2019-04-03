@@ -108,17 +108,10 @@ namespace Microsoft.PowerApps.UIAutomation.Api
                     driver.ClickWhenAvailable(By.Id("use_another_account_link"));
 
                 // Attempt to locate the UserId field
-                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]));
+                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]));            
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.UserId]));
 
                 var userIdFieldVisible = driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.UserId]));
-
-                if(!userIdFieldVisible)
-                {
-                    Console.WriteLine($"Setting visibility of UserId field to True");
-                    driver.SetVisible(By.XPath(Elements.Xpath[Reference.Login.UserId]), true);
-
-                    userIdFieldVisible = driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.UserId]));
-                }
 
                 Console.WriteLine($"Value of userIdFieldVisible: {userIdFieldVisible}");
 

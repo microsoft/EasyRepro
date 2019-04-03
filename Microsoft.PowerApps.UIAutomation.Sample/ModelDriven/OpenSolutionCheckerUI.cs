@@ -49,5 +49,19 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                 
             }
         }
+
+        [TestMethod]
+        public void TestLogin()
+        {
+            using (var appBrowser = new PowerAppBrowser(TestSettings.Options))
+            {
+
+                appBrowser.OnlineLogin.Login(_xrmUri, _username.ToSecureString(), _password.ToSecureString());
+
+                appBrowser.ThinkTime(5000);
+
+
+            }
+        }
     }
 }
