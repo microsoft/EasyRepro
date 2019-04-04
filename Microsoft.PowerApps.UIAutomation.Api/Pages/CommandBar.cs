@@ -35,70 +35,50 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             return this.Execute(GetOptions("Cancel Solution Checker Run Results"), driver =>
             {
 
-                // Verify Solution Checker running... button is present in the command bar
-                var commandBarButtonName = "Solution checker running";
-                var commandBarContainer = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.Container]));
-                var commandBarButton = commandBarContainer.FindElement(By.XPath($"//button[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')=\"{commandBarButtonName.ToLowerString()}\"]"));
+            // Verify Solution Checker running... button is present in the command bar
+            var commandBarButtonName = "Solution checker running";
+            var commandBarContainer = driver.FindElement(By.XPath(Elements.Xpath[Reference.CommandBar.Container]));
+            var commandBarButton = commandBarContainer.FindElement(By.XPath($"//button[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')=\"{commandBarButtonName.ToLowerString()}\"]"));
 
-                // Check to confirm button was found
-                if (commandBarButton == null)
+            // Check to confirm button was found
+            if (commandBarButton == null)
+            {
+                return false;
+            }
+            else
+            {
+                // Click the 'Solution checker running' button to expose the cancel button
+                commandBarButton.Click(true);
+
+                var solutionCancellationList = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.CancelSolutionCheckerSolutionList]));
+                var solutionCancellationListRows = solutionCancellationList.FindElements(By.ClassName("ms-List-cell"));
+
+                foreach (var row in solutionCancellationListRows)
                 {
-                    return false;
-                }
-                else
-                {
-                    // Click the 'Solution checker running' button to expose the cancel button
-                    commandBarButton.Click(true);
+                    var cancelRowText = row.FindElements(By.TagName("span")).Where(x => x.Text.Equals(solutionName, StringComparison.OrdinalIgnoreCase));
 
-                    var solutionCancellationList = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.CommandBar.CancelSolutionCheckerSolutionList]));
-
-                    var solutionCancellationListRows = solutionCancellationList.FindElements(By.ClassName("ms-List-cell"));
-
-                    foreach (var row in solutionCancellationListRows)
+                    if (cancelRowText != null)
                     {
-                        var rowSpans = row.FindElements(By.TagName("span"));
+                        var cancelButton = row.FindElement(By.TagName("button"));
 
-                        if (rowSpans[1].Text.Equals(solutionName, StringComparison.OrdinalIgnoreCase))
+                        // Check to confirm Cancel button was found
+                        if (cancelButton == null)
                         {
-                            var cancelButton = rowSpans[0].FindElement(By.TagName("button"));
-
-                            // Check to confirm Cancel button was found
-                            if (cancelButton == null)
-                            {
+                                Console.WriteLine($"Unable to locate the cancel button for {solutionName}");
                                 return false;
-                            }
-                            else
+                        }
+                        else
                             {
+                                Console.WriteLine("Cancel button located.");
                                 // Click the cancel button to stop the solution checker run
-                                //add a try/catch here - if element position has shifted we should pull the new location again...
-                                cancelButton.Click(true);
-
-
-                                if (Browser.Options.BrowserType.ToString() == "IE")
-                                    if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.CommandBar.CancelSolutionCheckerSolutionList])))
-                                    {
-                                        //cancelButton = rowSpans[0].FindElement(By.TagName("button"));
-
-                                        //var cancelLocation = cancelButton.Location;
-                                        //cancelButton.Hover(driver, true);
-                                        //cancelButton.Click(true);
-                                        //cancelButton.SendKeys(Keys.Enter);
-
-                                        //new Actions(driver).MoveToElement(cancelButton).Click(cancelButton).Perform();
-
-                                        //new Actions(driver).MoveToElement(cancelButton).MoveByOffset((cancelLocation.X+3), (cancelLocation.Y+3)).Click().Perform();
-
-                                        //IJavaScriptExecutor executor = (IJavaScriptExecutor)driver;
-                                        //cancelButton.SendKeys(Keys.Shift);
-                                        //Thread.Sleep(1000);
-                                        //Browser.ThinkTime(250);
-                                        //executor.ExecuteScript("arguments[0].click();", cancelButton);      
-
-                                        return true;
-                                    }
+                                cancelButton.Click(true);                               
 
                                 Browser.ThinkTime(500);
                             }
+                        }
+                    else
+                        {
+                            Console.WriteLine($"No rows contained text equal to: {solutionName}");
                         }
                     }                 
                 }

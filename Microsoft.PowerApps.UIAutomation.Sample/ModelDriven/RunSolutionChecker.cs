@@ -899,7 +899,7 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         appBrowser.ModelDrivenApps.MoreCommands(_solutionName, _commandBarButton, _subButtonRun);
 
                         // Wait 5 seconds
-                        appBrowser.ThinkTime(15000);
+                        appBrowser.ThinkTime(5000);
 
                         // Check to confirm the run has not thrown an initial error
                         string messageBarText = appBrowser.ModelDrivenApps.CheckForErrors();
@@ -909,7 +909,6 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                             throw new InvalidOperationException(messageBarText);
                         }
 
-
                         // Check for a Portal Notification prior to closing (blocks the Cancel button in command bar)
                         appBrowser.ModelDrivenApps.CloseNotification();
 
@@ -917,8 +916,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         Console.WriteLine($"Cancelling Solution Checker run...");
                         var cancelSuccess = appBrowser.CommandBar.CancelSolutionCheckerRun(_solutionName);
 
-                        // Cancel should only take a few seconds at most... wait 10 seconds and check status
-                        appBrowser.ThinkTime(10000);
+                        // Cancel should only take a few seconds at most... wait 5 seconds and check status
+                        appBrowser.ThinkTime(5000);
 
                         string solutionCheckStatus = "";
                         do
@@ -929,22 +928,20 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         while (solutionCheckStatus == "");
 
-                        if (appBrowser.Options.BrowserType.ToString() != "IE")
+                        // Validate that we did not receive an error status
+                        if (!solutionCheckStatus.Contains("Results as of"))
                         {
-                            // Validate that we did not receive an error status
-                            if (!solutionCheckStatus.Contains("Results as of"))
-                            {
-                                throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of '{originalSolutionStatus}' ");
-                            }
-
-                            // Validate that "new" status is the same as original status pre-cancellation
-                            if (solutionCheckStatus != originalSolutionStatus)
-                            {
-                                Console.WriteLine($"Starting Solution Status was: {originalSolutionStatus}");
-                                Console.WriteLine($"Ending Solution Status was: {solutionCheckStatus}");
-                                throw new InvalidOperationException($"Unexpected Solution Check Status. New Status Value '{solutionCheckStatus}' has changed from original value '{originalSolutionStatus}'.");
-                            }
+                            throw new InvalidOperationException($"Unexpected Solution Check Status. Value '{solutionCheckStatus}' received instead of '{originalSolutionStatus}' ");
                         }
+
+                        // Validate that "new" status is the same as original status pre-cancellation
+                        if (solutionCheckStatus != originalSolutionStatus)
+                        {
+                            Console.WriteLine($"Starting Solution Status was: {originalSolutionStatus}");
+                            Console.WriteLine($"Ending Solution Status was: {solutionCheckStatus}");
+                            throw new InvalidOperationException($"Unexpected Solution Check Status. New Status Value '{solutionCheckStatus}' has changed from original value '{originalSolutionStatus}'.");
+                        }
+
                     }
                     else
                     {
@@ -952,8 +949,8 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         Console.WriteLine($"Cancelling Solution Checker run...");
                         var cancelSuccess = appBrowser.CommandBar.CancelSolutionCheckerRun(_solutionName);
 
-                        // Cancel should only take a few seconds at most... wait 10 seconds and check status
-                        appBrowser.ThinkTime(10000);
+                        // Cancel should only take a few seconds at most... wait 5 seconds and check status
+                        appBrowser.ThinkTime(5000);
 
                         string solutionCheckStatus = "";
                         do
@@ -964,18 +961,15 @@ namespace Microsoft.PowerApps.UIAutomation.Sample.ModelDriven
                         }
                         while (solutionCheckStatus == "");
 
-                        if (appBrowser.Options.BrowserType.ToString() != "IE")
+                        // Validate that we did not receive an error status
+                        if (solutionCheckStatus.Contains("Running..."))
                         {
-                            // Validate that we did not receive an error status
-                            if (solutionCheckStatus.Contains("Running..."))
-                            {
-                                throw new InvalidOperationException($"Analysis Cancellation failed - status is still '{solutionCheckStatus}'");
-                            }
+                            throw new InvalidOperationException($"Analysis Cancellation failed - status is still '{solutionCheckStatus}'");
                         }
 
                     }
 
-                    appBrowser.ThinkTime(10000);
+                    appBrowser.ThinkTime(5000);
                 }
                 catch (Exception e)
                 {
