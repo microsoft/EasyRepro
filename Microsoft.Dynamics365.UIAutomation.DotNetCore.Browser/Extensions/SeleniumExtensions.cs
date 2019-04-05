@@ -12,7 +12,9 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading;
 //using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser {
     public static class SeleniumExtensions {
@@ -29,13 +31,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser {
             return driver;
         }
 
-        public static void Click(this IWebElement element, bool ignoreStaleElementException = false) {
+        public static void Click(this IWebElement element, bool ignoreStaleElementException = true) {
             try {
                 element.Click();
             }
             catch (StaleElementReferenceException ex) {
                 if (!ignoreStaleElementException)
                     throw ex;
+            }
+        }
+
+        public static void Hover(this IWebElement Element, IWebDriver driver, bool ignoreStaleElementException = true) {
+            try {
+                Actions action = new Actions(driver);
+                action.MoveToElement(Element).Build().Perform();
+            }
+            catch (StaleElementReferenceException) {
+                if (!ignoreStaleElementException)
+                    throw;
             }
         }
 
@@ -49,7 +62,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser {
             WaitUntilClickable(driver,
                                 by,
                                 timeout,
-                                d => { element.Click(); },
+                                d => { element.Click(true); },
                                 e => { throw new InvalidOperationException($"Unable to click element."); });
 
 
@@ -122,10 +135,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser {
 
             var results = ExecuteScript(driver, $"return JSON.stringify({@object});").ToString();
             //var jsSerializer = new JavaScriptSerializer();
-            var jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(results);
+
             //jsSerializer.RegisterConverters(new[] { new DynamicJsonConverter() });
 
             //var jsonObj = new JavaScriptSerializer().Deserialize<T>(results);
+
+            var jsonObj = JsonConvert.DeserializeObject<T>(results);
 
             return jsonObj;
         }
@@ -201,9 +216,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser {
             return driver.FindElement(By.TagName("body")).Text;
         }
 
+        public static bool HasAttribute(this IWebElement element, string attributeName) {
+            return element.GetAttribute(attributeName) == null ? false : true;
+        }
+
         public static bool HasElement(this IWebDriver driver, By by) {
             try {
                 return driver.FindElements(by).Count > 0;
+            }
+            catch (NoSuchElementException) {
+                return false;
+            }
+        }
+
+        public static bool HasElement(this IWebElement element, By by) {
+            try {
+                return element.FindElements(by).Count > 0;
             }
             catch (NoSuchElementException) {
                 return false;
@@ -239,9 +267,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser {
         public static void SendKeys(this IWebElement element, string value, bool clear) {
             if (clear) {
                 element.Clear();
+                element.SendKeys(value);
             }
-
-            element.SendKeys(value);
+            else {
+                element.SendKeys(value);
+            }
         }
 
         public static bool AlertIsPresent(this IWebDriver driver) {
