@@ -87,6 +87,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AzureDevOps\UCI\CreateAccount.cs" />
     <Compile Include="SharedAPI\AzureInsights\OpenLead.cs" />
     <Compile Include="SharedAPI\BrowserTests\BrowserTests.cs" />
     <Compile Include="UCI\BusinessProcessFlow\BusinessProcessFlowNextStage.cs" />
@@ -221,6 +222,7 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="AzureDevOps\EasyRepro.runsettings" />
     <None Include="packages.config" />
     <None Include="UCI\UnifiedInterface.orderedtest" />
     <None Include="Web\WebClient.orderedtest" />
