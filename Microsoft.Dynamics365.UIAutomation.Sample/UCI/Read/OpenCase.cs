@@ -56,24 +56,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
-        public void UCITestOpenCaseById()
-        {
-            var client = new WebClient(TestSettings.Options);
-            using (var xrmApp = new XrmApp(client))
-            {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
-
-                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
-
-                xrmApp.Navigation.OpenSubArea("Service", "Cases");
-
-                xrmApp.Entity.OpenEntity("incident", new Guid("dc9e62a8-90df-e311-9565-a45d36fc5fe8"));
-
-                xrmApp.Entity.OpenEntity(new Uri("https://fttoken.crm6.dynamics.com/main.aspx?appid=b6822181-fc47-e911-a97c-000d3ae05a70&pagetype=entityrecord&etn=incident&id=dc9e62a8-90df-e311-9565-a45d36fc5fe8"));
-            }
-        }
-
-        [TestMethod]
         public void UCITestOpenCaseRetrieveHeaderValues()
         {
             var client = new WebClient(TestSettings.Options);
