@@ -250,40 +250,39 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> OpenSubArea(string area, string subarea, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            //this.Browser.ThinkTime(thinkTime);
 
             return this.Execute(GetOptions("Open Sub Area"), driver =>
             {
-
                 area = area.ToLowerString();
                 subarea = subarea.ToLowerString();
 
-                var areas = OpenAreas(area).Value;
+                //If the subarea is already in the left hand nav, click it
+                var navSubAreas = OpenSubMenu(subarea, 100).Value;
 
-                //Added for Bug
-                IWebElement menuItem = null;
-                bool foundMenuItem = areas.TryGetValue(area, out menuItem);
-                if (foundMenuItem)
+                if (navSubAreas.ContainsKey(subarea))
                 {
-                    //For some reason, ClickWhenAvailable isn't ignoring StaleElementExceptions
-                    try
-                    {
-                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.SubArea].Replace("[NAME]", menuItem.GetAttribute("data-id"))));
-                    }
-                    catch (StaleElementReferenceException)
-                    {
-                    }
+                    navSubAreas[subarea].Click(true);
+                    driver.WaitForTransaction();
+
+                    return true;
                 }
 
+                //We didn't find the subarea in the left hand nav. Try to find it
+                var areas = OpenAreas(area).Value;
+
+                IWebElement menuItem = null;
+                bool foundMenuItem = areas.TryGetValue(area, out menuItem);
+
+                if (foundMenuItem)
+                    menuItem.Click(true);
+
                 driver.WaitForTransaction();
-                //End Added For Bug
 
                 var subAreas = OpenSubMenu(subarea).Value;
 
                 if (!subAreas.ContainsKey(subarea))
-                {
                     throw new InvalidOperationException($"No subarea with the name '{subarea}' exists inside of '{area}'.");
-                }
 
                 subAreas[subarea].Click(true);
 
