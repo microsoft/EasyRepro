@@ -39,6 +39,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SitemapMenuItems = "Nav_SitemapMenuItems";
             public static string SitemapSwitcherButton = "Nav_SitemapSwitcherButton";
             public static string SitemapSwitcherFlyout = "Nav_SitemapSwitcherFlyout";
+            public static string UCIAppContainer = "Nav_UCIAppContainer";
+            public static string UCIAppTile = "Nav_UCIAppTile";
         }
 
         public static class Grid
@@ -250,6 +252,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_SitemapMenuItems", "//li[contains(@data-id,'sitemap-entity')]"},
             { "Nav_SitemapSwitcherButton", "//button[contains(@data-id,'sitemap-areaSwitcher-expand-btn')]"},
             { "Nav_SitemapSwitcherFlyout","//div[contains(@data-lp-id,'sitemap-area-switcher-flyout')]"},
+            { "Nav_UCIAppContainer","//div[contains(@id,'AppLandingPageContentContainer')]"},
+            { "Nav_UCIAppTile", ".//a[contains(@aria-label,'[NAME]')]"},
 
             
             //Grid

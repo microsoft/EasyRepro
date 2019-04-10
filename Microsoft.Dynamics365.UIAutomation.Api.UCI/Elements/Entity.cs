@@ -205,6 +205,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Open Entity
+        /// </summary>
+        /// <param name="entityUri">The entity Uri</param>
+        public void OpenEntity(Uri entityUri)
+        {
+            _client.OpenEntity(entityUri,0);
+        }
+
+        /// <summary>
         /// Open record set and navigate record index.
         /// This method supersedes Navigate Up and Navigate Down outside of UCI 
         /// </summary>
