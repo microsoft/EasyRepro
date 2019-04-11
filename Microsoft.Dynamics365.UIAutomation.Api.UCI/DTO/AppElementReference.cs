@@ -32,13 +32,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Search = "Nav_Search";
             public static string QuickLaunchMenu = "Nav_QuickLaunchMenu";
             public static string QuickLaunchButton = "Nav_QuickLaunchButton";
-			public static string QuickCreateButton = "Nav_QuickCreateButton";
+            public static string QuickCreateButton = "Nav_QuickCreateButton";
             public static string QuickCreateMenuList = "Nav_QuickCreateMenuList";
             public static string QuickCreateMenuItems = "Nav_QuickCreateMenuItems";
             public static string PinnedSitemapEntity = "Nav_PinnedSitemapEntity";
             public static string SitemapMenuItems = "Nav_SitemapMenuItems";
             public static string SitemapSwitcherButton = "Nav_SitemapSwitcherButton";
             public static string SitemapSwitcherFlyout = "Nav_SitemapSwitcherFlyout";
+            public static string UCIAppContainer = "Nav_UCIAppContainer";
+            public static string UCIAppTile = "Nav_UCIAppTile";
         }
 
         public static class Grid
@@ -140,7 +142,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string FlyoutList = "MultiSelect_FlyoutList";
             public static string ExpandCollapseButton = "MultiSelect_ExpandCollapseButton";
         }
-        
+
         public static class GlobalSearch
         {
             public static string Button = "Search_Button";
@@ -187,7 +189,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SwitchProcessContainer = "Dialog_SwitchProcessContainer";
         }
 
-		public static class QuickCreate
+        public static class QuickCreate
         {
             public static string SaveButton = "QuickCreate_SaveButton";
             public static string SaveAndCloseButton = "QuickCreate_SaveAndCloseButton";
@@ -243,13 +245,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_Search",                "//*[@id=\"categorizedSearchInputAndButton\"]"},
             { "Nav_QuickLaunchMenu",                "//div[contains(@data-id,'quick-launch-bar')]"},
             { "Nav_QuickLaunchButton",                "//li[contains(@title, '[NAME]')]"},
-			{ "Nav_QuickCreateButton", "//button[contains(@data-id,'quickCreateLauncher')]" },
+            { "Nav_QuickCreateButton", "//button[contains(@data-id,'quickCreateLauncher')]" },
             { "Nav_QuickCreateMenuList", "//ul[contains(@id,'MenuSectionItemsquickCreate')]" },
             { "Nav_QuickCreateMenuItems", "//li[@role='menuitem']" },
             { "Nav_PinnedSitemapEntity","//li[contains(@data-id,'sitemap-entity-Pinned') and contains(@role,'treeitem')]"},
             { "Nav_SitemapMenuItems", "//li[contains(@data-id,'sitemap-entity')]"},
             { "Nav_SitemapSwitcherButton", "//button[contains(@data-id,'sitemap-areaSwitcher-expand-btn')]"},
             { "Nav_SitemapSwitcherFlyout","//div[contains(@data-lp-id,'sitemap-area-switcher-flyout')]"},
+            { "Nav_UCIAppContainer","//div[contains(@id,'AppLandingPageContentContainer')]"},
+            { "Nav_UCIAppTile", ".//a[contains(@aria-label,'[NAME]')]"},
 
             
             //Grid
@@ -404,7 +408,3 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         Redirect
     }
 }
-
-
-
-

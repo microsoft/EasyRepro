@@ -182,7 +182,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Login_UserId", "//input[@type='email']"},
             { "Login_Password", "//input[@type='password']"},
             { "Login_SignIn", "id(\"cred_sign_in_button\")"},
-            { "Login_CrmMainPage", "id(\"crmTopBar\")"},
+            { "Login_CrmMainPage", "//*[contains(@id,'crmTopBar')or contains(@data-id,'topBar')]"},
             { "Login_StaySignedIn", "//input[@id=\"idSIButton9\"]"},
 
             //Notification           
@@ -393,7 +393,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string AddConnectionHeader = "Dialog_AddConnectionHeader";
             public static string WarningFooter = "Dialog_WarningFooter";
             public static string WarningCloseButton = "Dialog_WarningCloseButton";
-           
+
 
             public static class CloseOpportunity
             {
@@ -450,7 +450,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 public static string Add = "Dialog_AddUser";
             }
 
-}
+        }
         public static class SetValue
         {
             public static string LookupRenderClass = "SetValue_LookupRenderClass";
