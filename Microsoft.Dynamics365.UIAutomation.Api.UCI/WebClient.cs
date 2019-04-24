@@ -2421,6 +2421,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.ClickWhenAvailable(menuName);
                 try
                 {
+                    driver.WaitUntilAvailable(menuItemName);
                     driver.ClickWhenAvailable(menuItemName);
                 }
                 catch
