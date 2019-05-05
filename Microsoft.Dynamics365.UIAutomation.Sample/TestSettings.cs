@@ -12,6 +12,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         public static string LookupField = "primarycontactid";
         public static string LookupName = "Rene Valdes (sample)";
         private static readonly string Type = System.Configuration.ConfigurationManager.AppSettings["BrowserType"].ToString();
+        private static readonly string RemoteType = System.Configuration.ConfigurationManager.AppSettings["RemoteBrowserType"].ToString();
+        private static readonly string RemoteHubServerURL = System.Configuration.ConfigurationManager.AppSettings["RemoteHubServer"].ToString();
 
         public static BrowserOptions Options = new BrowserOptions
         {
@@ -20,7 +22,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             FireEvents = false,
             Headless = false,
             UserAgent = false,
-            DefaultThinkTime = 2000
+            DefaultThinkTime = 2000,
+            RemoteBrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), RemoteType),
+            RemoteHubServer = new Uri(RemoteHubServerURL)
         };
 
         public static string GetRandomString(int minLen, int maxLen)
