@@ -8,6 +8,7 @@ using OpenQA.Selenium.IE;
 using OpenQA.Selenium.PhantomJS;
 using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Edge;
+using OpenQA.Selenium.Remote;
 using System;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
@@ -40,7 +41,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     var edgeService = EdgeDriverService.CreateDefaultService();
                     edgeService.HideCommandPromptWindow = options.HideDiagnosticWindow;
                     driver = new EdgeDriver(edgeService,options.ToEdge(), TimeSpan.FromMinutes(20));
-
+                    break;
+                case BrowserType.Remote:
+                    ICapabilities capabilities = null;
+                    switch (options.RemoteBrowserType)
+                    {
+                        case BrowserType.Chrome:
+                            capabilities = options.ToChrome().ToCapabilities();
+                            break;
+                        case BrowserType.Firefox:
+                            capabilities = options.ToFireFox().ToCapabilities();
+                            break;
+                    }
+                    driver = new RemoteWebDriver(options.RemoteHubServer, capabilities, TimeSpan.FromMinutes(20));
                     break;
                 default:
                     throw new InvalidOperationException(
