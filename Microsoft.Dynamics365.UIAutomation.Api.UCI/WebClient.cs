@@ -1600,19 +1600,37 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (input != null)
                     {
                         input.Click();
-                        input.SendKeys(value, true);
+
+                        if (string.IsNullOrEmpty(value))
+                        {
+                            input.SendKeys(Keys.Control + "a");
+                            input.SendKeys(Keys.Backspace);
+                        }
+                        else
+                        {
+                            input.SendKeys(value, true);
+                        }
                     }
                 }
                 else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
                 {
-                    fieldContainer.FindElement(By.TagName("textarea")).Click();
-                    fieldContainer.FindElement(By.TagName("textarea")).Clear();
-                    fieldContainer.FindElement(By.TagName("textarea")).SendKeys(value);
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        fieldContainer.FindElement(By.TagName("textarea")).SendKeys(Keys.Control + "a");
+                        fieldContainer.FindElement(By.TagName("textarea")).SendKeys(Keys.Backspace);
+                    }
+                    else
+                    {
+                        fieldContainer.FindElement(By.TagName("textarea")).SendKeys(value, true);
+                    }
                 }
                 else
                 {
                     throw new Exception($"Field with name {field} does not exist.");
                 }
+
+                // Needed to transfer focus out of special fields (email or phone)
+                driver.FindElement(By.TagName("body")).Click();
 
                 return true;
             });
