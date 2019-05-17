@@ -560,6 +560,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         return true;
                     }
 
+                    if (!openLookupPage)
+                        return true;
+
                     var input = driver.ClickWhenAvailable(By.Id(field.Name));
 
                     if (input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])) == null)
@@ -1048,12 +1051,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 if (driver.HasElement(By.Id(control.Name)))
                 {
+                    if (control.Value != null)
+                        SelectLookup(control, true, false);
+
                     driver.WaitUntilVisible(By.Id(control.Name));
 
                     var input = driver.ClickWhenAvailable(By.Id(control.Name));
 
                     if (input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])) == null)
                         throw new InvalidOperationException($"Field: {control.Name} is not lookup");
+
+                    driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldTd].Replace("[NAME]", control.Name)));
+                    var editInput = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldInput].Replace("[NAME]", control.Name)));
+                    editInput.SendKeys(control.Value);
 
                     input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click();
 
