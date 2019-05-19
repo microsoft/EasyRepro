@@ -3,6 +3,7 @@
 
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -618,7 +619,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Sets the value of a TwoOption / Checkbox field on an Entity form.
+        /// Sets the value of a TwoOption field on an Entity form.
         /// </summary>
         /// <param name="option">Field name or ID.</param>
         /// <example>xrmBrowser.Entity.SetValue(new TwoOption{ Name = "creditonhold"});</example>
@@ -626,19 +627,75 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute(GetOptions($"Set TwoOption Value: {option.Name}"), driver =>
             {
+                var isBoolean = bool.TryParse(option.Value, out var optionValue);
+                if (!isBoolean)
+                    throw new ArgumentException($"Value {option.Value}: Cannot be converted to a boolean value");
+
                 if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
                 {
                     var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
 
-                    if (fieldElement.FindElements(By.TagName("label")).Count > 0)
-                    {
-                        var label = fieldElement.FindElement(By.TagName("label"));
+                    var hasRadio = false;
+                    var hasList = false;
+                    var hasCheckbox = false;
+                    string selectedValue = null;
+                    ReadOnlyCollection<IWebElement> options = null;
 
-                        if (label.Text != option.Value)
+                    if (fieldElement.HasAttribute("data-picklisttype"))
+                    {
+                        if (fieldElement.GetAttribute("data-picklisttype") == "0")
+                            hasRadio = true;
+                        else
+                            hasList = true;
+
+                        var radioTd = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldTd].Replace("[NAME]", option.Name)));
+                        selectedValue = radioTd.GetAttribute("title");
+                        var radioList = fieldElement.FindElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldList].Replace("[NAME]", option.Name)));
+                        options = radioList.FindElements(By.TagName("option"));
+                    }
+                    else
+                    {
+                        hasCheckbox = fieldElement.HasElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldCheckbox].Replace("[NAME]", option.Name)));
+                    }
+
+                    if (hasRadio)
+                    {
+                        if (optionValue && selectedValue == options.FirstOrDefault(a => a.GetAttribute("value") == "0")?.GetAttribute("title") ||
+                           !optionValue && selectedValue == options.FirstOrDefault(a => a.GetAttribute("value") == "1")?.GetAttribute("title"))
                         {
-                            fieldElement.Click(true);
+                            driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
                         }
                     }
+                    else if (hasCheckbox)
+                    {
+                        var checkbox = fieldElement.FindElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldCheckbox].Replace("[NAME]", option.Name)));
+
+                        if (optionValue && !checkbox.Selected || !optionValue && checkbox.Selected)
+                        {
+                            driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldCheckbox].Replace("[NAME]", option.Name)));
+                        }
+                    }
+                    else if (hasList)
+                    {
+                        var num = string.Empty;
+                        if (optionValue && selectedValue == options.FirstOrDefault(a => a.GetAttribute("value") == "0")?.GetAttribute("title"))
+                        {
+                            num = "1";
+                        }
+                        else if (!optionValue && selectedValue == options.FirstOrDefault(a => a.GetAttribute("value") == "1")?.GetAttribute("title"))
+                        {
+                            num = "0";
+                        }
+
+                        if (!string.IsNullOrEmpty(num))
+                        {
+                            fieldElement.Hover(driver);
+                            driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
+                            driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldListOption].Replace("[NAME]", option.Name).Replace("[VALUE]", num)));
+                        }
+                    }
+                    else
+                        throw new InvalidOperationException($"Field: {option.Name} Is not a TwoOption field");
                 }
                 else
                     throw new InvalidOperationException($"Field: {option.Name} Does not exist");

@@ -139,6 +139,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Entity_FieldContainer"       , "//div[contains(@id,'[NAME]')]"},
             { "Entity_TextFieldContainer"     , "//div[@id=\"[NAME]\"]" },
             { "Entity_CheckboxFieldContainer"     , "//div[@id=\"[NAME]\"]" },
+            { "Entity_TwoOptionFieldList", "//select[@id=\"[NAME]_i\"]" },
+            { "Entity_TwoOptionFieldListOption", "//select[@id=\"[NAME]_i\"]//option[@value=\"[VALUE]\"]" },
+            { "Entity_TwoOptionFieldTd", "//td[@id=\"[NAME]_d\"]" },
+            { "Entity_TwoOptionFieldCheckbox", "//input[@id=\"[NAME]_i\"]" },
             { "Entity_OptionSetFieldContainer"     , "//div[@id=\"[NAME]\"]" },
             { "Entity_LookupFieldContainer"     , "//div[@id=\"[NAME]\"]" },
             { "Entity_DateFieldContainer"     , "//div[@id=\"[NAME]\"]" },
@@ -146,6 +150,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Entity_GetLookupSearchIcon"     , "//div[@id=\"[NAME]_lookupSearchIconDiv\"]" },
             { "Entity_Header_TextFieldContainer"     , "//div[@id=\"header_[NAME]\"]" },
             { "Entity_Header_CheckboxFieldContainer"     , "//div[@id=\"header_[NAME]\"]" },
+            { "Entity_Header_TwoOptionFieldList", "//select[@id=\"header_[NAME]_i\"]" },
+            { "Entity_Header_TwoOptionFieldListOption", "//select[@id=\"header_[NAME]_i\"]//option[@value=\"[VALUE]\"]" },
+            { "Entity_Header_TwoOptionFieldDiv", "//div[@id=\"header_[NAME]_d\"]" },
+            { "Entity_Header_TwoOptionFieldCheckbox", "//input[@id=\"header_[NAME]_i\"]" },
             { "Entity_Header_OptionSetFieldContainer"     , "//div[@id=\"header_[NAME]\"]" },
             { "Entity_Header_LookupFieldContainer"     , "//div[@id=\"header_[NAME]\"]" },
             { "Entity_Header_DateFieldContainer"     , "//div[@id=\"header_[NAME]\"]" },
@@ -153,6 +161,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Entity_Header_GetLookupSearchIcon"     , "//div[@id=\"header_[NAME]_lookupSearchIconDiv\"]" },
             { "Entity_Footer_TextFieldContainer"     , "//div[@id=\"footer_[NAME]\"]" },
             { "Entity_Footer_CheckboxFieldContainer"     , "//div[@id=\"footer_[NAME]\"]" },
+            { "Entity_Footer_TwoOptionFieldTd", "//td[@id=\"footer_[NAME]_d\"]" },
+            { "Entity_Footer_TwoOptionFieldCheckbox", "//input[@id=\"footer_[NAME]_i\"]" },
             { "Entity_Footer_OptionSetFieldContainer"     , "//div[@id=\"footer_[NAME]\"]" },
             { "Entity_Footer_LookupFieldContainer"     , "//div[@id=\"footer_[NAME]\"]" },
             { "Entity_Footer_DateFieldContainer"     , "//div[@id=\"footer_[NAME]\"]" },
@@ -641,6 +651,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string FieldContainer = "Entity_FieldContainer";
             public static string TextFieldContainer = "Entity_TextFieldContainer";
             public static string CheckboxFieldContainer = "Entity_CheckboxFieldContainer";
+            public static string TwoOptionFieldList = "Entity_TwoOptionFieldList";
+            public static string TwoOptionFieldListOption = "Entity_TwoOptionFieldListOption";
+            public static string TwoOptionFieldTd = "Entity_TwoOptionFieldTd";
+            public static string TwoOptionFieldCheckbox = "Entity_TwoOptionFieldCheckbox";
             public static string OptionSetFieldContainer = "Entity_OptionSetFieldContainer";
             public static string LookupFieldContainer = "Entity_LookupFieldContainer";
             public static string DateFieldContainer = "Entity_DateFieldContainer";
@@ -648,6 +662,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string GetLookupSearchIcon = "Entity_GetLookupSearchIcon";
             public static string TextFieldContainer_Header = "Entity_Header_TextFieldContainer";
             public static string CheckboxFieldContainer_Header = "Entity_Header_CheckboxFieldContainer";
+            public static string TwoOptionFieldList_Header = "Entity_Header_TwoOptionFieldList";
+            public static string TwoOptionFieldListOption_Header = "Entity_Header_TwoOptionFieldListOption";
+            public static string TwoOptionFieldDiv_Header = "Entity_Header_TwoOptionFieldDiv";
+            public static string TwoOptionFieldCheckbox_Header = "Entity_Header_TwoOptionFieldCheckbox";
             public static string OptionSetFieldContainer_Header = "Entity_Header_OptionSetFieldContainer";
             public static string LookupFieldContainer_Header = "Entity_Header_LookupFieldContainer";
             public static string DateFieldContainer_Header = "Entity_Header_DateFieldContainer";
@@ -655,6 +673,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string GetLookupSearchIcon_Header = "Entity_Header_GetLookupSearchIcon";
             public static string TextFieldContainer_Footer = "Entity_Footer_TextFieldContainer";
             public static string CheckboxFieldContainer_Footer = "Entity_Footer_CheckboxFieldContainer";
+            public static string TwoOptionFieldTd_Footer = "Entity_Footer_TwoOptionFieldTd";
+            public static string TwoOptionFieldCheckbox_Footer = "Entity_Footer_TwoOptionFieldCheckbox";
             public static string OptionSetFieldContainer_Footer = "Entity_Footer_OptionSetFieldContainer";
             public static string LookupFieldContainer_Footer = "Entity_Footer_LookupFieldContainer";
             public static string DateFieldContainer_Footer = "Entity_Footer_DateFieldContainer";

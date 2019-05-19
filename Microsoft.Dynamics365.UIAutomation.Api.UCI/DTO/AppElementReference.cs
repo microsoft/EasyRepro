@@ -107,6 +107,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string DuplicateDetectionGridRows = "Entity_DuplicateDetectionGridRows";
             public static string DuplicateDetectionIgnoreAndSaveButton = "Entity_DuplicateDetectionIgnoreAndSaveButton";
             public static string FooterStatusValue = "Entity_FooterStatusField";
+            public static string EntityBooleanFieldRadioContainer = "Entity_BooleanFieldRadioContainer";
+            public static string EntityBooleanFieldRadioTrue = "Entity_BooleanFieldRadioTrue";
+            public static string EntityBooleanFieldRadioFalse = "Entity_BooleanFieldRadioFalse";
+            public static string EntityBooleanFieldCheckboxContainer = "Entity_BooleanFieldCheckboxContainer";
+            public static string EntityBooleanFieldCheckbox = "Entity_BooleanFieldCheckbox";
+            public static string EntityBooleanFieldList = "Entity_BooleanFieldList";
 
         }
 
@@ -314,6 +320,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_DuplicateDetectionGridRows", "//div[contains(@class,'data-selectable')]" },
             { "Entity_DuplicateDetectionIgnoreAndSaveButton", "//button[contains(@data-id,'ignore_save')]"},
             { "Entity_FooterStatusField",".//span[contains(@role,'status')]"},
+            { "Entity_BooleanFieldRadioContainer", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container') and contains(@role,'radiogroup')]"},
+            { "Entity_BooleanFieldRadioTrue", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-second')]"},
+            { "Entity_BooleanFieldRadioFalse", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-first')]"},
+            { "Entity_BooleanFieldCheckboxContainer", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container')]"},
+            { "Entity_BooleanFieldCheckbox", "//input[contains(@data-id, '[NAME].fieldControl-checkbox-toggle')]"},
+            { "Entity_BooleanFieldList", "//select[contains(@data-id, '[NAME].fieldControl-checkbox-select')]"},
 			
                         
             //CommandBar
