@@ -2295,6 +2295,41 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> SelectForm(string formName)
+        {
+            return this.Execute(GetOptions($"Select Form {formName}"), driver =>
+            {
+                driver.WaitForTransaction();
+
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.FormSelector])))
+                    throw new NotFoundException("Unable to find form selector on the form");
+
+                var formSelector = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.FormSelector]));
+                // Click didn't work with IE
+                formSelector.SendKeys(Keys.Enter);
+
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Entity.FormSelectorFlyout]));
+
+                var flyout = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.FormSelectorFlyout]));
+                var forms = flyout.FindElements(By.XPath(Elements.Xpath[Reference.Entity.FormSelectorItem]));
+
+                var form = forms.FirstOrDefault(a => a.GetAttribute("data-text").EndsWith(formName, StringComparison.OrdinalIgnoreCase));
+                if (form == null)
+                    throw new NotFoundException($"Form {formName} is not in the form selector");
+
+                driver.ClickWhenAvailable(By.Id(form.GetAttribute("id")));
+
+                driver.WaitForPageToLoad();
+                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
+                    new TimeSpan(0, 0, 30),
+                    null,
+                    d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
+                );
+
+                return true;
+            });
+        }
+
         #endregion
 
         #region Lookup 
