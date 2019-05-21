@@ -27,8 +27,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.RecordingScanInterval = TimeSpan.FromMilliseconds(Constants.Browser.Recording.DefaultScanInterval);
             this.Credentials = BrowserCredentials.Default;
             this.HideDiagnosticWindow = true;
+            this.Height = null;
+            this.Width = null;
         }
 
+        public BrowserType RemoteBrowserType { get; set; }
+        public Uri RemoteHubServer { get; set; }
         public BrowserType BrowserType { get; set; }
         public BrowserCredentials Credentials { get; set; }
         public string DriversPath { get; set; }
@@ -36,6 +40,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool CleanSession { get; set; }
         public TimeSpan PageLoadTimeout { get; set; }
         public TimeSpan CommandTimeout { get; set; }
+        /// <summary>
+        /// When <see langword="true" /> the browser will open maximized at the highest supported resolution.
+        /// </summary>
         public bool StartMaximized { get; set; }
         public bool FireEvents { get; set; }
         public bool EnableRecording { get; set; }
@@ -46,6 +53,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool UserAgent { get; set; }
         public string UserAgentValue { get; set; }
         public int DefaultThinkTime { get; set; }
+        /// <summary>
+        /// Gets or sets the browser height when <see cref="StartMaximized"/> is <see langword="false" />. Both <see cref="Height"/> and <see cref="Width"/> must be set.
+        /// </summary>
+        public int? Height { get; set; }
+        /// <summary>
+        /// Gets or sets the browser width when Both <see cref="StartMaximized"/> is <see langword="false" />. Both <see cref="Height"/> and <see cref="Width"/> must be set.
+        /// </summary>
+        public int? Width { get; set; }
 
         public virtual ChromeOptions ToChrome()
         {

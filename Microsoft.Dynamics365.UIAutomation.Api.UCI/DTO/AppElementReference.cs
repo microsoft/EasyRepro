@@ -75,6 +75,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string TextFieldLookup = "Entity_TextFieldLookup";
             public static string TextFieldLookupMenu = "Entity_TextFieldLookupMenu";
             public static string LookupFieldDeleteExistingValue = "Entity_LookupFieldDeleteExistingValue";
+            public static string LookupFieldNoRecordsText = "Entity_LookupFieldNoRecordsText";
+            public static string LookupFieldResultList = "Entity_LookupFieldResultList";
             public static string LookupFieldHoverExistingValue = "Entity_LookupFieldHoverExistingValue";
             public static string LookupResultsDropdown = "Entity_LookupResultsDropdown";
             public static string TextFieldLookupFieldContainer = "Entity_TextFieldLookupFieldContainer";
@@ -257,7 +259,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             
             //Grid
-            { "Grid_Container"       , "//*[@id=\"_outer\"]/div/div[3][@data-type=\"Grid\"]"},
+            { "Grid_Container"       , "//div[@data-type=\"Grid\"]"},
             { "Grid_QuickFind"       , "//*[contains(@id, \'quickFind_text\')]"},
             { "Grid_NextPage"       , "//button[contains(@data-id,'moveToNextPage')]"},
             { "Grid_PreviousPage"       , "//button[contains(@data-id,'moveToPreviousPage')]"},
@@ -291,6 +293,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_TextFieldLookup", "//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
             { "Entity_TextFieldLookupMenu", "//div[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]') and contains(@data-id,'tabContainer')]" },
             { "Entity_LookupFieldDeleteExistingValue", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]" },
+            { "Entity_LookupFieldNoRecordsText", "//*[@data-id=\'[NAME].fieldControl-LookupResultsDropdown_[NAME]_No_Records_Text']" },
+            { "Entity_LookupFieldResultList", "//*[@data-id=\'[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab']" },
             { "Entity_LookupFieldHoverExistingValue", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList')]" },
             { "Entity_TextFieldLookupFieldContainer", "//*[contains(@data-id, '[NAME].fieldControl-Lookup_[NAME]')]" },
             { "Entity_RecordSetNavigatorOpen", "//button[contains(@data-lp-id, 'recordset-navigator')]" },

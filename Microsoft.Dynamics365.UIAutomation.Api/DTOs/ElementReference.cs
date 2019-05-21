@@ -141,6 +141,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Entity_CheckboxFieldContainer"     , "//div[@id=\"[NAME]\"]" },
             { "Entity_OptionSetFieldContainer"     , "//div[@id=\"[NAME]\"]" },
             { "Entity_LookupFieldContainer"     , "//div[@id=\"[NAME]\"]" },
+            { "Entity_LookupFieldTd"     , "//td[@id=\"[NAME]_d\"]" },
+            { "Entity_LookupFieldInput"     , "//input[@id=\"[NAME]_ledit\"]" },
             { "Entity_DateFieldContainer"     , "//div[@id=\"[NAME]\"]" },
             { "Entity_DateFieldInput"     , "//input[@id=\"[NAME]_iDateInput\"]" },
             { "Entity_GetLookupSearchIcon"     , "//div[@id=\"[NAME]_lookupSearchIconDiv\"]" },
@@ -643,6 +645,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string CheckboxFieldContainer = "Entity_CheckboxFieldContainer";
             public static string OptionSetFieldContainer = "Entity_OptionSetFieldContainer";
             public static string LookupFieldContainer = "Entity_LookupFieldContainer";
+            public static string LookupFieldTd= "Entity_LookupFieldTd";
+            public static string LookupFieldInput= "Entity_LookupFieldInput";
             public static string DateFieldContainer = "Entity_DateFieldContainer";
             public static string DateFieldInput = "Entity_DateFieldInput";
             public static string GetLookupSearchIcon = "Entity_GetLookupSearchIcon";

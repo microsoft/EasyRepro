@@ -3,6 +3,7 @@
 
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -1599,19 +1600,37 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (input != null)
                     {
                         input.Click();
-                        input.SendKeys(value, true);
+
+                        if (string.IsNullOrEmpty(value))
+                        {
+                            input.SendKeys(Keys.Control + "a");
+                            input.SendKeys(Keys.Backspace);
+                        }
+                        else
+                        {
+                            input.SendKeys(value, true);
+                        }
                     }
                 }
                 else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
                 {
-                    fieldContainer.FindElement(By.TagName("textarea")).Click();
-                    fieldContainer.FindElement(By.TagName("textarea")).Clear();
-                    fieldContainer.FindElement(By.TagName("textarea")).SendKeys(value);
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        fieldContainer.FindElement(By.TagName("textarea")).SendKeys(Keys.Control + "a");
+                        fieldContainer.FindElement(By.TagName("textarea")).SendKeys(Keys.Backspace);
+                    }
+                    else
+                    {
+                        fieldContainer.FindElement(By.TagName("textarea")).SendKeys(value, true);
+                    }
                 }
                 else
                 {
                     throw new Exception($"Field with name {field} does not exist.");
                 }
+
+                // Needed to transfer focus out of special fields (email or phone)
+                driver.FindElement(By.TagName("body")).Click();
 
                 return true;
             });
@@ -1627,15 +1646,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
             {
+                driver.WaitForTransaction(5);
+
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
 
                 if (fieldContainer.FindElements(By.TagName("input")).Count == 0)
                 {
                     var existingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", control.Name)));
                     existingLookupValue.Hover(driver);
+                    Thread.Sleep(500);
 
                     var deleteExistingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
                     deleteExistingLookupValue.Click();
+                    Thread.Sleep(500);
                 }
 
                 fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
@@ -1653,7 +1676,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (control.Value != null && control.Value != "")
                 {
-                    var flyoutDialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupMenu].Replace("[NAME]", control.Name)));
+                    var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+                    wait.Until(d => d.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldNoRecordsText].Replace("[NAME]", control.Name) + "|" +
+                        AppElements.Xpath[AppReference.Entity.LookupFieldResultList].Replace("[NAME]", control.Name))));
+
+                    var flyoutDialog = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupMenu].Replace("[NAME]", control.Name)));
                     var dialogItems = OpenDialog(flyoutDialog).Value;
 
                     if (dialogItems.Count <= 0)
@@ -2481,6 +2508,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.ClickWhenAvailable(menuName);
                 try
                 {
+                    driver.WaitUntilAvailable(menuItemName);
                     driver.ClickWhenAvailable(menuItemName);
                 }
                 catch
