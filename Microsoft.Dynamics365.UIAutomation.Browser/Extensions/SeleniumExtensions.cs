@@ -354,6 +354,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return driver.SwitchTo().Window(driver.WindowHandles.Last());
         }
 
+        /// <summary>Clears the focus from all elements.</summary>
+        /// <param name="driver">The driver.</param>
+        public static void ClearFocus(this IWebDriver driver)
+        {
+            driver.FindElement(By.TagName("body")).Click();
+        }
+
         #endregion Elements
 
         #region Waits
