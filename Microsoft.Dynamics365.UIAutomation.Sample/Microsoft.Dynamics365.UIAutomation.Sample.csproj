@@ -108,6 +108,7 @@
     <Compile Include="UCI\Delete\DeleteOpportunity.cs" />
     <Compile Include="UCI\GetValue.cs" />
     <Compile Include="UCI\GlobalSearch\GlobalSearch.cs" />
+    <Compile Include="UCI\Navigation\FormSelector.cs" />
     <Compile Include="UCI\Navigation\GlobalSearch.cs" />
     <Compile Include="UCI\Navigation\OpenNavigation.cs" />
     <Compile Include="UCI\Navigation\PortalAdmin.cs" />
