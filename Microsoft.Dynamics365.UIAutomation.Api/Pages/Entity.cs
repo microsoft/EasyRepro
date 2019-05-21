@@ -4,6 +4,7 @@
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -893,43 +894,52 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Gets the value of a Checkbox/TwoOption field on an Entity footer.
+        /// Gets the value of a TwoOption field on an Entity footer.
         /// </summary>
         /// <param name="option">The TwoOption field you want to set</param>
         /// <example>xrmBrowser.Entity.GetFooterValue(new TwoOption {Name="creditonhold"});</example>
         public BrowserCommandResult<bool> GetFooterValue(TwoOption option)
         {
-            return this.Execute(GetOptions($"Get Checkbox/TwoOption Footer Value: {option.Name}"), driver =>
+            return this.Execute(GetOptions($"Get TwoOption Footer Value: {option.Name}"), driver =>
             {
-                bool check = false;
+                var check = false;
 
                 if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Footer].Replace("[NAME]", option.Name.ToLower()))))
                 {
                     var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Footer].Replace("[NAME]", option.Name.ToLower())));
-                    var select = fieldElement;
-                    var text = "";
 
+                    var fieldTd = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldTd_Footer].Replace("[NAME]", option.Name)));
+                    var text = fieldTd.GetAttribute("title");
 
-                    if (fieldElement.FindElements(By.TagName("label")).Count > 0)
+                    if (fieldElement.FindElements(By.TagName("select")).Count > 0)
                     {
-                        var label = fieldElement.FindElement(By.TagName("label"));
-                        text = label.Text;
-                    }
+                        var select = fieldElement;
 
-                    if (fieldElement.TagName != "select")
-                        select = fieldElement.FindElement(By.TagName("select"));
+                        if (fieldElement.TagName != "select")
+                            select = fieldElement.FindElement(By.TagName("select"));
 
-                    var options = select.FindElements(By.TagName("option"));
+                        var options = select.FindElements(By.TagName("option"));
 
-                    foreach (var op in options)
-                    {
-                        if (op.Text.ToLower() == text.ToLower() || op.GetAttribute("title").ToLower() == text.ToLower())
+                        foreach (var op in options)
                         {
-                            var value = Convert.ToInt32(op.GetAttribute("value"));
+                            if (string.Equals(op.Text, text, StringComparison.CurrentCultureIgnoreCase) ||
+                                string.Equals(op.GetAttribute("title"), text, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                var value = Convert.ToInt32(op.GetAttribute("value"));
 
-                            check = Convert.ToBoolean(value);
+                                check = Convert.ToBoolean(value);
+                            }
                         }
                     }
+                    else if (fieldElement.FindElements(By.TagName("input")).Count > 0)
+                    {
+                        var checkbox = fieldElement.FindElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldCheckbox_Footer].Replace("[NAME]", option.Name)));
+                        var option1 = checkbox.GetAttribute("option_1");
+
+                        check = string.Equals(option1, text, StringComparison.CurrentCultureIgnoreCase);
+                    }
+                    else
+                        throw new InvalidOperationException($"Field: {option.Name} Is not a TwoOption field");
                 }
                 else
                     throw new InvalidOperationException($"Unable to locate TwoOption field '{option.Name}' in the footer. Please verify the TwoOption field exists and try again.");
@@ -1088,42 +1098,48 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Gets the value of a Checkbox/TwoOption field on an Entity header.
+        /// Gets the value of a TwoOption field on an Entity header.
         /// </summary>
         /// <param name="option">The TwoOption field you want to set</param>
         /// <example>xrmBrowser.Entity.GetHeaderValue(new TwoOption {Name="creditonhold"});</example>
         public BrowserCommandResult<bool> GetHeaderValue(TwoOption option)
         {
-            return this.Execute(GetOptions($"Get Checkbox/TwoOption Header Value: {option.Name}"), driver =>
+            return this.Execute(GetOptions($"Get TwoOption Header Value: {option.Name}"), driver =>
             {
-                bool check = false;
+                var check = false;
 
                 if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower()))))
                 {
                     var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower())));
-                    var select = fieldElement;
-                    var text = "";
 
+                    var fieldDiv = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldDiv_Header].Replace("[NAME]", option.Name)));
+                    var text = fieldDiv.GetAttribute("title");
 
-                    if (fieldElement.FindElements(By.TagName("label")).Count > 0)
+                    if (fieldElement.FindElements(By.TagName("select")).Count > 0)
                     {
-                        var label = fieldElement.FindElement(By.TagName("label"));
-                        text = label.Text;
-                    }
+                        var select = fieldElement;
 
-                    if (fieldElement.TagName != "select")
-                        select = fieldElement.FindElement(By.TagName("select"));
+                        if (fieldElement.TagName != "select")
+                            select = fieldElement.FindElement(By.TagName("select"));
 
-                    var options = select.FindElements(By.TagName("option"));
+                        var options = select.FindElements(By.TagName("option"));
 
-                    foreach (var op in options)
-                    {
-                        if (op.Text.ToLower() == text.ToLower() || op.GetAttribute("title").ToLower() == text.ToLower())
+                        foreach (var op in options)
                         {
-                            var value = Convert.ToInt32(op.GetAttribute("value"));
+                            if (string.Equals(op.Text, text, StringComparison.CurrentCultureIgnoreCase) ||
+                                string.Equals(op.GetAttribute("title"), text, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                var value = Convert.ToInt32(op.GetAttribute("value"));
 
-                            check = Convert.ToBoolean(value);
+                                check = Convert.ToBoolean(value);
+                            }
                         }
+                    }
+                    else if (fieldElement.FindElements(By.TagName("input")).Count > 0)
+                    {
+                        var checkbox = fieldElement.FindElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldCheckbox_Header].Replace("[NAME]", option.Name)));
+
+                        check = Convert.ToInt32(checkbox.GetAttribute("value")) == 1;
                     }
                 }
                 else
@@ -1334,43 +1350,51 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Gets the value of a Checkbox/TwoOption field in an Entity form.
+        /// Gets the value of a TwoOption field in an Entity form.
         /// </summary>
         /// <param name="option">The TwoOption field you want to set</param>
         /// <example>xrmBrowser.Entity.GetValue(new TwoOption {Name="creditonhold"});</example>
         public BrowserCommandResult<bool> GetValue(TwoOption option)
         {
-            return this.Execute(GetOptions($"Get Checkbox/TwoOption Value: {option.Name}"), driver =>
+            return this.Execute(GetOptions($"Get TwoOption Value: {option.Name}"), driver =>
             {
-                bool check = false;
+                var check = false;
 
                 if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower()))))
                 {
                     var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer].Replace("[NAME]", option.Name.ToLower())));
-                    var select = fieldElement;
-                    var text = "";
 
+                    var fieldTd = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldTd].Replace("[NAME]", option.Name)));
+                    var text = fieldTd.GetAttribute("title");
 
-                    if (fieldElement.FindElements(By.TagName("label")).Count > 0)
+                    if (fieldElement.FindElements(By.TagName("select")).Count > 0)
                     {
-                        var label = fieldElement.FindElement(By.TagName("label"));
-                        text = label.Text;
-                    }
+                        var select = fieldElement;
 
-                    if (fieldElement.TagName != "select")
-                        select = fieldElement.FindElement(By.TagName("select"));
+                        if (fieldElement.TagName != "select")
+                            select = fieldElement.FindElement(By.TagName("select"));
 
-                    var options = select.FindElements(By.TagName("option"));
+                        var options = select.FindElements(By.TagName("option"));
 
-                    foreach (var op in options)
-                    {
-                        if (op.Text.ToLower() == text.ToLower() || op.GetAttribute("title").ToLower() == text.ToLower())
+                        foreach (var op in options)
                         {
-                            var value = Convert.ToInt32(op.GetAttribute("value"));
+                            if (string.Equals(op.Text, text, StringComparison.CurrentCultureIgnoreCase) ||
+                                string.Equals(op.GetAttribute("title"), text, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                var value = Convert.ToInt32(op.GetAttribute("value"));
 
-                            check = Convert.ToBoolean(value);
+                                check = Convert.ToBoolean(value);
+                            }
                         }
                     }
+                    else if (fieldElement.FindElements(By.TagName("input")).Count > 0)
+                    {
+                        var checkbox = fieldElement.FindElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldCheckbox].Replace("[NAME]", option.Name)));
+
+                        check = Convert.ToInt32(checkbox.GetAttribute("value")) == 1;
+                    }
+                    else
+                        throw new InvalidOperationException($"Field: {option.Name} Is not a TwoOption field");
                 }
                 else
                     throw new InvalidOperationException($"Unable to locate TwoOption field '{option.Name}' on the form. Please verify the TwoOption field exists and try again.");
@@ -1724,7 +1748,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
-        /// Sets the value of a TwoOption / Checkbox field on an Entity header.
+        /// Sets the value of a TwoOption field on an Entity header.
         /// </summary>
         /// <param name="option">Field name or ID.</param>
         /// <example>xrmBrowser.Entity.SetHeaderValue(new TwoOption{ Name = "creditonhold"});</example>
@@ -1732,19 +1756,76 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute(GetOptions($"Set TwoOption Header Value: {option.Name}"), driver =>
             {
+                var isBoolean = bool.TryParse(option.Value, out var optionValue);
+                if (!isBoolean)
+                    throw new ArgumentException($"Value {option.Value}: Cannot be converted to a boolean value");
+
                 if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower()))))
                 {
                     var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower())));
 
-                    if (fieldElement.FindElements(By.TagName("label")).Count > 0)
-                    {
-                        var label = fieldElement.FindElement(By.TagName("label"));
+                    var hasRadio = false;
+                    var hasList = false;
+                    var hasCheckbox = false;
+                    string selectedValue = null;
+                    ReadOnlyCollection<IWebElement> options = null;
 
-                        if (label.Text != option.Value)
+                    if (fieldElement.HasAttribute("data-picklisttype"))
+                    {
+                        if (fieldElement.GetAttribute("data-picklisttype") == "0")
+                            hasRadio = true;
+                        else
+                            hasList = true;
+
+                        var radioDiv = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldDiv_Header].Replace("[NAME]", option.Name)));
+                        selectedValue = radioDiv.GetAttribute("title");
+                        var radioList = fieldElement.FindElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldList_Header].Replace("[NAME]", option.Name)));
+                        options = radioList.FindElements(By.TagName("option"));
+                    }
+                    else
+                    {
+                        hasCheckbox = fieldElement.HasElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldCheckbox_Header].Replace("[NAME]", option.Name)));
+                    }
+
+                    if (hasRadio)
+                    {
+                        if (optionValue && selectedValue == options.FirstOrDefault(a => a.GetAttribute("value") == "0")?.GetAttribute("title") ||
+                            !optionValue && selectedValue == options.FirstOrDefault(a => a.GetAttribute("value") == "1")?.GetAttribute("title"))
                         {
-                            fieldElement.Click(true);
+                            driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower())));
+                            driver.ClearFocus();
                         }
                     }
+                    else if (hasCheckbox)
+                    {
+                        var checkbox = fieldElement.FindElement(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldCheckbox_Header].Replace("[NAME]", option.Name)));
+
+                        if (optionValue && !checkbox.Selected || !optionValue && checkbox.Selected)
+                        {
+                            driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldCheckbox_Header].Replace("[NAME]", option.Name)));
+                        }
+                    }
+                    else if (hasList)
+                    {
+                        var num = string.Empty;
+                        if (optionValue && selectedValue == options.FirstOrDefault(a => a.GetAttribute("value") == "0")?.GetAttribute("title"))
+                        {
+                            num = "1";
+                        }
+                        else if (!optionValue && selectedValue == options.FirstOrDefault(a => a.GetAttribute("value") == "1")?.GetAttribute("title"))
+                        {
+                            num = "0";
+                        }
+
+                        if (!string.IsNullOrEmpty(num))
+                        {
+                            fieldElement.Hover(driver);
+                            driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower())));
+                            driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.TwoOptionFieldListOption_Header].Replace("[NAME]", option.Name).Replace("[VALUE]", num)));
+                        }
+                    }
+                    else
+                        throw new InvalidOperationException($"Field: {option.Name} Is not a TwoOption field");
                 }
                 else
                     throw new InvalidOperationException($"Unable to locate TwoOption field '{option.Name}' in the header. Please verify the TwoOption field exists and try again.");

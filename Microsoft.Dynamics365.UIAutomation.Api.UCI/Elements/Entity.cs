@@ -111,6 +111,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.GetHeaderValue(control);
         }
+        
+        /// <summary>
+        /// Gets the value of a Boolean Item from the header
+        /// </summary>
+        /// <param name="control">The boolean field you want to Get.</param>
+        /// <example>xrmApp.Entity.GetHeaderValue(new BooleanItem { Name = "preferredcontactmethodcode"}); </example>
+        public bool GetHeaderValue(BooleanItem control)
+        {
+            return _client.GetHeaderValue(control);
+        }
 
         /// <summary>
         /// Gets the value of a field from the header
@@ -183,6 +193,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public string GetValue(OptionSet optionSet)
         {
             return _client.GetValue(optionSet);
+        }
+
+        /// <summary>
+        /// Gets the value of a Boolean Item.
+        /// </summary>
+        /// <param name="option">The boolean field name.</param>
+        public bool GetValue(BooleanItem option)
+        {
+            return _client.GetValue(option);
         }
 
         /// <summary>
@@ -284,6 +303,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Sets the value of a BooleanItem in the header
+        /// </summary>
+        /// <param name="control">The boolean field you want to set.</param>
+        public void SetHeaderValue(BooleanItem control)
+        {
+            _client.SetHeaderValue(control);
+        }
+
+        /// <summary>
         /// Sets the value of a field
         /// </summary>
         /// <param name="field">The field</param>
@@ -314,10 +342,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Sets the value of a Boolean Item.
         /// </summary>
-        /// <param name="option">The option you want to set.</param>
-        public void SetValue(BooleanItem optionSet)
+        /// <param name="option">The boolean field name.</param>
+        public void SetValue(BooleanItem option)
         {
-            _client.SetValue(optionSet);
+            _client.SetValue(option);
         }
 
         /// <summary>
