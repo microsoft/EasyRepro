@@ -95,5 +95,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Navigation.OpenMenu(Reference.MenuRelated.Related, Reference.MenuRelated.CommonActivities);
             }
         }
+
+        [TestMethod]
+        public void UCITestOpenGroupSubArea()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+                xrmApp.Navigation.OpenGroupSubArea("Customers", "Accounts");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                xrmApp.ThinkTime(3000);
+            }
+        }
     }
 }

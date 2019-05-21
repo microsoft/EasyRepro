@@ -24,6 +24,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Opens a sub area from a group in the active app &amp; area
+        /// </summary>
+        /// <param name="group">Name of the group</param>
+        /// <param name="subarea">Name of the subarea</param>
+        /// <example>xrmApp.Navigation.OpenGroupSubArea("Customers", "Accounts");</example>
+        public void OpenGroupSubArea(string group, string subarea)
+        {
+            _client.OpenGroupSubArea(group, subarea);
+        }
+
+        /// <summary>
         /// Opens a sub area in the unified client
         /// </summary>
         /// <param name="area">Name of the area</param>
