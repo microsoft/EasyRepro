@@ -1756,27 +1756,62 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Sets the value of a Boolean Item.
         /// </summary>
-        /// <param name="option">The option you want to set.</param>
-        /// <example>xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
+        /// <param name="option">The boolean field name.</param>
+        /// <example>xrmApp.Entity.SetValue(new BooleanItem { Name = "donotemail", Value = true });</example>
         public BrowserCommandResult<bool> SetValue(BooleanItem option)
         {
             return this.Execute(GetOptions($"Set BooleanItem Value: {option.Name}"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
-                if (option.Value)
+
+                var hasRadio = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioContainer].Replace("[NAME]", option.Name)));
+                var hasCheckbox = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
+                var hasList = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldList].Replace("[NAME]", option.Name)));
+
+                if (hasRadio)
                 {
-                    if (!fieldContainer.Selected)
+                    var trueRadio = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioTrue].Replace("[NAME]", option.Name)));
+                    var falseRadio = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioFalse].Replace("[NAME]", option.Name)));
+
+                    if (option.Value && bool.Parse(falseRadio.GetAttribute("aria-checked")) || !option.Value && bool.Parse(trueRadio.GetAttribute("aria-checked")))
                     {
-                        fieldContainer.Click();
+                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioContainer].Replace("[NAME]", option.Name)));
+                    }
+                }
+                else if (hasCheckbox)
+                {
+                    var checkbox = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
+
+                    if (option.Value && !checkbox.Selected || !option.Value && checkbox.Selected)
+                    {
+                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckboxContainer].Replace("[NAME]", option.Name)));
+                    }
+                }
+                else if (hasList)
+                {
+                    var list = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldList].Replace("[NAME]", option.Name)));
+                    var options = list.FindElements(By.TagName("option"));
+                    var selectedOption = options.FirstOrDefault(a => a.HasAttribute("data-selected") && bool.Parse(a.GetAttribute("data-selected")));
+                    var unselectedOption = options.FirstOrDefault(a => !a.HasAttribute("data-selected"));
+
+                    var trueOptionSelected = false;
+                    if (selectedOption != null)
+                    {
+                        trueOptionSelected = selectedOption.GetAttribute("value") == "1";
+                    }
+
+                    if (option.Value && !trueOptionSelected || !option.Value && trueOptionSelected)
+                    {
+                        if (unselectedOption != null)
+                        {
+                            driver.ClickWhenAvailable(By.Id(unselectedOption.GetAttribute("id")));
+                        }
                     }
                 }
                 else
-                {
-                    if (fieldContainer.Selected)
-                    {
-                        fieldContainer.Click();
-                    }
-                }
+                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+
+
                 return true;
             });
         }
@@ -2049,6 +2084,53 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Sets the value of a Boolean Item.
+        /// </summary>
+        /// <param name="option">The boolean field name.</param>
+        /// <example>xrmApp.Entity.GetValue(new BooleanItem { Name = "creditonhold" });</example>
+        internal BrowserCommandResult<bool> GetValue(BooleanItem option)
+        {
+            return this.Execute($"Get BooleanItem Value: {option.Name}", driver =>
+            {
+                var check = false;
+
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
+
+                var hasRadio = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioContainer].Replace("[NAME]", option.Name)));
+                var hasCheckbox = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
+                var hasList = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldList].Replace("[NAME]", option.Name)));
+
+                if (hasRadio)
+                {
+                    var trueRadio = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioTrue].Replace("[NAME]", option.Name)));
+
+                    check = bool.Parse(trueRadio.GetAttribute("aria-checked"));
+                }
+                else if (hasCheckbox)
+                {
+                    var checkbox = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
+
+                    check = bool.Parse(checkbox.GetAttribute("aria-checked"));
+                }
+                else if (hasList)
+                {
+                    var list = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldList].Replace("[NAME]", option.Name)));
+                    var options = list.FindElements(By.TagName("option"));
+                    var selectedOption = options.FirstOrDefault(a => a.HasAttribute("data-selected") && bool.Parse(a.GetAttribute("data-selected")));
+
+                    if (selectedOption != null)
+                    {
+                        check = int.Parse(selectedOption.GetAttribute("value")) == 1;
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+
+                return check;
+            });
+        }
+
+        /// <summary>
         /// Gets the value from the multselect type control
         /// </summary>
         /// <param name="option">Object of type MultiValueOptionSet containing name of the Field</param>
@@ -2261,6 +2343,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> GetHeaderValue(BooleanItem control)
+        {
+            return this.Execute(GetOptions($"Get Header BooleanItem Value {control}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
+                    throw new NotFoundException("Unable to find header on the form");
+
+                return GetValue(control);
+            });
+        }
+
         internal BrowserCommandResult<string> GetStatusFromFooter()
         {
             return this.Execute(GetOptions($"Get Status value from footer"), driver =>
@@ -2322,6 +2415,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         internal BrowserCommandResult<bool> SetHeaderValue(OptionSet control)
         {
             return this.Execute(GetOptions($"Set Header OptionSet Value {control.Name}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
+                    throw new NotFoundException("Unable to find header on the form");
+
+                SetValue(control);
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SetHeaderValue(BooleanItem control)
+        {
+            return this.Execute(GetOptions($"Set Header BooleanItem Value {control.Name}"), driver =>
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
