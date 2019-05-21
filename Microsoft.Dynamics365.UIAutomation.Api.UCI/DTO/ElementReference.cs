@@ -110,10 +110,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Form"       , "id(\"tab0\")"},
             { "Entity_Close"       , "id(\"closeButton\")"},
             { "Entity_Save"       , "id(\"savefooter_statuscontrol\")"},
-            { "Entity_FormSectionContentTable" , "id(\"flyoutFormSection_ContentTable\")" }, //GitHub Issue 56
-            { "Entity_SelectFormContentTable" , "id(\"Dialog_0\")" }, //GitHub Issue 56
-            { "Entity_SelectForm",  "id(\"header_crmFormSelector\")"}, //GitHub Issue #56 - Correcting reference point for SelectForm() method
-            { "Entity_SelectFormSection",  "id(\"FormSecNavigationControl-Icon\")"}, //GitHub Issue 56
+            { "Entity_FormSelector", "//*[@data-id=\"form-selector\"]" },
+            { "Entity_FormSelectorFlyout", "//*[@data-id=\"form-selector-flyout\"]" },
+            { "Entity_FormSelectorItem", "//li[contains(@data-id, 'form-selector-item')]" },
 
             //Related MenuItems
             { "Related_Popout",                 "//li[contains(@data-id,\"tablist-tab_related\")]" },
@@ -564,10 +563,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Close = "Entity_Close";
             public static string Tab = "Entity_TabId";
             public static string Save = "Entity_Save";
-            public static string SelectFormContentTable = "Entity_SelectFormContentTable"; //GitHub Issue 56
-            public static string FormSectionContentTable = "Entity_FormSectionContentTable"; //GitHub Issue 56
-            public static string SelectForm = "Entity_SelectForm";
-            public static string SelectFormSection = "Entity_SelectFormSection"; //GitHub Issue 56
+            public static string FormSelector = "Entity_FormSelector";
+            public static string FormSelectorFlyout = "Entity_FormSelectorFlyout";
+            public static string FormSelectorItem = "Entity_FormSelectorItem";
             public static string LookupRender = "Entity_LookupRenderClass";
             public static string Popout = "Entity_PopoutClass";
         }
