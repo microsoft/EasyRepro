@@ -17,7 +17,7 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             { "Login_UserId", "//input[@type='email']"},
             { "Login_Password", "//input[@type='password']"},
             { "Login_SignIn", "id(\"cred_sign_in_button\")"},
-            { "Login_MainPage", "//div[@class=\"home-page-component\"]"},
+            { "Login_MainPage", "//div[contains(@class,\"home-page-component\")]"},
             { "Login_SharePointPage", "id(\"O365_NavHeader\")"},
             { "Login_StaySignedIn", "id(\"idSIButton9\")"},
 
