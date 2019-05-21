@@ -1411,9 +1411,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Open: {entityName} {id}"), driver =>
             {
                 var uri = new Uri(this.Browser.Driver.Url);
-                var link = $"{uri.Scheme}://{uri.Authority}/main.aspx?etn={entityName}&pagetype=entityrecord&id=%7B{id:D}%7D";
+                var qs = HttpUtility.ParseQueryString(uri.Query.ToLower());
+                var appId = qs.Get("appid");
+                var link = $"{uri.Scheme}://{uri.Authority}/main.aspx?appid={appId}&etn={entityName}&pagetype=entityrecord&id={id}";
 
-                driver.Navigate().GoToUrl(uri);
+                driver.Navigate().GoToUrl(link);
 
                 //SwitchToContent();
                 driver.WaitForPageToLoad();
