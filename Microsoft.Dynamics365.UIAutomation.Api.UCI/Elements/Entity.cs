@@ -387,5 +387,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.SwitchProcess(processToSwitchTo);
         }
+
+        /// <summary>
+        /// Switches forms using the form selector
+        /// </summary>
+        /// <param name="formName">Name of the form</param>
+        /// <example>xrmApp.Entity.SelectForm("AI for Sales");</example>
+        public void SelectForm(string formName)
+        {
+            _client.SelectForm(formName);
+        }
     }   
 }
