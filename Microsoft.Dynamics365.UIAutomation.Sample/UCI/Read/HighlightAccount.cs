@@ -29,7 +29,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
-                xrmApp.Grid.Search("04");
+                xrmApp.Grid.Search("Adventure");
 
                 xrmApp.Grid.HighLightRecord(0); //Ticks the box, allowing you to Edit / Delete (Command) if you so desire
                 xrmApp.CommandBar.ClickCommand("Edit");
