@@ -29,6 +29,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.HideDiagnosticWindow = true;
         }
 
+        public BrowserType RemoteBrowserType { get; set; }
+        public Uri RemoteHubServer { get; set; }
         public BrowserType BrowserType { get; set; }
         public BrowserCredentials Credentials { get; set; }
         public string DriversPath { get; set; }
