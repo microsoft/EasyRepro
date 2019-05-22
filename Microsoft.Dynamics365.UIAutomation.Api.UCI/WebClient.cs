@@ -1436,14 +1436,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Open: {entityName} {id}"), driver =>
             {
-                //retrieve the appId from the current Uri
-                string appId = HttpUtility.ParseQueryString(new Uri(driver.Url).Query).Get("appid");
-
-                Guid guid = Guid.Empty;
-
-                if (!Guid.TryParse(appId, out guid))
-                    throw new InvalidOperationException("Unable to determine the appid for UCI");
-
                 //https:///main.aspx?appid=98d1cf55-fc47-e911-a97c-000d3ae05a70&pagetype=entityrecord&etn=lead&id=ed975ea3-531c-e511-80d8-3863bb3ce2c8
                 var uri = new Uri(this.Browser.Driver.Url);
                 var qs = HttpUtility.ParseQueryString(uri.Query.ToLower());
