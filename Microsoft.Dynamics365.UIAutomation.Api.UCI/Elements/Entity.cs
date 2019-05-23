@@ -103,7 +103,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Gets the value of an OptionSet from the header
+        /// Gets the value of a picklist or status field from the header
         /// </summary>
         /// <param name="option">The option you want to Get.</param>
         /// <example>xrmBrowser.Entity.GetValue(new OptionSet { Name = "preferredcontactmethodcode"}); </example>
@@ -187,7 +187,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Gets the value of a OptionSet.
+        /// Gets the value of a picklist or status field.
         /// </summary>
         /// <param name="option">The option you want to set.</param>
         public string GetValue(OptionSet optionSet)
@@ -294,7 +294,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Sets the value of an OptionSet in the header
+        /// Sets the value of a picklist or status field in the header
         /// </summary>
         /// <param name="option">The option you want to set.</param>
         public void SetHeaderValue(OptionSet control)
@@ -331,7 +331,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Sets the value of a picklist.
+        /// Sets the value of a picklist or status field.
         /// </summary>
         /// <param name="option">The option you want to set.</param>
         public void SetValue(OptionSet optionSet)
