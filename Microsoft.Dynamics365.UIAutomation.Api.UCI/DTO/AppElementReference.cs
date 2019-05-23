@@ -117,6 +117,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EntityBooleanFieldCheckboxContainer = "Entity_BooleanFieldCheckboxContainer";
             public static string EntityBooleanFieldCheckbox = "Entity_BooleanFieldCheckbox";
             public static string EntityBooleanFieldList = "Entity_BooleanFieldList";
+            public static string EntityOptionsetStatusCombo = "Entity_OptionsetStatusCombo";
+            public static string EntityOptionsetStatusComboButton = "Entity_OptionsetStatusComboButton";
+            public static string EntityOptionsetStatusComboList = "Entity_OptionsetStatusComboList";
+            public static string EntityOptionsetStatusTextValue = "Entity_OptionsetStatusTextValue";
 
         }
 
@@ -334,6 +338,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_BooleanFieldCheckboxContainer", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container')]"},
             { "Entity_BooleanFieldCheckbox", "//input[contains(@data-id, '[NAME].fieldControl-checkbox-toggle')]"},
             { "Entity_BooleanFieldList", "//select[contains(@data-id, '[NAME].fieldControl-checkbox-select')]"},
+            { "Entity_OptionsetStatusCombo", "//div[contains(@data-id, '[NAME].fieldControl-pickliststatus-comboBox')]"},
+            { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},
+            { "Entity_OptionsetStatusComboList", "//ul[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_list')]"},
+            { "Entity_OptionsetStatusTextValue", "//span[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_text-value')]"},
 			
                         
             //CommandBar

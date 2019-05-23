@@ -1691,10 +1691,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Sets the value of a picklist.
+        /// Sets the value of a picklist or status field.
         /// </summary>
         /// <param name="option">The option you want to set.</param>
-        /// <example>xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
+        /// <example>xrmApp.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
         public BrowserCommandResult<bool> SetValue(OptionSet option)
         {
             return this.Execute(GetOptions($"Set OptionSet Value: {option.Name}"), driver =>
@@ -1705,6 +1705,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     var select = fieldContainer.FindElement(By.TagName("select"));
                     var options = select.FindElements(By.TagName("option"));
+
+                    foreach (var op in options)
+                    {
+                        if (op.Text != option.Value && op.GetAttribute("value") != option.Value) continue;
+                        op.Click();
+                        break;
+                    }
+                }
+                else if (fieldContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EntityOptionsetStatusCombo].Replace("[NAME]", option.Name))).Count > 0)
+                {
+                    // This is for statuscode (type = status) that should act like an optionset doesn't doesn't follow the same pattern when rendered
+                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.EntityOptionsetStatusComboButton].Replace("[NAME]", option.Name)));
+                    
+                    var listBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityOptionsetStatusComboList].Replace("[NAME]", option.Name)));
+                    var options = listBox.FindElements(By.TagName("li"));
 
                     foreach (var op in options)
                     {
@@ -2020,10 +2035,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Gets the value of a picklist.
+        /// Gets the value of a picklist or status field.
         /// </summary>
         /// <param name="option">The option you want to set.</param>
-        /// <example>xrmBrowser.Entity.GetValue(new OptionSet { Name = "preferredcontactmethodcode"}); </example>
+        /// <example>xrmApp.Entity.GetValue(new OptionSet { Name = "preferredcontactmethodcode"}); </example>
         internal BrowserCommandResult<string> GetValue(OptionSet option)
         {
             return this.Execute($"Get OptionSet Value: {option.Name}", driver =>
@@ -2041,6 +2056,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         text = op.Text;
                         break;
                     }
+                }
+                else if (fieldContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EntityOptionsetStatusCombo].Replace("[NAME]", option.Name))).Count > 0)
+                {
+                    // This is for statuscode (type = status) that should act like an optionset doesn't doesn't follow the same pattern when rendered
+                    var valueSpan = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityOptionsetStatusTextValue].Replace("[NAME]", option.Name)));
+
+                    text = valueSpan.Text;
                 }
                 else
                 {
