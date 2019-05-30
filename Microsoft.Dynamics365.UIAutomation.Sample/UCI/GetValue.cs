@@ -54,7 +54,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 		
-		[TestMethod]
+	[TestMethod]
         public void UCITestActivityPartyGetValue()
         {
             var client = new WebClient(TestSettings.Options);
