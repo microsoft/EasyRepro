@@ -1605,7 +1605,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Sets the value of a Lookup.
+        /// Sets the value of a Lookup, Customer, Owner or ActivityParty Lookup which accepts only a single value.
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmApp.Entity.SetValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
@@ -1618,76 +1618,141 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
 
-                if (fieldContainer.FindElements(By.TagName("input")).Count == 0)
+                ClearValue(control);
+
+                var input = fieldContainer.FindElements(By.TagName("input")).Count > 0
+                    ? fieldContainer.FindElement(By.TagName("input"))
+                    : null;
+
+                if (input != null)
                 {
-                    var existingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", control.Name)));
-                    existingLookupValue.Hover(driver);
-                    Thread.Sleep(500);
+                    input.SendKeys(control.Value, true);
 
-                    var deleteExistingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
-                    deleteExistingLookupValue.Click();
-                    Thread.Sleep(500);
+                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupSearchButton].Replace("[NAME]", control.Name)));
+                    driver.WaitForTransaction();
                 }
-
-                fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
-
-                if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
-                {
-                    var input = fieldContainer.FindElement(By.TagName("input"));
-                    if (input != null)
-                    {
-                        input.SendKeys(control.Value, true);
-                        input.SendKeys(Keys.Tab);
-                    }
-                }
-
 
                 if (control.Value != null && control.Value != "")
                 {
-                    var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-                    wait.Until(d => d.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldNoRecordsText].Replace("[NAME]", control.Name) + "|" +
-                        AppElements.Xpath[AppReference.Entity.LookupFieldResultList].Replace("[NAME]", control.Name))));
-
-                    var flyoutDialog = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupMenu].Replace("[NAME]", control.Name)));
-                    var dialogItems = OpenDialog(flyoutDialog).Value;
-
-                    if (dialogItems.Count <= 0)
-                        throw new InvalidOperationException($"List does not contain a record with the name:  {control.Value}");
-
-                    if (index + 1 > dialogItems.Count)
-                    {
-                        throw new InvalidOperationException($"List does not contain {index + 1} records. Please provide an index value less than {dialogItems.Count} ");
-                    }
-                    else
-                    {
-                        var dialogItem = dialogItems[index];
-                        driver.ClickWhenAvailable(By.Id(dialogItem.Id));
-                    }
+                    SetLookUpByValue(driver, control, index);
                 }
                 else if (control.Value == "")
                 {
-                    var lookupResultsDialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.LookupResultsDropdown].Replace("[NAME]", control.Name)));
-                    var lookupResults = LookupResultsDropdown(lookupResultsDialog).Value;
-
-                    if (lookupResults.Count > 0)
-                    {
-                        if (index + 1 > lookupResults.Count)
-                            throw new InvalidOperationException($"Recently Viewed list does not contain {index + 1} records. Please provide an index value less than {lookupResults.Count}");
-
-                        var lookupResult = lookupResults[index];
-
-                        driver.ClickWhenAvailable(By.Id(lookupResult.Id));
-                    }
-                    else
-                        throw new InvalidOperationException($"No results exist in the Recently Viewed flyout menu. Please provide a text value for {control.Name}");
+                    SetLookupByIndex(driver, control, index);
                 }
                 else if (control.Value == null)
                 {
-                    throw new InvalidOperationException($"No value has been provided for the LookupItem {control.Name}. Please provide a value and try again.");
+                    throw new InvalidOperationException($"No value has been provided for the LookupItem {control.Name}. Please provide a value or an empty string and try again.");
                 }
 
                 return true;
             });
+        }
+
+        /// <summary>
+        /// Sets the value of an ActivityParty Lookup.
+        /// </summary>
+        /// <param name="control">The lookup field name, value or index of the lookup.</param>
+        /// <example>xrmApp.Entity.SetValue(new Lookup[] { Name = "to", Value = "Rene Valdes (sample)" }, { Name = "to", Value = "Alpine Ski House (sample)" } );</example>
+        /// The default index position is 0, which will be the first result record in the lookup results window. Suppy a value > 0 to select a different record if multiple are present.
+        internal BrowserCommandResult<bool> SetValue(LookupItem[] controls, int index = 0, bool clearFirst = true)
+        {
+            return this.Execute(GetOptions($"Set ActivityParty Lookup Value: {controls.First().Name}"), driver =>
+            {
+                driver.WaitForTransaction(5);
+
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", controls.First().Name)));
+
+                if (clearFirst)
+                    ClearValue(controls[0]);
+
+                var input = fieldContainer.FindElements(By.TagName("input")).Count > 0
+                    ? fieldContainer.FindElement(By.TagName("input"))
+                    : null;
+
+                foreach (var control in controls)
+                {
+                    if (input != null)
+                    {
+                        if (control.Value != null && control.Value != "")
+                        {
+                            input.SendKeys(control.Value, true);
+                            input.SendKeys(Keys.Tab);
+                            input.SendKeys(Keys.Enter);
+                        }
+                        else
+                        {
+                            input.Click();
+                        }
+                        driver.WaitForTransaction();
+                    }
+
+                    if (control.Value != null && control.Value != "")
+                    {
+                        SetLookUpByValue(driver, control, index);
+                    }
+                    else if (control.Value == "")
+                    {
+                        SetLookupByIndex(driver, control, index);
+                    }
+                    else if (control.Value == null)
+                    {
+                        throw new InvalidOperationException($"No value has been provided for the LookupItem {control.Name}. Please provide a value or an empty string and try again.");
+                    }
+                }
+
+                input.SendKeys(Keys.Escape); // IE wants to keep the flyout open on multi-value fields, this makes sure it closes
+
+                return true;
+            });
+        }
+
+        private void SetLookUpByValue(IWebDriver driver, LookupItem control, int index)
+        {
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait.Until(d => d.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldNoRecordsText].Replace("[NAME]", control.Name) + "|" +
+                AppElements.Xpath[AppReference.Entity.LookupFieldResultList].Replace("[NAME]", control.Name))));
+
+            driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupMenu].Replace("[NAME]", control.Name)));
+            var flyoutDialog = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupMenu].Replace("[NAME]", control.Name)));
+
+            driver.WaitForTransaction();
+            driver.WaitFor(d => d.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", control.Name))).Count > 0);
+            var dialogItems = OpenDialog(flyoutDialog).Value;
+
+            driver.WaitForTransaction();
+            if (dialogItems.Count == 0)
+                throw new InvalidOperationException($"List does not contain a record with the name:  {control.Value}");
+
+            if (index + 1 > dialogItems.Count)
+                throw new InvalidOperationException($"List does not contain {index + 1} records. Please provide an index value less than {dialogItems.Count} ");
+
+            var dialogItem = dialogItems[index];
+            driver.ClickWhenAvailable(By.Id(dialogItem.Id));
+
+            driver.WaitForTransaction();
+        }
+
+        private void SetLookupByIndex(IWebDriver driver, LookupItem control, int index)
+        {
+            driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.LookupResultsDropdown].Replace("[NAME]", control.Name)));
+            var lookupResultsDialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.LookupResultsDropdown].Replace("[NAME]", control.Name)));
+
+            driver.WaitForTransaction();
+            driver.WaitFor(d => d.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", control.Name))).Count > 0);
+            var lookupResults = LookupResultsDropdown(lookupResultsDialog).Value;
+
+            driver.WaitForTransaction();
+            if (lookupResults.Count == 0)
+                throw new InvalidOperationException($"No results exist in the Recently Viewed flyout menu. Please provide a text value for {control.Name}");
+
+            if (index + 1 > lookupResults.Count)
+                throw new InvalidOperationException($"Recently Viewed list does not contain {index + 1} records. Please provide an index value less than {lookupResults.Count}");
+
+            var lookupResult = lookupResults[index];
+            driver.ClickWhenAvailable(By.Id(lookupResult.Id));
+
+            driver.WaitForTransaction();
         }
 
         /// <summary>
@@ -2035,6 +2100,55 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Gets the value of an ActivityParty Lookup.
+        /// </summary>
+        /// <param name="control">The lookup field name of the lookup.</param>
+        /// <example>xrmApp.Entity.GetValue(new LookupItem[] { new LookupItem { Name = "to" } });</example>
+        public BrowserCommandResult<string[]> GetValue(LookupItem[] controls)
+        {
+            return this.Execute($"Get ActivityParty Lookup Value: {controls.First().Name}", driver =>
+            {
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", controls.First().Name)));
+
+                var existingValues = fieldContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldExistingValue].Replace("[NAME]", controls.First().Name)));
+
+                var expandCollapseButtons = fieldContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldExpandCollapseButton].Replace("[NAME]", controls.First().Name)));
+                if (expandCollapseButtons.Any())
+                {
+                    expandCollapseButtons.First().Click(true);
+
+                    driver.WaitFor(x => x.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldExistingValue].Replace("[NAME]", controls.First().Name))).Count > existingValues.Count);
+                    existingValues = fieldContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldExistingValue].Replace("[NAME]", controls.First().Name)));
+                }
+
+                string[] lookupValues = null;
+
+                try
+                {
+                    if (existingValues.Any())
+                    {
+                        char[] trimCharacters = { '', '\r', '\n', '', '', '' }; //IE can return line breaks
+                        lookupValues = existingValues.Select(v => v.GetAttribute("innerText").Trim(trimCharacters)).ToArray();
+                    }
+                    else if (fieldContainer.FindElements(By.TagName("input")).Any())
+                    {
+                        lookupValues = null;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Field: {controls.First().Name} Does not exist");
+                    }
+                }
+                catch (Exception exp)
+                {
+                    throw new InvalidOperationException($"Field: {controls.First().Name} Does not exist", exp);
+                }
+
+                return lookupValues;
+            });
+        }
+
+        /// <summary>
         /// Gets the value of a picklist or status field.
         /// </summary>
         /// <param name="option">The option you want to set.</param>
@@ -2300,6 +2414,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<string[]> GetHeaderValue(LookupItem[] controls)
+        {
+            return this.Execute(GetOptions($"Get Header Activityparty LookupItem Value {controls.First().Name}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
+                    throw new NotFoundException("Unable to find header on the form");
+
+                return GetValue(controls);
+            });
+        }
+
         internal BrowserCommandResult<string> GetHeaderValue(string control)
         {
             return this.Execute(GetOptions($"Get Header Value {control}"), driver =>
@@ -2389,6 +2514,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> SetHeaderValue(LookupItem[] controls)
+        {
+            return this.Execute(GetOptions($"Set Header Activityparty LookupItem Value {controls[0].Name}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
+                    throw new NotFoundException("Unable to find header on the form");
+
+                SetValue(controls);
+
+                return true;
+            });
+        }
+
         internal BrowserCommandResult<bool> SetHeaderValue(MultiValueOptionSet control)
         {
             return this.Execute(GetOptions($"Set Header MultiValueOptionSet Value {control.Name}"), driver =>
@@ -2438,19 +2576,71 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        internal BrowserCommandResult<bool> ClearValue(LookupItem control)
+        internal BrowserCommandResult<bool> ClearValue(LookupItem control, bool removeAll = true)
         {
             return this.Execute(GetOptions($"Clear Field {control.Name}"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
 
-                if (fieldContainer.FindElements(By.TagName("input")).Count == 0)
-                {
-                    var existingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", control.Name)));
-                    existingLookupValue.Hover(driver);
+                var existingValues = fieldContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
 
-                    var deleteExistingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
-                    deleteExistingLookupValue.Click();
+                var expandCollapseButtons = fieldContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldExpandCollapseButton].Replace("[NAME]", control.Name)));
+                if (expandCollapseButtons.Any())
+                {
+                    expandCollapseButtons.First().Click(true);
+
+                    driver.WaitFor(x => x.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldExistingValue].Replace("[NAME]", control.Name))).Count > existingValues.Count);
+                }
+                else
+                {
+                    if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", control.Name))))
+                    {
+                        var existingList = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", control.Name)));
+                        existingList.SendKeys(Keys.Clear);
+                    }
+                }
+                driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupSearchButton].Replace("[NAME]", control.Name)));
+
+                existingValues = fieldContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
+                if (existingValues.Count == 0)
+                    return true;
+
+                if (removeAll)
+                {
+                    // Removes all selected items
+                    while (existingValues.Count > 0)
+                    {
+                        driver.ClickWhenAvailable(By.Id(existingValues.First().GetAttribute("id")));
+                        existingValues = fieldContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
+                    }
+                }
+                else
+                {
+                    // Removes an individual item by value or index
+                    if (control.Value != null && control.Value != "")
+                    {
+                        foreach (var existingValue in existingValues)
+                        {
+                            if (existingValue.GetAttribute("aria-label").EndsWith(control.Value))
+                            {
+                                driver.ClickWhenAvailable(By.Id(existingValue.GetAttribute("id")));
+                                return true;
+                            }
+                        }
+
+                        throw new InvalidOperationException($"Field '{control.Name}' does not contain a record with the name:  {control.Value}");
+                    }
+                    else if (control.Value == "")
+                    {
+                        if (control.Index + 1 > existingValues.Count)
+                            throw new InvalidOperationException($"Field '{control.Name}' does not contain {control.Index + 1} records. Please provide an index value less than {existingValues.Count}");
+
+                        driver.ClickWhenAvailable(By.Id(existingValues[control.Index].GetAttribute("id")));
+                    }
+                    else if (control.Value == null)
+                    {
+                        throw new InvalidOperationException($"No value or index has been provided for the LookupItem {control.Name}. Please provide an value or an empty string or an index and try again.");
+                    }
                 }
 
                 return true;
@@ -2508,6 +2698,29 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     null,
                     d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
                 );
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> AddValues(LookupItem[] controls, int index = 0)
+        {
+            return this.Execute(GetOptions($"Add values {controls.First().Name}"), driver =>
+            {
+                SetValue(controls, index, false);
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> RemoveValues(LookupItem[] controls)
+        {
+            return this.Execute(GetOptions($"Remove values {controls.First().Name}"), driver =>
+            {
+                foreach (var control in controls)
+                {
+                    ClearValue(control, false);
+                }
 
                 return true;
             });
