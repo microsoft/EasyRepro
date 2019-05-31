@@ -53,5 +53,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 string lookupValue = xrmApp.Entity.GetValue(new LookupItem { Name = "primarycontactid" });
             }
         }
+		
+	[TestMethod]
+        public void UCITestActivityPartyGetValue()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Activities");
+
+                xrmApp.Grid.SwitchView("All Phone Calls");
+                xrmApp.ThinkTime(500);
+
+                xrmApp.Grid.OpenRecord(0);
+                xrmApp.ThinkTime(500);
+
+                var to = xrmApp.Entity.GetValue(new LookupItem[] { new LookupItem { Name = "to" } });
+                xrmApp.ThinkTime(500);
+            }
+        }
     }
 }

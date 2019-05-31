@@ -35,8 +35,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         /// <summary>
         /// Clears a value from the LookupItem provided
+        /// Can be used on a lookup, customer, owner, or activityparty field
         /// </summary>
         /// <param name="control"></param>
+        /// <example>xrmApp.Entity.ClearValue(new LookupItem { Name = "parentcustomerid" });</example>
+        /// <example>xrmApp.Entity.ClearValue(new LookupItem { Name = "to" });</example>
         public void ClearValue(LookupItem control)
         {
             _client.ClearValue(control);
@@ -100,6 +103,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public string GetHeaderValue(LookupItem control)
         {
             return _client.GetHeaderValue(control);
+        }
+
+        /// <summary>
+        /// Gets the value of an ActivityParty Lookup from the header
+        /// </summary>
+        /// <param name="controls">The activityparty lookup field name, value or index of the lookup.</param>
+        /// <example>xrmApp.Entity.GetHeaderValue(new LookupItem[] { new LookupItem { Name = "to" } });</example>
+        public string[] GetHeaderValue(LookupItem[] controls)
+        {
+            return _client.GetValue(controls);
         }
 
         /// <summary>
@@ -175,6 +188,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public string GetValue(LookupItem control)
         {
             return _client.GetValue(control);
+        }
+
+        /// <summary>
+        /// Gets the value of an ActivityParty Lookup.
+        /// </summary>
+        /// <param name="controls">The activityparty lookup field name, value or index of the lookup.</param>
+        /// <example>xrmApp.Entity.GetValue(new LookupItem[] { new LookupItem { Name = "to" } });</example>
+        public string[] GetValue(LookupItem[] controls)
+        {
+            return _client.GetValue(controls);
         }
 
         /// <summary>
@@ -285,6 +308,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Sets the value of am ActivityParty Lookup in the header
+        /// </summary>
+        /// <param name="controls">The activityparty lookup field name, value or index of the lookup.</param>
+        /// <example>xrmApp.Entity.SetHeaderValue(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
+        public void SetHeaderValue(LookupItem[] controls)
+        {
+            _client.SetHeaderValue(controls);
+        }
+
+        /// <summary>
         /// Sets/Removes the value from the multselect type control in the header
         /// </summary>
         /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be set/removed</param>
@@ -328,6 +361,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public void SetValue(LookupItem control, int index = 0)
         {
             _client.SetValue(control, index);
+        }
+
+        /// <summary>
+        /// Sets the value of an ActivityParty Lookup.
+        /// </summary>
+        /// <param name="controls">The activityparty lookup field name, value or index of the lookup.</param>
+        /// <example>xrmApp.Entity.SetValue(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
+        public void SetValue(LookupItem[] controls, int index = 0)
+        {
+            _client.SetValue(controls, index);
         }
 
         /// <summary>
@@ -386,6 +429,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public void SelectForm(string formName)
         {
             _client.SelectForm(formName);
+        }
+
+        /// <summary>
+        /// Adds values to an ActivityParty Lookup.
+        /// </summary>
+        /// <param name="controls">The activityparty lookup field name, value or index of the lookup.</param>
+        /// <example>xrmApp.Entity.AddValues(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
+        public void AddValues(LookupItem[] controls, int index = 0)
+        {
+            _client.AddValues(controls, index);
+        }
+
+        /// <summary>
+        /// Removes values from an ActivityParty Lookup.
+        /// </summary>
+        /// <param name="controls">The activityparty lookup field name, value or index of the lookup.</param>
+        /// <example>xrmApp.Entity.RemoveValues(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
+        public void RemoveValues(LookupItem[] controls)
+        {
+            _client.RemoveValues(controls);
         }
     }   
 }
