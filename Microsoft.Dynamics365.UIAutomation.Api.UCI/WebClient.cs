@@ -249,6 +249,46 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> OpenGroupSubArea(string group, string subarea, int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Open Group Sub Area"), driver =>
+            {
+                //Make sure the sitemap-launcher is expanded - 9.1
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton])))
+                {
+                    var expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton])).GetAttribute("aria-expanded"));
+
+                    if (!expanded)
+                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+                }
+
+                var groups = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapMenuGroup]));
+                var groupList = groups.FirstOrDefault(g => g.GetAttribute("aria-label").ToLowerString() == group.ToLowerString());
+                if (groupList == null)
+                {
+                    throw new NotFoundException($"No group with the name '{group}' exists");
+                }
+   
+                var subAreaItems = groupList.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapMenuItems]));
+                var subAreaItem = subAreaItems.FirstOrDefault(a => a.GetAttribute("data-text").ToLowerString() == subarea.ToLowerString());
+                if (subAreaItem == null)
+                {
+                    throw new NotFoundException($"No subarea with the name '{subarea}' exists inside of '{group}'");
+                }
+
+                subAreaItem.Click(true);
+
+                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
+                driver.WaitForPageToLoad();
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
         internal BrowserCommandResult<bool> OpenSubArea(string area, string subarea, int thinkTime = Constants.DefaultThinkTime)
         {
             //this.Browser.ThinkTime(thinkTime);

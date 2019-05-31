@@ -36,6 +36,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string QuickCreateMenuList = "Nav_QuickCreateMenuList";
             public static string QuickCreateMenuItems = "Nav_QuickCreateMenuItems";
             public static string PinnedSitemapEntity = "Nav_PinnedSitemapEntity";
+            public static string SitemapMenuGroup = "Nav_SitemapMenuGroup";
             public static string SitemapMenuItems = "Nav_SitemapMenuItems";
             public static string SitemapSwitcherButton = "Nav_SitemapSwitcherButton";
             public static string SitemapSwitcherFlyout = "Nav_SitemapSwitcherFlyout";
@@ -261,6 +262,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_QuickCreateMenuList", "//ul[contains(@id,'MenuSectionItemsquickCreate')]" },
             { "Nav_QuickCreateMenuItems", "//li[@role='menuitem']" },
             { "Nav_PinnedSitemapEntity","//li[contains(@data-id,'sitemap-entity-Pinned') and contains(@role,'treeitem')]"},
+            { "Nav_SitemapMenuGroup", "//ul[@role=\"group\"]"},
             { "Nav_SitemapMenuItems", "//li[contains(@data-id,'sitemap-entity')]"},
             { "Nav_SitemapSwitcherButton", "//button[contains(@data-id,'sitemap-areaSwitcher-expand-btn')]"},
             { "Nav_SitemapSwitcherFlyout","//div[contains(@data-lp-id,'sitemap-area-switcher-flyout')]"},
