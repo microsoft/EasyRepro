@@ -170,7 +170,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Entity_Footer_DateFieldContainer"     , "//div[@id=\"footer_[NAME]\"]" },
             { "Entity_Footer_DateFieldInput"     , "//input[@id=\"footer_[NAME]_iDateInput\"]" },
             { "Entity_Footer_GetLookupSearchIcon"     , "//div[@id=\"footer_[NAME]_lookupSearchIconDiv\"]" },
-
+            { "Entity_SubGrid"                      ,"//span[@id='[NAME]_span' and @type='subgrid']" },
+            { "Entity_SubGrid_HeaderCell"           ,"//div[@id='[NAME]_divDataArea']/div/table/thead/tr/th" },
+            { "Entity_SubGrid_Row"                  ,"//div[@id='[NAME]_divDataArea']/div/table/tbody/tr" },
+            { "Entity_SubGrid_Cell"                 ,"//div[@id='[NAME]_divDataArea']/div/table/tbody/tr/td" },
+            { "Entity_SubGrid_RowDeleteButton"      ,"//a[contains(@id,'gridBodyTable_delete_[RECORDID]')]" },
 
             //Related MenuItems
             { "Related_Popout",                 "//li[contains(@data-id,\"tablist-tab_related\")]" },
@@ -684,6 +688,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string DateFieldContainer_Footer = "Entity_Footer_DateFieldContainer";
             public static string DateFieldInput_Footer = "Entity_Footer_DateFieldInput";
             public static string GetLookupSearchIcon_Footer = "Entity_Footer_GetLookupSearchIcon";
+            public static string SubGrid = "Entity_SubGrid";
+            public static string SubGridHeaderCell = "Entity_SubGrid_HeaderCell";
+            public static string SubGridRow = "Entity_SubGrid_Row";
+            public static string SubGridCell = "Entity_SubGrid_Cell";
+            public static string SubGridRowDeleteButton = "Entity_SubGrid_RowDeleteButton";
         }
         public static class MenuRelated
         {

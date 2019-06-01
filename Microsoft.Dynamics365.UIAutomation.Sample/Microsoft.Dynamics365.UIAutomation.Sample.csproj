@@ -129,6 +129,7 @@
     <Compile Include="Web\Delete\DeleteOpportunity.cs" />
     <Compile Include="Web\Dialogs\CloseWarning.cs" />
     <Compile Include="Web\AddConnection.cs" />
+    <Compile Include="Web\Entity\SubGrid.cs" />
     <Compile Include="Web\Entity\TestBase.cs" />
     <Compile Include="Web\Entity\Account.cs" />
     <Compile Include="Web\ValidationTests\CreateUser.cs" />
