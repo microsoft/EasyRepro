@@ -429,7 +429,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <summary>
         /// Retrieve the items from a subgrid.
         /// </summary>
-        /// <param name="subgridName">Label of the subgrid.</param>
+        /// <param name="subgridName">Unique name (not label) of the subgrid.</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
         /// <example>xrmBrowser.Grid.GetSubGridItems("CONTACTS");</example>
         public BrowserCommandResult<List<GridItem>> GetSubGridItems(string subgridName, int thinkTime = Constants.DefaultThinkTime)
@@ -496,7 +496,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <summary>
         /// Retrieves the number of rows from a subgrid
         /// </summary>
-        /// <param name="subgridName">Label of the subgrid to retrieve items from</param>
+        /// <param name="subgridName">Unique name (not label) of the subgrid to retrieve items from</param>
         /// <example>xrmBrowser.Grid.GetSubGridItemsCount("CONTACTS");</example>
         public BrowserCommandResult<int> GetSubGridItemsCount(string subgridName)
         {
@@ -510,7 +510,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <summary>
         /// Open a record on a subgrid.
         /// </summary>
-        /// <param name="subgridName">Label of the subgrid.</param>
+        /// <param name="subgridName">Unique name (not label) of the subgrid.</param>
         /// <param name="index">Index of the record to open.</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
         /// <example>xrmBrowser.Grid.OpenSubGridRecord("CONTACTS", 0);</example>
@@ -535,7 +535,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <summary>
         /// Deletes a record from a subgrid.
         /// </summary>
-        /// <param name="subgridName">Label of the subgrid.</param>
+        /// <param name="subgridName">Unique name (not label) of the subgrid.</param>
         /// <param name="index">Index of the record to delete.</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
         /// <example>xrmBrowser.Grid.DeleteSubGridRecord("CONTACTS", 0);</example>

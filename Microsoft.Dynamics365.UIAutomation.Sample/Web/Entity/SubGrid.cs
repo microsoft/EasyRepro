@@ -32,6 +32,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.Grid.OpenRecord(0);
 
+                //This uses the unique name (not label) from the subgrid properties
                 xrmBrowser.Grid.OpenSubGridRecord("CONTACTS", 0);
 
                 xrmBrowser.ThinkTime(2000);
@@ -53,6 +54,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.Grid.OpenRecord(0);
 
+                //This uses the unique name (not label) from the subgrid properties
                 xrmBrowser.Grid.DeleteSubGridRecord("CONTACTS", 0);
 
                 xrmBrowser.ThinkTime(2000);
@@ -74,8 +76,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.Grid.OpenRecord(0);
 
+                //This uses the unique name (not label) from the subgrid properties
                 List<GridItem> contacts = xrmBrowser.Grid.GetSubGridItems("CONTACTS");
 
+                //This uses the unique name (not label) from the subgrid properties
                 var contactCount = xrmBrowser.Grid.GetSubGridItemsCount("CONTACTS");
 
                 xrmBrowser.ThinkTime(2000);
