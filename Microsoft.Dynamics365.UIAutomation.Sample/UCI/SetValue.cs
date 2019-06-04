@@ -71,7 +71,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Grid.OpenRecord(0);
                 xrmApp.ThinkTime(500);
 
-                xrmApp.Entity.SetValue(new LookupItem { Name = "primarycontactid", Value = "Test" });
+                xrmApp.Entity.SetValue(new LookupItem { Name = "primarycontactid", Value = "Nancy Anderson (sample)" });
                 xrmApp.ThinkTime(500);
             }
         }
