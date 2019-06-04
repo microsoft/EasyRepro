@@ -57,11 +57,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 LookupItem acct = new LookupItem();
                 acct.Name = "parentaccountid";
-                acct.Value = "Test Account";
+                acct.Value = "Adventure Works (sample)";
 
                 LookupItem contact = new LookupItem();
                 contact.Name = "parentcontactid";
-                contact.Value = "EasyRepro";
+                contact.Value = "Nancy Anderson (sample)";
 
                 xrmApp.BusinessProcessFlow.SelectStage("Qualify");
 
