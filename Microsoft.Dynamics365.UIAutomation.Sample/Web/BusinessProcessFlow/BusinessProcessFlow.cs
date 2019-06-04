@@ -77,12 +77,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sales", "Opportunities");
+                xrmBrowser.Navigation.OpenSubArea("Service", "Cases");
 
-                xrmBrowser.Grid.SwitchView("Open Opportunities");
+                xrmBrowser.Grid.SwitchView("Active Cases");
 
                 xrmBrowser.Grid.OpenRecord(0);
 
+                // If using on an entity that requires selection of a record, use NextStage(int index);
                 xrmBrowser.BusinessProcessFlow.NextStage();
 
             }
