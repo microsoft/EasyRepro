@@ -41,7 +41,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 xrmBrowser.Related.Search("F");
 
                 xrmBrowser.Related.ClickCommand("ADD NEW CASE");
-                xrmBrowser.QuickCreate.Cancel();
+                xrmBrowser.QuickCreate.SetValue("title", "Fake Case");
+                xrmBrowser.QuickCreate.Save();
                 
                 xrmBrowser.ThinkTime(2000);
                 xrmBrowser.Related.OpenGridRow(0);
