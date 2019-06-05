@@ -70,7 +70,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
         }
 
         [TestMethod]
-        public void WEBTestBusinessProcessFlowNextStage()
+        public void WEBTestBusinessProcessFlowNextPreviousStage()
         {
             using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
@@ -81,28 +81,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.Grid.SwitchView("Active Cases");
 
+                xrmBrowser.Grid.Search("Faulty product catalog");
+
                 xrmBrowser.Grid.OpenRecord(0);
 
                 // If using on an entity that requires selection of a record, use NextStage(int index);
-                xrmBrowser.BusinessProcessFlow.NextStage();
-
-            }
-        }
-
-        [TestMethod]
-        public void WEBTestBusinessProcessFlowPreviousStage()
-        {
-            using (var xrmBrowser = new Api.Browser(TestSettings.Options))
-            {
-                xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
-                xrmBrowser.GuidedHelp.CloseGuidedHelp();
-
-                xrmBrowser.Navigation.OpenSubArea("Sales", "Opportunities");
-
-                xrmBrowser.Grid.SwitchView("Open Opportunities");
-
-                xrmBrowser.Grid.OpenRecord(0);
-
                 xrmBrowser.BusinessProcessFlow.NextStage();
 
                 xrmBrowser.BusinessProcessFlow.PreviousStage();
