@@ -128,7 +128,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.BusinessProcessFlow.Hide();
 
-                xrmBrowser.BusinessProcessFlow.SelectStage(0);
+                xrmBrowser.BusinessProcessFlow.SelectStage(1);
             }
         }
 
@@ -140,17 +140,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
 
-                xrmBrowser.Navigation.OpenSubArea("Sales", "Opportunities");
+                xrmBrowser.Navigation.OpenSubArea("Service", "Cases");
 
-                xrmBrowser.Grid.SwitchView("Open Opportunities");
+                xrmBrowser.Grid.SwitchView("Active Cases");
 
                 xrmBrowser.Grid.OpenRecord(0);
 
-                xrmBrowser.BusinessProcessFlow.Hide();
+                xrmBrowser.BusinessProcessFlow.NextStage();
 
                 xrmBrowser.BusinessProcessFlow.SelectStage(0);
 
                 xrmBrowser.BusinessProcessFlow.SetActive();
+
             }
         }
 
