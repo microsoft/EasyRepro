@@ -1620,9 +1620,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Set Lookup Value for Subgrid subgridName
         /// </summary>
         /// <param name="subgridName">The SubgridName</param>
-        /// <param name="value"></param>
+        /// <param name="value">Used to match where text contains the provided value.</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Entity.SelectSubgridLookup("Stakeholders", "Alex Wu");</example>
+        /// <example>xrmBrowser.Entity.SelectSubgridLookup("Stakeholders", "Maria Campbell");</example>
         public BrowserCommandResult<bool> SelectSubgridLookup(string subgridName, string value, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
@@ -1641,10 +1641,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     var dialogItems = OpenDialog(dialog).Value;
 
-                    if (!dialogItems.Exists(x => x.Title == value))
+                    if (!dialogItems.Exists(x => x.Title.Contains(value)))
                         throw new InvalidOperationException($"List does not have {value}.");
 
-                    var dialogItem = dialogItems.Where(x => x.Title == value).First();
+                    var dialogItem = dialogItems.Where(x => x.Title.Contains(value)).First();
                     dialogItem.Element.Click();
                 }
 

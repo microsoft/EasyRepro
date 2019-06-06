@@ -221,7 +221,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <summary>
         /// Selects Item based on the value given
         /// </summary>
-        /// <param name="value">The value</param>
+        /// <param name="value">Used to match where text contains the provided value.</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
         /// <example>xrmBrowser.Lookup.SelectItem("Alex Wu");</example>
         public BrowserCommandResult<bool> SelectItem(string value, int thinkTime = Constants.DefaultThinkTime)
@@ -242,7 +242,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 foreach (var item in items)
                 {
                     var primary = item.FindElements(By.TagName("td"))[1];
-                    if (primary.Text == value)
+                    if (primary.Text.Contains(value))
                     {
                         var checkbox = item.FindElements(By.TagName("td"))[0];
 

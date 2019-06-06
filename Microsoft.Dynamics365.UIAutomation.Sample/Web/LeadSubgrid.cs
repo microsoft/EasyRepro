@@ -28,20 +28,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 
                 xrmBrowser.Navigation.OpenSubArea("Sales", "Leads");
 
-                xrmBrowser.Grid.SwitchView("All Leads");
+                xrmBrowser.Grid.SwitchView("Open Leads");
                 
                 xrmBrowser.Grid.OpenRecord(0);
 
-
                 xrmBrowser.Entity.ClickSubgridAddButton("Stakeholders");
-                xrmBrowser.Entity.SelectSubgridLookup("Stakeholders", "Alex Wu");
+                xrmBrowser.Entity.SelectSubgridLookup("Stakeholders", "Maria Campbell");
                 xrmBrowser.Entity.ClickSubgridAddButton("Stakeholders");
                 xrmBrowser.Entity.SelectSubgridLookup("Stakeholders", 3);
                 xrmBrowser.Entity.ClickSubgridAddButton("Stakeholders");
                 xrmBrowser.Entity.SelectSubgridLookup("Stakeholders", true);
                 xrmBrowser.Lookup.SelectItem(0);
                 xrmBrowser.Lookup.Select();
-                xrmBrowser.Lookup.SelectItem("Alex Wu");
+                xrmBrowser.Lookup.SelectItem("Maria Campbell");
                 xrmBrowser.Lookup.Select();
                 xrmBrowser.Lookup.Add();
 
