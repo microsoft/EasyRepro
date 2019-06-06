@@ -1620,7 +1620,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Set Lookup Value for Subgrid subgridName
         /// </summary>
         /// <param name="subgridName">The SubgridName</param>
-        /// <param name="value"></param>
+        /// <param name="value">Used to match where text contains the provided value.</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
         /// <example>xrmBrowser.Entity.SelectSubgridLookup("Stakeholders", "Maria Campbell");</example>
         public BrowserCommandResult<bool> SelectSubgridLookup(string subgridName, string value, int thinkTime = Constants.DefaultThinkTime)
