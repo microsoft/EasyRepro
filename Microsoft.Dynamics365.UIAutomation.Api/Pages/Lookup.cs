@@ -242,7 +242,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 foreach (var item in items)
                 {
                     var primary = item.FindElements(By.TagName("td"))[1];
-                    if (primary.Text == value)
+                    if (primary.Text.Contains(value))
                     {
                         var checkbox = item.FindElements(By.TagName("td"))[0];
 
