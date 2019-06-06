@@ -3514,20 +3514,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Filter With: {entity}"), driver =>
             {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Filter])))
-                    throw new InvalidOperationException("Filter With picklist is not available");
+                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Filter]), 
+                                        new TimeSpan(0, 0, 10),
+                                        e => {
+                                            var picklist = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Filter]));
+                                            var options = picklist.FindElements(By.TagName("option"));
 
-                var picklist = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Filter]));
-                var options = picklist.FindElements(By.TagName("option"));
+                                            picklist.Click();
 
-                picklist.Click();
+                                            IWebElement option = options.FirstOrDefault(x => x.Text == entity);
 
-                IWebElement option = options.FirstOrDefault(x => x.Text == entity);
+                                            if (option == null)
+                                                throw new InvalidOperationException($"Entity '{entity}' does not exist in the Filter options.");
 
-                if (option == null)
-                    throw new InvalidOperationException($"Entity '{entity}' does not exist in the Filter options.");
-
-                option.Click();
+                                            option.Click();
+                                            },
+                                        f=> {
+                                             throw new InvalidOperationException("Filter With picklist is not available. The timeout period elapsed waiting for the picklist to be available.");
+                                        }
+                                        );
 
                 return true;
             });
