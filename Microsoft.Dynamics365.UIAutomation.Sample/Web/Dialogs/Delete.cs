@@ -28,11 +28,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 xrmBrowser.ThinkTime(500);
                 xrmBrowser.Navigation.OpenSubArea("Sales", "Opportunities");
 
-                xrmBrowser.ThinkTime(2000);
-                xrmBrowser.Grid.SwitchView("Open Opportunities");
-
                 xrmBrowser.ThinkTime(1000);
-                xrmBrowser.Grid.OpenRecord(0);
+                xrmBrowser.CommandBar.ClickCommand("New");
+
+                xrmBrowser.Entity.SetValue("name", "Test EasyRepro Opportunity");
+
+                xrmBrowser.Entity.Save();
 
                 xrmBrowser.CommandBar.ClickCommand("Delete");
 
