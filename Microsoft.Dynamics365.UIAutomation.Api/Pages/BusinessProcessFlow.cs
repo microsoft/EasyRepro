@@ -746,7 +746,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
         /// <example>xrmBrowser.BusinessProcessFlow.SetActive();</example>
-        public BrowserCommandResult<bool> SetActive(int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> SetActive(bool ignoreAlreadyActive = false, int thinkTime = Constants.DefaultThinkTime)
         {
             this.Browser.ThinkTime(thinkTime);
 
@@ -756,7 +756,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     throw new Exception("Business Process Flow Set Active Element does not exist");
 
                 if (driver.FindElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.SetActive])).GetAttribute("class").Contains("hidden"))
-                    throw new Exception("The Business Process is already Active");
+                {
+                    if (ignoreAlreadyActive)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        throw new Exception("The Business Process is already Active");
+                    }
+                }
 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.SetActive]));
 
