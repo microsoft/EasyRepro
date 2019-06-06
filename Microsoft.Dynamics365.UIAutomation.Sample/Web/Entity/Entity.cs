@@ -17,7 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
         public override void TestSetup()
         {
             XrmTestBrowser.ThinkTime(500);
-            //OpenEntity("Sales", "Contacts", "Active Contacts");
+            OpenEntity("Sales", "Contacts", "Active Contacts");
         }
 
         [TestMethod]
