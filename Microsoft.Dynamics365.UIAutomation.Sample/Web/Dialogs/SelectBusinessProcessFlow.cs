@@ -25,19 +25,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
 
                 xrmBrowser.ThinkTime(500);
-                xrmBrowser.Navigation.OpenSubArea("Sales", "Opportunities");
+                xrmBrowser.Navigation.OpenSubArea("Service", "Cases");
 
                 xrmBrowser.ThinkTime(2000);
-                xrmBrowser.Grid.SwitchView("Open Opportunities");
+                xrmBrowser.Grid.SwitchView("Active Cases");
 
                 xrmBrowser.ThinkTime(1000);
                 xrmBrowser.Grid.OpenRecord(0);
 
                 xrmBrowser.CommandBar.ClickCommand("Process","Switch Process");
 
-                xrmBrowser.BusinessProcessFlow.SelectBusinessProcessFlow("Opportunity Sales Process");
+                xrmBrowser.BusinessProcessFlow.SelectBusinessProcessFlow("Case to Work Order Business Process");
 
-                xrmBrowser.ThinkTime(1000);
+                xrmBrowser.ThinkTime(5000);
             }
         }
     }
