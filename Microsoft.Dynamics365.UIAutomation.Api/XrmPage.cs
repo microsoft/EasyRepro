@@ -835,14 +835,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         fieldElement.Clear();
                         fieldElement.SendKeys(value);
-                        fieldElement.SendKeys(Keys.Escape);
+                        fieldElement.SendKeys(Keys.Enter);
                     }
                     else
                     {
                         //BugFix - Setvalue -The value is getting erased even after setting the value ,might be due to recent CSS changes.
                         //driver.ExecuteScript("Xrm.Page.getAttribute('" + field + "').setValue('')");
+                        fieldElement.FindElement(By.TagName("input")).SendKeys(Keys.Control + "a");
+                        fieldElement.FindElement(By.TagName("input")).SendKeys(Keys.Backspace);
                         fieldElement.FindElement(By.TagName("input")).SendKeys(value, true);
-                        fieldElement.SendKeys(Keys.Escape);
+                        fieldElement.SendKeys(Keys.Enter);
                     }
                 }
                 else
