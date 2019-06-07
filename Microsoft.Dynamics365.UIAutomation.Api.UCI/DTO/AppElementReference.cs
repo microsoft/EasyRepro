@@ -92,6 +92,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string RecordSetNavCollapseIconParent = "Entity_RecordSetNavCollapseIconParent";
             public static string FieldControlDateTimeInput = "Entity_FieldControlDateTimeInput";
             public static string FieldControlDateTimeInputUCI = "Entity_FieldControlDateTimeInputUCI";
+            public static string FieldControlDateTimeTimeInputUCI = "Entity_FieldControlDateTimeInputUCI";
             public static string Delete = "Entity_Delete";
             public static string Assign = "Entity_Assign";
             public static string SwitchProcess = "Entity_SwitchProcess";
@@ -327,6 +328,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SubTab", "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]" },
             { "Entity_FieldControlDateTimeInput","//input[contains(@id,'[FIELD].fieldControl-date-time-input')]" },
             { "Entity_FieldControlDateTimeInputUCI","//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
+            { "Entity_FieldControlDateTimeTimeInputUCI","//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input" },
             { "Entity_LookupResultsDropdown", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
             { "Entity_Footer", "//div[contains(@id,'footerWrapper')]" },
             { "Entity_SubGridTitle", "//div[contains(text(), '[NAME]')]"},

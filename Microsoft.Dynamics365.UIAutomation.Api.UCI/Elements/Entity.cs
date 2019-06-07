@@ -136,10 +136,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Gets the value of a field from the header
+        /// Gets the value of a text or date field from the header
         /// </summary>
         /// <param name="control">The schema name of the field</param>
-        /// <example>xrmBrowser.Entity.GetValue("emailaddress1");</example>
+        /// <example>xrmApp.Entity.GetHeaderValue("emailaddress1");</example>
         public string GetHeaderValue(string control)
         {
             return _client.GetHeaderValue(control);
@@ -201,9 +201,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Gets the value of a field.
+        /// Gets the value of a text or date field.
         /// </summary>
         /// <param name="control">The schema name of the field</param>
+        /// <example>xrmApp.Entity.GetValue("emailaddress1");</example>
         public string GetValue(string field)
         {
             return _client.GetValue(field);
@@ -345,6 +346,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Sets the value of a Date field in the header
+        /// </summary>
+        /// <param name="field">Date field name.</param>
+        /// <param name="date">DateTime value.</param>
+        /// <param name="format">Datetime format matching Short Date & Time formatting personal options.</param>
+        /// <example>xrmApp.Entity.SetHeaderValue("birthdate", DateTime.Parse("11/1/1980"));</example>
+        public void SetHeaderValue(string field, DateTime date, string format = "M/d/yyyy h:mm tt")
+        {
+            _client.SetHeaderValue(field, date, format);
+        }
+
+        /// <summary>
         /// Sets the value of a field
         /// </summary>
         /// <param name="field">The field</param>
@@ -394,10 +407,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Sets the value of a Date Field.
         /// </summary>
-        /// <param name="field">The field id or name.</param>
+        /// <param name="field">Date field name.</param>
         /// <param name="date">DateTime value.</param>
-        /// <param name="format">DateTime format</param>
-        public void SetValue(string field, DateTime date, string format ="MM dd yyyy")
+        /// <param name="format">Datetime format matching Short Date & Time formatting personal options.</param>
+        /// <example>xrmApp.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
+        public void SetValue(string field, DateTime date, string format = "M/d/yyyy h:mm tt")
         {
             _client.SetValue(field, date, format);
         }

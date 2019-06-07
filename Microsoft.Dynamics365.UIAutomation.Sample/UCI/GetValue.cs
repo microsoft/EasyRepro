@@ -53,8 +53,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 string lookupValue = xrmApp.Entity.GetValue(new LookupItem { Name = "primarycontactid" });
             }
         }
-		
-	[TestMethod]
+
+        [TestMethod]
         public void UCITestActivityPartyGetValue()
         {
             var client = new WebClient(TestSettings.Options);
@@ -73,6 +73,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(500);
 
                 var to = xrmApp.Entity.GetValue(new LookupItem[] { new LookupItem { Name = "to" } });
+                xrmApp.ThinkTime(500);
+            }
+        }
+
+        [TestMethod]
+        public void UCITestGetValueFromDateTime()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+                xrmApp.ThinkTime(500);
+
+                xrmApp.Grid.OpenRecord(0);
+                xrmApp.ThinkTime(500);
+
+                var lastOnHoldTime = xrmApp.Entity.GetValue("lastonholdtime");
                 xrmApp.ThinkTime(500);
             }
         }
