@@ -23,6 +23,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             SwitchToDefaultContent();
         }
 
+        [Obsolete("This method has been deprectead and is no longer supported.")]
         public BrowserCommandResult<bool> Open(int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
