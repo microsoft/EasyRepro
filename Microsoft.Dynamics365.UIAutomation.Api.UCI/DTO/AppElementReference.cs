@@ -162,13 +162,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public static class GlobalSearch
         {
-            public static string Button = "Search_Button";
+            public static string CategorizedSearchButton = "Search_CategorizedSearchButton";
+            public static string RelevanceSearchButton = "Search_RelevanceSearchButton";
             public static string Text = "Search_Text";
             public static string Filter = "Search_Filter";
             public static string Results = "Search_Result";
             public static string Container = "Search_Container";
             public static string EntityContainer = "Search_EntityContainer";
             public static string Records = "Search_Records";
+            public static string Type = "Search_Type";
+            public static string GroupContainer = "Search_GroupContainer";
+            public static string FilterValue = "Search_FilterValue";
+            public static string RelevanceResultsContainer = "Search_RelevanceResultsContainer";
+            public static string RelevanceResults = "Search_RelevanceResults";
+
         }
 
         public static class BusinessProcessFlow
@@ -361,12 +368,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Cmd_Button", "//*[contains(text(),'[NAME]')]"},
 
             //GlobalSearch
-            { "Search_Button"       , "//div[@id=\"categorizedSearchHeader\"]//button[contains(@data-id,'search-submit-button')]" },
+            { "Search_RelevanceSearchButton"       , "//div[@aria-label=\"Search box\"]//button" },
+            { "Search_CategorizedSearchButton"       , "//button[contains(@data-id,'search-submit-button')]" },
             { "Search_Text"       , "//input[@aria-label=\"Search box\"]" },
             { "Search_Filter"       , "//select[@aria-label=\"Filter with\"]"},
             { "Search_Container"    , "//div[@id=\"searchResultList\"]"},
             { "Search_EntityContainer"    , "//div[@id=\"View[NAME]\"]"},
             { "Search_Records"    , "//li[@role=\"row\"]" },
+            { "Search_Type"       , "//select[contains(@data-id,\"search-root-selector\")]"},
+            { "Search_GroupContainer", "//label[contains(text(), '[NAME]')]/parent::div"},
+            { "Search_FilterValue", "//label[contains(text(), '[NAME]')]"},
+            { "Search_RelevanceResultsContainer"       , "//div[@aria-label=\"Search Results\"]"},
+            { "Search_RelevanceResults"       , "//li//label[contains(text(), '[ENTITY]')]"},
 
             //Timeline
             { "Timeline_SaveAndClose", "//button[contains(@data-id,\"[NAME].SaveAndClose\")]" },

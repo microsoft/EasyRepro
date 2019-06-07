@@ -3481,13 +3481,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Text])))
                 {
-                    var button = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Button]));
+                    var searchType = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type])).GetAttribute("value");
+                    IWebElement button = null;
+
+                    if (searchType == "1") //Categorized Search
+                    {
+                        button = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.CategorizedSearchButton]));
+                    }
+                    else if (searchType=="0") //Relevance Search
+                    {
+                        button = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceSearchButton]));
+                    }
+                        
                     var input = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Text]));
 
                     if (button != null && input != null)
                     {
                         input.SendKeys(criteria, true);
-                        button.Click();
+                        button.Click(true);
                     }
                     else
                     {
@@ -3539,6 +3550,38 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Filter by group and value in the Global Search Results.
+        /// </summary>
+        /// <param name="filterby">The Group that contains the filter you want to use.</param>
+        /// <param name="value">The value listed in the group by area.</param>
+        /// <example>xrmBrowser.GlobalSearch.Filter("Record Type", "Accounts");</example>
+        public BrowserCommandResult<bool> Filter(string filterBy, string value, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Filter With: {value}"), driver =>
+            {
+                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.GroupContainer].Replace("[NAME]", filterBy)),
+                                        new TimeSpan(0, 0, 10),
+                                        e => {
+                                            var groupContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.GroupContainer].Replace("[NAME]", filterBy)));
+                                            var filter = groupContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.FilterValue].Replace("[NAME]", value)));
+
+                                            if (filter == null)
+                                                throw new InvalidOperationException($"Filter By Value '{value}' does not exist in the Filter options.");
+
+                                            filter.Click();
+                                        },
+                                        f => {
+                                            throw new InvalidOperationException("Filter With picklist is not available. The timeout period elapsed waiting for the picklist to be available.");
+                                        }
+                                        );
+
+                return true;
+            });
+        }
+
+        /// <summary>
         /// Opens the specified record in the Global Search Results.
         /// </summary>
         /// <param name="entity">The entity you want to open a record.</param>
@@ -3551,6 +3594,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Open Global Search Record"), driver =>
             {
+                var searchType = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type])).GetAttribute("value");
+
+                if (searchType == "1") //Categorized Search
+                {
                 driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Container]),
                                         Constants.DefaultTimeout,
                                         null,
@@ -3575,7 +3622,48 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     null,
                     d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
                 );
+                }
+                else if (searchType == "0")   //Relevance Search
+                {
+                    var resultsContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceResultsContainer]));
+                    var records = resultsContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceResults].Replace("[ENTITY]",entity.ToUpper())));
 
+                    if (records.Count >= index+1)
+                        records[index].Click(true);
+                }
+
+                return true;
+            });
+        }
+
+
+        /// <summary>
+        /// Changes the search type used for global search
+        /// </summary>
+        /// <param name="type">The type of search that you want to do.</param>
+        /// <example>xrmBrowser.GlobalSearch.ChangeSearchType("Categorized");</example>
+        public BrowserCommandResult<bool> ChangeSearchType(string type, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Change Search Type"), driver =>
+            {
+                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type]),
+                                        Constants.DefaultTimeout,
+                                        c=> {
+                                            var select = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type]));
+                                            var options = select.FindElements(By.TagName("option"));
+
+                                            var option = options.FirstOrDefault(x => x.Text.Trim() == type);
+
+                                            if(option!=null)
+                                            {
+                                                select.Click(true);
+                                                option.Click(true);
+                                            } 
+
+                                        },
+                                        d => { throw new InvalidOperationException("Search Results is not available"); });
                 return true;
             });
         }
