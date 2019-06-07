@@ -10,7 +10,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         public static string InvalidAccountLogicalName = "accounts";
 
         public static string LookupField = "primarycontactid";
-        public static string LookupName = "Rene Valdes (sample)";
+        public static string LookupName = "Nancy Anderson (sample)";
         private static readonly string Type = System.Configuration.ConfigurationManager.AppSettings["BrowserType"].ToString();
         private static readonly string RemoteType = System.Configuration.ConfigurationManager.AppSettings["RemoteBrowserType"].ToString();
         private static readonly string RemoteHubServerURL = System.Configuration.ConfigurationManager.AppSettings["RemoteHubServer"].ToString();
