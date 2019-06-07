@@ -169,6 +169,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Container = "Search_Container";
             public static string EntityContainer = "Search_EntityContainer";
             public static string Records = "Search_Records";
+            public static string Type = "Search_Type";
+            public static string GroupContainer = "Search_GroupContainer";
+            public static string FilterValue = "Search_FilterValue";
+            public static string RelevanceResultsContainer = "Search_RelevanceResultsContainer";
+            public static string RelevanceResults = "Search_RelevanceResults";
+
         }
 
         public static class BusinessProcessFlow
@@ -367,6 +373,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Search_Container"    , "//div[@id=\"searchResultList\"]"},
             { "Search_EntityContainer"    , "//div[@id=\"View[NAME]\"]"},
             { "Search_Records"    , "//li[@role=\"row\"]" },
+            { "Search_Type"       , "//select[contains(@data-id,\"search-root-selector\")]"},
+            { "Search_GroupContainer", "//label[contains(text(), '[NAME]')]/parent::div"},
+            { "Search_FilterValue", "//label[contains(text(), '[NAME]')]"},
+            { "Search_RelevanceResultsContainer"       , "//div[@aria-label=\"Search Results\"]"},
+            { "Search_RelevanceResults"       , "//li//label[contains(text(), '[ENTITY]')]"},
 
             //Timeline
             { "Timeline_SaveAndClose", "//button[contains(@data-id,\"[NAME].SaveAndClose\")]" },
