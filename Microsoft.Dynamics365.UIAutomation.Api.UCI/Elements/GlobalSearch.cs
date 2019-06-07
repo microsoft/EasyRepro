@@ -34,6 +34,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Filter by value in the Global Search Results.
+        /// </summary>
+        /// <param name="filterBy">The Group you want to filter on.</param>
+        /// <param name="value">The value you want to filter on.</param>
+        /// <example>xrmBrowser.GlobalSearch.Filter("Record Type", "Accounts");</example>
+        public bool Filter(string filterBy, string value)
+        {
+            return _client.Filter(filterBy, value);
+        }
+
+        /// <summary>
         /// Opens the specified record in the Global Search Results.
         /// </summary>
         /// <param name="entity">The entity you want to open a record.</param>
@@ -43,5 +54,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.OpenGlobalSearchRecord(entity, index);
         }
+
+        /// <summary>
+        /// Changes the Global Search Type
+        /// </summary>
+        /// <param name="type">The type of search that you want to do </param>
+        /// <param name="index">The index of the record you want to open.</param>
+        /// <example>xrmBrowser.GlobalSearch.ChangeSearchType("Categorized Search");</example>
+        public bool ChangeSearchType(string type)
+        {
+            return _client.ChangeSearchType(type);
+        }
+        
     }
 }
