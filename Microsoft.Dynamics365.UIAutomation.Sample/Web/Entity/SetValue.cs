@@ -30,7 +30,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.Grid.SwitchView("All Leads");
 
-                xrmBrowser.Grid.OpenRecord(0);
+                xrmBrowser.CommandBar.ClickCommand("New");
 
                 List<Field> fields = new List<Field>
                 {
