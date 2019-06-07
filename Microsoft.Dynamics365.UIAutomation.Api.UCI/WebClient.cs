@@ -1907,39 +1907,39 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Sets the value of a Date Field.
         /// </summary>
-        /// <param name="field">The field id or name.</param>
+        /// <param name="field">Date field name.</param>
         /// <param name="date">DateTime value.</param>
-        /// <param name="format">DateTime format</param>
-        /// <example> xrmBrowser.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
-        public BrowserCommandResult<bool> SetValue(string field, DateTime date, string format = "MM dd yyyy")
+        /// <param name="format">Datetime format matching Short Date & Time formatting personal options.</param>
+        /// <example>xrmApp.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
+        public BrowserCommandResult<bool> SetValue(string field, DateTime date, string format = "M/d/yyyy h:mm tt")
         {
             return this.Execute(GetOptions($"Set Value: {field}"), driver =>
             {
+                driver.WaitForTransaction();
+
                 var dateField = AppElements.Xpath[AppReference.Entity.FieldControlDateTimeInputUCI].Replace("[FIELD]", field);
 
                 if (driver.HasElement(By.XPath(dateField)))
                 {
                     var fieldElement = driver.ClickWhenAvailable(By.XPath(dateField));
-
+                    fieldElement.Click();
                     if (fieldElement.GetAttribute("value").Length > 0)
                     {
-                        //fieldElement.Click();
-                        //fieldElement.SendKeys(date.ToString(format));
-                        //fieldElement.SendKeys(Keys.Enter);
+                        fieldElement.SendKeys(Keys.Control + "a");
+                        fieldElement.SendKeys(Keys.Backspace);
 
-                        fieldElement.Click();
-                        fieldElement.SendKeys(Keys.Backspace);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        fieldElement.SendKeys(date.ToString(format));
-                        fieldElement.SendKeys(Keys.Tab);
+                        var timefields = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field)));
+                        if (timefields.Any())
+                        {
+                            driver.ClearFocus();
+                            driver.WaitForTransaction();
+                        }
                     }
-                    else
-                    {
-                        fieldElement.SendKeys(date.ToString(format));
-                        fieldElement.SendKeys(Keys.Enter);
-                    }
+
+                    fieldElement.SendKeys(date.ToString(format));
+
+                    driver.WaitFor(d => fieldElement.GetAttribute("value") == date.ToString(format));
+                    driver.ClearFocus();
                 }
                 else
                     throw new InvalidOperationException($"Field: {field} Does not exist");
@@ -2087,6 +2087,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         IWebElement fieldValue = input.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldValue].Replace("[NAME]", field)));
                         text = fieldValue.GetAttribute("value").ToString();
+
+                        // Needed if getting a date field which also displays time as there isn't a date specifc GetValue method
+                        var timefields = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field)));
+                        if (timefields.Any())
+                        {
+                            text += $" {timefields.First().GetAttribute("value")}";
+                        }
                     }
                 }
                 else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
@@ -2601,6 +2608,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new NotFoundException("Unable to find header on the form");
 
                 SetValue(control);
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SetHeaderValue(string field, DateTime date, string format)
+        {
+            return this.Execute(GetOptions($"Set Header Value {field}"), driver =>
+            {
+                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
+                    throw new NotFoundException("Unable to find header on the form");
+
+                SetValue(field, date, format);
 
                 return true;
             });
