@@ -25,7 +25,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Clears a value from the field provided
+        /// Clears a value from the text or date field provided
         /// </summary>
         /// <param name="field"></param>
         public void ClearValue(string field)
