@@ -3481,13 +3481,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Text])))
                 {
-                    var button = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Button]));
+                    var searchType = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type])).GetAttribute("value");
+                    IWebElement button = null;
+
+                    if (searchType == "1") //Categorized Search
+                    {
+                        button = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.CategorizedSearchButton]));
+                    }
+                    else if (searchType=="0") //Relevance Search
+                    {
+                        button = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceSearchButton]));
+                    }
+                        
                     var input = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Text]));
 
                     if (button != null && input != null)
                     {
                         input.SendKeys(criteria, true);
-                        button.Click();
+                        button.Click(true);
                     }
                     else
                     {
