@@ -28,7 +28,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.AzureDevOps.UCI
 
             _username = _testContext.Properties["OnlineUsername"].ToString();
             _password = _testContext.Properties["OnlinePassword"].ToString();
-            _xrmUri = new Uri(_testContext.Properties["OnlineUrl"].ToString());
+            _xrmUri = new Uri(_testContext.Properties["OnlineCrmUrl"].ToString());
             _browserType = (BrowserType)Enum.Parse(typeof(BrowserType), _testContext.Properties["BrowserType"].ToString());
         }
 

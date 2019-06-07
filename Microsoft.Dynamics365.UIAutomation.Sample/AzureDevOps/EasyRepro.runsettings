@@ -42,7 +42,7 @@
   <TestRunParameters>
     <Parameter name="OnlineUsername" value="" />
     <Parameter name="OnlinePassword" value="" />
-    <Parameter name="OnlineUrl" value="" />
+    <Parameter name="OnlineCrmUrl" value="" />
     <Parameter name="BrowserType" value="Chrome" />
     <Parameter name="AzureKey" value="" />
   </TestRunParameters>
