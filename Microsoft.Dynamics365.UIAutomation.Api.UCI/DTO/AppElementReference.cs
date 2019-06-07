@@ -367,7 +367,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Cmd_Button", "//*[contains(text(),'[NAME]')]"},
 
             //GlobalSearch
-            { "Search_Button"       , "//div[@id=\"categorizedSearchHeader\"]//button[contains(@data-id,'search-submit-button')]" },
+            { "Search_Button"       , "//button[contains(@data-id,'search-submit-button')]" },
             { "Search_Text"       , "//input[@aria-label=\"Search box\"]" },
             { "Search_Filter"       , "//select[@aria-label=\"Filter with\"]"},
             { "Search_Container"    , "//div[@id=\"searchResultList\"]"},
