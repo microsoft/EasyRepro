@@ -15,7 +15,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
         private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
-        public void WEBTestGetVersion()
+        public void WEBTestRetrieveServerVersion()
         {
             using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
@@ -25,14 +25,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.ThinkTime(500);
 
-                xrmBrowser.Navigation.OpenAbout();
+                var serverVersion = xrmBrowser.Navigation.RetrieveServerVersion().Value;
 
-                xrmBrowser.Driver.LastWindow().SwitchTo().ActiveElement();
-
-                var dbVersion = xrmBrowser.Document.getElementByXPath("id(\"PageBody\")/table/tbody/tr[1]/td[2]/div/bdo[3]").Text;
-                var appVersion = xrmBrowser.Document.getElementByXPath("id(\"PageBody\")/table/tbody/tr[1]/td[2]/div/bdo[2]").Text.Replace("(","").Replace(")","");
-
-                Console.WriteLine("App Version: {0} , DB Version: {1}", appVersion, dbVersion);
+                Console.WriteLine($"Server Version for {_xrmUri} is: {serverVersion}");
             }
         }
     }

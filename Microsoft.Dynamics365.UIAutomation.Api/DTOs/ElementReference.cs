@@ -84,6 +84,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Nav_AppsForCrm"       , "id(\"navTabButtonSettingsNavAppsForCrmId\")"},
             { "Nav_WelcomeScreen"       , "id(\"navTabButtonSettingsNavTourId\")"},
             { "Nav_About"       , "id(\"navTabButtonSettingsAboutId\")"},
+            { "Nav_AboutVersionText"       , "//span[contains(text(), 'Version')]"},
             { "Nav_OptOutLP"       , "id(\"navTabButtonSettingsGuidedHelpId\")"},
             { "Nav_Privacy"       , "id(\"NodeSettingsPrivacyStatementId\")"},
             { "Nav_UserInfo"       , "id(\"navTabButtonUserInfoLinkId\")"},
@@ -591,6 +592,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string AppsForCRM = "Nav_AppsForCrm";
             public static string WelcomeScreen = "Nav_WelcomeScreen";
             public static string About = "Nav_About";
+            public static string AboutVersionText = "Nav_AboutVersionText";
             public static string OptOutLP = "Nav_OptOutLP";
             public static string Privacy = "Nav_Privacy";
             public static string UserInfo = "Nav_UserInfo";
