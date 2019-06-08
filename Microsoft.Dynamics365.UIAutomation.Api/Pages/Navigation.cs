@@ -451,6 +451,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
+        /// Opens About from navigation bar
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.RetrieveServerVersion();</example>
+        public BrowserCommandResult<string> RetrieveServerVersion(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Open About"), driver =>
+            {
+                OpenSettingsOption(driver, Elements.Xpath[Reference.Navigation.About]);
+
+                driver.LastWindow().SwitchTo().ActiveElement();
+
+                var versionElement = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.AboutVersionText]));
+                var listedVersions = versionElement.FindElements(By.TagName("bdo"));
+
+                var serverVersion = listedVersions[1].Text.ToString().TrimStart('(').TrimEnd(')');
+
+                return serverVersion;
+            });
+        }
+
+
+        /// <summary>
         /// SignOut
         /// </summary>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
