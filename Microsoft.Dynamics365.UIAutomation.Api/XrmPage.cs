@@ -3,6 +3,7 @@
 
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
@@ -553,14 +554,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     if (fieldContainer.Text != "" && clearFieldValue)
                     {
                         fieldContainer.Hover(driver, true);
-                        fieldContainer.Click(true);
 
                         var lookupSearchIcon = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", field.Name)));
                         lookupSearchIcon.Hover(driver, true);
 
                         var lookupSearchIconImage = driver.FindElement(By.TagName("img"));
                         lookupSearchIconImage.Hover(driver, true);
-                        lookupSearchIconImage.Click(true);
+
+                        Actions clickAction = new Actions(driver).SendKeys(Keys.Enter);
+                        clickAction.Build().Perform();
+
 
                         var lookupMenuName = $"Dialog_{field.Name}_IMenu";
                         var lookupMenu = driver.WaitUntilAvailable(By.Id(lookupMenuName));
@@ -576,6 +579,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         SwitchToDialog();
 
                         driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.LookUp.Remove]));
+
+                        SwitchToContent();
 
                     }
                     else if (fieldContainer.Text != "" && !clearFieldValue)
@@ -1077,52 +1082,78 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 if (driver.HasElement(By.Id(control.Name)))
                 {
-                    if (control.Value != null)
+                    var fieldContainer = driver.ClickWhenAvailable(By.Id(control.Name));
+
+                    if (fieldContainer.Text != "" && control.Value != null)
                         SelectLookup(control, true, false);
 
                     driver.WaitUntilVisible(By.Id(control.Name));
 
-                    var input = driver.ClickWhenAvailable(By.Id(control.Name));
+                    fieldContainer = driver.ClickWhenAvailable(By.Id(control.Name));
 
-                    if (input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])) == null)
+                    if (fieldContainer.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])) == null)
                         throw new InvalidOperationException($"Field: {control.Name} is not lookup");
 
-                    driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldTd].Replace("[NAME]", control.Name)));
-                    var editInput = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldInput].Replace("[NAME]", control.Name)));
-                    editInput.SendKeys(control.Value);
+                    var lookupSearchIcon = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name)));
+                    lookupSearchIcon.Hover(driver, true);
 
-                    input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click();
+                    var lookupSearchIconImage = driver.FindElement(By.TagName("img"));
+                    lookupSearchIconImage.Hover(driver, true);
+
+                    Actions clickAction = new Actions(driver).SendKeys(Keys.Enter);
+                    clickAction.Build().Perform();
 
                     var dialogName = $"Dialog_{control.Name}_IMenu";
                     var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
 
                     var dialogItems = OpenDialog(dialog).Value;
 
+                    if (dialogItems.Any())
+                    {
+                        var lookupMenuItem = dialogItems.Last();
+                        lookupMenuItem.Element.Click();
+                    }
 
                     if (control.Value != null)
                     {
+                        SwitchToDialog();
 
-                        if (!dialogItems.Exists(x => x.Title == control.Value))
-                            throw new InvalidOperationException($"List does not have {control.Value}.");
+                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria])).Clear();
+                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria])).SendKeys(control.Value);
+                        driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Grid.FindCriteriaImg]));
 
-                        var dialogItem = dialogItems.Where(x => x.Title == control.Value).First();
-                        dialogItem.Element.Click();
+                        var itemsTable = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Grid.GridBodyTable]));
+
+                        if (itemsTable.GetAttribute("totalrecordcount") == "0")
+                        {
+                            throw new InvalidOperationException($"No records are available in this view for the Search'{control.Value}'");
+                        }
+                        var tbody = itemsTable.FindElement(By.TagName("tbody"));
+                        var items = tbody.FindElements(By.TagName("tr"));
+
+                        foreach (var item in items)
+                        {
+                            var primary = item.FindElements(By.TagName("td"))[1];
+                            if (primary.Text.Contains(control.Value))
+                            {
+                                var checkbox = item.FindElements(By.TagName("td"))[0];
+
+                                if (item.GetAttribute("selected") != "true")
+                                    checkbox.Click();
+                                break;
+                            }
+                        }
+
+                        driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.LookUp.Begin]));
+
+                        SwitchToContent();
 
                     }
                     else
-                    {
-                        if (dialogItems.Count < control.Index)
-                            throw new InvalidOperationException($"List does not have {control.Index + 1} items.");
-
-                        var dialogItem = dialogItems[control.Index];
-                        dialogItem.Element.Click();
-                    }
+                        throw new InvalidOperationException($"Field: {control.Name} Does not exist");
                 }
-                else
-                    throw new InvalidOperationException($"Field: {control.Name} Does not exist");
-
-                return true;
-            });
+                    return true;
+                });
         }
 
         internal bool SwitchToContent()
