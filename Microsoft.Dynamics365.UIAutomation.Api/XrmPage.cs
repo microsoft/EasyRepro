@@ -552,7 +552,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     if (fieldContainer.Text != "" && clearFieldValue)
                     {
-                        fieldContainer.SendKeys(Keys.Clear);
+                        fieldContainer.Hover(driver, true);
+                        fieldContainer.Click(true);
+
+                        var lookupSearchIcon = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", field.Name)));
+                        lookupSearchIcon.Hover(driver, true);
+
+                        var lookupSearchIconImage = driver.FindElement(By.TagName("img"));
+                        lookupSearchIconImage.Hover(driver, true);
+                        lookupSearchIconImage.Click(true);
+
+                        var lookupMenuName = $"Dialog_{field.Name}_IMenu";
+                        var lookupMenu = driver.WaitUntilAvailable(By.Id(lookupMenuName));
+
+                        var lookupMenuItems = OpenDialog(lookupMenu).Value;
+
+                        if (lookupMenuItems.Any())
+                        {
+                            var lookupMenuItem = lookupMenuItems.Last();
+                            lookupMenuItem.Element.Click();
+                        }
+
+                        SwitchToDialog();
+
+                        driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.LookUp.Remove]));
+
                     }
                     else if (fieldContainer.Text != "" && !clearFieldValue)
                     {
