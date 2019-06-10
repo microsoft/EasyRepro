@@ -86,7 +86,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 xrmBrowser.Grid.OpenRecord(0);
 
                 xrmBrowser.Entity.SetValue(new LookupItem { Name = "primarycontactid", Value = "Nancy Anderson (sample)" });
-                xrmBrowser.ThinkTime(1000);
+
+                xrmBrowser.ThinkTime(5000);
 
             }
         }

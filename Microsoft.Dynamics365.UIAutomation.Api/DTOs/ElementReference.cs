@@ -269,6 +269,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "LookUp_Remove", "id(\"btnRemoveValue\")"},
             { "LookUp_Add", "id(\"btnAdd\")"},
             { "LookUp_Begin", "id(\"butBegin\")"},
+            { "LookUp_Search", "input(\"crmGrid_findCriteria\")"},
 
             //Reports
             { "Report_Close", "id(\"btnCancel\")"},
@@ -842,6 +843,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string Remove = "LookUp_Remove";
             public static string Add = "LookUp_Add";
             public static string Begin = "LookUp_Begin";
+            public static string Search = "LookUp_Search";
 
         }
         public static class Login
