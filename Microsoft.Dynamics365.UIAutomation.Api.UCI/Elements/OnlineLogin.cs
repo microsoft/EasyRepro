@@ -24,6 +24,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public void Login(Uri orgUrl, SecureString username, SecureString password)
         {
             _client.Login(orgUrl, username, password);
+
+            if (_client.Browser.Options.UCITestMode)
+            {
+                _client.InitializeTestMode();
+            }
         }
 
         /// <summary>
@@ -36,6 +41,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public void Login(Uri orgUrl, SecureString username, SecureString password, Action<LoginRedirectEventArgs> redirectAction)
         {
             _client.Login(orgUrl, username, password, redirectAction);
+
+            if (_client.Browser.Options.UCITestMode)
+            {
+                _client.InitializeTestMode();
+            }
         }
 
     }

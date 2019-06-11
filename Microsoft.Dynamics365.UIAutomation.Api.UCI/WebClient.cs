@@ -35,7 +35,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 typeof(NoSuchElementException), typeof(StaleElementReferenceException));
         }
 
-        public BrowserCommandResult<bool> InitializeTestMode()
+        internal BrowserCommandResult<bool> InitializeTestMode()
         {
             return this.Execute(GetOptions("Initialize Unified Interface TestMode"), driver =>
             {
