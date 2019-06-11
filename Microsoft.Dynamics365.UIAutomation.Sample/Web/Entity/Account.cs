@@ -43,17 +43,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
         public void WEBTestOpenLookup()
         {
             if (!HasData) return;
-            XrmTestBrowser.Entity.SelectLookup(TestSettings.LookupField, TestSettings.LookupName);
-            XrmTestBrowser.Entity.SelectLookup(TestSettings.LookupField, 0);
+            XrmTestBrowser.Entity.SelectLookup(TestSettings.LookupValues, true, false);
+            //XrmTestBrowser.Entity.SelectLookup(TestSettings.LookupField, 0);
         }
 
         [TestMethod]
         public void WEBTestSearchLookup()
         {
             if (!HasData) return;
-            XrmTestBrowser.Entity.SetValue(TestSettings.LookupField, TestSettings.LookupName);
-            XrmTestBrowser.Entity.SelectLookup(TestSettings.LookupField, TestSettings.LookupName);
-            XrmTestBrowser.Entity.SelectLookup(TestSettings.LookupField, 0);
+            XrmTestBrowser.Entity.SetValue(TestSettings.LookupValues);
+
+            XrmTestBrowser.ThinkTime(5000);
+
+            XrmTestBrowser.Entity.SelectLookup(TestSettings.LookupValues, true, false);
+
+            XrmTestBrowser.ThinkTime(5000);
+            //XrmTestBrowser.Entity.SelectLookup(TestSettings.LookupField, 0);
         }
 
         [TestMethod]

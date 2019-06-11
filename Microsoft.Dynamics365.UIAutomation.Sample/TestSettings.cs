@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
+using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 
@@ -9,6 +10,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
     {
         public static string InvalidAccountLogicalName = "accounts";
 
+        public static LookupItem LookupValues = new LookupItem { Name = "primarycontactid", Value = "Nancy Anderson (sample)" } ;
         public static string LookupField = "primarycontactid";
         public static string LookupName = "Nancy Anderson (sample)";
         private static readonly string Type = System.Configuration.ConfigurationManager.AppSettings["BrowserType"].ToString();

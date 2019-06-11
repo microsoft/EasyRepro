@@ -554,6 +554,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     if (fieldContainer.Text != "" && clearFieldValue)
                     {
                         fieldContainer.Hover(driver, true);
+                        fieldContainer.Click(true);
 
                         var lookupSearchIcon = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", field.Name)));
                         lookupSearchIcon.Hover(driver, true);
@@ -1082,7 +1083,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 if (driver.HasElement(By.Id(control.Name)))
                 {
-                    var fieldContainer = driver.ClickWhenAvailable(By.Id(control.Name));
+                    var fieldContainer = driver.WaitUntilAvailable(By.Id(control.Name));
 
                     if (fieldContainer.Text != "" && control.Value != null)
                         SelectLookup(control, true, false);
