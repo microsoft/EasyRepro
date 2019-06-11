@@ -52,7 +52,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
         {
             if (!HasData) return;
             XrmTestBrowser.Entity.SetValue(TestSettings.LookupValues);
+
+            XrmTestBrowser.ThinkTime(5000);
+
             XrmTestBrowser.Entity.SelectLookup(TestSettings.LookupValues, true, false);
+
+            XrmTestBrowser.ThinkTime(5000);
             //XrmTestBrowser.Entity.SelectLookup(TestSettings.LookupField, 0);
         }
 
