@@ -40,13 +40,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions("Initialize Unified Interface TestMode"), driver =>
             {
                 var uri = driver.Url;
+                var queryParams = "&flags=testmode=true";
 
-                if (!uri.Contains("flags=testmode=true"))
+                if (!uri.Contains(queryParams))
                 {
-                    var queryParams = "&flags=testmode=true";
-                    var newUri = uri + queryParams;
+                    var testModeUri = uri + queryParams;
 
-                    driver.Navigate().GoToUrl(newUri);
+                    driver.Navigate().GoToUrl(testModeUri);
 
                     driver.WaitForPageToLoad();
                     driver.WaitForTransaction();
