@@ -29,6 +29,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.HideDiagnosticWindow = true;
             this.Height = null;
             this.Width = null;
+            this.UCITestMode = true;
         }
 
         public BrowserType RemoteBrowserType { get; set; }
@@ -61,6 +62,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         /// Gets or sets the browser width when Both <see cref="StartMaximized"/> is <see langword="false" />. Both <see cref="Height"/> and <see cref="Width"/> must be set.
         /// </summary>
         public int? Width { get; set; }
+        /// <summary>
+        /// Gets or sets the TestMode flag for the UnifiedInterface. This flag should not be used when capturing performance measurements
+        /// This flag introduces full loading patterns that are not typical of a normal user experience, but are required for full DOM interaction.
+        /// Please raise any issues with this TestMode being enabled to the Microsoft/EasyRepro community on GitHub for review.
+        /// </summary>
+        public bool UCITestMode { get; set; }
 
         public virtual ChromeOptions ToChrome()
         {

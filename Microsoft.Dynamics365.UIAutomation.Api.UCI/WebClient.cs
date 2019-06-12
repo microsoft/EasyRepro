@@ -35,6 +35,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 typeof(NoSuchElementException), typeof(StaleElementReferenceException));
         }
 
+        internal BrowserCommandResult<bool> InitializeTestMode()
+        {
+            return this.Execute(GetOptions("Initialize Unified Interface TestMode"), driver =>
+            {
+                var uri = driver.Url;
+                var queryParams = "&flags=testmode=true";
+
+                if (!uri.Contains(queryParams))
+                {
+                    var testModeUri = uri + queryParams;
+
+                    driver.Navigate().GoToUrl(testModeUri);
+
+                    driver.WaitForPageToLoad();
+                    driver.WaitForTransaction();
+                }
+
+                return true;
+            });
+        }
+
+
         public string[] OnlineDomains { get; set; }
 
         #region Login
@@ -217,6 +239,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     driver.WaitForTransaction();
 
+                    if (Browser.Options.UCITestMode)
+                    {
+                        InitializeTestMode();
+                    }
+
                     return true;
                 }
 
@@ -227,6 +254,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
 
                     driver.WaitForTransaction();
+
+                    if (Browser.Options.UCITestMode)
+                    {
+                        InitializeTestMode();
+                    }
 
                 }
                 else
@@ -240,6 +272,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
 
                         driver.WaitForTransaction();
+
+                        if (Browser.Options.UCITestMode)
+                        {
+                            InitializeTestMode();
+                        }
                     }
                     else
                         throw new InvalidOperationException($"App Name {appName} not found.");
