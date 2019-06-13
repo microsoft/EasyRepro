@@ -1703,6 +1703,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (input != null)
                 {
+                    input.SendKeys(Keys.Control + "a");
+                    input.SendKeys(Keys.Backspace);
                     input.SendKeys(control.Value, true);
 
                     driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupSearchButton].Replace("[NAME]", control.Name)));
@@ -3229,8 +3231,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var input = fieldContainer.FindElement(By.TagName("input"));
                     if (input != null)
                     {
-                        //input.Click(true);
+                        input.Click(true);
+                        input.Clear();
                         input.SendKeys(value, true);
+                        input.SendKeys(Keys.Tab);
                     }
                 }
                 else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
