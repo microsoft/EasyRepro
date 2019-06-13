@@ -17,7 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"]);
 
         [TestMethod]
-        public void UCITestOpenGlobalSearch()
+        public void UCITestOpenGlobalSearchSelectForm()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
@@ -34,7 +34,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.ThinkTime(3000);
 
-                xrmApp.Entity.SelectForm("AI for Sales");
+                xrmApp.Entity.SelectForm("Sales Insights");
 
                 xrmApp.ThinkTime(3000);
             }
