@@ -1519,10 +1519,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var appId = qs.Get("appid");
                 var link = $"{uri.Scheme}://{uri.Authority}/main.aspx?appid={appId}&etn={entityName}&pagetype=entityrecord&id={id}";
 
+                if (Browser.Options.UCITestMode)
+                {
+                    link += "&flags=testmode=true";
+                }
+
                 driver.Navigate().GoToUrl(link);
 
                 //SwitchToContent();
                 driver.WaitForPageToLoad();
+                driver.WaitForTransaction();
                 driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
                     new TimeSpan(0, 0, 30),
                     null,

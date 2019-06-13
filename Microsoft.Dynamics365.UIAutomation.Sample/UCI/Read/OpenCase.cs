@@ -67,7 +67,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Service", "Cases");
 
-                xrmApp.Entity.OpenEntity("incident", new Guid("dc9e62a8-90df-e311-9565-a45d36fc5fe8"));
+                // For proper test usage, please update the recordId below to a valid Case recordId
+                Guid recordId = new Guid("ba9a3931-675d-e911-a852-000d3a372393");
+
+                xrmApp.Entity.OpenEntity("incident", recordId);
             }
         }
 
