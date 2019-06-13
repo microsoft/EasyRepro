@@ -2134,7 +2134,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         var timefields = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field)));
                         if (timefields.Any())
                         {
-                            text += $" {timefields.First().GetAttribute("value")}";
+                            text = $" {timefields.First().GetAttribute("value")}";
                         }
                     }
                 }

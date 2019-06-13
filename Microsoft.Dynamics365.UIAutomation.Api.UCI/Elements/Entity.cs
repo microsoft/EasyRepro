@@ -274,6 +274,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.Save();
             _client.HandleSaveDialog();
+            _client.Browser.Driver.WaitForTransaction();
         }
 
         /// <summary>
