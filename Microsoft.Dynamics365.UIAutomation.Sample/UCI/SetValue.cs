@@ -95,7 +95,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(500);
 
                 xrmApp.Entity.SetValue(new LookupItem[] {
-                    new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)", Index = 0 },
+                    new LookupItem { Name = "to", Value = "Adeventure Works (sample)", Index = 0 },
                     new LookupItem { Name = "to", Value = "", Index = 0 } });
                 xrmApp.ThinkTime(500);
 

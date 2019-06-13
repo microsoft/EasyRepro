@@ -1794,7 +1794,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var flyoutDialog = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupMenu].Replace("[NAME]", control.Name)));
 
             driver.WaitForTransaction();
-            driver.WaitFor(d => d.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", control.Name))).Count > 0);
+
+            var lookupResultsItems = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", control.Name)));
+
+            if (lookupResultsItems == null)
+                throw new NotFoundException($"No Results Matching {control.Value} Were Found.");            
+
             var dialogItems = OpenDialog(flyoutDialog).Value;
 
             driver.WaitForTransaction();
