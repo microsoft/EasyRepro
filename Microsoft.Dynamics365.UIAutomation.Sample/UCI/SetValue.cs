@@ -68,6 +68,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
+                xrmApp.Grid.SwitchView("Active Accounts");
+
                 xrmApp.Grid.OpenRecord(0);
                 xrmApp.ThinkTime(500);
 
@@ -95,7 +97,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(500);
 
                 xrmApp.Entity.SetValue(new LookupItem[] {
-                    new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)", Index = 0 },
+                    new LookupItem { Name = "to", Value = "Adeventure Works (sample)", Index = 0 },
                     new LookupItem { Name = "to", Value = "", Index = 0 } });
                 xrmApp.ThinkTime(500);
 
@@ -197,14 +199,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+                xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
                 xrmApp.ThinkTime(500);
 
-                xrmApp.Grid.OpenRecord(0);
+                xrmApp.CommandBar.ClickCommand("New");
                 xrmApp.ThinkTime(500);
 
-                xrmApp.Entity.SetValue("lastonholdtime", DateTime.Now, "M/d/yyyy h:mm tt");
+                xrmApp.Entity.SetValue("name", "Test EasyRepro Opportunity");
+
+                xrmApp.Entity.SetValue("estimatedclosedate", DateTime.Now, "M/d/yyyy h:mm tt");
                 xrmApp.ThinkTime(500);
+
+                xrmApp.Entity.Save();
+
+                xrmApp.ThinkTime(2000);
             }
         }
     }

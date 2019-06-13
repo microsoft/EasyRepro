@@ -1519,10 +1519,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var appId = qs.Get("appid");
                 var link = $"{uri.Scheme}://{uri.Authority}/main.aspx?appid={appId}&etn={entityName}&pagetype=entityrecord&id={id}";
 
+                if (Browser.Options.UCITestMode)
+                {
+                    link += "&flags=testmode=true";
+                }
+
                 driver.Navigate().GoToUrl(link);
 
                 //SwitchToContent();
                 driver.WaitForPageToLoad();
+                driver.WaitForTransaction();
                 driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
                     new TimeSpan(0, 0, 30),
                     null,
@@ -1703,6 +1709,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (input != null)
                 {
+                    input.SendKeys(Keys.Control + "a");
+                    input.SendKeys(Keys.Backspace);
                     input.SendKeys(control.Value, true);
 
                     driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupSearchButton].Replace("[NAME]", control.Name)));
@@ -1794,7 +1802,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var flyoutDialog = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupMenu].Replace("[NAME]", control.Name)));
 
             driver.WaitForTransaction();
-            driver.WaitFor(d => d.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", control.Name))).Count > 0);
+
+            var lookupResultsItems = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", control.Name)));
+
+            if (lookupResultsItems == null)
+                throw new NotFoundException($"No Results Matching {control.Value} Were Found.");            
+
             var dialogItems = OpenDialog(flyoutDialog).Value;
 
             driver.WaitForTransaction();
@@ -2129,7 +2142,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         var timefields = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field)));
                         if (timefields.Any())
                         {
-                            text += $" {timefields.First().GetAttribute("value")}";
+                            text = $" {timefields.First().GetAttribute("value")}";
                         }
                     }
                 }
@@ -3224,8 +3237,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var input = fieldContainer.FindElement(By.TagName("input"));
                     if (input != null)
                     {
-                        //input.Click(true);
+                        input.Click(true);
+                        input.Clear();
                         input.SendKeys(value, true);
+                        input.SendKeys(Keys.Tab);
                     }
                 }
                 else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)

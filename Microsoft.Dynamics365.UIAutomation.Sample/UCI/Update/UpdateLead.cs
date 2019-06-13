@@ -67,7 +67,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.BusinessProcessFlow.SetValue(acct);
                 xrmApp.BusinessProcessFlow.SetValue(contact);
-                xrmApp.BusinessProcessFlow.SetValue("budgetamount", "1000");
+                xrmApp.BusinessProcessFlow.SetValue("budgetamount", "100.00");
 
                 xrmApp.ThinkTime(3000);
             }
