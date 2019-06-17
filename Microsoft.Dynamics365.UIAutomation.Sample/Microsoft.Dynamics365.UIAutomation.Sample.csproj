@@ -131,6 +131,7 @@
     <Compile Include="Web\Entity\SubGrid.cs" />
     <Compile Include="Web\Entity\TestBase.cs" />
     <Compile Include="Web\Entity\Account.cs" />
+    <Compile Include="Web\Navigation\AreasAndSubAreas.cs" />
     <Compile Include="Web\ValidationTests\CreateUser.cs" />
     <Compile Include="Web\ValidationTests\CreateWorkflow.cs" />
     <Compile Include="Web\ValidationTests\OpenO365App.cs" />

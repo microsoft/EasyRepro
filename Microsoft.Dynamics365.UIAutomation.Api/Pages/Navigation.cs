@@ -474,6 +474,52 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
+        /// <summary>
+        /// Retrieves a Dictionary containing all of the Areas on the main menu
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.GetAreas();</example>
+
+        public BrowserCommandResult<Dictionary<string, IWebElement>> GetAreas(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Get Areas"), driver =>
+            {
+                var areas = OpenMenu().Value;
+
+                driver.WaitForPageToLoad();
+
+                return areas;
+            });
+        }
+
+        /// <summary>
+        /// Retrieves a list of the sub areas within a specified area
+        /// </summary>
+        /// <param name="area">The area whose subareas you want to check</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.GetSubAreas("Sales"); - returns all of the subareas in the Sales area</example>
+        public BrowserCommandResult<List<KeyValuePair<string, IWebElement>>> GetSubAreas(string area, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Get SubAreas"), driver =>
+            {
+                area = area.ToLower();
+
+                var areas = OpenMenu().Value;
+
+                if (!areas.ContainsKey(area))
+                {
+                    throw new InvalidOperationException($"No area with the name '{area}' exists.");
+                }
+
+                var subAreas = OpenSubMenu(areas[area]).Value;
+
+                return subAreas;
+            });
+        }
 
         /// <summary>
         /// SignOut
