@@ -1169,6 +1169,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
+        /// <summary>
+        /// Returns the Entity Name for the current entity record. 
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Entity.GetEntityName();</example>
+        public BrowserCommandResult<string> GetEntityName(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Get Entity Name for the Current Record"), driver =>
+            {
+                SwitchToContentFrame();
+
+                var entityName = driver.ExecuteScript("return Xrm.Page.data.entity.getEntityName();").ToString();
+
+                return entityName;
+            });
+        }
+
 
         /// <summary>
         /// Returns the state of the tab, either Expanded or Collapsed. 
