@@ -2178,10 +2178,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmBrowser.Grid.GetSubGridItemsCount("CONTACTS");</example>
         public BrowserCommandResult<int> GetSubGridItemsCount(string subgridName)
         {
-            return this.Execute(GetOptions($"Get Subgrid Items Count for subgrid { subgridName}"), driver =>
+            return this.Execute(GetOptions($"Get Subgrid Items Count for subgrid { subgridName }"), driver =>
             {
-                List<GridItem> rows = GetSubGridItems(subgridName);
-                return rows.Count;
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.SubGrid].Replace("[NAME]", subgridName))))
+                {
+                    throw new NotFoundException($"{ subgridName } subgrid not found. Subgrid names are case sensitive.  Please make sure casing is the same.");
+                }
+
+                //Find the subgrid contents
+                var subGrid = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.SubGrid].Replace("[NAME]", subgridName)));
+
+                var totalCount = subGrid.FindElement(By.XPath(Elements.Xpath[Reference.Entity.SubGridItemsTotal].Replace("[NAME]", subgridName)));
+
+                if (int.TryParse(totalCount.Text, out var ret))
+                {
+                    return ret;
+                }
+                else {
+                    List<GridItem> rows = GetSubGridItems(subgridName);
+                    return rows.Count;
+                }
             });
         }
 
