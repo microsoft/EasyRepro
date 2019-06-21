@@ -970,9 +970,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         text = fieldElement.FindElement(By.TagName("textarea")).GetAttribute("value");
                     }
-                    else
+                    else if (fieldElement.FindElements(By.TagName("input")).Count > 0)
                     {
                         text = fieldElement.FindElement(By.TagName("input")).GetAttribute("value");
+                    }
+                    else
+                    {
+                        text = fieldElement.Text;
                     }
                 }
                 else
