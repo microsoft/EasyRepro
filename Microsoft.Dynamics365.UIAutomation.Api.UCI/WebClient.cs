@@ -2381,6 +2381,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        /// <summary>
+        /// Returns the Entity Name of the entity
+        /// </summary>
+        /// <returns>Entity Name of the Entity</returns>
+        internal BrowserCommandResult<string> GetEntityName(int thinkTime = Constants.DefaultThinkTime)
+        {
+            return this.Execute(GetOptions($"Get Entity Name"), driver =>
+            {
+                var entityName = driver.ExecuteScript("return Xrm.Page.data.entity.getEntityName();").ToString();
+
+                if (string.IsNullOrEmpty(entityName)) {
+                    throw new NotFoundException("Unable to retrieve Entity Name for this entity");
+                }
+
+                return entityName;
+            });
+        }
+
         internal BrowserCommandResult<List<GridItem>> GetSubGridItems(string subgridName)
         {
             return this.Execute(GetOptions($"Get Subgrid Items for Subgrid {subgridName}"), driver =>
