@@ -21,23 +21,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             switch (options.BrowserType)
             {
                 case BrowserType.Chrome:
-                    var chromeService = ChromeDriverService.CreateDefaultService();
+                    var chromeService = ChromeDriverService.CreateDefaultService(options.DriversPath);
                     chromeService.HideCommandPromptWindow = options.HideDiagnosticWindow;
                     driver = new ChromeDriver(chromeService, options.ToChrome());
                     break;
                 case BrowserType.IE:
-                    var ieService = InternetExplorerDriverService.CreateDefaultService();
+                    var ieService = InternetExplorerDriverService.CreateDefaultService(options.DriversPath);
                     ieService.SuppressInitialDiagnosticInformation = options.HideDiagnosticWindow;
                     driver = new InternetExplorerDriver(ieService, options.ToInternetExplorer(), TimeSpan.FromMinutes(20));
                     break;
                 case BrowserType.Firefox:
-                    var ffService = FirefoxDriverService.CreateDefaultService();
+                    var ffService = FirefoxDriverService.CreateDefaultService(options.DriversPath);
                     ffService.HideCommandPromptWindow = options.HideDiagnosticWindow;
                     driver = new FirefoxDriver(ffService);
                     driver.Manage().Timeouts().ImplicitWait = new TimeSpan(0, 0, 5);
                     break;
                 case BrowserType.Edge:
-                    var edgeService = EdgeDriverService.CreateDefaultService();
+                    var edgeService = EdgeDriverService.CreateDefaultService(options.DriversPath);
                     edgeService.HideCommandPromptWindow = options.HideDiagnosticWindow;
                     driver = new EdgeDriver(edgeService,options.ToEdge(), TimeSpan.FromMinutes(20));
                     break;
