@@ -176,6 +176,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Entity_SubGrid_Row"                  ,"//div[@id='[NAME]_divDataArea']/div/table/tbody/tr" },
             { "Entity_SubGrid_Cell"                 ,"//div[@id='[NAME]_divDataArea']/div/table/tbody/tr/td" },
             { "Entity_SubGrid_RowDeleteButton"      ,"//a[contains(@id,'gridBodyTable_delete_[RECORDID]')]" },
+            { "Entity_SubGrid_ItemsTotal"           ,"//span[@id='[NAME]_ItemsTotal']" },
 
             //Related MenuItems
             { "Related_Popout",                 "//li[contains(@data-id,\"tablist-tab_related\")]" },
@@ -696,6 +697,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string SubGridRow = "Entity_SubGrid_Row";
             public static string SubGridCell = "Entity_SubGrid_Cell";
             public static string SubGridRowDeleteButton = "Entity_SubGrid_RowDeleteButton";
+            public static string SubGridItemsTotal = "Entity_SubGrid_ItemsTotal";
         }
         public static class MenuRelated
         {
