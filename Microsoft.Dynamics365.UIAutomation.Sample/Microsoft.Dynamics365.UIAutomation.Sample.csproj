@@ -81,6 +81,7 @@
     <Compile Include="SharedAPI\BrowserTests\BrowserTests.cs" />
     <Compile Include="UCI\BusinessProcessFlow\BusinessProcessFlowNextStage.cs" />
     <Compile Include="UCI\BusinessProcessFlow\SwitchBusinessProcessFlow.cs" />
+    <Compile Include="UCI\CommandBar\CommandButton.cs" />
     <Compile Include="UCI\CommandBar\AssignAccount.cs" />
     <Compile Include="UCI\CommandBar\CloseOpportunity.cs" />
     <Compile Include="UCI\CommandBar\DuplicateDetection.cs" />

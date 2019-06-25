@@ -27,7 +27,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             if (_client.Browser.Options.UCITestMode)
             {
-                _client.InitializeTestMode();
+                _client.InitializeTestMode(true);
             }
         }
 
@@ -44,7 +44,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             if (_client.Browser.Options.UCITestMode)
             {
-                _client.InitializeTestMode();
+                _client.InitializeTestMode(true);
             }
         }
 
