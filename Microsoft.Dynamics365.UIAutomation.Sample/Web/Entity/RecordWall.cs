@@ -85,8 +85,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
             XrmTestBrowser.ActivityFeed.SelectTab(Api.Pages.ActivityFeed.Tab.Activities);
             XrmTestBrowser.ActivityFeed.AddTask("Schedule an appointment", "Capture preliminary customer and product information.", DateTime.Now, new OptionSet { Name = "prioritycode", Value = "High" });
 
-            DateTime futureDate = DateTime.Parse("10/31/2021 5:50 am");            
+            DateTime futureDate = DateTime.Parse("10/31/2021");            
             XrmTestBrowser.ActivityFeed.AddTask("Schedule an appointment", "Capture preliminary customer and product information.", futureDate , new OptionSet { Name = "prioritycode", Value = "Low" });
+
+            DateTime shortDate = new DateTime(2021, 5, 1);
+            XrmTestBrowser.ActivityFeed.AddTask("Schedule an appointment", "Capture preliminary customer and product information.", shortDate, new OptionSet { Name = "prioritycode", Value = "Low" });
 
             XrmTestBrowser.ThinkTime(4000); 
         }
