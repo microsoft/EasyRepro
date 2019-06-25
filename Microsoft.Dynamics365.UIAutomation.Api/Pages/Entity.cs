@@ -987,6 +987,43 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
+        /// Get all the available header option values from a dropdown
+        /// </summary>
+        /// <param name="field">the field  id.</param>
+        /// <returns>The list of options</returns>
+        /// <example>xrmBrowser.Entity.GetHeaderOptionValues("status");</example>
+        public BrowserCommandResult<List<string>> GetHeaderOptionValues(string field)
+        {
+            return Execute($"Get OptionSet Header Values: {field}",
+                driver =>
+                {
+                    if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer_Header]
+                        .Replace("[NAME]", field.ToLower()))))
+                    {
+                        var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements
+                            .Xpath[Reference.Entity.OptionSetFieldContainer_Header]
+                            .Replace("[NAME]", field.ToLower())));
+                        var select = fieldElement;
+
+                        if (fieldElement.TagName != "select")
+                            select = fieldElement.FindElement(By.TagName("select"));
+
+                        var options = select.FindElements(By.TagName("option"));
+                        var list = new List<string>();
+                        foreach (var op in options)
+                        {
+                            list.Add(op.GetAttribute("title"));
+                        }
+
+                        return list;
+                    }
+
+                    throw new InvalidOperationException(
+                        $"Unable to locate OptionSet '{field}' in the header. Please verify the OptionSet exists and try again.");
+                });
+        }
+
+        /// <summary>
         /// PLACEHOLDER: Gets the value of a Composite control on an Entity header.
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
@@ -1220,6 +1257,39 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     throw new InvalidOperationException("Unexpected tab state. Tab state should be either Collapsed or Expanded");
 
                 return tabState;
+            });
+        }
+
+        /// <summary>
+        /// List all the option values available in the dropdown
+        /// </summary>
+        /// <param name="field">The field id.</param>
+        /// <returns></returns>
+        public BrowserCommandResult<List<string>> GetOptionValues(string field)
+        {
+            return this.Execute($"Get OptionSet Values: {field}", driver =>
+            {
+                driver.WaitUntilVisible(By.Id(field));
+
+                if (driver.HasElement(By.Id(field)))
+                {
+                    var input = driver.ClickWhenAvailable(By.Id(field));
+                    var select = input;
+
+                    if (input.TagName != "select")
+                        select = input.FindElement(By.TagName("select"));
+
+                    var options = select.FindElements(By.TagName("option"));
+                    var list = new List<string>();
+                    foreach (var op in options)
+                    {
+                        list.Add(op.Text);
+                    }
+
+                    return list;
+                }
+
+                throw new InvalidOperationException($"Field: {field} Does not exist");
             });
         }
 
