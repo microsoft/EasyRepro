@@ -427,7 +427,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         throw new InvalidOperationException($"Field: {field} is not lookup");
 
                     var lookupIcon = input.FindElement(By.ClassName("Lookup_RenderButton_td"));
-                    lookupIcon.Click();
+                    lookupIcon.Hover(driver, true);
+                    lookupIcon.Click(true);
 
                     var dialogName = $"Dialog_{field}_IMenu";
                     var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
