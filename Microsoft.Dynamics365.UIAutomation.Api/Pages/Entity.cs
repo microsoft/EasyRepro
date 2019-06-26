@@ -989,20 +989,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <summary>
         /// Get all the available header option values from a dropdown
         /// </summary>
-        /// <param name="field">the field  id.</param>
+        /// <param name="option">The option you want to get values.</param>
         /// <returns>The list of options</returns>
         /// <example>xrmBrowser.Entity.GetHeaderOptionValues("status");</example>
-        public BrowserCommandResult<List<string>> GetHeaderOptionValues(string field)
+        public BrowserCommandResult<List<string>> GetHeaderOptionValues(OptionSet option)
         {
-            return Execute($"Get OptionSet Header Values: {field}",
+            return Execute($"Get OptionSet Header Values: {option.Name}",
                 driver =>
                 {
                     if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer_Header]
-                        .Replace("[NAME]", field.ToLower()))))
+                        .Replace("[NAME]", option.Name.ToLower()))))
                     {
                         var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements
                             .Xpath[Reference.Entity.OptionSetFieldContainer_Header]
-                            .Replace("[NAME]", field.ToLower())));
+                            .Replace("[NAME]", option.Name.ToLower())));
                         var select = fieldElement;
 
                         if (fieldElement.TagName != "select")
@@ -1019,7 +1019,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
 
                     throw new InvalidOperationException(
-                        $"Unable to locate OptionSet '{field}' in the header. Please verify the OptionSet exists and try again.");
+                        $"Unable to locate OptionSet '{option.Name}' in the header. Please verify the OptionSet exists and try again.");
                 });
         }
 
@@ -1263,17 +1263,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <summary>
         /// List all the option values available in the dropdown
         /// </summary>
-        /// <param name="field">The field id.</param>
+        /// <param name="option">The option you want to get values.</param>
         /// <returns></returns>
-        public BrowserCommandResult<List<string>> GetOptionValues(string field)
+        public BrowserCommandResult<List<string>> GetOptionValues(OptionSet option)
         {
-            return this.Execute($"Get OptionSet Values: {field}", driver =>
+            return this.Execute($"Get OptionSet Values: {option.Name}", driver =>
             {
-                driver.WaitUntilVisible(By.Id(field));
+                driver.WaitUntilVisible(By.Id(option.Name));
 
-                if (driver.HasElement(By.Id(field)))
+                if (driver.HasElement(By.Id(option.Name)))
                 {
-                    var input = driver.ClickWhenAvailable(By.Id(field));
+                    var input = driver.ClickWhenAvailable(By.Id(option.Name));
                     var select = input;
 
                     if (input.TagName != "select")
@@ -1289,7 +1289,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     return list;
                 }
 
-                throw new InvalidOperationException($"Field: {field} Does not exist");
+                throw new InvalidOperationException($"Field: {option.Name} Does not exist");
             });
         }
 
