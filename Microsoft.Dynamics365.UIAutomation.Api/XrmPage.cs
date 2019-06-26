@@ -426,7 +426,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     if (input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])) == null)
                         throw new InvalidOperationException($"Field: {field} is not lookup");
 
-                    input.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.LookupRenderClass])).Click();
+                    var lookupIcon = input.FindElement(By.ClassName("Lookup_RenderButton_td"));
+                    lookupIcon.Click();
 
                     var dialogName = $"Dialog_{field}_IMenu";
                     var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
