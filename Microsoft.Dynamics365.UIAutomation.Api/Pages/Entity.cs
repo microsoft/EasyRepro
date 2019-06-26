@@ -991,7 +991,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="option">The option you want to get values.</param>
         /// <returns>The list of options</returns>
-        /// <example>xrmBrowser.Entity.GetHeaderOptionValues("status");</example>
+        /// <example>xrmBrowser.Entity.GetHeaderOptionValues(new OptionSet { Name = "status"}); </example>
         public BrowserCommandResult<List<string>> GetHeaderOptionValues(OptionSet option)
         {
             return Execute($"Get OptionSet Header Values: {option.Name}",
@@ -1265,6 +1265,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="option">The option you want to get values.</param>
         /// <returns></returns>
+        /// <example>xrmBrowser.Entity.GetOptionValues(new OptionSet { Name = "status"}); </example>
         public BrowserCommandResult<List<string>> GetOptionValues(OptionSet option)
         {
             return this.Execute($"Get OptionSet Values: {option.Name}", driver =>
