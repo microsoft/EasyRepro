@@ -171,12 +171,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 var dictionary = new Dictionary<string, IWebElement>();
 
+                driver.WaitUntilAvailable(By.ClassName(Elements.CssClass[Reference.Navigation.TopLevelItem]));
+
                 var topItem = driver.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.TopLevelItem])).FirstOrDefault();
                 topItem?.FindElement(By.Name(Elements.Name[Reference.Navigation.HomeTab])).Click();
 
-                //  driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.HomeTab]));
-
-                Thread.Sleep(1000);
+                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Navigation.ActionGroup]));
 
                 var element = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ActionGroup]));
                 var subItems = element.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.ActionButtonContainer]));

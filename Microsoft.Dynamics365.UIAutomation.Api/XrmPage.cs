@@ -309,6 +309,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="dialog"></param>
         public BrowserCommandResult<List<ListItem>> OpenDialog(IWebElement dialog)
         {
+            // Delay briefly to ensure we can get items from the dialog
+            Browser.ThinkTime(500);
+
             var list = new List<ListItem>();
             var dialogItems = dialog.FindElements(By.TagName("li"));
 
@@ -414,7 +417,116 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="field">The Field</param>
         /// <param name="index">The Index</param>
+        /// <example>xrmBrowser.Entity.SelectLookup(new LookupItem {Name = "lookupSchemaName", Index = 0 });</example>
+        public BrowserCommandResult<bool> SelectLookup(LookupItem control)
+        {
+            return this.Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
+            {
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer].Replace("[NAME]", control.Name.ToLower()))))
+                {
+                    var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer].Replace("[NAME]", control.Name.ToLower())));
+                    var dialogName = $"Dialog_{control.Name}_IMenu";
+                    IWebElement dialog;
+                    List<ListItem> dialogItems;
+                    ListItem dialogItem;
+
+                    // If field contains a value, clear the value and then set the new desired value
+                    if (fieldElement.Text != "")
+                    {
+                        fieldElement.Hover(driver, true);
+
+                        if (fieldElement.FindElement(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name.ToLower()))) == null)
+                            throw new InvalidOperationException($"Field: {control.Name} is not Lookup control");
+
+                        driver.Manage().Window.Maximize();
+                        var lookupSearch = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name.ToLower())));
+
+                        if (!lookupSearch.Displayed)
+                        {
+                            driver.Manage().Window.Minimize();
+                            driver.Manage().Window.Maximize();
+                            fieldElement.Hover(driver, true);
+                            lookupSearch = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name.ToLower())));
+                        }
+
+                        lookupSearch.Click(true);
+
+                        dialog = driver.WaitUntilAvailable(By.Id(dialogName));
+                        dialogItems = OpenDialog(dialog).Value;
+
+                        if (dialogItems.Any())
+                        {
+                            dialogItem = dialogItems.Last();
+                            dialogItem.Element.Click();
+                        }
+
+                        SwitchToDialog();
+
+                        Browser.ThinkTime(500);
+
+                        driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.LookUp.Remove])).Click(true);
+
+                        SwitchToContent();
+
+                    }
+
+                    fieldElement = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.LookupFieldContainer].Replace("[NAME]", control.Name.ToLower())));
+                    fieldElement.Hover(driver);
+                    fieldElement.Click(true);
+
+                    var lookupSearchIcon = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name)));
+
+                    if (Browser.Options.BrowserType != BrowserType.Firefox)
+                    {
+                        var lookupIcon = fieldElement.FindElement(By.ClassName("Lookup_RenderButton_td"));
+                        lookupSearchIcon = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name)));
+                        lookupIcon.Hover(driver);
+                        lookupIcon.Click(true);
+
+                        /*
+                        lookupSearchIcon.Hover(driver, true);
+                        lookupSearchIcon.Click(true);
+
+                        var lookupSearchIconImage = driver.FindElement(By.TagName("img"));
+                        lookupSearchIconImage.Hover(driver, true);
+
+                        Actions clickAction = new Actions(driver).SendKeys(Keys.Enter);
+                        clickAction.Build().Perform();
+                        */
+                    }
+                    else
+                    {
+                        var lookupIcon = fieldElement.FindElement(By.ClassName("Lookup_RenderButton_td"));
+                        lookupSearchIcon = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name)));
+                        lookupIcon.Hover(driver);
+                        lookupIcon.Click(true);
+                    }
+
+
+                    dialog = driver.WaitUntilAvailable(By.Id(dialogName));
+                    dialogItems = OpenDialog(dialog).Value;
+
+                    if (dialogItems.Count < control.Index)
+                        throw new InvalidOperationException($"List does not have {control.Index + 1} items.");
+
+                    dialogItem = dialogItems[control.Index];
+                    dialogItem.Element.Click();
+
+                }
+                else
+                    throw new InvalidOperationException($"Field: {control.Name} Does not exist");
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Set Lookup Value for the field
+        /// </summary>
+        /// <param name="field">The Field</param>
+        /// <param name="index">The Index</param>
         /// <example>xrmBrowser.Entity.SelectLookup("customerid", 0);</example>
+        [Obsolete("This method has been deprecated. Please use the new SelectLookup(new LookupItem { Name = \"lookupSchemaName\", Index = 0})")]
         public BrowserCommandResult<bool> SelectLookup(string field, [Range(0, 9)]int index)
         {
             return this.Execute(GetOptions($"Set Lookup Value: {field}"), driver =>
@@ -453,6 +565,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="field">The Field</param>
         /// <param name="value">The Lookup value</param>
+        [Obsolete("This method has been deprecated. Please use the new SelectLookup(LookupItem field, bool clearFieldValue = true, bool openLookupPage = true)")]
         public BrowserCommandResult<bool> SelectLookup(string field, string value)
         {
             return this.Execute(GetOptions($"Set Lookup Value: {field}"), driver =>
@@ -491,7 +604,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="field">The Field</param>
         /// <param name="clearFieldValue">Remove Existing Field Value, if present. False = Click the existing value</param>
         /// <param name="openLookupPage">The Open Lookup Page</param>
-        [Obsolete("SelectLookup is deprecated, please use SelectLookup(LookupItem...) instead.")]
+        [Obsolete("SelectLookup is deprecated, please use SelectLookup(LookupItem field, bool clearFieldValue = true, bool openLookupPage = true) instead.")]
         public BrowserCommandResult<bool> SelectLookup(string field, bool clearFieldValue = true, bool openLookupPage = true)
         {
             return this.Execute(GetOptions($"Select Lookup for: {field}"), driver =>
@@ -555,18 +668,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     if (fieldContainer.Text != "" && clearFieldValue)
                     {
-                        fieldContainer.Hover(driver, true);
-                        fieldContainer.Click(true);
+                        if (Browser.Options.BrowserType != BrowserType.Firefox)
+                        {
+                            fieldContainer.Hover(driver, true);
+                            fieldContainer.Click(true);
 
-                        var lookupSearchIcon = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", field.Name)));
-                        lookupSearchIcon.Hover(driver, true);
+                            var lookupSearchIcon = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", field.Name)));
+                            lookupSearchIcon.Hover(driver, true);
 
-                        var lookupSearchIconImage = driver.FindElement(By.TagName("img"));
-                        lookupSearchIconImage.Hover(driver, true);
+                            var lookupSearchIconImage = driver.FindElement(By.TagName("img"));
+                            lookupSearchIconImage.Hover(driver, true);
 
-                        Actions clickAction = new Actions(driver).SendKeys(Keys.Enter);
-                        clickAction.Build().Perform();
-
+                            Actions clickAction = new Actions(driver).SendKeys(Keys.Enter);
+                            clickAction.Build().Perform();
+                        }
+                        else if (Browser.Options.BrowserType == BrowserType.Firefox)
+                        {
+                            fieldContainer.Hover(driver, true);
+                            var lookupIcon = fieldContainer.FindElement(By.Id("[NAME]_lookupSearchIconDiv".Replace("[NAME]", field.Name)));
+                            lookupIcon.Hover(driver, true);
+                            lookupIcon.Click(true);
+                        }
 
                         var lookupMenuName = $"Dialog_{field.Name}_IMenu";
                         var lookupMenu = driver.WaitUntilAvailable(By.Id(lookupMenuName));
@@ -579,11 +701,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                             lookupMenuItem.Element.Click();
                         }
 
+                        driver.WaitUntilAvailable(By.Id("InlineDialog"),new TimeSpan(0,0,5));
                         SwitchToDialog();
-
+                        driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.LookUp.Remove]));
                         driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.LookUp.Remove]));
 
                         SwitchToContent();
+
+                        driver.WaitForPageToLoad();
+                        driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
+                                                    new TimeSpan(0, 0, 30),
+                                                    null,
+                                                    d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
+                                                );
 
                     }
                     else if (fieldContainer.Text != "" && !clearFieldValue)
@@ -1083,7 +1213,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
             {
-                if (driver.HasElement(By.Id(control.Name)))
+                 if (driver.HasElement(By.Id(control.Name)))
                 {
                     var fieldContainer = driver.WaitUntilAvailable(By.Id(control.Name));
 
@@ -1098,13 +1228,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         throw new InvalidOperationException($"Field: {control.Name} is not lookup");
 
                     var lookupSearchIcon = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name)));
-                    lookupSearchIcon.Hover(driver, true);
 
-                    var lookupSearchIconImage = driver.FindElement(By.TagName("img"));
-                    lookupSearchIconImage.Hover(driver, true);
+                    if (Browser.Options.BrowserType != BrowserType.Firefox)
+                    {
+                        var lookupIcon = fieldContainer.FindElement(By.ClassName("Lookup_RenderButton_td"));
+                        lookupSearchIcon = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name)));
+                        lookupIcon.Hover(driver);
+                        lookupIcon.Click(true);
 
-                    Actions clickAction = new Actions(driver).SendKeys(Keys.Enter);
-                    clickAction.Build().Perform();
+                        /*
+                        lookupSearchIcon.Hover(driver, true);
+                        lookupSearchIcon.Click(true);
+
+                        var lookupSearchIconImage = driver.FindElement(By.TagName("img"));
+                        lookupSearchIconImage.Hover(driver, true);
+
+                        Actions clickAction = new Actions(driver).SendKeys(Keys.Enter);
+                        clickAction.Build().Perform();
+                        */
+                    }
+                    else
+                    {
+                        var lookupIcon = fieldContainer.FindElement(By.ClassName("Lookup_RenderButton_td"));
+                        lookupSearchIcon = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.GetLookupSearchIcon].Replace("[NAME]", control.Name)));
+                        lookupIcon.Hover(driver);
+                        lookupIcon.Click(true);
+                    }
 
                     var dialogName = $"Dialog_{control.Name}_IMenu";
                     var dialog = driver.WaitUntilAvailable(By.Id(dialogName));
@@ -1121,6 +1270,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         SwitchToDialog();
 
+                        driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria]));
                         driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria])).Clear();
                         driver.FindElement(By.XPath(Elements.Xpath[Reference.Grid.FindCriteria])).SendKeys(control.Value);
                         driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Grid.FindCriteriaImg]));
