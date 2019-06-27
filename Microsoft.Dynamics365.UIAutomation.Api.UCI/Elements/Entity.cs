@@ -163,6 +163,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Get the Entity Name of the current entity
+        /// </summary>
+        public string GetEntityName()
+        {
+            return _client.GetEntityName();
+        }
+
+        /// <summary>
         /// Retrieve the items from a subgrid
         /// </summary>
         /// <param name="subgridName">Label of the subgrid to retrieve items from</param>

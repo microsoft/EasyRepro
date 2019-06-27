@@ -231,7 +231,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.Pages
                 this.SetValue(Elements.ElementId[Reference.ActivityFeed.ActivityTaskSubjectId], subject);
                 this.SetValue(Elements.ElementId[Reference.ActivityFeed.ActivityTaskDescriptionId], description);
                 this.SetCalenderValue(Elements.ElementId[Reference.ActivityFeed.ActivityAddTaskDueDateId], dueDate.ToShortDateString());
-                this.SetCalenderValue(Elements.ElementId[Reference.ActivityFeed.ActivityAddTaskDueTimeId], dueDate.ToShortTimeString());
+
+                if (driver.HasElement(By.Id(Elements.ElementId[Reference.ActivityFeed.ActivityAddTaskDueTimeId])))
+                {
+                    this.SetCalenderValue(Elements.ElementId[Reference.ActivityFeed.ActivityAddTaskDueTimeId], dueDate.ToShortTimeString());
+                }
+
+                // Update prioritycode id value for unique declaration in AddTask
+                priority.Name = "quickCreateActivity4212controlId_[NAME]_d".Replace("[NAME]", priority.Name);
+
                 this.SetValue(priority);
 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.ActivityFeed.ActivityTaskOk]));

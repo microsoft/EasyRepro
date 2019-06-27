@@ -35,7 +35,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 typeof(NoSuchElementException), typeof(StaleElementReferenceException));
         }
 
-        internal BrowserCommandResult<bool> InitializeTestMode()
+        internal BrowserCommandResult<bool> InitializeTestMode(bool onlineLoginPath = false)
         {
             return this.Execute(GetOptions("Initialize Unified Interface TestMode"), driver =>
             {
@@ -49,7 +49,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     driver.Navigate().GoToUrl(testModeUri);
 
                     driver.WaitForPageToLoad();
-                    driver.WaitForTransaction();
+
+                    if (!onlineLoginPath)
+                    {
+                        driver.WaitForTransaction();
+                    }
                 }
 
                 return true;
@@ -1048,6 +1052,103 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
+        /// <summary>
+        /// Returns the values of CommandBar objects
+        /// </summary>
+        /// <param name="moreCommands">The moreCommands</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Related.ClickCommand("ADD NEW CASE");</example>
+        internal BrowserCommandResult<List<string>> GetCommandValues(bool includeMoreCommandsValues = false, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Get CommandBar Command Count"), driver =>
+            {
+                IWebElement ribbon = null;
+                List<string> commandValues = new List<string>();
+
+                //Find the button in the CommandBar
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container])))
+                    ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]));
+
+                if (ribbon == null)
+                {
+                    if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid])))
+                        ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid]));
+                    else
+                        throw new InvalidOperationException("Unable to find the ribbon.");
+                }
+
+                //Get the CommandBar buttons
+                var commandBarItems = ribbon.FindElements(By.TagName("li"));
+
+                foreach (var value in commandBarItems)
+                {
+                    if (value.Text != "")
+                    {
+                        string commandText = value.Text.ToString();
+
+                        if (commandText.Contains("\r\n"))
+                        {
+                            commandText = commandText.Substring(0, commandText.IndexOf("\r\n"));
+                        }
+
+                        if (!commandValues.Contains(value.Text))
+                        {
+                            commandValues.Add(commandText);
+                        }
+                    }
+                }
+
+                if (includeMoreCommandsValues)
+                {
+                    if (commandBarItems.Any(x => x.GetAttribute("aria-label").Equals("More Commands", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        //Click More Commands Button
+                        commandBarItems.FirstOrDefault(x => x.GetAttribute("aria-label").Equals("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                        driver.WaitForTransaction();
+
+                        //Click the button
+                        var moreCommandsMenu = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.MoreCommandsMenu]));
+
+                        if (moreCommandsMenu != null)
+                        {
+                            var moreCommandsItems = moreCommandsMenu.FindElements(By.TagName("li"));
+
+                            foreach (var value in moreCommandsItems)
+                            {
+                                if (value.Text != "")
+                                {
+                                    string commandText = value.Text.ToString();
+
+                                    if (commandText.Contains("\r\n"))
+                                    {
+                                        commandText = commandText.Substring(0, commandText.IndexOf("\r\n"));
+                                    }
+
+                                    if (!commandValues.Contains(value.Text))
+                                    {
+                                        commandValues.Add(commandText);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("Unable to locate the 'More Commands' menu");
+                        }
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("No button matching 'More Commands' exists in the CommandBar");
+                    }
+                }
+
+                return commandValues;
+            });
+        }
+       
         #endregion
 
         #region Grid
@@ -2378,6 +2479,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new NotFoundException("Unable to retrieve object Id for this entity");
 
                 return oId;
+            });
+        }
+
+        /// <summary>
+        /// Returns the Entity Name of the entity
+        /// </summary>
+        /// <returns>Entity Name of the Entity</returns>
+        internal BrowserCommandResult<string> GetEntityName(int thinkTime = Constants.DefaultThinkTime)
+        {
+            return this.Execute(GetOptions($"Get Entity Name"), driver =>
+            {
+                var entityName = driver.ExecuteScript("return Xrm.Page.data.entity.getEntityName();").ToString();
+
+                if (string.IsNullOrEmpty(entityName)) {
+                    throw new NotFoundException("Unable to retrieve Entity Name for this entity");
+                }
+
+                return entityName;
             });
         }
 
