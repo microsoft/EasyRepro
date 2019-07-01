@@ -1753,28 +1753,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         input.Click();
 
-                        if (string.IsNullOrEmpty(value))
-                        {
-                            input.SendKeys(Keys.Control + "a");
-                            input.SendKeys(Keys.Backspace);
-                        }
-                        else
-                        {
+                        // Clear current content
+                        input.SendKeys(Keys.Control + "a");
+                        input.SendKeys(Keys.Backspace);
+                        // Update new content
+                        if (!string.IsNullOrEmpty(value))
                             input.SendKeys(value, true);
-                        }
                     }
                 }
                 else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
                 {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        fieldContainer.FindElement(By.TagName("textarea")).SendKeys(Keys.Control + "a");
-                        fieldContainer.FindElement(By.TagName("textarea")).SendKeys(Keys.Backspace);
-                    }
-                    else
-                    {
+                    // Clear current content
+                    fieldContainer.FindElement(By.TagName("textarea")).SendKeys(Keys.Control + "a");
+                    fieldContainer.FindElement(By.TagName("textarea")).SendKeys(Keys.Backspace);
+
+                    // Update new content
+                    if (!string.IsNullOrEmpty(value))
                         fieldContainer.FindElement(By.TagName("textarea")).SendKeys(value, true);
-                    }
                 }
                 else
                 {
