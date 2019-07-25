@@ -89,7 +89,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             var redirect = false;
             bool online = !(this.OnlineDomains != null && !this.OnlineDomains.Any(d => uri.Host.EndsWith(d)));
             driver.Navigate().GoToUrl(uri);
-
+            
             if (online)
             {
                 if (driver.IsVisible(By.Id("use_another_account_link")))
@@ -132,7 +132,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])))
                     {
                         driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]));
-                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])).Submit();
+                        
+                        //Click didn't work so use submit
+                        if(driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])))
+                            driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])).Submit();
                     }
 
                     driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
@@ -140,6 +143,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         e => 
                         {
                             e.WaitForPageToLoad();
+                            MarkOperation(driver);
                             e.SwitchTo().Frame(0);
                             e.WaitForPageToLoad();
                         },
@@ -148,6 +152,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             }
 
             return redirect ? LoginResult.Redirect : LoginResult.Success;
+        }
+
+        private void MarkOperation(IWebDriver driver)
+        {
+            if (driver.HasElement(By.Id(Elements.ElementId[Reference.Login.TaggingId])))
+                driver.ExecuteScript($"document.getElementById('{Elements.ElementId[Reference.Login.TaggingId]}').src = '_imgs/NavBar/Invisible.gif?operation=easyrepro|web|{Guid.NewGuid().ToString()}';");
         }
 
         public void ADFSLoginAction(LoginRedirectEventArgs args)
