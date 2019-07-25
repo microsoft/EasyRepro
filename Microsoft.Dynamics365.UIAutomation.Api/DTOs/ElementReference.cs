@@ -376,6 +376,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Process_Category", "WorkflowCategory"},
             { "Process_Entity", "PrimaryEntity"},
 
+            //Login
+            { "Login_TaggingId", "navTabAppSwitcherImage_TabAppSwitcherNode"},
+
     };
 
         public static Dictionary<string, string> CssClass = new Dictionary<string, string>()
@@ -855,6 +858,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string SignIn = "Login_SignIn";
             public static string CrmMainPage = "Login_CrmMainPage";
             public static string StaySignedIn = "Login_StaySignedIn";
+            public static string TaggingId = "Login_TaggingId";
         }
         public static class Report
         {
