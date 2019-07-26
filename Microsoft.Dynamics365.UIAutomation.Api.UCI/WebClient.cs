@@ -40,7 +40,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions("Initialize Unified Interface TestMode"), driver =>
             {
                 var uri = driver.Url;
-                var queryParams = "&flags=testmode=true";
+                var queryParams = "&flags=testmode=true,easyreproautomation=true";
 
                 if (!uri.Contains(queryParams))
                 {
