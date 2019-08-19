@@ -2089,7 +2089,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     fieldElement.SendKeys(date.ToString(format));
 
-                    driver.WaitFor(d => fieldElement.GetAttribute("value") == date.ToString(format));
+                    try
+                    {
+                        driver.WaitFor(d => fieldElement.GetAttribute("value") == date.ToString(format));
+                    }
+                    catch (WebDriverTimeoutException ex)
+                    {
+                        throw new InvalidOperationException($"Timeout after 30 seconds. Expected: {date.ToString(format)}. Actual: {fieldElement.GetAttribute("value")}", ex);
+                    }
                     driver.ClearFocus();
                 }
                 else
