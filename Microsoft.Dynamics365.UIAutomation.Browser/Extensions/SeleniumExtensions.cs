@@ -273,6 +273,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
         }
 
+        public static bool TryFindElement(this IWebDriver driver, By by, out IWebElement element)
+        {
+            try
+            {
+                element = driver.FindElement(by);
+                return true;
+            }
+            catch (NoSuchElementException)
+            {
+                element = null;
+                return false;
+            }
+        }
+
+        public static bool TryFindElement(this IWebElement element, By by, out IWebElement foundElement)
+        {
+            try
+            {
+                foundElement = element.FindElement(by);
+                return true;
+            }
+            catch (NoSuchElementException)
+            {
+                foundElement = null;
+                return false;
+            }
+        }
+
         public static bool IsVisible(this IWebDriver driver, By by)
         {
             try
