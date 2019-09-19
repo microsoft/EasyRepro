@@ -54,7 +54,7 @@ Selenium is a set of different software tools each with a different approach to 
 Although we don't have specific commands to cover the above funcationality, we have generic commands that will allow you to still interact with those features. 
 
 ## Known Issues #
-- Edge Browser is currently not supported due to known bug that is planned for future release.
+- Microsoft Edge Browser, based on Chromium, is currently not supported.
 - Firefox has sometimes been inconsistent with testing results.  The click command is inconsistent. This is a known issue and has been reported to that team that manages that driver. 
 - IE Driver has a 32-bit version and a 64-bit version. If you're using the 32-bit version on 64-bit windows with 64-bit IE then the driver will not work as intended.  Use the appropriate version of IE Driver with the specific version of IE. 
 
