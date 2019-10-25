@@ -120,6 +120,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     redirectAction?.Invoke(new LoginRedirectEventArgs(username, password, driver));
 
                     redirect = true;
+
+                    MarkOperation(driver);
                 }
                 else
                 {
