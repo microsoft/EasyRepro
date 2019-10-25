@@ -326,7 +326,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_LookupFieldResultList", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
             { "Entity_LookupFieldResultListItem", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_resultsContainer')]" },
             { "Entity_LookupFieldHoverExistingValue", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList')]" },
-            { "Entity_TextFieldLookupFieldContainer", "//*[contains(@data-id, '[NAME].fieldControl-Lookup_[NAME]')]" },
+            { "Entity_TextFieldLookupFieldContainer", "//div[@role='tabpanel']/parent::*//*[contains(@data-id, '[NAME].fieldControl-Lookup_[NAME]')]" },
             { "Entity_RecordSetNavigatorOpen", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
             { "Entity_RecordSetNavigator", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
             { "Entity_RecordSetNavList", "//ul[contains(@data-id, 'recordSetNaveList')]" },
