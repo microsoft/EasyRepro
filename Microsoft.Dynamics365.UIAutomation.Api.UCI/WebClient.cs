@@ -1802,6 +1802,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
 
+
                 ClearValue(control);
 
                 var input = fieldContainer.FindElements(By.TagName("input")).Count > 0
@@ -1814,7 +1815,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     input.SendKeys(Keys.Backspace);
                     input.SendKeys(control.Value, true);
 
-                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupSearchButton].Replace("[NAME]", control.Name)));
+                    //No longer needed, the search dialog opens when you enter the value
+                    //driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupSearchButton].Replace("[NAME]", control.Name)));
+
                     driver.WaitForTransaction();
                 }
 
@@ -2818,6 +2821,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
 
+                fieldContainer.Hover(driver);
+
                 var existingValues = fieldContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
 
                 var expandCollapseButtons = fieldContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldExpandCollapseButton].Replace("[NAME]", control.Name)));
@@ -3304,6 +3309,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal void ClickTab(IWebElement tabList, string xpath, string name)
         {
+            IWebElement moreTabsButton;
+            IWebElement listItem;
             // Look for the tab in the tab list, else in the more tabs menu
             IWebElement searchScope = null;
             if(tabList.HasElement(By.XPath(string.Format(xpath, name))))
@@ -3311,14 +3318,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 searchScope = tabList;
 
             }
-            else if(tabList.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabs]), out IWebElement moreTabsButton))
+            else if(tabList.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabs]), out moreTabsButton))
             {
                 moreTabsButton.Click();
                 searchScope = Browser.Driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabsMenu]));
             }
             
 
-            if (searchScope.TryFindElement(By.XPath(string.Format(xpath, name)), out IWebElement listItem))
+            if (searchScope.TryFindElement(By.XPath(string.Format(xpath, name)), out listItem))
             {
                 listItem.Click(true);
             }
