@@ -35,6 +35,9 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             { "Navigation_ChangeEnvironmentButton", "//button[contains(@class, 'groups-menu-toggle')]" },
             { "Navigation_ChangeEnvironmentList", "//div[contains(@class, 'action-menu-panel')]" },
 
+            //TestFramework
+            { "TestFramework_ToastMessage", "//*[@class=\"toast-message\"]" },
+
             //Backstage
             { "Backstage_MenuContainer","//div[contains(@class, 'backstage-nav')]" },
             { "Backstage_OpenFileMenu","//button[contains(@id, 'appmagic-file-tab')]" },
@@ -156,6 +159,12 @@ namespace Microsoft.PowerApps.UIAutomation.Api
             public static string CreateAppFromDataSPConnectButtonClassName = "data-sources-pane-connect-button";
             
         }
+
+        public static class TestFramework
+        {
+            public static string ToastMessage = "TestFramework_ToastMessage";
+        }
+
         public static class BackStage
         {
             public static string MenuContainer = "Backstage_MenuContainer";

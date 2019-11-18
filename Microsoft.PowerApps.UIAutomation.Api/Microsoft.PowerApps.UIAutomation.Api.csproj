@@ -57,6 +57,7 @@
     <Compile Include="Pages\Backstage.cs" />
     <Compile Include="Pages\BackstageAppSettings.cs" />
     <Compile Include="Pages\BackstageSidebar.cs" />
+    <Compile Include="Pages\TestFramework.cs" />
     <Compile Include="Pages\Player.cs" />
     <Compile Include="Pages\Canvas.cs" />
     <Compile Include="Pages\Home.cs" />
