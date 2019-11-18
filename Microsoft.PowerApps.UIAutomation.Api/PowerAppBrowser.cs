@@ -42,8 +42,12 @@ namespace Microsoft.PowerApps.UIAutomation.Api
 
         #endregion Login
 
-        #region Sidebar
+        #region Navigation
         public Navigation Navigation => this.GetPage<Navigation>();
+        #endregion
+
+        #region TestFramework
+        public TestFramework TestFramework => this.GetPage<TestFramework>();
         #endregion
 
         #region SideBar
