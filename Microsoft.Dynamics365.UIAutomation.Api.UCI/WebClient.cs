@@ -11,6 +11,7 @@ using System.Linq;
 using System.Security;
 using System.Threading;
 using System.Web;
+using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -218,7 +219,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions("Open App"), driver =>
             {
-
                 driver.SwitchTo().DefaultContent();
 
                 //Handle left hand Nav
@@ -242,28 +242,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     driver.WaitForPageToLoad();
 
                     driver.WaitForTransaction();
-
-                    if (Browser.Options.UCITestMode)
-                    {
-                        InitializeTestMode();
-                    }
-
-                    return true;
                 }
-
-                //Handle main.aspx?ForcUCI=1
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer])))
+                else  if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]))) //Handle main.aspx?ForcUCI=1
                 {
                     var tileContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]));
                     tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
 
                     driver.WaitForTransaction();
-
-                    if (Browser.Options.UCITestMode)
-                    {
-                        InitializeTestMode();
-                    }
-
                 }
                 else
                 {
@@ -276,15 +261,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
 
                         driver.WaitForTransaction();
-
-                        if (Browser.Options.UCITestMode)
-                        {
-                            InitializeTestMode();
-                        }
                     }
                     else
                         throw new InvalidOperationException($"App Name {appName} not found.");
                 }
+
+                if (Browser.Options.UCITestMode) InitializeTestMode();
+                if (Browser.Options.UCIPerformanceMode) EnablePerformanceCenter();
 
                 return true;
             });
@@ -3900,12 +3883,45 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dashboard.DashboardSelector]));
                 //Select the dashboard
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dashboard.DashboardItemUCI].Replace("[NAME]", dashboardName)));
-
+                
                 return true;
             });
         }
         #endregion
 
+        #region PerformanceCenter
+
+        internal void EnablePerformanceCenter()
+        {
+            Browser.Driver.Navigate().GoToUrl(string.Format("{0}&perf=true", Browser.Driver.Url));
+            Browser.Driver.WaitForPageToLoad();
+            Browser.Driver.WaitForTransaction();
+        }
+
+        internal BrowserCommandResult<bool> TrackPerformanceEvents()
+        {
+            return this.Execute(GetOptions($"Track Performance Center Events"), driver =>
+            {
+                Dictionary<string, double> markers = GetPerformanceMarkers();
+
+                
+
+                return true;
+            });
+        }
+
+        internal Dictionary<string, double> GetPerformanceMarkers()
+        {
+            var jsonResults = Browser.Driver.ExecuteScript("UCPerformanceTimeline.getKeyPerformanceIndicators()").ToString();
+            var jsSerializer = new JavaScriptSerializer();
+
+            jsSerializer.RegisterConverters(new[] { new DynamicJsonConverter() });
+
+            var jsonObj = (Dictionary<string, double>)jsSerializer.Deserialize(jsonResults, typeof(Dictionary<string, double>));
+
+            return jsonObj;
+        }
+        #endregion
         internal void ThinkTime(int milliseconds)
         {
             Browser.ThinkTime(milliseconds);

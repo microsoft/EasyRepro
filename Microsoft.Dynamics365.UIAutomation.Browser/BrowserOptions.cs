@@ -30,6 +30,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.Height = null;
             this.Width = null;
             this.UCITestMode = true;
+            this.UCIPerformanceMode = false;
+            this.AppInsightsKey = string.Empty;
         }
 
         public BrowserType RemoteBrowserType { get; set; }
@@ -68,6 +70,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         /// Please raise any issues with this TestMode being enabled to the Microsoft/EasyRepro community on GitHub for review.
         /// </summary>
         public bool UCITestMode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Performance Mode to enable performance center telemetry. 
+        /// </summary>
+        public bool UCIPerformanceMode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Application Insights Instrumentation Key to write telemetry to. 
+        /// </summary>
+        public string AppInsightsKey { get; set; }
 
         public virtual ChromeOptions ToChrome()
         {

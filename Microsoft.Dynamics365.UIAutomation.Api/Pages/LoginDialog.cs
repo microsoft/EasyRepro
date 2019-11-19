@@ -154,6 +154,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return redirect ? LoginResult.Redirect : LoginResult.Success;
         }
 
+        internal BrowserCommandResult<bool> PassThroughLogin(Uri uri)
+        {
+            return this.Execute(GetOptions("Pass Through Login"), driver =>
+            {
+                driver.Navigate().GoToUrl(uri);
+
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
+                       , new TimeSpan(0, 0, 60),
+                       e =>
+                       {
+                           e.WaitForPageToLoad();
+                           MarkOperation(driver);
+                           e.SwitchTo().Frame(0);
+                           e.WaitForPageToLoad();
+                       },
+                       f => { throw new Exception("Login page failed."); });
+                return true;
+            });
+        }
         private void MarkOperation(IWebDriver driver)
         {
             if (driver.HasElement(By.Id(Elements.ElementId[Reference.Login.TaggingId])))

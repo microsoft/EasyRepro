@@ -31,6 +31,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public GlobalSearch GlobalSearch => this.GetElement<GlobalSearch>(_client);
 		public QuickCreate QuickCreate => this.GetElement<QuickCreate>(_client);
         public Lookup Lookup => this.GetElement<Lookup>(_client);
+        public PerformanceCenter PerformanceCenter => this.GetElement<PerformanceCenter>(_client);
 
         public T GetElement<T>(WebClient client)
             where T : Element

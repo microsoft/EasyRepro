@@ -29,6 +29,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 _client.InitializeTestMode(true);
             }
+
+            if (_client.Browser.Options.UCIPerformanceMode) _client.EnablePerformanceCenter();
         }
 
         /// <summary>
@@ -46,6 +48,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 _client.InitializeTestMode(true);
             }
+
+            if (_client.Browser.Options.UCIPerformanceMode) _client.EnablePerformanceCenter();
         }
 
     }
