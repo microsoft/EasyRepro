@@ -226,7 +226,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuButton]));
 
-                    var container = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuContainer]));
+                    var container = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuContainer]));
 
                     var buttons = container.FindElements(By.TagName("button"));
 
