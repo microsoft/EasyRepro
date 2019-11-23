@@ -25,12 +25,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.Login(orgUrl, username, password);
 
-            if (_client.Browser.Options.UCITestMode)
-            {
-                _client.InitializeTestMode(true);
-            }
-
-            if (_client.Browser.Options.UCIPerformanceMode) _client.EnablePerformanceCenter();
+            _client.InitializeModes(true);
         }
 
         /// <summary>
@@ -44,12 +39,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.Login(orgUrl, username, password, redirectAction);
 
-            if (_client.Browser.Options.UCITestMode)
-            {
-                _client.InitializeTestMode(true);
-            }
-
-            if (_client.Browser.Options.UCIPerformanceMode) _client.EnablePerformanceCenter();
+            _client.InitializeModes(true);           
         }
 
     }

@@ -18,11 +18,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     public class WebClient : BrowserPage
     {
         public List<ICommandResult> CommandResults => Browser.CommandResults;
+        public Guid ClientSessionId;
 
         public WebClient(BrowserOptions options)
         {
             Browser = new InteractiveBrowser(options);
             OnlineDomains = Constants.Xrm.XrmDomains;
+            ClientSessionId = Guid.NewGuid();
         }
 
         internal BrowserCommandOptions GetOptions(string commandName)
@@ -36,14 +38,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 typeof(NoSuchElementException), typeof(StaleElementReferenceException));
         }
 
-        internal BrowserCommandResult<bool> InitializeTestMode(bool onlineLoginPath = false)
+        internal BrowserCommandResult<bool> InitializeModes(bool onlineLoginPath = false)
         {
-            return this.Execute(GetOptions("Initialize Unified Interface TestMode"), driver =>
+            return this.Execute(GetOptions("Initialize Unified Interface Modes"), driver =>
             {
                 var uri = driver.Url;
-                var queryParams = "&flags=testmode=true,easyreproautomation=true";
+                var queryParams = "";
 
-                if (!uri.Contains(queryParams))
+                if(Browser.Options.UCITestMode) queryParams += "&flags=testmode=true,easyreproautomation=true";
+                if (Browser.Options.UCIPerformanceMode) queryParams += "&perf=true";
+
+                if (!string.IsNullOrEmpty(queryParams) && !uri.Contains(queryParams))
                 {
                     var testModeUri = uri + queryParams;
 
@@ -266,8 +271,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         throw new InvalidOperationException($"App Name {appName} not found.");
                 }
 
-                if (Browser.Options.UCITestMode) InitializeTestMode();
-                if (Browser.Options.UCIPerformanceMode) EnablePerformanceCenter();
+                InitializeModes();
 
                 return true;
             });
@@ -3897,31 +3901,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             Browser.Driver.WaitForPageToLoad();
             Browser.Driver.WaitForTransaction();
         }
-
-        internal BrowserCommandResult<bool> TrackPerformanceEvents()
-        {
-            return this.Execute(GetOptions($"Track Performance Center Events"), driver =>
-            {
-                Dictionary<string, double> markers = GetPerformanceMarkers();
-
-                
-
-                return true;
-            });
-        }
-
-        internal Dictionary<string, double> GetPerformanceMarkers()
-        {
-            var jsonResults = Browser.Driver.ExecuteScript("UCPerformanceTimeline.getKeyPerformanceIndicators()").ToString();
-            var jsSerializer = new JavaScriptSerializer();
-
-            jsSerializer.RegisterConverters(new[] { new DynamicJsonConverter() });
-
-            var jsonObj = (Dictionary<string, double>)jsSerializer.Deserialize(jsonResults, typeof(Dictionary<string, double>));
-
-            return jsonObj;
-        }
+      
+       
         #endregion
+
         internal void ThinkTime(int milliseconds)
         {
             Browser.ThinkTime(milliseconds);

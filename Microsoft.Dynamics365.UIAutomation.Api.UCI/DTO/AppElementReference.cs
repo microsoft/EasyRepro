@@ -242,6 +242,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             public static string ReadOnly = "Field_ReadOnly";
         }
+        public static class PerformanceWidget
+        {
+            public static string Container = "Performance_Widget";
+            public static string Page = "Performance_WidgetPage";
+        }
     }
 
     public static class AppElements
@@ -449,7 +454,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Lookup_ChangeViewButton", "//button[contains(@data-id,'changeViewBtn')]"},
             { "Lookup_ViewRows", "//li[contains(@data-id,'viewLineContainer')]"},
             { "Lookup_ResultRows", "//li[contains(@data-id,'LookupResultsDropdown') and contains(@data-id,'resultsContainer')]"},
-            { "Lookup_NewButton", "//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]" }
+            { "Lookup_NewButton", "//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]" },
+
+            //Performance Width
+            { "Performance_Widget","//div[@data-id='performance-widget']/div"},
+            { "Performance_WidgetPage", "//div[@data-id='performance-widget']//span[contains(text(), '[NAME]')]" }
         };
     }
 
