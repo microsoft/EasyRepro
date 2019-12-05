@@ -62,6 +62,16 @@ Although we don't have specific commands to cover the above funcationality, we h
 #### Install Instructions:
 The Sample project should have NUGET packages added and you just need to build the solution and restore the packages.  For the specific browser drivers, you can add them using NUGET. The default driver is Chrome and the NUGET package is already installed on the Sample project.   
 
+#### Run the Sample Project
+
+Change the keys in your `app.config` below to match your environment. Open the Test explorer window. Right click and run one test to ensure everything works. Trying the `CreateAccount` test under `Microsoft.Dynamics365.UIAutomation.Sample.Web` is a good start.
+
+```cs
+<add key="OnlineUsername" value="name@name.onmicrosoft.com" />
+<add key="OnlinePassword" value="*********" />
+<add key="OnlineCrmUrl" value="https://org.crm.dynamics.com/" />
+```
+
 #### Supported Browser WebDriver
  The application supports following browser:
   
