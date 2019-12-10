@@ -57,7 +57,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             if (this.Browser.Options.Credentials.IsDefault)
                 throw new InvalidOperationException("The default login method cannot be invoked without first setting credentials on the Browser object.");
 
-            return this.Execute(GetOptions("Login"), this.Login, uri, this.Browser.Options.Credentials.Username, this.Browser.Options.Credentials.Password, default(Action<LoginRedirectEventArgs>));
+            if (string.IsNullOrEmpty(this.Browser.Options.Credentials.Username.ToUnsecureString()))
+                return PassThroughLogin(uri);
+            else
+                return this.Execute(GetOptions("Login"), this.Login, uri, this.Browser.Options.Credentials.Username, this.Browser.Options.Credentials.Password, default(Action<LoginRedirectEventArgs>));
         }
         /// <summary>
         /// Login Page
@@ -156,6 +159,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return redirect ? LoginResult.Redirect : LoginResult.Success;
         }
 
+        internal BrowserCommandResult<LoginResult> PassThroughLogin(Uri uri)
+        {
+            return this.Execute(GetOptions("Pass Through Login"), driver =>
+            {
+                driver.Navigate().GoToUrl(uri);
+
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
+                       , new TimeSpan(0, 0, 60),
+                       e =>
+                       {
+                           e.WaitForPageToLoad();
+                           MarkOperation(driver);
+                           e.SwitchTo().Frame(0);
+                           e.WaitForPageToLoad();
+                       },
+                       f => { throw new Exception("Login page failed."); });
+                return LoginResult.Success;
+            });
+        }
         private void MarkOperation(IWebDriver driver)
         {
             if (driver.HasElement(By.Id(Elements.ElementId[Reference.Login.TaggingId])))

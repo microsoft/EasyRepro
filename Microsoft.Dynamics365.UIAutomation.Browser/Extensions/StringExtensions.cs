@@ -69,4 +69,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return AsString(@bool, trueCondition, string.Empty);
         }
     }
+
+    public static class ObjectExtensions
+    {
+        public static double ToDouble(this object obj)
+        {
+            double ret;
+
+            if (!double.TryParse(obj.ToString(), out ret))
+                ret = 0;
+
+            return ret;
+        }
+    }
 }

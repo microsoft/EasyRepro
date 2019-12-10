@@ -11,17 +11,20 @@ using System.Linq;
 using System.Security;
 using System.Threading;
 using System.Web;
+using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
     public class WebClient : BrowserPage
     {
         public List<ICommandResult> CommandResults => Browser.CommandResults;
+        public Guid ClientSessionId;
 
         public WebClient(BrowserOptions options)
         {
             Browser = new InteractiveBrowser(options);
             OnlineDomains = Constants.Xrm.XrmDomains;
+            ClientSessionId = Guid.NewGuid();
         }
 
         internal BrowserCommandOptions GetOptions(string commandName)
@@ -35,14 +38,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 typeof(NoSuchElementException), typeof(StaleElementReferenceException));
         }
 
-        internal BrowserCommandResult<bool> InitializeTestMode(bool onlineLoginPath = false)
+        internal BrowserCommandResult<bool> InitializeModes(bool onlineLoginPath = false)
         {
-            return this.Execute(GetOptions("Initialize Unified Interface TestMode"), driver =>
+            return this.Execute(GetOptions("Initialize Unified Interface Modes"), driver =>
             {
                 var uri = driver.Url;
-                var queryParams = "&flags=testmode=true,easyreproautomation=true";
+                var queryParams = "";
 
-                if (!uri.Contains(queryParams))
+                if(Browser.Options.UCITestMode) queryParams += "&flags=testmode=true,easyreproautomation=true";
+                if (Browser.Options.UCIPerformanceMode) queryParams += "&perf=true";
+
+                if (!string.IsNullOrEmpty(queryParams) && !uri.Contains(queryParams))
                 {
                     var testModeUri = uri + queryParams;
 
@@ -218,7 +224,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions("Open App"), driver =>
             {
-
                 driver.SwitchTo().DefaultContent();
 
                 //Handle left hand Nav
@@ -242,28 +247,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     driver.WaitForPageToLoad();
 
                     driver.WaitForTransaction();
-
-                    if (Browser.Options.UCITestMode)
-                    {
-                        InitializeTestMode();
-                    }
-
-                    return true;
                 }
-
-                //Handle main.aspx?ForcUCI=1
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer])))
+                else  if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]))) //Handle main.aspx?ForcUCI=1
                 {
                     var tileContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]));
                     tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
 
                     driver.WaitForTransaction();
-
-                    if (Browser.Options.UCITestMode)
-                    {
-                        InitializeTestMode();
-                    }
-
                 }
                 else
                 {
@@ -276,15 +266,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
 
                         driver.WaitForTransaction();
-
-                        if (Browser.Options.UCITestMode)
-                        {
-                            InitializeTestMode();
-                        }
                     }
                     else
                         throw new InvalidOperationException($"App Name {appName} not found.");
                 }
+
+                InitializeModes();
 
                 return true;
             });
@@ -3900,10 +3887,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dashboard.DashboardSelector]));
                 //Select the dashboard
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dashboard.DashboardItemUCI].Replace("[NAME]", dashboardName)));
-
+                
                 return true;
             });
         }
+        #endregion
+
+        #region PerformanceCenter
+
+        internal void EnablePerformanceCenter()
+        {
+            Browser.Driver.Navigate().GoToUrl(string.Format("{0}&perf=true", Browser.Driver.Url));
+            Browser.Driver.WaitForPageToLoad();
+            Browser.Driver.WaitForTransaction();
+        }
+      
+       
         #endregion
 
         internal void ThinkTime(int milliseconds)

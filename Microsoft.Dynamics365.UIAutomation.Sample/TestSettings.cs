@@ -27,7 +27,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             DefaultThinkTime = 2000,
             RemoteBrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), RemoteType),
             RemoteHubServer = new Uri(RemoteHubServerURL),
-            UCITestMode = true
+            UCITestMode = true,
+            UCIPerformanceMode = true
         };
 
         public static string GetRandomString(int minLen, int maxLen)
