@@ -1504,7 +1504,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (sortCol == null)
                     throw new InvalidOperationException($"Column: {columnName} Does not exist");
                 else
-                    sortCol.Click();
+                    sortCol.Click(true);
+
+                driver.WaitForTransaction();
                 return true;
             });
         }
