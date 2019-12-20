@@ -241,6 +241,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public static class Field
         {
             public static string ReadOnly = "Field_ReadOnly";
+            public static string Required = "Field_Required";
         }
         public static class PerformanceWidget
         {
@@ -427,6 +428,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             //Field
             {"Field_ReadOnly",".//*[@aria-readonly]" },
+            {"Field_Required", ".//*[@aria-required]"},
 
             //Dialogs
             { "AssignDialog_ToggleField" , "//label[contains(@data-id,'rdoMe_id.fieldControl-checkbox-inner-first')]" },
