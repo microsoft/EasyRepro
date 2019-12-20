@@ -70,6 +70,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public string[] OnlineDomains { get; set; }
 
         #region Login
+        internal BrowserCommandResult<LoginResult> Login(Uri uri)
+        {
+            if (this.Browser.Options.Credentials.Username == null)
+                return PassThroughLogin(uri);
+            else
+                return this.Execute(GetOptions("Login"), this.Login, uri, this.Browser.Options.Credentials.Username, this.Browser.Options.Credentials.Password, default(Action<LoginRedirectEventArgs>));
+        }
+
         internal BrowserCommandResult<LoginResult> Login(Uri orgUri, SecureString username, SecureString password)
         {
             return this.Execute(GetOptions("Login"), this.Login, orgUri, username, password, default(Action<LoginRedirectEventArgs>));
@@ -149,7 +157,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return redirect ? LoginResult.Redirect : LoginResult.Success;
         }
+        internal BrowserCommandResult<LoginResult> PassThroughLogin(Uri uri)
+        {
+            return this.Execute(GetOptions("Pass Through Login"), driver =>
+            {
+                driver.Navigate().GoToUrl(uri);
 
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
+                         , new TimeSpan(0, 0, 60),
+                         e => {
+                             e.WaitForPageToLoad();
+                             e.SwitchTo().Frame(0);
+                             e.WaitForPageToLoad();
+
+                             //Switch Back to Default Content for Navigation Steps
+                             e.SwitchTo().DefaultContent();
+                         },
+                         f => { throw new Exception("Login page failed."); });
+
+                return LoginResult.Success;
+            });
+        }
         public void ADFSLoginAction(LoginRedirectEventArgs args)
 
         {

@@ -54,10 +54,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         public BrowserCommandResult<LoginResult> Login(Uri uri)
         {
-            if (this.Browser.Options.Credentials.IsDefault)
-                throw new InvalidOperationException("The default login method cannot be invoked without first setting credentials on the Browser object.");
-
-            if (string.IsNullOrEmpty(this.Browser.Options.Credentials.Username.ToUnsecureString()))
+            if (this.Browser.Options.Credentials.Username== null)
                 return PassThroughLogin(uri);
             else
                 return this.Execute(GetOptions("Login"), this.Login, uri, this.Browser.Options.Credentials.Username, this.Browser.Options.Credentials.Password, default(Action<LoginRedirectEventArgs>));
