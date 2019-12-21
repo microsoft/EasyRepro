@@ -4,10 +4,9 @@ using System.Collections.Generic;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
-    public class CompositeControl
+    public class CompositeControl : FieldReference
     {
         public string Id { get; set; }
-        public string Name { get; set; }
         public List<Field> Fields { get; set; }
     }
 }

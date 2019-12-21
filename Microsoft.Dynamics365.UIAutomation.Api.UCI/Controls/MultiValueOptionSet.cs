@@ -3,9 +3,8 @@
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
-    public class MultiValueOptionSet
+    public class MultiValueOptionSet : FieldReference
     {
-        public string Name { get; set; }
         public string[] Values { get; set; }
     }
 }

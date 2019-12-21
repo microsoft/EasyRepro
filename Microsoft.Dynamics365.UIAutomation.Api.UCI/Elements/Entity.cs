@@ -218,6 +218,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.GetValue(field);
         }
 
+        public string GetValue(FieldReference field)
+        {
+            return _client.GetValue(field);
+        }
+
         /// <summary>
         /// Gets the value of a picklist or status field.
         /// </summary>
@@ -372,6 +377,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="field">The field</param>
         /// <param name="value">The value</param>
         public void SetValue(string field, string value)
+        {
+            _client.SetValue(field, value);
+        }
+
+        public void SetValue(FieldReference field, string value)
         {
             _client.SetValue(field, value);
         }

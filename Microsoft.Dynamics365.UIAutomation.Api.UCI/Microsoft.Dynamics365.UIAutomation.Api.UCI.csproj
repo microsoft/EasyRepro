@@ -55,6 +55,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\FieldReference.cs" />
     <Compile Include="Controls\CompositeControl.cs" />
     <Compile Include="Controls\Field.cs" />
     <Compile Include="Controls\LookupItem.cs" />

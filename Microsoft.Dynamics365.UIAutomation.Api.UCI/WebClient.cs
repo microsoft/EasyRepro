@@ -1788,6 +1788,54 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> SetValue(FieldReference field, string value)
+        {
+            return this.Execute(GetOptions($"Set Value"), driver =>
+            {
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field.Name)));
+
+                if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
+                {
+                    var input = fieldContainer.FindElement(By.TagName("input"));
+                    if (input != null)
+                    {
+                        input.Click();
+
+                        if (string.IsNullOrEmpty(value))
+                        {
+                            input.SendKeys(Keys.Control + "a");
+                            input.SendKeys(Keys.Backspace);
+                        }
+                        else
+                        {
+                            input.SendKeys(value, true);
+                        }
+                    }
+                }
+                else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
+                {
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        fieldContainer.FindElement(By.TagName("textarea")).SendKeys(Keys.Control + "a");
+                        fieldContainer.FindElement(By.TagName("textarea")).SendKeys(Keys.Backspace);
+                    }
+                    else
+                    {
+                        fieldContainer.FindElement(By.TagName("textarea")).SendKeys(value, true);
+                    }
+                }
+                else
+                {
+                    throw new Exception($"Field with name {field.Name} does not exist.");
+                }
+
+                // Needed to transfer focus out of special fields (email or phone)
+                driver.FindElement(By.TagName("body")).Click();
+
+                return true;
+            });
+        }
+
         /// <summary>
         /// Sets the value of a Lookup, Customer, Owner or ActivityParty Lookup which accepts only a single value.
         /// </summary>
@@ -2264,6 +2312,42 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                 {
                     throw new Exception($"Field with name {field} does not exist.");
+                }
+
+                return text;
+            });
+        }
+
+        internal BrowserCommandResult<string> GetValue(FieldReference field)
+        {
+            return this.Execute(GetOptions($"Get Value"), driver =>
+            {
+                string text = string.Empty;
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field.Name)));
+
+                if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
+                {
+                    var input = fieldContainer.FindElement(By.TagName("input"));
+                    if (input != null)
+                    {
+                        IWebElement fieldValue = input.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldValue].Replace("[NAME]", field.Name)));
+                        text = fieldValue.GetAttribute("value").ToString();
+
+                        // Needed if getting a date field which also displays time as there isn't a date specifc GetValue method
+                        var timefields = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field.Name)));
+                        if (timefields.Any())
+                        {
+                            text = $" {timefields.First().GetAttribute("value")}";
+                        }
+                    }
+                }
+                else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
+                {
+                    text = fieldContainer.FindElement(By.TagName("textarea")).GetAttribute("value");
+                }
+                else
+                {
+                    throw new Exception($"Field with name {field.Name} does not exist.");
                 }
 
                 return text;

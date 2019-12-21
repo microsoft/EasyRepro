@@ -3,9 +3,8 @@
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
-    public class LookupItem
+    public class LookupItem : FieldReference
     {
-        public string Name { get; set; }
         public string Value { get; set; }
         public int Index { get; set; }
     }

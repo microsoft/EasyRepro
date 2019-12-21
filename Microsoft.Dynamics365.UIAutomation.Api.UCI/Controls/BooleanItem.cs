@@ -6,9 +6,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     /// <summary>
     /// Represents a Boolean Item in Dynamics 365.
     /// </summary>
-    public class BooleanItem
+    public class BooleanItem : FieldReference
     {
-        public string Name { get; set; }
         public bool Value { get; set; }
     }
 }

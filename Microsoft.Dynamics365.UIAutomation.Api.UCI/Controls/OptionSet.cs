@@ -6,9 +6,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     /// <summary>
     /// Represents an Option Set in Dynamics 365.
     /// </summary>
-    public class OptionSet
+    public class OptionSet : FieldReference
     {
-        public string Name { get; set; }
         public string Value { get; set; }
     }
 }
