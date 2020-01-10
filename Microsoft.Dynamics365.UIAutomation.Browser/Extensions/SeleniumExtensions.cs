@@ -588,8 +588,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
             try
             {
-                returnElement = wait.Until(d => d.FindElement(by));
-
+                var foundElements = wait.Until(d => d.FindElements(by));
+                if (foundElements != null && foundElements.Count > 1)
+                {
+                    returnElement = foundElements.FirstOrDefault(x => x.Displayed == true);
+                }
+                else
+                {
+                    returnElement = foundElements.FirstOrDefault();
+                }
                 success = true;
             }
             catch (NoSuchElementException)
