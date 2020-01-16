@@ -2653,6 +2653,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
+
                 return GetValue(control);
             });
         }
@@ -2663,6 +2665,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
+
+                var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
 
                 return GetValue(controls);
             });
@@ -2675,6 +2679,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
+
                 return GetValue(control);
             });
         }
@@ -2685,6 +2691,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
+
+                var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
 
                 return GetValue(control);
             });
@@ -2697,6 +2705,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
+
                 return GetValue(control);
             });
         }
@@ -2707,6 +2717,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
+
+                var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
 
                 return GetValue(control);
             });
@@ -2738,6 +2750,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
+
                 SetValue(field, value);
 
                 return true;
@@ -2750,6 +2764,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
+
+                var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
 
                 SetValue(control);
 
@@ -2764,6 +2780,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
+
                 SetValue(controls);
 
                 return true;
@@ -2776,6 +2794,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
+
+                var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
 
                 SetValue(control);
 
@@ -2790,6 +2810,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
+
                 SetValue(control);
 
                 return true;
@@ -2803,6 +2825,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
+
                 SetValue(control);
 
                 return true;
@@ -2815,6 +2839,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
+
+                var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
 
                 SetValue(field, date, format);
 
