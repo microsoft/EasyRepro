@@ -2653,12 +2653,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
-                bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
-
-                if (!expanded)
-                {
-                    var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
-                }
+                ExpandHeader(driver);
 
                 return GetValue(control);
             });
@@ -2671,12 +2666,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
-                bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
-
-                if (!expanded)
-                {
-                    var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
-                }
+                ExpandHeader(driver);
 
                 return GetValue(controls);
             });
@@ -2689,12 +2679,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
-                bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
-
-                if (!expanded)
-                {
-                    var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
-                }
+                ExpandHeader(driver);
 
                 return GetValue(control);
             });
@@ -2707,12 +2692,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
-                bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
-
-                if (!expanded)
-                {
-                    var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
-                }
+                ExpandHeader(driver);
 
                 return GetValue(control);
             });
@@ -2725,12 +2705,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
-                bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
-
-                if (!expanded)
-                {
-                    var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
-                }
+                ExpandHeader(driver);
 
                 return GetValue(control);
             });
@@ -2743,12 +2718,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
-                bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
-
-                if (!expanded)
-                {
-                    var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
-                }
+                ExpandHeader(driver);
 
                 return GetValue(control);
             });
@@ -2780,12 +2750,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
-                bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
-
-                if (!expanded)
-                {
-                    var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
-                }
+                ExpandHeader(driver);
 
                 SetValue(field, value);
 
@@ -2800,12 +2765,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
-                bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
-
-                if (!expanded)
-                {
-                    var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
-                }
+                ExpandHeader(driver);
 
                 SetValue(control);
 
@@ -2820,12 +2780,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
-                bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
-
-                if (!expanded)
-                {
-                    var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
-                }
+                ExpandHeader(driver);
 
                 SetValue(controls);
 
@@ -2840,12 +2795,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
-                bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
-
-                if (!expanded)
-                {
-                    var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
-                }
+                ExpandHeader(driver);
 
                 SetValue(control);
 
@@ -2860,12 +2810,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
-                bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
-
-                if (!expanded)
-                {
-                    var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
-                }
+                ExpandHeader(driver);
 
                 SetValue(control);
 
@@ -2880,12 +2825,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
-                bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
-
-                if (!expanded)
-                {
-                    var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
-                }
+                ExpandHeader(driver);
 
                 SetValue(control);
 
@@ -2900,12 +2840,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
-                bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
-
-                if (!expanded)
-                {
-                    var flyoutButton = driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
-                }
+                ExpandHeader(driver);
 
                 SetValue(field, date, format);
 
@@ -3074,6 +3009,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
+        internal void ExpandHeader(IWebDriver driver)
+        {
+            bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
+
+            if (!expanded)
+            {
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
+            }
+        }
+
 
         #endregion
 
