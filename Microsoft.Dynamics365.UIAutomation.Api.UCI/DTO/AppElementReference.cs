@@ -129,6 +129,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EntityOptionsetStatusComboButton = "Entity_OptionsetStatusComboButton";
             public static string EntityOptionsetStatusComboList = "Entity_OptionsetStatusComboList";
             public static string EntityOptionsetStatusTextValue = "Entity_OptionsetStatusTextValue";
+            public static string HeaderFlyoutButton = "Entity_HeaderFlyoutButton";
 
         }
 
@@ -371,6 +372,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},
             { "Entity_OptionsetStatusComboList", "//ul[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_list')]"},
             { "Entity_OptionsetStatusTextValue", "//span[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_text-value')]"},
+            { "Entity_HeaderFlyoutButton","//button[contains(@id,'headerFieldsExpandButton')]" },
                         
             //CommandBar
             { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
