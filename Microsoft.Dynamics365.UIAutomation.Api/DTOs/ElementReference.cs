@@ -99,6 +99,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Nav_SearchLabel"       , "id(\"findHintText\")"},
             { "Nav_Search"       , "id(\"search\")"},
             { "Nav_StartSearch"       , "id(\"findCriteriaButton\")"},
+            { "Nav_OpenAppTabArrowDivider", "//*[@id=\"TabArrowDivider\"]/a" },
+            { "Nav_OpenAppContainer", "//*[@id=\"taskpane-scroll-container\"]" },
+            
 
             { "Nav_Tab_Summary",      "//li[contains(@data-id,\"tablist-SUMMARY_TAB\")]" },
             { "Nav_Tab_Details",      "//li[contains(@data-id,\"tablist-DETAILS_TAB\")]" },
@@ -617,6 +620,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string SummaryTab = "Nav_Tab_Summary";
             public static string DetailsTab = "Nav_Tab_Details";
             public static string PerfTab = "Nav_Tab_Perf";
+            public static string OpenAppTabDivider = "Nav_OpenAppTabArrowDivider";
+            public static string OpenAppContainer = "Nav_OpenAppContainer";
         }
         public static class Grid
         {

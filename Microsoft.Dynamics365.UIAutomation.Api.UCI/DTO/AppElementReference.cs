@@ -129,6 +129,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EntityOptionsetStatusComboButton = "Entity_OptionsetStatusComboButton";
             public static string EntityOptionsetStatusComboList = "Entity_OptionsetStatusComboList";
             public static string EntityOptionsetStatusTextValue = "Entity_OptionsetStatusTextValue";
+            public static string HeaderFlyoutButton = "Entity_HeaderFlyoutButton";
 
         }
 
@@ -241,6 +242,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public static class Field
         {
             public static string ReadOnly = "Field_ReadOnly";
+            public static string Required = "Field_Required";
+        }
+        public static class PerformanceWidget
+        {
+            public static string Container = "Performance_Widget";
+            public static string Page = "Performance_WidgetPage";
         }
     }
 
@@ -298,7 +305,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Grid_Rows"           , "//div[contains(@role,'row')]"},
             { "Grid_ChartSelector"           , "//span[contains(@id,'ChartSelector')]"},
             { "Grid_ChartViewList"           , "//ul[contains(@role,'listbox')]"},
-            { "Grid_SortColumn",            "//div[@id='btnheaderselectcolumn']/parent::*//div[text()='[COLNAME]'"},
+            { "Grid_SortColumn",            "//div[@data-type='Grid']//div[@title='[COLNAME]']//div[@class='grid-header-text']"},
             { "Grid_CellContainer"    ,"//div[@role='grid'][@data-id='grid-cell-container']"},
             { "Grid_ViewSelector"   , "//span[contains(@id,'ViewSelector')]" },
             { "Grid_ViewContainer"   , "//ul[contains(@id,'ViewSelector')]" },
@@ -326,7 +333,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_LookupFieldResultList", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
             { "Entity_LookupFieldResultListItem", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_resultsContainer')]" },
             { "Entity_LookupFieldHoverExistingValue", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList')]" },
-            { "Entity_TextFieldLookupFieldContainer", "//*[contains(@data-id, '[NAME].fieldControl-Lookup_[NAME]')]" },
+            { "Entity_TextFieldLookupFieldContainer", "//div[@data-id='[NAME].fieldControl-Lookup_[NAME]']" },
             { "Entity_RecordSetNavigatorOpen", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
             { "Entity_RecordSetNavigator", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
             { "Entity_RecordSetNavList", "//ul[contains(@data-id, 'recordSetNaveList')]" },
@@ -365,6 +372,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},
             { "Entity_OptionsetStatusComboList", "//ul[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_list')]"},
             { "Entity_OptionsetStatusTextValue", "//span[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_text-value')]"},
+            { "Entity_HeaderFlyoutButton","//button[contains(@id,'headerFieldsExpandButton')]" },
                         
             //CommandBar
             { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
@@ -422,6 +430,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             //Field
             {"Field_ReadOnly",".//*[@aria-readonly]" },
+            {"Field_Required", ".//*[@aria-required]"},
 
             //Dialogs
             { "AssignDialog_ToggleField" , "//label[contains(@data-id,'rdoMe_id.fieldControl-checkbox-inner-first')]" },
@@ -449,7 +458,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Lookup_ChangeViewButton", "//button[contains(@data-id,'changeViewBtn')]"},
             { "Lookup_ViewRows", "//li[contains(@data-id,'viewLineContainer')]"},
             { "Lookup_ResultRows", "//li[contains(@data-id,'LookupResultsDropdown') and contains(@data-id,'resultsContainer')]"},
-            { "Lookup_NewButton", "//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]" }
+            { "Lookup_NewButton", "//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]" },
+
+            //Performance Width
+            { "Performance_Widget","//div[@data-id='performance-widget']/div"},
+            { "Performance_WidgetPage", "//div[@data-id='performance-widget']//span[contains(text(), '[NAME]')]" }
         };
     }
 

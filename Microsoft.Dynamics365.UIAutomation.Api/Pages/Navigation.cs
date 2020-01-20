@@ -532,10 +532,49 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions($"SignOut"), driver =>
             {
-                var userInfo = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.UserInfo]));
-                userInfo?.Click();
-                var signOut = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.SignOut]));
-                signOut?.Click();
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.UserInfo]));
+
+                Browser.ThinkTime(500);
+
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.SignOut]));         
+                return true;
+            });
+        }
+
+        public BrowserCommandResult<bool> OpenApp(string appName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Open App"), driver =>
+            {
+                driver.SwitchTo().DefaultContent();
+
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Navigation.OpenAppTabDivider])))
+                {
+                    driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.OpenAppTabDivider]));
+
+                    var container = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.OpenAppContainer]));
+
+                    var buttons = container.FindElements(By.TagName("button"));
+
+                    var button = buttons.FirstOrDefault(x => x.Text.Trim() == appName);
+
+                    if (button != null)
+                        button.Click(true);
+                    else
+                        throw new InvalidOperationException($"App Name {appName} not found.");
+
+                    driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
+                      , new TimeSpan(0, 0, 60),
+                      e =>
+                      {
+                          e.WaitForPageToLoad();
+                          e.SwitchTo().Frame(0);
+                          e.WaitForPageToLoad();
+                      },
+                      f => { throw new Exception("App Load failed. "); });
+                }
+
                 return true;
             });
         }

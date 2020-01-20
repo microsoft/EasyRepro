@@ -11,17 +11,20 @@ using System.Linq;
 using System.Security;
 using System.Threading;
 using System.Web;
+using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
     public class WebClient : BrowserPage
     {
         public List<ICommandResult> CommandResults => Browser.CommandResults;
+        public Guid ClientSessionId;
 
         public WebClient(BrowserOptions options)
         {
             Browser = new InteractiveBrowser(options);
             OnlineDomains = Constants.Xrm.XrmDomains;
+            ClientSessionId = Guid.NewGuid();
         }
 
         internal BrowserCommandOptions GetOptions(string commandName)
@@ -35,14 +38,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 typeof(NoSuchElementException), typeof(StaleElementReferenceException));
         }
 
-        internal BrowserCommandResult<bool> InitializeTestMode(bool onlineLoginPath = false)
+        internal BrowserCommandResult<bool> InitializeModes(bool onlineLoginPath = false)
         {
-            return this.Execute(GetOptions("Initialize Unified Interface TestMode"), driver =>
+            return this.Execute(GetOptions("Initialize Unified Interface Modes"), driver =>
             {
                 var uri = driver.Url;
-                var queryParams = "&flags=testmode=true,easyreproautomation=true";
+                var queryParams = "";
 
-                if (!uri.Contains(queryParams))
+                if(Browser.Options.UCITestMode) queryParams += "&flags=testmode=true,easyreproautomation=true";
+                if (Browser.Options.UCIPerformanceMode) queryParams += "&perf=true";
+
+                if (!string.IsNullOrEmpty(queryParams) && !uri.Contains(queryParams))
                 {
                     var testModeUri = uri + queryParams;
 
@@ -64,6 +70,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public string[] OnlineDomains { get; set; }
 
         #region Login
+        internal BrowserCommandResult<LoginResult> Login(Uri uri)
+        {
+            if (this.Browser.Options.Credentials.Username == null)
+                return PassThroughLogin(uri);
+            else
+                return this.Execute(GetOptions("Login"), this.Login, uri, this.Browser.Options.Credentials.Username, this.Browser.Options.Credentials.Password, default(Action<LoginRedirectEventArgs>));
+        }
+
         internal BrowserCommandResult<LoginResult> Login(Uri orgUri, SecureString username, SecureString password)
         {
             return this.Execute(GetOptions("Login"), this.Login, orgUri, username, password, default(Action<LoginRedirectEventArgs>));
@@ -143,7 +157,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return redirect ? LoginResult.Redirect : LoginResult.Success;
         }
+        internal BrowserCommandResult<LoginResult> PassThroughLogin(Uri uri)
+        {
+            return this.Execute(GetOptions("Pass Through Login"), driver =>
+            {
+                driver.Navigate().GoToUrl(uri);
 
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
+                         , new TimeSpan(0, 0, 60),
+                         e => {
+                             e.WaitForPageToLoad();
+                             e.SwitchTo().Frame(0);
+                             e.WaitForPageToLoad();
+
+                             //Switch Back to Default Content for Navigation Steps
+                             e.SwitchTo().DefaultContent();
+                         },
+                         f => { throw new Exception("Login page failed."); });
+
+                return LoginResult.Success;
+            });
+        }
         public void ADFSLoginAction(LoginRedirectEventArgs args)
 
         {
@@ -218,7 +252,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions("Open App"), driver =>
             {
-
                 driver.SwitchTo().DefaultContent();
 
                 //Handle left hand Nav
@@ -226,7 +259,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuButton]));
 
-                    var container = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuContainer]));
+                    var container = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuContainer]));
 
                     var buttons = container.FindElements(By.TagName("button"));
 
@@ -242,28 +275,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     driver.WaitForPageToLoad();
 
                     driver.WaitForTransaction();
-
-                    if (Browser.Options.UCITestMode)
-                    {
-                        InitializeTestMode();
-                    }
-
-                    return true;
                 }
-
-                //Handle main.aspx?ForcUCI=1
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer])))
+                else  if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]))) //Handle main.aspx?ForcUCI=1
                 {
                     var tileContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]));
                     tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
 
                     driver.WaitForTransaction();
-
-                    if (Browser.Options.UCITestMode)
-                    {
-                        InitializeTestMode();
-                    }
-
                 }
                 else
                 {
@@ -276,15 +294,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
 
                         driver.WaitForTransaction();
-
-                        if (Browser.Options.UCITestMode)
-                        {
-                            InitializeTestMode();
-                        }
                     }
                     else
                         throw new InvalidOperationException($"App Name {appName} not found.");
                 }
+
+                InitializeModes();
 
                 return true;
             });
@@ -1517,7 +1532,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (sortCol == null)
                     throw new InvalidOperationException($"Column: {columnName} Does not exist");
                 else
-                    sortCol.Click();
+                    sortCol.Click(true);
+
+                driver.WaitForTransaction();
                 return true;
             });
         }
@@ -1802,6 +1819,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
 
+
                 ClearValue(control);
 
                 var input = fieldContainer.FindElements(By.TagName("input")).Count > 0
@@ -1814,7 +1832,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     input.SendKeys(Keys.Backspace);
                     input.SendKeys(control.Value, true);
 
-                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupSearchButton].Replace("[NAME]", control.Name)));
+                    //No longer needed, the search dialog opens when you enter the value
+                    //driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupSearchButton].Replace("[NAME]", control.Name)));
+
                     driver.WaitForTransaction();
                 }
 
@@ -2633,6 +2653,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                ExpandHeader(driver);
+
                 return GetValue(control);
             });
         }
@@ -2643,6 +2665,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
+
+                ExpandHeader(driver);
 
                 return GetValue(controls);
             });
@@ -2655,6 +2679,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                ExpandHeader(driver);
+
                 return GetValue(control);
             });
         }
@@ -2665,6 +2691,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
+
+                ExpandHeader(driver);
 
                 return GetValue(control);
             });
@@ -2677,6 +2705,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                ExpandHeader(driver);
+
                 return GetValue(control);
             });
         }
@@ -2687,6 +2717,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
+
+                ExpandHeader(driver);
 
                 return GetValue(control);
             });
@@ -2718,6 +2750,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                ExpandHeader(driver);
+
                 SetValue(field, value);
 
                 return true;
@@ -2730,6 +2764,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
+
+                ExpandHeader(driver);
 
                 SetValue(control);
 
@@ -2744,6 +2780,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                ExpandHeader(driver);
+
                 SetValue(controls);
 
                 return true;
@@ -2756,6 +2794,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
+
+                ExpandHeader(driver);
 
                 SetValue(control);
 
@@ -2770,6 +2810,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                ExpandHeader(driver);
+
                 SetValue(control);
 
                 return true;
@@ -2783,6 +2825,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
+                ExpandHeader(driver);
+
                 SetValue(control);
 
                 return true;
@@ -2795,6 +2839,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
+
+                ExpandHeader(driver);
 
                 SetValue(field, date, format);
 
@@ -2817,6 +2863,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Clear Field {control.Name}"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
+
+                fieldContainer.Hover(driver);
 
                 var existingValues = fieldContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
 
@@ -2961,6 +3009,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
+        internal void ExpandHeader(IWebDriver driver)
+        {
+            bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton])).GetAttribute("aria-expanded"));
+
+            if (!expanded)
+            {
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderFlyoutButton]));
+            }
+        }
+
 
         #endregion
 
@@ -3304,6 +3363,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal void ClickTab(IWebElement tabList, string xpath, string name)
         {
+            IWebElement moreTabsButton;
+            IWebElement listItem;
             // Look for the tab in the tab list, else in the more tabs menu
             IWebElement searchScope = null;
             if(tabList.HasElement(By.XPath(string.Format(xpath, name))))
@@ -3311,14 +3372,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 searchScope = tabList;
 
             }
-            else if(tabList.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabs]), out IWebElement moreTabsButton))
+            else if(tabList.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabs]), out moreTabsButton))
             {
                 moreTabsButton.Click();
                 searchScope = Browser.Driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabsMenu]));
             }
             
 
-            if (searchScope.TryFindElement(By.XPath(string.Format(xpath, name)), out IWebElement listItem))
+            if (searchScope.TryFindElement(By.XPath(string.Format(xpath, name)), out listItem))
             {
                 listItem.Click(true);
             }
@@ -3893,10 +3954,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dashboard.DashboardSelector]));
                 //Select the dashboard
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dashboard.DashboardItemUCI].Replace("[NAME]", dashboardName)));
-
+                
                 return true;
             });
         }
+        #endregion
+
+        #region PerformanceCenter
+
+        internal void EnablePerformanceCenter()
+        {
+            Browser.Driver.Navigate().GoToUrl(string.Format("{0}&perf=true", Browser.Driver.Url));
+            Browser.Driver.WaitForPageToLoad();
+            Browser.Driver.WaitForTransaction();
+        }
+      
+       
         #endregion
 
         internal void ThinkTime(int milliseconds)
