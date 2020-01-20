@@ -68,15 +68,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public static IWebElement ClickWhenAvailable(this IWebDriver driver, By by, TimeSpan timeout)
         {
-            var element = driver.FindElement(by);
-
+            IWebElement element = null;
             WaitUntilClickable(driver,
                                 by,
                                 timeout,
-                                d => { element.Click(true); },
-                                e => { throw new InvalidOperationException($"Unable to click element."); });
-
-
+                                d =>
+                                {
+                                    element = d.FindElement(by);
+                                    element?.Click(true);
+                                },
+                                e => throw new InvalidOperationException("Unable to click element."));
 
             return element;
         }
