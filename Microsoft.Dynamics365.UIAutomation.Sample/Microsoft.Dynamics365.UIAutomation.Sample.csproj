@@ -223,6 +223,7 @@
     <Compile Include="Web\Views\Views.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.build.config" />
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>

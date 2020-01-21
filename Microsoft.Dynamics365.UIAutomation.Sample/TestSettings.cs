@@ -3,6 +3,7 @@
 using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
+using System.IO;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
@@ -16,6 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         private static readonly string Type = System.Configuration.ConfigurationManager.AppSettings["BrowserType"].ToString();
         private static readonly string RemoteType = System.Configuration.ConfigurationManager.AppSettings["RemoteBrowserType"].ToString();
         private static readonly string RemoteHubServerURL = System.Configuration.ConfigurationManager.AppSettings["RemoteHubServer"].ToString();
+        private static readonly string DriversPath = System.Configuration.ConfigurationManager.AppSettings["DriversPath"];
 
         public static BrowserOptions Options = new BrowserOptions
         {
@@ -28,7 +30,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             RemoteBrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), RemoteType),
             RemoteHubServer = new Uri(RemoteHubServerURL),
             UCITestMode = true,
-            UCIPerformanceMode = true
+            UCIPerformanceMode = true,
+            DriversPath = Path.IsPathRooted(DriversPath) ? DriversPath : Path.Combine(Directory.GetCurrentDirectory(), DriversPath) 
         };
 
         public static string GetRandomString(int minLen, int maxLen)
