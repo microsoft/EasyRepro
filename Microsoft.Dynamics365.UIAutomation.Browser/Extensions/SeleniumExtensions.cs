@@ -40,7 +40,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             {
                 element.Click();
             }
-            catch(StaleElementReferenceException ex)
+            catch (StaleElementReferenceException ex)
             {
                 if (!ignoreStaleElementException)
                     throw ex;
@@ -329,7 +329,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public static void SetVisible(this IWebDriver driver, By by, bool visible)
         {
             IWebElement element = driver.FindElement(by);
-            if(visible)
+            if (visible)
                 driver.ExecuteScript($"document.getElementById('{element.GetAttribute("Id")}').setAttribute('style', 'display: inline;')");
             else
                 driver.ExecuteScript($"document.getElementById('{element.GetAttribute("Id")}').setAttribute('style', 'display: none;')");
@@ -507,11 +507,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     return state;
                 });
             }
-            catch(Exception)
+            catch (Exception)
             {
 
             }
-           
+
             return state;
         }
         public static string Last(this System.Collections.ObjectModel.ReadOnlyCollection<string> handles, IWebDriver driver)
@@ -662,6 +662,37 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return success.Value;
         }
 
+        public static bool RepeatUntil(this IWebDriver driver, Action action, Predicate<IWebDriver> predicate,
+                                       TimeSpan? timeout = null,
+                                       int attemps = Constants.DefaultRetryAttempts,
+                                       Action successCallback = null, Action failureCallback = null)
+        {
+            timeout = timeout ?? Constants.DefaultTimeout;
+            var waittime = new TimeSpan(timeout.Value.Ticks / attemps);
+
+            WebDriverWait wait = new WebDriverWait(driver, waittime);
+            wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
+
+            bool success = predicate(driver);
+            while (!success && attemps > 0)
+            {
+                try
+                {
+                    action();
+                    attemps --;
+                    success = wait.Until(d => predicate(d));             
+                }
+                catch (WebDriverTimeoutException){}
+            }
+
+            if (success)
+                successCallback?.Invoke();
+            else 
+                failureCallback?.Invoke();
+
+            return success;
+        }
+
         public static bool WaitUntilClickable(this IWebDriver driver, By by)
         {
             return WaitUntilClickable(driver, by, Constants.DefaultTimeout, null, null);
@@ -723,7 +754,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     return e.FindMethod.ToString();
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return e.FindMethod.ToString();
             }
