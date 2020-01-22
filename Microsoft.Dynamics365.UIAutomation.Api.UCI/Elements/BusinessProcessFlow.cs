@@ -110,9 +110,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Sets the value of a Date field
         /// </summary>
         /// <param name="field">Schema name of the field to retrieve</param>
-        public void SetValue(string field, DateTime date, string format = "MM dd yyyy")
+        public void SetValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
-            _client.SetValue(field, date, format);
+            _client.SetValue(field, date, formatDate, formatTime);
         }
 
         /// <summary>
