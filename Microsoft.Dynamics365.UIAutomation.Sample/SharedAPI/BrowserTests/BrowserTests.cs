@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.SharedAPI

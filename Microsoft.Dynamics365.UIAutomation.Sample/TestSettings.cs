@@ -28,7 +28,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             RemoteBrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), RemoteType),
             RemoteHubServer = new Uri(RemoteHubServerURL),
             UCITestMode = true,
-            UCIPerformanceMode = true
+            UCIPerformanceMode = false
         };
 
         public static string GetRandomString(int minLen, int maxLen)
