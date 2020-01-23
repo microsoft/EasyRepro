@@ -17,7 +17,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string AreaMenu = "Nav_AreaMenu";
             public static string AreaMoreMenu = "Nav_AreaMoreMenu";
             public static string SubAreaContainer = "Nav_SubAreaContainer";
-            public static string AppMenuButton = "Nav_AppMenuButton";
+            public static string WebAppMenuButton = "Nav_WebAppMenuButton";
+            public static string UCAppMenuButton = "Nav_UCAppMenuButton";
             public static string SiteMapLauncherButton = "Nav_SiteMapLauncherButton";
             public static string SiteMapLauncherCloseButton = "Nav_SiteMapLauncherCloseButton";
             public static string SiteMapAreaMoreButton = "Nav_SiteMapAreaMoreButton";
@@ -263,7 +264,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_AreaMenu"       , "//*[@data-lp-id=\"sitemap-areabar-overflow-flyout\"]"},
             { "Nav_AreaMoreMenu"       , "//ul[@role=\"menubar\"]"},
             { "Nav_SubAreaContainer"       , "//*[@data-id=\"navbar-container\"]/div/ul"},
-            { "Nav_AppMenuButton"       , "//*[@id=\"TabArrowDivider\"]/a"},
+            { "Nav_WebAppMenuButton"       , "//*[@id=\"TabArrowDivider\"]/a"},
+            { "Nav_UCAppMenuButton"       , "//button[@data-id=\"navbar-switch-app\"]"},
             { "Nav_SiteMapLauncherButton", "//button[@data-lp-id=\"sitemap-launcher\"]" },
             { "Nav_SiteMapLauncherCloseButton", "//button[@aria-label=\"Close Site Map\"]" },
             { "Nav_SiteMapAreaMoreButton", "//button[@data-lp-id=\"sitemap-areaBar-more-btn\"]" },
