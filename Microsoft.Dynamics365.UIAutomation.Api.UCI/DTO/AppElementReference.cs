@@ -425,7 +425,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_CloseStageButton","//button[contains(@id,'stageContentClose')]"},
 
             //Related Grid
-            { "Related_CommandBarButton", "//button[contains(., '[NAME]') and contains(@data-id,'SubGridAssociated')]"},
+            { "Related_CommandBarButton", "//button[contains(., '[NAME]') and contains(@data-id,'SubGrid')]"},
             { "Related_CommandBarSubButton" ,"//button[contains(., '[NAME]')]"},
 
             //Field
