@@ -32,7 +32,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             RemoteBrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), RemoteType),
             RemoteHubServer = new Uri(RemoteHubServerURL),
             UCITestMode = true,
-            UCIPerformanceMode = false
+            UCIPerformanceMode = false,
             DriversPath = Path.IsPathRooted(DriversPath) ? DriversPath : Path.Combine(Directory.GetCurrentDirectory(), DriversPath) 
         };
 
