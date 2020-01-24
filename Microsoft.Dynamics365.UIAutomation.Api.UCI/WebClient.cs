@@ -38,29 +38,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 typeof(NoSuchElementException), typeof(StaleElementReferenceException));
         }
 
-        internal BrowserCommandResult<bool> InitializeModes(bool onlineLoginPath = false)
+        internal BrowserCommandResult<bool> InitializeModes()
         {
             return this.Execute(GetOptions("Initialize Unified Interface Modes"), driver =>
             {
                 var uri = driver.Url;
-                var queryParams = "";
+                var queryParams = "&flags=easyreproautomation=true";
 
-                if (Browser.Options.UCITestMode) queryParams += "&flags=testmode=true,easyreproautomation=true";
+                if (Browser.Options.UCITestMode) queryParams += ",testmode=true";
                 if (Browser.Options.UCIPerformanceMode) queryParams += "&perf=true";
 
-                if (!string.IsNullOrEmpty(queryParams) && !uri.Contains(queryParams))
+                if(!uri.Contains(queryParams) && !uri.Contains(System.Web.HttpUtility.UrlEncode(queryParams)))
                 {
                     var testModeUri = uri + queryParams;
 
                     driver.Navigate().GoToUrl(testModeUri);
-
-                    driver.WaitForPageToLoad();
-
-                    if (!onlineLoginPath)
-                    {
-                        driver.WaitForTransaction();
-                    }
+                    
                 }
+
+                WaitForMainPage();
 
                 return true;
             });
@@ -68,6 +64,44 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
 
         public string[] OnlineDomains { get; set; }
+
+        #region PageWaits
+        internal void WaitForLoginPage()
+        {
+            IWebDriver driver = this.Browser.Driver;
+
+            driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
+                         , new TimeSpan(0, 0, 60),
+                         e => {
+
+                             //determine if we landed on the Unified Client Main page
+                             if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.CrmUCMainPage])))
+                             {
+                                 e.WaitForPageToLoad();
+                                 e.WaitForTransaction();
+                             }
+                             else //else we landed on the Web Client main page or app picker page
+                             {
+                                 e.WaitForPageToLoad();
+                                 e.SwitchTo().Frame(0);
+                                 e.WaitForPageToLoad();
+                                 //Switch Back to Default Content for Navigation Steps
+                                 e.SwitchTo().DefaultContent();
+                             }
+                         },
+                         f => { throw new Exception("Login page failed."); });
+        }
+        internal void WaitForMainPage()
+        {
+            IWebDriver driver = this.Browser.Driver;
+            driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]));
+            driver.WaitForPageToLoad();
+            if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.CrmUCMainPage])))
+            {
+                driver.WaitForTransaction();
+            }
+        }
+        #endregion
 
         #region Login
         internal BrowserCommandResult<LoginResult> Login(Uri uri)
@@ -141,17 +175,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]));
                     }
 
-                    driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
-                        , new TimeSpan(0, 0, 60),
-                        e => {
-                            e.WaitForPageToLoad();
-                            e.SwitchTo().Frame(0);
-                            e.WaitForPageToLoad();
-
-                            //Switch Back to Default Content for Navigation Steps
-                            e.SwitchTo().DefaultContent();
-                        },
-                        f => { throw new Exception("Login page failed."); });
+                    WaitForLoginPage();
                 }
             }
 
@@ -163,21 +187,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.Navigate().GoToUrl(uri);
 
-                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
-                         , new TimeSpan(0, 0, 60),
-                         e => {
-                             e.WaitForPageToLoad();
-                             e.SwitchTo().Frame(0);
-                             e.WaitForPageToLoad();
-
-                             //Switch Back to Default Content for Navigation Steps
-                             e.SwitchTo().DefaultContent();
-                         },
-                         f => { throw new Exception("Login page failed."); });
+                WaitForLoginPage();
 
                 return LoginResult.Success;
             });
         }
+
+        
         public void ADFSLoginAction(LoginRedirectEventArgs args)
 
         {
@@ -254,34 +270,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.SwitchTo().DefaultContent();
 
-                //Handle left hand Nav
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuButton])))
+                //Handle left hand Nav in Web Client
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.WebAppMenuButton])))
                 {
-                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuButton]));
+                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.WebAppMenuButton]));
 
-                    var container = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuContainer]));
+                    OpenAppFromMenu(driver, appName);
+                }
+                else if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCAppMenuButton])))  //Handle Left Hand Nav in UC Client
+                {
+                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.UCAppMenuButton]));
 
-                    var buttons = container.FindElements(By.TagName("button"));
-
-                    var button = buttons.FirstOrDefault(x => x.Text.Trim() == appName);
-
-                    if (button != null)
-                        button.Click(true);
-                    else
-                        throw new InvalidOperationException($"App Name {appName} not found.");
-
-                    driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
-                    driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
-                    driver.WaitForPageToLoad();
-
-                    driver.WaitForTransaction();
+                    OpenAppFromMenu(driver, appName);
                 }
                 else if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]))) //Handle main.aspx?ForcUCI=1
                 {
                     var tileContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]));
                     tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
 
-                    driver.WaitForTransaction();
+                    WaitForMainPage();
                 }
                 else
                 {
@@ -293,11 +300,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         var tileContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]));
                         tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
 
-                        driver.WaitForTransaction();
+                        WaitForMainPage();
                     }
                     else
                         throw new InvalidOperationException($"App Name {appName} not found.");
                 }
+                Thread.Sleep(1000);
 
                 InitializeModes();
 
@@ -305,6 +313,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal void OpenAppFromMenu(IWebDriver driver, string appName)
+        {
+            var container = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuContainer]));
+
+            var buttons = container.FindElements(By.TagName("button"));
+
+            var button = buttons.FirstOrDefault(x => x.Text.Trim() == appName);
+
+            if (button != null)
+                button.Click(true);
+            else
+                throw new InvalidOperationException($"App Name {appName} not found.");
+
+            driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
+            driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+
+            WaitForMainPage();
+        }
         internal BrowserCommandResult<bool> OpenGroupSubArea(string group, string subarea, int thinkTime = Constants.DefaultThinkTime)
         {
             this.Browser.ThinkTime(thinkTime);
