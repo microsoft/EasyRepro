@@ -23,7 +23,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.Login(orgUrl);
 
-            _client.InitializeModes(true);
+            _client.InitializeModes();
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.Login(orgUrl, username, password, mfaSecrectKey);
 
-            _client.InitializeModes(true);
+            _client.InitializeModes();
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.Login(orgUrl, username, password, mfaSecrectKey, redirectAction);
 
-            _client.InitializeModes(true);           
+            _client.InitializeModes();           
         }
 
     }

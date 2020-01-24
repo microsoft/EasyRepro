@@ -3,22 +3,16 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
-using Microsoft.Dynamics365.UIAutomation.Browser;
-using System;
 using System.Linq;
-using System.Security;
 using System.Collections.Generic;
+using Microsoft.Dynamics365.UIAutomation.Sample.UCI;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.SharedAPI
 {
     [TestClass]
-    public class UploadTelemetryUCI
+    public class UploadTelemetryUCI : TestsBase
     {
-
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
-        private readonly string _azureKey = System.Configuration.ConfigurationManager.AppSettings["AzureKey"].ToString();
+        private readonly string _azureKey = System.Configuration.ConfigurationManager.AppSettings["AzureKey"];
 
         [TestMethod]
         public void SharedTestUploadTelemetryUCI()
@@ -28,12 +22,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.SharedAPI
             var options = TestSettings.Options;
             options.AppInsightsKey = _azureKey;
             options.UCIPerformanceMode = true;
-
-
+            
             var client = new WebClient(options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
