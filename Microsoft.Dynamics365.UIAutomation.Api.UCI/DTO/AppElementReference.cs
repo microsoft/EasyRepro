@@ -115,7 +115,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SubGridRecordCheckbox = "Entity_SubGridRecordCheckbox";
             public static string FieldLookupButton = "Entity_FieldLookupButton";
             public static string SearchButtonIcon = "Entity_SearchButtonIcon";
-            public static string EntityHeader = "Entity_Header";
             public static string DuplicateDetectionWindowMarker = "Entity_DuplicateDetectionWindowMarker";
             public static string DuplicateDetectionGridRows = "Entity_DuplicateDetectionGridRows";
             public static string DuplicateDetectionIgnoreAndSaveButton = "Entity_DuplicateDetectionIgnoreAndSaveButton";
@@ -130,10 +129,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EntityOptionsetStatusComboButton = "Entity_OptionsetStatusComboButton";
             public static string EntityOptionsetStatusComboList = "Entity_OptionsetStatusComboList";
             public static string EntityOptionsetStatusTextValue = "Entity_OptionsetStatusTextValue";
-            public static string HeaderFlyoutButton = "Entity_HeaderFlyoutButton";
-
+            
+            public static class Header
+            {
+                public static string Container = "Entity_Header";
+                public static string Flyout = "Entity_Header_Flyout";
+                public static string FlyoutButton = "Entity_Header_FlyoutButton";
+                public static string LookupFieldContainer = "Entity_Header_LookupFieldContainer";
+                public static string TextFieldContainer = "Entity_Header_TextFieldContainer";
+            }
         }
-
+    
         public static class CommandBar
         {
             public static string Container = "Cmd_Container";
@@ -359,7 +365,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SubGridRecordCheckbox","//div[contains(@data-id,'cell-[INDEX]-1') and contains(@data-lp-id,'[NAME]')]"},
             { "Entity_FieldLookupButton","//button[contains(@data-id,'[NAME]_search')]" },
             { "Entity_SearchButtonIcon", "//span[contains(@data-id,'microsoftIcon_searchButton')]" },
-            { "Entity_Header", "//div[contains(@data-id,'form-header')]"},
             { "Entity_DuplicateDetectionWindowMarker","//div[contains(@data-id,'ManageDuplicates')]"},
             { "Entity_DuplicateDetectionGridRows", "//div[contains(@class,'data-selectable')]" },
             { "Entity_DuplicateDetectionIgnoreAndSaveButton", "//button[contains(@data-id,'ignore_save')]"},
@@ -374,7 +379,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},
             { "Entity_OptionsetStatusComboList", "//ul[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_list')]"},
             { "Entity_OptionsetStatusTextValue", "//span[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_text-value')]"},
-            { "Entity_HeaderFlyoutButton","//button[contains(@id,'headerFieldsExpandButton')]" },
+
+            //Entity Header
+            { "Entity_Header", "//div[contains(@data-id,'form-header')]"},
+            { "Entity_Header_Flyout","//div[@data-id='headerFieldsFlyout']" },
+            { "Entity_Header_FlyoutButton","//button[contains(@id,'headerFieldsExpandButton')]" },
+            { "Entity_Header_LookupFieldContainer", "//div[@data-id='header_[NAME].fieldControl-Lookup_[NAME]']" },
+            { "Entity_Header_TextFieldContainer", "//div[@data-id='header_[NAME].fieldControl-text-box-container']" },
                         
             //CommandBar
             { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},

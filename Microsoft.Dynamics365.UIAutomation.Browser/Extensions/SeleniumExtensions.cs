@@ -12,7 +12,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
@@ -247,7 +246,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public static bool HasAttribute(this IWebElement element, string attributeName)
         {
-            return element.GetAttribute(attributeName) == null ? false : true;
+            return element.GetAttribute(attributeName) != null;
         }
 
         public static bool HasElement(this IWebDriver driver, By by)
@@ -274,32 +273,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
         }
 
-        public static bool TryFindElement(this IWebDriver driver, By by, out IWebElement element)
+        public static bool TryFindElement(this ISearchContext context, By by, out IWebElement element)
         {
-            try
-            {
-                element = driver.FindElement(by);
-                return true;
-            }
-            catch (NoSuchElementException)
-            {
-                element = null;
-                return false;
-            }
-        }
-
-        public static bool TryFindElement(this IWebElement element, By by, out IWebElement foundElement)
-        {
-            try
-            {
-                foundElement = element.FindElement(by);
-                return true;
-            }
-            catch (NoSuchElementException)
-            {
-                foundElement = null;
-                return false;
-            }
+            var elements = context.FindElements(by);
+            var success = elements.Count > 0;
+            element = success ? elements[0] : null;
+            return success;
         }
 
         public static bool IsVisible(this IWebDriver driver, By by)
@@ -335,17 +314,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 driver.ExecuteScript($"document.getElementById('{element.GetAttribute("Id")}').setAttribute('style', 'display: none;')");
         }
 
-        public static void SendKeys(this IWebElement element, string value, bool clear)
+        public static void SendKeys(this IWebElement element, string value, bool clear = true)
         {
             if (clear)
-            {
                 element.Clear();
-                element.SendKeys(value);
-            }
-            else
-            {
-                element.SendKeys(value);
-            }
+           
+            element.SendKeys(value);
         }
 
         public static bool AlertIsPresent(this IWebDriver driver)
@@ -394,10 +368,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         #region Waits
 
+        public static bool WaitFor(this IWebElement element, Predicate<IWebElement> predicate)
+        {
+            var wait = new DefaultWait<IWebElement>(element)
+            {
+                Timeout = Constants.DefaultTimeout
+            };
+            var result = wait.Until(e => predicate(e));
+            return result;
+        }
+        
         public static bool WaitFor(this IWebDriver driver, Predicate<IWebDriver> predicate)
         {
             return WaitFor(driver, predicate, Constants.DefaultTimeout);
         }
+
 
         public static bool WaitFor(this IWebDriver driver, Predicate<IWebDriver> predicate, TimeSpan timeout)
         {
@@ -495,21 +480,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                         //Check to see if UCI is idle
                         state = (bool)driver.ExecuteScript("return window.UCWorkBlockTracker.isAppIdle()", "");
                     }
-                    catch (TimeoutException)
-                    {
-
-                    }
-                    catch (NullReferenceException)
-                    {
-
-                    }
+                    catch (TimeoutException) { }
+                    catch (NullReferenceException) {}
 
                     return state;
                 });
             }
             catch (Exception)
             {
-
+                // ignored
             }
 
             return state;
@@ -548,71 +527,50 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return null;
         }
 
-        public static IWebElement WaitUntilAvailable(this IWebDriver driver, By by)
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by)
         {
             return WaitUntilAvailable(driver, by, Constants.DefaultTimeout, null, null);
         }
 
-        public static IWebElement WaitUntilAvailable(this IWebDriver driver, By by, TimeSpan timeout)
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, TimeSpan timeout)
         {
             return WaitUntilAvailable(driver, by, timeout, null, null);
         }
 
-        public static IWebElement WaitUntilAvailable(this IWebDriver driver, By by, string exceptionMessage)
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, string exceptionMessage)
         {
-            return WaitUntilAvailable(driver, by, Constants.DefaultTimeout, null, d =>
-            {
-                throw new InvalidOperationException(exceptionMessage);
-            });
+            return WaitUntilAvailable(driver, by, Constants.DefaultTimeout, null, d => throw new InvalidOperationException(exceptionMessage));
         }
 
-        public static IWebElement WaitUntilAvailable(this IWebDriver driver, By by, TimeSpan timeout, string exceptionMessage)
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, TimeSpan timeout, string exceptionMessage)
         {
-            return WaitUntilAvailable(driver, by, timeout, null, d =>
-            {
-                throw new InvalidOperationException(exceptionMessage);
-            });
+            return WaitUntilAvailable(driver, by, timeout, null, d => throw new InvalidOperationException(exceptionMessage));
         }
 
-        public static IWebElement WaitUntilAvailable(this IWebDriver driver, By by, TimeSpan timeout, Action<IWebDriver> successCallback)
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, TimeSpan timeout, Action<ISearchContext> successCallback)
         {
             return WaitUntilAvailable(driver, by, timeout, successCallback, null);
         }
 
-        public static IWebElement WaitUntilAvailable(this IWebDriver driver, By by, TimeSpan timeout, Action<IWebDriver> successCallback, Action<IWebDriver> failureCallback)
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, TimeSpan timeout, Action<ISearchContext> successCallback, Action<ISearchContext> failureCallback)
         {
-            WebDriverWait wait = new WebDriverWait(driver, timeout);
-            bool? success;
+            var wait = new DefaultWait<ISearchContext>(driver) {Timeout =  timeout};
+            bool success = false;
             IWebElement returnElement = null;
 
             wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
 
             try
             {
-                var foundElements = wait.Until(d => d.FindElements(by));
-                if (foundElements != null && foundElements.Count > 1)
-                {
-                    returnElement = foundElements.FirstOrDefault(x => x.Displayed == true);
-                }
-                else
-                {
-                    returnElement = foundElements.FirstOrDefault();
-                }
+                returnElement = wait.Until(d => d.FindElement(by));
                 success = true;
             }
-            catch (NoSuchElementException)
-            {
-                success = false;
-            }
-            catch (WebDriverTimeoutException)
-            {
-                success = false;
-            }
+            catch (WebDriverTimeoutException) { }
 
-            if (success.HasValue && success.Value && successCallback != null)
-                successCallback(driver);
-            else if (success.HasValue && !success.Value && failureCallback != null)
-                failureCallback(driver);
+            if (success)
+                successCallback?.Invoke(driver);
+            else 
+                failureCallback?.Invoke(driver);
 
             return returnElement;
         }
