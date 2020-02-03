@@ -45,7 +45,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Grid.ViewSelector]),
                                          new TimeSpan(0,0,20),
                                          d=> { d.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Grid.ViewSelector])); },
-                                         d=> { throw new Exception("Unable to click the View Picker"); });                
+                                         "Unable to click the View Picker");                
 
                 driver.WaitUntilVisible(By.ClassName(Elements.CssClass[Reference.Grid.ViewContainer]),
                                         new TimeSpan(0, 0, 20),
@@ -284,7 +284,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
                                                     new TimeSpan(0, 0, 30),
                                                     null,
-                                                    d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
+                                                    "CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
                                                 );
                     }
                     return true;

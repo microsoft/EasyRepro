@@ -1823,7 +1823,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
             {
-                driver.WaitForTransaction(5);
+                driver.WaitForTransaction(TimeSpan.FromSeconds(5));
 
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
 
@@ -1908,7 +1908,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             input.SendKeys(Keys.Escape); // IE wants to keep the flyout open on multi-value fields, this makes sure it closes
         }
 
-        private void TrySetValue(IWebDriver driver, LookupItem control, string value, int index)
+        private void TrySetValue(IWebElement driver, LookupItem control, string value, int index)
         {
             if (value == null)
                 throw new InvalidOperationException($"No value has been provided for the LookupItem {control.Name}. Please provide a value or an empty string and try again.");
@@ -1919,7 +1919,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             SetLookUpByValue(driver, control, index);
         }
 
-        private void SetLookUpByValue(IWebDriver driver, LookupItem control, int index)
+        private void SetLookUpByValue(ISearchContext driver, LookupItem control, int index)
         {
             var controlName = control.Name;
             var xpathToText = AppElements.Xpath[AppReference.Entity.LookupFieldNoRecordsText].Replace("[NAME]", controlName);
@@ -1945,7 +1945,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (dialogItems.Count == 0)
                 throw new InvalidOperationException($"List does not contain a record with the name:  {value}");
 
-            if (index + 1 > dialogItems.Count)
+            if (index >= dialogItems.Count)
                 throw new InvalidOperationException($"List does not contain {index + 1} records. Please provide an index value less than {dialogItems.Count} ");
 
             var dialogItem = dialogItems[index];
@@ -1963,7 +1963,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var lookupResultsDialog = driver.WaitUntilAvailable(xpathToControl);
 
             driver.WaitForTransaction();
-            driver.WaitFor(d => d.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", controlName))).Count > 0);
+            driver.WaitUntil(d => d.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", controlName))).Count > 0);
             var lookupResults = LookupResultsDropdown(lookupResultsDialog).Value;
 
             driver.WaitForTransaction();
@@ -2394,7 +2394,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 collapseButton.Click(true);
 
                 int count = existingValues.Count;
-                fieldContainer.WaitFor(fc => fc.FindElements(xpathToExistingValues).Count > count);
+                fieldContainer.WaitUntil(fc => fc.FindElements(xpathToExistingValues).Count > count);
 
                 existingValues = fieldContainer.FindElements(xpathToExistingValues);
             }
@@ -2940,7 +2940,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 expandButton.Click(true);
 
                 var count = existingValues.Count;
-                fieldContainer.WaitFor(x => x.FindElements(xpathDeleteExistingValues).Count > count);
+                fieldContainer.WaitUntil(x => x.FindElements(xpathDeleteExistingValues).Count > count);
             }
             else
             {

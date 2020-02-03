@@ -90,11 +90,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.OpenRecord(0);
 
-                LookupItem ownerId = new LookupItem() { Name = "ownerid" };
+                LookupItem ownerId = new LookupItem { Name = "ownerid" };
                 string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
 
-                OptionSet priorityCode = new OptionSet() { Name = "prioritycode" };
+                ownerId.Value = "Angel Rodriguez";
+                xrmApp.Entity.SetHeaderValue(ownerId);
+
+                ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
+                Assert.AreEqual(ownerIdValue, ownerId.Value);
+
+                OptionSet priorityCode = new OptionSet { Name = "prioritycode" };
                 string priorityCodeValue = xrmApp.Entity.GetHeaderValue(priorityCode);
+
+                priorityCode.Value = "High";
+                xrmApp.Entity.SetHeaderValue(priorityCode);
+                priorityCodeValue = xrmApp.Entity.GetHeaderValue(priorityCode);
+                Assert.AreEqual(priorityCodeValue, priorityCode.Value);
 
                 xrmApp.ThinkTime(2000);
 

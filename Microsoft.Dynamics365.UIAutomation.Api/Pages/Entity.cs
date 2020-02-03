@@ -1640,7 +1640,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 driver.WaitUntilVisible(By.Id("titlefooter_statuscontrol"));
 
                 // Wait until the footer is not equal to 'saving', indicating save is complete or failed
-                driver.WaitFor(x => x.FindElement(By.Id("titlefooter_statuscontrol")).Text != "saving", new TimeSpan(0, 2, 0));
+                driver.WaitUntil(x => x.FindElement(By.Id("titlefooter_statuscontrol")).Text != "saving", new TimeSpan(0, 2, 0));
 
                 var footerText = driver.FindElement(By.Id("titlefooter_statuscontrol")).Text;
 
