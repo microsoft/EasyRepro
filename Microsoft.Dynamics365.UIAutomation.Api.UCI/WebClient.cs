@@ -1257,8 +1257,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         if (currentindex == index)
                         {
-                            var tag = checkRecord ? "div" : "a";
-                            row.FindElement(By.TagName(tag)).Click();
+                            var tag = "div";
+                            if (checkRecord)
+                            {
+                                row.FindElement(By.TagName(tag)).Click();
+                            }
+                            else
+                            {
+                                driver.DoubleClick(row.FindElement(By.TagName(tag)));
+                            }
+
                             break;
                         }
 
