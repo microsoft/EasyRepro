@@ -76,9 +76,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 //Handle Firefox not clicking the viewpicker the first time
                 driver.WaitUntilVisible(By.ClassName(Elements.CssClass[Reference.DashBoard.ViewContainerClass]),
-                                        new TimeSpan(0, 0, 2),
-                                        null,
-                                        () => dashboardSelectorContainer.FindElement(By.TagName("a")).Click());
+                                        TimeSpan.FromSeconds(2),
+                                        failureCallback: () => dashboardSelectorContainer.FindElement(By.TagName("a")).Click());
 
                 var viewContainer = driver.WaitUntilAvailable(By.ClassName(Elements.CssClass[Reference.DashBoard.ViewContainerClass]));
                 var viewItems = viewContainer.FindElements(By.TagName("li"));
