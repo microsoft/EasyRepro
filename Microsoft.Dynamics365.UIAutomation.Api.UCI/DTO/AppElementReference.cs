@@ -85,6 +85,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string LookupFieldResultListItem = "Entity_LookupFieldResultListItem";
             public static string LookupFieldHoverExistingValue = "Entity_LookupFieldHoverExistingValue";
             public static string LookupResultsDropdown = "Entity_LookupResultsDropdown";
+            public static string OptionSetFieldContainer = "Entity_OptionSetFieldContainer";
             public static string TextFieldLookupFieldContainer = "Entity_TextFieldLookupFieldContainer";
             public static string RecordSetNavigator = "Entity_RecordSetNavigator";
             public static string RecordSetNavigatorOpen = "Entity_RecordSetNavigatorOpen";
@@ -137,6 +138,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 public static string FlyoutButton = "Entity_Header_FlyoutButton";
                 public static string LookupFieldContainer = "Entity_Header_LookupFieldContainer";
                 public static string TextFieldContainer = "Entity_Header_TextFieldContainer";
+                public static string OptionSetFieldContainer = "Entity_Header_OptionSetFieldContainer";
             }
         }
     
@@ -375,6 +377,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_BooleanFieldCheckboxContainer", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container')]"},
             { "Entity_BooleanFieldCheckbox", "//input[contains(@data-id, '[NAME].fieldControl-checkbox-toggle')]"},
             { "Entity_BooleanFieldList", "//select[contains(@data-id, '[NAME].fieldControl-checkbox-select')]"},
+            { "Entity_OptionSetFieldContainer", "//div[@data-id='[NAME].fieldControl-option-set-container']" },
             { "Entity_OptionsetStatusCombo", "//div[contains(@data-id, '[NAME].fieldControl-pickliststatus-comboBox')]"},
             { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},
             { "Entity_OptionsetStatusComboList", "//ul[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_list')]"},
@@ -386,6 +389,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Header_FlyoutButton","//button[contains(@id,'headerFieldsExpandButton')]" },
             { "Entity_Header_LookupFieldContainer", "//div[@data-id='header_[NAME].fieldControl-Lookup_[NAME]']" },
             { "Entity_Header_TextFieldContainer", "//div[@data-id='header_[NAME].fieldControl-text-box-container']" },
+            { "Entity_Header_OptionSetFieldContainer", "//div[@data-id='header_[NAME].fieldControl-option-set-container']" },
                         
             //CommandBar
             { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},

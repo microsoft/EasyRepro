@@ -173,7 +173,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 foreach (var link in links)
                 {
                     var id = link.GetAttribute("id");
-
                     if (id != null && id.StartsWith(Elements.ElementId[Reference.Grid.PrimaryField]))
                     {
                         if (currentIndex == index)
@@ -183,27 +182,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                             break;
                         }
-
                         currentIndex++;
                     }
                 }
 
-                if (clicked)
-                {
-                    SwitchToContent();
-                    driver.WaitForPageToLoad();
-                    driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
-                        new TimeSpan(0, 0, 60),
-                        null,
-                        d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
-                    );
-
-                    return true;
-                }
-                else
-                {
+                if (!clicked)
                     throw new InvalidOperationException($"No record with the index '{index}' exists.");
-                }
+
+                SwitchToContent();
+                driver.WaitForPageToLoad();
+                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
+                    TimeSpan.FromSeconds(60),
+                    "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
+                );
+
+                return true;
             });
         }
     }

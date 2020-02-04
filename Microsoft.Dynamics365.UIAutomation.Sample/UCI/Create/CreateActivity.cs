@@ -5,9 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
-using System.Globalization;
 using System.Security;
-using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {

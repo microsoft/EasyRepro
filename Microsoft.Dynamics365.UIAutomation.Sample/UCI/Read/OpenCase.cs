@@ -93,22 +93,100 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 LookupItem ownerId = new LookupItem { Name = "ownerid" };
                 string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
 
+                OptionSet priorityCode = new OptionSet { Name = "prioritycode" };
+                string priorityCodeValue = xrmApp.Entity.GetHeaderValue(priorityCode);
+
+                xrmApp.ThinkTime(2000);
+            }
+        }
+
+        [TestMethod]
+        public void UCITestOpenCaseRetrieveHeaderValues_SetLookup()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Cases");
+
+                xrmApp.Grid.SwitchView("Active Cases");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                LookupItem ownerId = new LookupItem { Name = "ownerid" };
+                string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
+
+                client.Browser.Driver.ClearFocus();
+
                 ownerId.Value = "Angel Rodriguez";
                 xrmApp.Entity.SetHeaderValue(ownerId);
-
+                
                 ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
-                Assert.AreEqual(ownerIdValue, ownerId.Value);
+                Assert.AreEqual(ownerId.Value, ownerIdValue);
 
+                xrmApp.ThinkTime(2000);
+            }
+        }
+
+        
+        [TestMethod]
+        public void UCITestOpenCaseRetrieveHeaderValues_SetOptionSet()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Cases");
+
+                xrmApp.Grid.SwitchView("Active Cases");
+
+                xrmApp.Grid.OpenRecord(0);
+                
                 OptionSet priorityCode = new OptionSet { Name = "prioritycode" };
                 string priorityCodeValue = xrmApp.Entity.GetHeaderValue(priorityCode);
 
                 priorityCode.Value = "High";
                 xrmApp.Entity.SetHeaderValue(priorityCode);
+
                 priorityCodeValue = xrmApp.Entity.GetHeaderValue(priorityCode);
-                Assert.AreEqual(priorityCodeValue, priorityCode.Value);
+                Assert.AreEqual(priorityCode.Value, priorityCodeValue);
 
                 xrmApp.ThinkTime(2000);
+            }
+        }
 
+        [TestMethod]
+        public void UCITestOpenCase_SetOptionSet()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Cases");
+
+                xrmApp.Grid.SwitchView("Active Cases");
+
+                xrmApp.Grid.OpenRecord(0);
+                
+                OptionSet priorityCode = new OptionSet { Name = "prioritycode" };
+                string priorityCodeValue = xrmApp.Entity.GetValue(priorityCode);
+
+                priorityCode.Value = "High";
+                xrmApp.Entity.SetValue(priorityCode);
+
+                priorityCodeValue = xrmApp.Entity.GetValue(priorityCode);
+                Assert.AreEqual(priorityCode.Value, priorityCodeValue);
+
+                xrmApp.ThinkTime(2000);
             }
         }
     }
