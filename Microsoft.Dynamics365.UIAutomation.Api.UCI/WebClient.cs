@@ -6,13 +6,10 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Security;
 using System.Threading;
 using System.Web;
-using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
