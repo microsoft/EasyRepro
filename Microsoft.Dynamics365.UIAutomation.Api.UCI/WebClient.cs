@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Security;
 using System.Threading;
 using System.Web;
@@ -2149,24 +2150,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             // Try Set Time
             var timeFieldXPath = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", controlName));
             success = driver.TryFindElement(timeFieldXPath, out var timeField);
-            if (!success || timeField == null)
-                return true;
+            if (success)
+            {
+                timeField.Click();
+                driver.WaitForTransaction();
+
+                string time = control.TimeAsString;
+                driver.RepeatUntil(() =>
+                    {
+                        timeField.Clear();
+                        timeField.Click();
+                        timeField.SendKeys(time);
+                    },
+                    d => timeField.GetAttribute("value").IsValueEqualsTo(time),
+                    new TimeSpan(0, 0, 9), 3,
+                    failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {time}. Actual: {timeField.GetAttribute("value")}")
+                );
+            }
 
             // wait until the time get updated after change/clear the date
-            timeField.Click();
-            driver.WaitForTransaction();
-
-            string time = control.TimeAsString;
-            driver.RepeatUntil(() =>
-                {
-                    timeField.Clear();
-                    timeField.Click();
-                    timeField.SendKeys(time);
-                },
-                d => timeField.GetAttribute("value").IsValueEqualsTo(time),
-                new TimeSpan(0, 0, 9), 3,
-                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {time}. Actual: {timeField.GetAttribute("value")}")
-            );
+            driver.ClearFocus();
             return true;
         }
 
@@ -2953,6 +2956,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return SetValue(driver, control);
             }); 
         }
+        
+        internal BrowserCommandResult<bool> ClearHeaderValue(DateTimeControl control) 
+            => SetHeaderValue(new DateTimeControl(control.Name)); // Passt an empty control
         
         internal BrowserCommandResult<bool> ClearValue(DateTimeControl control) 
             => Execute(GetOptions($"Clear Field: {control.Name}"), driver => SetValue(driver, new DateTimeControl(control.Name))); // Passt an empty control

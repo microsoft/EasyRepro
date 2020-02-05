@@ -63,8 +63,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.ClearValue(control);
         }
         
+
         /// <summary>
-        /// Clears a value from the MultiValueOptionSet provided
+        /// Clears a value from the DateTimeControl provided
+        /// </summary>
+        /// <param name="control"></param>
+        public void ClearHeaderValue(DateTimeControl control)
+        {
+            _client.ClearHeaderValue(control);
+        }
+
+        /// <summary>
+        /// Clears a value from the DateTimeControl provided
         /// </summary>
         /// <param name="control"></param>
         public void ClearValue(DateTimeControl control)

@@ -93,5 +93,38 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 Assert.AreEqual(null, date);
             }
         }
+
+        
+        [TestMethod]
+        public void UCITestCreateActivity_ClearHeaderDateTimes()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                xrmApp.Navigation.OpenSubArea("My Work", "Activities");
+
+                xrmApp.CommandBar.ClickCommand("Appointment");
+
+                xrmApp.ThinkTime(5000);
+                xrmApp.Entity.SetValue("subject", "Appointment "+ TestSettings.GetRandomString(5,10));
+                
+                DateTime expectedDate = DateTime.Today.AddDays(1).AddHours(10);
+             
+                //xrmApp.Entity.SetHeaderValue("scheduledstart",  expectedDate);
+                var start = new DateTimeControl("scheduledstart") { Value =  expectedDate};
+                xrmApp.Entity.SetHeaderValue(start);
+
+                DateTime? date = xrmApp.Entity.GetHeaderValue(start);
+                Assert.AreEqual(expectedDate, date);
+                
+                xrmApp.Entity.ClearHeaderValue(start);
+                date = xrmApp.Entity.GetHeaderValue(start);
+                Assert.AreEqual(null, date);
+            }
+        }
     }
 }
