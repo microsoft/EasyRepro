@@ -48,12 +48,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (Browser.Options.UCITestMode) queryParams += ",testmode=true";
                 if (Browser.Options.UCIPerformanceMode) queryParams += "&perf=true";
 
-                if(!uri.Contains(queryParams) && !uri.Contains(System.Web.HttpUtility.UrlEncode(queryParams)))
+                if (!uri.Contains(queryParams) && !uri.Contains(System.Web.HttpUtility.UrlEncode(queryParams)))
                 {
                     var testModeUri = uri + queryParams;
 
                     driver.Navigate().GoToUrl(testModeUri);
-                    
+
                 }
 
                 WaitForMainPage();
@@ -193,7 +193,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        
+
         public void ADFSLoginAction(LoginRedirectEventArgs args)
 
         {
@@ -1785,7 +1785,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.SetValue("firstname", "Test");</example>
         internal BrowserCommandResult<bool> SetValue(string field, string value)
         {
-            return this.Execute(GetOptions($"Set Value"), driver =>
+            return this.Execute(GetOptions("Set Value"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
 
@@ -2111,67 +2111,65 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
         public BrowserCommandResult<bool> SetValue(string field, DateTime value, string formatDate = null, string formatTime = null)
         {
-            return Execute(GetOptions($"Set Date/Time Value: {field}"), driver =>
+            var control = new DateTimeControl(field)
             {
-                driver.WaitForTransaction();
-                var xPath = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeInputUCI].Replace("[FIELD]", field));
-
-                var dateField = driver.WaitUntilAvailable(xPath, $"Field: {field} Does not exist");
-                try
-                {
-                    var date = formatDate == null ? value.ToShortDateString() : value.ToString(formatDate);
-                    driver.RepeatUntil(() =>
-                        {
-                            ClearFieldValue(dateField);
-                            dateField.SendKeys(date);
-                        },
-                        d => dateField.GetAttribute("value") == date,
-                        new TimeSpan(0, 0, 9), 3
-                    );
-                    driver.WaitForTransaction();
-                }
-                catch (WebDriverTimeoutException ex)
-                {
-                    throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {value}. Actual: {dateField.GetAttribute("value")}", ex);
-                }
-
-                // Try Set Time
-                var timeFieldXPath = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field));
-                bool success = driver.TryFindElement(timeFieldXPath, out var timeField);
-                if (!success || timeField == null)
-                    return true;
-                try
-                {
-                    var time = formatTime == null ? value.ToShortTimeString() : value.ToString(formatTime);
-                    driver.RepeatUntil(() =>
-                        {
-                            ClearFieldValue(timeField);
-                            timeField.SendKeys(time);
-                        },
-                        d => timeField.GetAttribute("value") == time,
-                        new TimeSpan(0, 0, 9), 3 
-                    );
-                    driver.WaitForTransaction();
-                }
-                catch (WebDriverTimeoutException ex)
-                {
-                    throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {value}. Actual: {timeField.GetAttribute("value")}", ex);
-                }
-                
-                return true;
-            });
+                Value = value,
+                DateFormat = formatDate,
+                TimeFormat = formatTime
+            };
+            return SetValue(control);
         }
 
-        private void ClearFieldValue(IWebElement field)
+        public BrowserCommandResult<bool> SetValue(DateTimeControl control)
+            => Execute(GetOptions($"Set Date/Time Value: {control.Name}"), driver => SetValue(driver, control));
+
+        private static bool SetValue(IWebDriver driver, DateTimeControl control)
         {
-            field.Click();
-            if (field.GetAttribute("value").Length > 0)
-            {
-                field.SendKeys(Keys.Control + "a");
-                field.SendKeys(Keys.Backspace);
-            }
-            ThinkTime(2000);
+            string controlName = control.Name;
+            var xPath = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeInputUCI].Replace("[FIELD]", controlName));
+
+            var dateField = driver.WaitUntilAvailable(xPath, $"DateTime Field: '{controlName}' does not exist");
+           
+            var strExpanded = dateField.GetAttribute("aria-expanded");
+            bool success = bool.TryParse(strExpanded, out var isCalendarExpanded);
+            if (success && isCalendarExpanded)
+                dateField.Click(); // close calendar
+            
+            string date = control.DateAsString;
+            driver.RepeatUntil(() =>
+                {
+                    driver.DoubleClick(dateField);
+                    dateField.SendKeys(date ?? Keys.Backspace);
+                },
+                d => dateField.GetAttribute("value").IsValueEqualsTo(date),
+                new TimeSpan(0, 0, 9), 3,
+                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
+            );
+
+            // Try Set Time
+            var timeFieldXPath = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", controlName));
+            success = driver.TryFindElement(timeFieldXPath, out var timeField);
+            if (!success || timeField == null)
+                return true;
+
+            // wait until the time get updated after change/clear the date
+            timeField.Click();
+            driver.WaitForTransaction();
+
+            string time = control.TimeAsString;
+            driver.RepeatUntil(() =>
+                {
+                    timeField.Clear();
+                    timeField.Click();
+                    timeField.SendKeys(time);
+                },
+                d => timeField.GetAttribute("value").IsValueEqualsTo(time),
+                new TimeSpan(0, 0, 9), 3,
+                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {time}. Actual: {timeField.GetAttribute("value")}")
+            );
+            return true;
         }
+
 
         /// <summary>
         /// Sets/Removes the value from the multselect type control
@@ -2544,7 +2542,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="control">The lookup field name of the lookup.</param>
         /// <example>xrmApp.Entity.GetValue(new Lookup { Name = "primarycontactid" });</example>
-        public BrowserCommandResult<DateTime> GetValue(DateTimeControl control)
+        public BrowserCommandResult<DateTime?> GetValue(DateTimeControl control)
         {
             string field = control.Name;
             return Execute($"Get DateTime Value: {field}", driver =>
@@ -2554,8 +2552,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 var dateField = driver.WaitUntilAvailable(xPath, $"Field: {field} Does not exist");
                 string strDate = dateField.GetAttribute("value");
+                if(strDate.IsEmptyValue())
+                    return (DateTime?) null;
+
                 var date = DateTime.Parse(strDate);
-                
+
                 // Try get Time
                 var timeFieldXPath = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field));
                 bool success = driver.TryFindElement(timeFieldXPath, out var timeField);
@@ -2563,6 +2564,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     return date;
 
                 string strTime = timeField.GetAttribute("value");
+                if(strTime.IsEmptyValue())
+                    return date;
+
                 var time = DateTime.Parse(strTime);
 
                 var result = date.AddHours(time.Hour).AddMinutes(time.Minute).AddSeconds(time.Second);
@@ -2738,7 +2742,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return GetValue(control);
             });
         }
-        
+
         internal BrowserCommandResult<string[]> GetHeaderValue(LookupItem[] controls)
         {
             return this.Execute(GetOptions($"Get Header Activityparty LookupItem Value {controls.First().Name}"), driver =>
@@ -2803,8 +2807,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return GetValue(control);
             });
         }
-        
-        internal BrowserCommandResult<DateTime> GetHeaderValue(DateTimeControl control)
+
+        internal BrowserCommandResult<DateTime?> GetHeaderValue(DateTimeControl control)
         {
             return this.Execute(GetOptions($"Get Header DateTime Value {control.Name}"), driver =>
             {
@@ -2925,21 +2929,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-
-        internal BrowserCommandResult<bool> SetHeaderValue(string field, DateTime date, string formatDate = null, string formatTime = null)
+        
+        internal BrowserCommandResult<bool> SetHeaderValue(string field, DateTime value, string formatDate = null, string formatTime = null)
         {
-            return this.Execute(GetOptions($"Set Header Value {field}"), driver =>
+            var control = new DateTimeControl(field)
+            {
+                Value = value,
+                DateFormat = formatDate,
+                TimeFormat = formatTime
+            };
+            return SetHeaderValue(control);
+        }
+       
+        internal BrowserCommandResult<bool> SetHeaderValue(DateTimeControl control)
+        {
+            return Execute(GetOptions($"Set Header Value {control.Name}"), driver =>
             {
                 if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
                     throw new NotFoundException("Unable to find header on the form");
 
                 ExpandHeader(driver);
-
-                SetValue(field, date, formatDate, formatTime);
-
-                return true;
-            });
+                
+                return SetValue(driver, control);
+            }); 
         }
+        
+        internal BrowserCommandResult<bool> ClearValue(DateTimeControl control) 
+            => Execute(GetOptions($"Clear Field: {control.Name}"), driver => SetValue(driver, new DateTimeControl(control.Name))); // Passt an empty control
 
         internal BrowserCommandResult<bool> ClearValue(string fieldName)
         {

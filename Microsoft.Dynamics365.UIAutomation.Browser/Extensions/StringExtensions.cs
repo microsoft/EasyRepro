@@ -49,7 +49,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             return source.IndexOf(value, compare) >= 0;
         }
+        
+        public static bool IsEmptyValue(this string fieldValue)
+            => string.IsNullOrWhiteSpace(fieldValue?.Trim('-')); // null, Empty or "---"
 
+        public static bool IsValueEqualsTo(this string fieldValue, string expected)
+            => fieldValue == expected || (fieldValue.IsEmptyValue() && expected.IsEmptyValue());
     }
 
     public static class BoolExtensions
@@ -82,4 +87,5 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return ret;
         }
     }
+
 }

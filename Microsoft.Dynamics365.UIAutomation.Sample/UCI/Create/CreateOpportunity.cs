@@ -61,7 +61,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Entity.SetHeaderValue("estimatedclosedate", expectedDate);
 
                 var commandResult = xrmApp.Entity.GetHeaderValue(new DateTimeControl("estimatedclosedate"));
-                DateTime date = commandResult;
+                DateTime? date = commandResult;
                 Assert.AreEqual(expectedDate, date);
             }
                
