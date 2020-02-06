@@ -1307,8 +1307,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         if (currentindex == index)
                         {
-                            var tag = checkRecord ? "div" : "a";
-                            row.FindElement(By.TagName(tag)).Click();
+                            var tag = "div";
+                            if (checkRecord)
+                            {
+                                row.FindElement(By.TagName(tag)).Click();
+                            }
+                            else
+                            {
+                                driver.DoubleClick(row.FindElement(By.TagName(tag)));
+                            }
+
                             break;
                         }
 
@@ -1675,6 +1683,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+        #endregion
+
+        #region Subgrid
+
+        public BrowserCommandResult<bool> ClickSubgridAddButton(string subgridName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Click add button of subgrid: {subgridName}"), driver =>
+            {
+                driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridAddButton].Replace("[NAME]", subgridName)))?.Click();
+
+                return true;
+            });
+        }
+
         #endregion
 
         #region Entity
