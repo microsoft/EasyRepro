@@ -6,6 +6,7 @@ using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Security;
@@ -123,7 +124,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (!online)
                 return LoginResult.Success;
 
-            driver.ClickIfVisible(By.Id("use_another_account_link"));
+            driver.ClickWhenAvailable(By.Id("use_another_account_link"));
 
             bool waitingForOtc = false;
             bool success = EnterUserName(driver, username);
@@ -146,7 +147,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (!waitingForOtc)
             {
                 ThinkTime(1000);
-                driver.ClickIfVisible(By.Id("aadTile"));
+                driver.ClickWhenAvailable(By.Id("aadTile"));
                 ThinkTime(1000);
 
                 //If expecting redirect then wait for redirect to trigger
@@ -513,7 +514,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return Execute(GetOptions("Open Unified Interface Area"), driver =>
             {
                 //  9.1 ?? 9.0.2 <- inverted order (fallback first) run quickly
-                var areas = OpenMenuFallback(area).Value ?? OpenMenu().Value;
+                var areas = OpenMenuFallback(area) ?? OpenMenu();
 
                 if (!areas.ContainsKey(area))
                     throw new InvalidOperationException($"No area with the name '{area}' exists.");
