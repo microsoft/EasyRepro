@@ -296,6 +296,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.OpenSubGridRecord(subgridName, index);
         }
 
+        public void AddSubgridItem(string subgridName)
+        {
+            _client.ClickSubgridAddButton(subgridName);
+        }
+
         /// <summary>
         /// Saves the entity
         /// </summary>

@@ -184,6 +184,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Login_CrmMainPage", "//*[contains(@id,'crmTopBar')or contains(@data-id,'topBar')]"},
             { "Login_CrmUCIMainPage", "//*[contains(@data-id,'topBar')]"},
             { "Login_StaySignedIn", "//input[@id=\"idSIButton9\"]"},
+            { "Login_OneTimeCode", "//input[@name='otc']"},
+
 
             //Notification           
             { "Notification_AppMessageBar", "id(\"crmAppMessageBar\")"},
@@ -726,6 +728,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string CrmMainPage = "Login_CrmMainPage";
             public static string CrmUCIMainPage = "Login_CrmUCIMainPage";
             public static string StaySignedIn = "Login_StaySignedIn";
+            public static string OneTimeCode = "Login_OneTimeCode";
         }
         public static class Report
         {

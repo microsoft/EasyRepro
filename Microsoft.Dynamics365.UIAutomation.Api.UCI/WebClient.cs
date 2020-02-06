@@ -11,6 +11,7 @@ using System.Linq;
 using System.Security;
 using System.Threading;
 using System.Web;
+using OtpNet;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -30,8 +31,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return new BrowserCommandOptions(Constants.DefaultTraceSource,
                 commandName,
-                0,
-                0,
+                Constants.DefaultRetryAttempts,
+                Constants.DefaultRetryDelay,
                 null,
                 true,
                 typeof(NoSuchElementException), typeof(StaleElementReferenceException));
@@ -101,49 +102,52 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #region Login
         internal BrowserCommandResult<LoginResult> Login(Uri uri)
         {
-            if (this.Browser.Options.Credentials.Username == null)
+            var username = Browser.Options.Credentials.Username;
+            if (username == null)
                 return PassThroughLogin(uri);
-            else
-                return this.Execute(GetOptions("Login"), this.Login, uri, this.Browser.Options.Credentials.Username, this.Browser.Options.Credentials.Password, default(Action<LoginRedirectEventArgs>));
+
+            var password = Browser.Options.Credentials.Password;
+            return Login(uri, username, password);
         }
 
-        internal BrowserCommandResult<LoginResult> Login(Uri orgUri, SecureString username, SecureString password)
+        internal BrowserCommandResult<LoginResult> Login(Uri orgUri, SecureString username, SecureString password, SecureString mfaSecrectKey = null, Action<LoginRedirectEventArgs> redirectAction = null)
         {
-            return this.Execute(GetOptions("Login"), this.Login, orgUri, username, password, default(Action<LoginRedirectEventArgs>));
+            return Execute(GetOptions("Login"), Login, orgUri, username, password, mfaSecrectKey, redirectAction);
         }
 
-        internal BrowserCommandResult<LoginResult> Login(Uri orgUri, SecureString username, SecureString password, Action<LoginRedirectEventArgs> redirectAction)
+        private LoginResult Login(IWebDriver driver, Uri uri, SecureString username, SecureString password, SecureString mfaSecrectKey = null, Action<LoginRedirectEventArgs> redirectAction = null)
         {
-            return this.Execute(GetOptions("Login"), this.Login, orgUri, username, password, redirectAction);
-        }
-
-        private LoginResult Login(IWebDriver driver, Uri uri, SecureString username, SecureString password,
-            Action<LoginRedirectEventArgs> redirectAction)
-        {
-            var redirect = false;
-            bool online = !(this.OnlineDomains != null && !this.OnlineDomains.Any(d => uri.Host.EndsWith(d)));
+            bool online = !(OnlineDomains != null && !OnlineDomains.Any(d => uri.Host.EndsWith(d)));
             driver.Navigate().GoToUrl(uri);
 
-            if (online)
+            if (!online)
+                return LoginResult.Success;
+
+            driver.ClickIfVisible(By.Id("use_another_account_link"));
+
+            bool waitingForOtc = false;
+            bool success = EnterUserName(driver, username);
+            if (!success)
             {
-                if (driver.IsVisible(By.Id("use_another_account_link")))
-                    driver.ClickWhenAvailable(By.Id("use_another_account_link"));
-
-                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]),
-                    $"The Office 365 sign in page did not return the expected result and the user '{username}' could not be signed in.");
-
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(username.ToUnsecureString());
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Tab);
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Enter);
-
-                Thread.Sleep(1000);
-
-                if (driver.IsVisible(By.Id("aadTile")))
+                var isUserAlreadyLogged = IsUserAlreadyLogged(driver);
+                if (isUserAlreadyLogged)
                 {
-                    driver.FindElement(By.Id("aadTile")).Click(true);
+                    SwitchToDefaultContent(driver);
+                    return LoginResult.Success;
                 }
 
-                Thread.Sleep(1000);
+                ThinkTime(1000);
+                waitingForOtc = GetOtcInput(driver) != null;
+
+                if (!waitingForOtc)
+                    throw new Exception($"Login page failed. {Reference.Login.UserId} not found.");
+                }
+
+            if (!waitingForOtc)
+            {
+                ThinkTime(1000);
+                driver.ClickIfVisible(By.Id("aadTile"));
+                ThinkTime(1000);
 
                 //If expecting redirect then wait for redirect to trigger
                 if (redirectAction != null)
@@ -151,50 +155,110 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     //Wait for redirect to occur.
                     Thread.Sleep(3000);
 
-                    redirectAction?.Invoke(new LoginRedirectEventArgs(username, password, driver));
-
-                    redirect = true;
+                    redirectAction.Invoke(new LoginRedirectEventArgs(username, password, driver));
+                    return LoginResult.Redirect;
                 }
-                else
+
+                EnterPassword(driver, password);
+                ThinkTime(1000);
+                }
+
+            EnterOneTimeCode(driver, mfaSecrectKey);
+
+            ClickStaySignedIn(driver);
+
+            ThinkTime(1000);
+
+            return LoginResult.Success;
+        }
+
+        private static bool IsUserAlreadyLogged(IWebDriver driver)
                 {
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).SendKeys(password.ToUnsecureString());
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).SendKeys(Keys.Tab);
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).Submit();
+            var xpathToMainPage = By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]);
+            bool result = driver.HasElement(xpathToMainPage);
+            return result;
+        }
 
-                    Thread.Sleep(1000);
+        private static string GenerateOneTimeCode(SecureString mfaSecrectKey)
+        {
+            // credits:
+            // https://dev.to/j_sakamoto/selenium-testing---how-to-sign-in-to-two-factor-authentication-2joi
+            // https://www.nuget.org/packages/Otp.NET/
+            string key = mfaSecrectKey?.ToUnsecureString(); // <- this 2FA secret key.
 
-                    driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]), TimeSpan.FromSeconds(5));
+            byte[] base32Bytes = Base32Encoding.ToBytes(key);
 
-                    if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])))
+            var totp = new Totp(base32Bytes);
+            var result = totp.ComputeTotp(); // <- got 2FA coed at this time!
+            return result;
+        }
+
+        private bool EnterUserName(IWebDriver driver, SecureString username)
                     {
-                        driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]));
+            var input = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]), new TimeSpan(0, 0, 30));
+            if (input == null)
+                return false;
+
+            input.SendKeys(username.ToUnsecureString());
+            input.SendKeys(Keys.Enter);
+            return true;
                     }
 
-                    WaitForLoginPage();
+        private static void EnterPassword(IWebDriver driver, SecureString password)
+        {
+            var input = driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword]));
+            input.SendKeys(password.ToUnsecureString());
+            input.Submit();
+                }
+
+        private static void EnterOneTimeCode(IWebDriver driver, SecureString mfaSecrectKey)
+        {
+            int attempts = 0;
+            while (true)
+            {
+                try
+                {
+                    IWebElement input = GetOtcInput(driver);
+                    var oneTimeCode = GenerateOneTimeCode(mfaSecrectKey);
+                    input.SendKeys(oneTimeCode);
+                    input.Submit();
+                    return;
+            }
+                catch (Exception e)
+                {
+                    Trace.TraceWarning($"An Error ocur entering OTC. Exception: {e}");
+                    if (attempts >= Constants.DefaultRetryAttempts)
+                        throw;
+                    Thread.Sleep(Constants.DefaultRetryDelay);
+                    attempts++;
                 }
             }
+        }
 
-            return redirect ? LoginResult.Redirect : LoginResult.Success;
+        private static IWebElement GetOtcInput(IWebDriver driver)
+            => driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.OneTimeCode]));
+
+        private static void ClickStaySignedIn(IWebDriver driver)
+        {
+            var xpath = By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]);
+            driver.WaitUntilVisible(xpath, new TimeSpan(0, 0, 5),
+                e => driver.ClickWhenAvailable(xpath));
         }
 
         private static void SwitchToDefaultContent(IWebDriver driver)
         {
-            driver.WaitForPageToLoad();
-            driver.SwitchTo().Frame(0);
-            driver.WaitForPageToLoad();
             SwitchToMainFrame(driver);
 
             //Switch Back to Default Content for Navigation Steps
             driver.SwitchTo().DefaultContent();
         }
-
+        
         private static void SwitchToMainFrame(IWebDriver driver)
         {
             driver.WaitForPageToLoad();
             driver.SwitchTo().Frame(0);
             driver.WaitForPageToLoad();
         }
-
         internal BrowserCommandResult<LoginResult> PassThroughLogin(Uri uri)
         {
             return this.Execute(GetOptions("Pass Through Login"), driver =>
@@ -262,53 +326,44 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #region Navigation
         internal BrowserCommandResult<bool> OpenApp(string appName, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions("Open App"), driver =>
+            return Execute(GetOptions($"Open App {appName}"), driver =>
             {
                 driver.SwitchTo().DefaultContent();
 
                 //Handle left hand Nav in Web Client
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.WebAppMenuButton])))
-                {
-                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.WebAppMenuButton]));
+                var success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton) ||
+                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton) ||
+                              TryToClickInAppTile(appName, driver);
+                if (!success)
+                    throw new InvalidOperationException($"App Name {appName} not found.");
 
-                    OpenAppFromMenu(driver, appName);
-                }
-                else if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCAppMenuButton])))  //Handle Left Hand Nav in UC Client
-                {
-                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.UCAppMenuButton]));
-
-                    OpenAppFromMenu(driver, appName);
-                }
-                else if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]))) //Handle main.aspx?ForcUCI=1
-                {
-                    var tileContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]));
-                    tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
-
-                    WaitForMainPage();
-                }
-                else
-                {
-                    //Switch to frame 0
-                    driver.SwitchTo().Frame(0);
-
-                    if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer])))
-                    {
-                        var tileContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]));
-                        tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName))).Click(true);
-
-                        WaitForMainPage();
-                    }
-                    else
-                        throw new InvalidOperationException($"App Name {appName} not found.");
-                }
                 Thread.Sleep(1000);
-
+                WaitForMainPage();
                 InitializeModes();
-
                 return true;
             });
+                }
+
+        private bool TryOpenAppFromMenu(IWebDriver driver, string appName, string appMenuButton)
+                {
+            try
+            {
+                var xpathToAppMenu = By.XPath(AppElements.Xpath[appMenuButton]);
+                bool found = driver.TryFindElement(xpathToAppMenu, out var appMenu);
+                if (found)
+                {
+                    appMenu.Click(true);
+                    OpenAppFromMenu(driver, appName);
+                }
+                return found;
+                }
+            catch (Exception e)
+                {
+               throw  new InvalidOperationException($"App Button {appMenuButton} not found.", e);
+                    }
+
         }
 
         internal void OpenAppFromMenu(IWebDriver driver, string appName)
@@ -326,9 +381,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
             driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
-
-            WaitForMainPage();
         }
+
+        private static bool TryToClickInAppTile(string appName, IWebDriver driver)
+        {
+            //Switch to frame 0
+            driver.SwitchTo().Frame(0);
+            IWebElement tileContainer;
+            bool success = driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]), out tileContainer);
+            if (success)
+            {
+                var appTile = tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName)));
+                appTile.Click(true);
+        }
+            return success;
+        }
+
         internal BrowserCommandResult<bool> OpenGroupSubArea(string group, string subarea, int thinkTime = Constants.DefaultThinkTime)
         {
             this.Browser.ThinkTime(thinkTime);
@@ -442,27 +510,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public BrowserCommandResult<Dictionary<string, IWebElement>> OpenAreas(string area, int thinkTime = Constants.DefaultThinkTime)
         {
-            return this.Execute(GetOptions("Open Unified Interface Area"), driver =>
+            return Execute(GetOptions("Open Unified Interface Area"), driver =>
             {
+                //  9.1 ?? 9.0.2 <- inverted order (fallback first) run quickly
+                var areas = OpenMenuFallback(area).Value ?? OpenMenu().Value;
 
-                //9.0.2
-                var areas = OpenMenu();
-                if (areas != null)
-                {
-                    if (!areas.ContainsKey(area))
-                    {
-                        throw new InvalidOperationException($"No area with the name '{area}' exists.");
-                    }
-                    return areas;
-                }
-
-                //9.1
-                areas = OpenMenuFallback(area);
                 if (!areas.ContainsKey(area))
-                {
-                    // In this scenario - 
                     throw new InvalidOperationException($"No area with the name '{area}' exists.");
-                }
+
                 return areas;
             });
         }
@@ -1240,8 +1295,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         if (currentindex == index)
                         {
-                            var tag = checkRecord ? "div" : "a";
+                            var tag = "div";
+                            if (checkRecord)
+                            {
                             row.FindElement(By.TagName(tag)).Click();
+                            }
+                            else
+                            {
+                                driver.DoubleClick(row.FindElement(By.TagName(tag)));
+                            }
+
                             break;
                         }
 
@@ -1601,6 +1664,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+        #endregion
+
+        #region Subgrid
+
+        public BrowserCommandResult<bool> ClickSubgridAddButton(string subgridName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Click add button of subgrid: {subgridName}"), driver =>
+            {
+                driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridAddButton].Replace("[NAME]", subgridName)))?.Click();
+
+                return true;
+            });
+        }
+
         #endregion
 
         #region Entity

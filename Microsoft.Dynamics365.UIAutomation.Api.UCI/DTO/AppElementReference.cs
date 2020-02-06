@@ -18,7 +18,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string AreaMoreMenu = "Nav_AreaMoreMenu";
             public static string SubAreaContainer = "Nav_SubAreaContainer";
             public static string WebAppMenuButton = "Nav_WebAppMenuButton";
-            public static string UCAppMenuButton = "Nav_UCAppMenuButton";
+            public static string UCIAppMenuButton = "Nav_UCIAppMenuButton";
             public static string SiteMapLauncherButton = "Nav_SiteMapLauncherButton";
             public static string SiteMapLauncherCloseButton = "Nav_SiteMapLauncherCloseButton";
             public static string SiteMapAreaMoreButton = "Nav_SiteMapAreaMoreButton";
@@ -114,6 +114,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SubGridRows = "Entity_SubGridRows";
             public static string SubGridHeaders = "Entity_SubGridHeaders";
             public static string SubGridRecordCheckbox = "Entity_SubGridRecordCheckbox";
+            public static string SubGridAddButton = "Entity_SubGridAddButton";
             public static string FieldLookupButton = "Entity_FieldLookupButton";
             public static string SearchButtonIcon = "Entity_SearchButtonIcon";
             public static string DuplicateDetectionWindowMarker = "Entity_DuplicateDetectionWindowMarker";
@@ -273,7 +274,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_AreaMoreMenu"       , "//ul[@role=\"menubar\"]"},
             { "Nav_SubAreaContainer"       , "//*[@data-id=\"navbar-container\"]/div/ul"},
             { "Nav_WebAppMenuButton"       , "//*[@id=\"TabArrowDivider\"]/a"},
-            { "Nav_UCAppMenuButton"       , "//button[@data-id=\"navbar-switch-app\"]"},
+            { "Nav_UCIAppMenuButton"       , "//button[@data-id=\"navbar-switch-app\"]"},
             { "Nav_SiteMapLauncherButton", "//button[@data-lp-id=\"sitemap-launcher\"]" },
             { "Nav_SiteMapLauncherCloseButton", "//button[@aria-label=\"Close Site Map\"]" },
             { "Nav_SiteMapAreaMoreButton", "//button[@data-lp-id=\"sitemap-areaBar-more-btn\"]" },
@@ -365,6 +366,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SubGridRows",".//div[contains(@class,'wj-row')]"},
             { "Entity_SubGridHeaders",".//div[contains(@class,'grid-header-text')]"},
             { "Entity_SubGridRecordCheckbox","//div[contains(@data-id,'cell-[INDEX]-1') and contains(@data-lp-id,'[NAME]')]"},
+            { "Entity_SubGridAddButton", "//button[contains(@data-id,'[NAME].AddNewStandard')]/parent::li/parent::ul[contains(@data-lp-id, 'commandbar-SubGridStandard:[NAME]')]" },
             { "Entity_FieldLookupButton","//button[contains(@data-id,'[NAME]_search')]" },
             { "Entity_SearchButtonIcon", "//span[contains(@data-id,'microsoftIcon_searchButton')]" },
             { "Entity_DuplicateDetectionWindowMarker","//div[contains(@data-id,'ManageDuplicates')]"},
