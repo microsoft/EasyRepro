@@ -7,12 +7,12 @@ using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Support.UI;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
@@ -302,6 +302,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
         }
 
+        public static void ClickIfVisible(this IWebDriver driver, By by, bool ignoreStaleElementException = true)
+        {
+            try
+            {
+                var link = driver.FindElement(by);
+                if (link.Displayed)
+                    link.Click(ignoreStaleElementException);
+            }
+            catch (NoSuchElementException){}
+        }
+
         public static bool IsVisible(this IWebDriver driver, By by)
         {
             try
@@ -329,10 +340,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public static void SetVisible(this IWebDriver driver, By by, bool visible)
         {
             IWebElement element = driver.FindElement(by);
-            if (visible)
-                driver.ExecuteScript($"document.getElementById('{element.GetAttribute("Id")}').setAttribute('style', 'display: inline;')");
-            else
-                driver.ExecuteScript($"document.getElementById('{element.GetAttribute("Id")}').setAttribute('style', 'display: none;')");
+            var visibility = visible ? "inline" : "none";
+            driver.ExecuteScript($"document.getElementById('{element.GetAttribute("Id")}').setAttribute('style', 'display: {visibility};')");
         }
 
         public static void SendKeys(this IWebElement element, string value, bool clear)
@@ -410,12 +419,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public static bool WaitForPageToLoad(this IWebDriver driver)
         {
-            return WaitForPageToLoad(driver, Constants.DefaultTimeout.Seconds);
+            return WaitForPageToLoad(driver, (int)Constants.DefaultTimeout.TotalSeconds);
         }
 
         public static bool WaitForTransaction(this IWebDriver driver)
         {
-            return WaitForTransaction(driver, Constants.DefaultTimeout.Seconds);
+            var seconds = (int)Constants.DefaultTimeout.TotalSeconds;
+            return WaitForTransaction(driver, seconds);
         }
 
         //public static bool WaitForPageToLoad(this IWebDriver driver, TimeSpan timeout)
@@ -437,7 +447,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
                 //Checks every 500 ms whether predicate returns true if returns exit otherwise keep trying till it returns ture
                 wait.Until(d => {
-
                     try
                     {
                         state = ((IJavaScriptExecutor)driver).ExecuteScript(@"return document.readyState").ToString();
@@ -487,7 +496,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             try
             {
                 //Poll every half second to see if UCI is idle
-                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(500));
+                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(maxWaitTimeInSeconds));
                 wait.Until(d =>
                 {
                     try
@@ -507,9 +516,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     return state;
                 });
             }
-            catch (Exception)
+            catch(Exception)
             {
-
+                // ignored
             }
 
             return state;
@@ -527,12 +536,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             WebDriverWait wait = new WebDriverWait(driver, timeout);
 
-            wait.Until((d) =>
+            wait.Until(d =>
             {
                 try
                 {
                     object returnValue = ExecuteScript(driver, script);
-
                     return returnValue;
                 }
                 catch (InvalidOperationException)
@@ -547,74 +555,56 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
             return null;
         }
-
-        public static IWebElement WaitUntilAvailable(this IWebDriver driver, By by)
-        {
-            return WaitUntilAvailable(driver, by, Constants.DefaultTimeout, null, null);
-        }
-
-        public static IWebElement WaitUntilAvailable(this IWebDriver driver, By by, TimeSpan timeout)
-        {
-            return WaitUntilAvailable(driver, by, timeout, null, null);
-        }
-
+        
         public static IWebElement WaitUntilAvailable(this IWebDriver driver, By by, string exceptionMessage)
         {
-            return WaitUntilAvailable(driver, by, Constants.DefaultTimeout, null, d =>
-            {
-                throw new InvalidOperationException(exceptionMessage);
-            });
+            return WaitUntilAvailable(driver, by, Constants.DefaultTimeout, null, d => throw new InvalidOperationException(exceptionMessage));
         }
-
+        
         public static IWebElement WaitUntilAvailable(this IWebDriver driver, By by, TimeSpan timeout, string exceptionMessage)
         {
-            return WaitUntilAvailable(driver, by, timeout, null, d =>
+            return WaitUntilAvailable(driver, by, timeout, null, d => throw new InvalidOperationException(exceptionMessage));
+        }
+
+        public static IWebElement WaitUntilAvailable(this IWebDriver driver, By by, TimeSpan? timeout = null, Action<IWebDriver> successCallback = null, Action<IWebDriver> failureCallback = null)
+        {
+            Func<IWebDriver, IWebElement> conditions = d =>
             {
-                throw new InvalidOperationException(exceptionMessage);
-            });
+                ReadOnlyCollection<IWebElement> elements = d.FindElements(by);
+                int? count = elements?.Count;
+                if (count == null || count == 0)
+                    return null;
+
+                var result = count > 1
+                    ? elements.FirstOrDefault(x => x?.Displayed == true)
+                    : elements.First(x => x != null);
+                
+                return result;
+            };
+            return WaitUntil(driver, conditions, timeout ?? Constants.DefaultTimeout, successCallback, failureCallback);
         }
 
-        public static IWebElement WaitUntilAvailable(this IWebDriver driver, By by, TimeSpan timeout, Action<IWebDriver> successCallback)
+        private static IWebElement WaitUntil(IWebDriver driver, Func<IWebDriver, IWebElement> conditions, TimeSpan? timeout, Action<IWebDriver> successCallback, Action<IWebDriver> failureCallback)
+            => TryWaitUntil(driver, conditions, timeout ?? Constants.DefaultTimeout, successCallback, failureCallback);
+     
+        private static IWebElement TryWaitUntil(IWebDriver driver, Func<IWebDriver, IWebElement> conditions, TimeSpan timeout, Action<IWebDriver> successCallback, Action<IWebDriver> failureCallback)
         {
-            return WaitUntilAvailable(driver, by, timeout, successCallback, null);
-        }
-
-        public static IWebElement WaitUntilAvailable(this IWebDriver driver, By by, TimeSpan timeout, Action<IWebDriver> successCallback, Action<IWebDriver> failureCallback)
-        {
-            WebDriverWait wait = new WebDriverWait(driver, timeout);
-            bool? success;
-            IWebElement returnElement = null;
-
+            var wait = new WebDriverWait(driver, timeout);
             wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
 
+            IWebElement result = null;
             try
             {
-                var foundElements = wait.Until(d => d.FindElements(by));
-                if (foundElements != null && foundElements.Count > 1)
-                {
-                    returnElement = foundElements.FirstOrDefault(x => x.Displayed == true);
-                }
-                else
-                {
-                    returnElement = foundElements.FirstOrDefault();
-                }
-                success = true;
+                result = wait.Until(conditions);
             }
-            catch (NoSuchElementException)
-            {
-                success = false;
-            }
-            catch (WebDriverTimeoutException)
-            {
-                success = false;
-            }
+            catch (WebDriverTimeoutException) { }
 
-            if (success.HasValue && success.Value && successCallback != null)
-                successCallback(driver);
-            else if (success.HasValue && !success.Value && failureCallback != null)
-                failureCallback(driver);
+            if (result != null)
+                successCallback?.Invoke(driver);
+            else
+                failureCallback?.Invoke(driver);
 
-            return returnElement;
+            return result;
         }
 
         public static bool WaitUntilVisible(this IWebDriver driver, By by)
@@ -679,15 +669,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 try
                 {
                     action();
-                    attemps --;
-                    success = wait.Until(d => predicate(d));             
+                    attemps--;
+                    success = wait.Until(d => predicate(d));
                 }
-                catch (WebDriverTimeoutException){}
+                catch (WebDriverTimeoutException) { }
             }
 
             if (success)
                 successCallback?.Invoke();
-            else 
+            else
                 failureCallback?.Invoke();
 
             return success;
@@ -721,10 +711,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
                 success = true;
             }
-            catch (NoSuchElementException)
-            {
-                success = false;
-            }
             catch (WebDriverTimeoutException)
             {
                 success = false;
@@ -746,15 +732,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             try
             {
                 if (e.Element != null)
-                {
                     return string.Format("{4} - [{0},{1}] - <{2}>{3}</{2}>", e.Element.Location.X, e.Element.Location.Y, e.Element.TagName, e.Element.Text, e.FindMethod);
-                }
-                else
-                {
-                    return e.FindMethod.ToString();
-                }
+
+                return e.FindMethod.ToString();
             }
-            catch (Exception)
+            catch(Exception)
             {
                 return e.FindMethod.ToString();
             }
