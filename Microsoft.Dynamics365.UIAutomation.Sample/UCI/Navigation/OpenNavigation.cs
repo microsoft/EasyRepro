@@ -12,6 +12,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestMethod]
         public void UCITestOpenOptions()
         {
+            TestSettings.Options.UCIPerformanceMode = false;
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
@@ -60,6 +61,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestMethod]
         public void UCITestOpenAbout()
         {
             var client = new WebClient(TestSettings.Options);
@@ -68,6 +70,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
                 xrmApp.Navigation.OpenAbout();
+            }
+        }
+
+        [TestMethod]
+        public void UCITestOpenAppSettings()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+                xrmApp.Navigation.OpenSubArea("App Settings", "PDF generation");
+            }
+        }
+
+        [TestMethod]
+        public void UCITestOpenHelp()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+                xrmApp.Navigation.OpenArea("Help and Support");
+                xrmApp.Navigation.OpenSubArea("Help Center");
             }
         }
 
