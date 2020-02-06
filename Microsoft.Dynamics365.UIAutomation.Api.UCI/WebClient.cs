@@ -3,17 +3,14 @@
 
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Security;
 using System.Threading;
 using System.Web;
-using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -363,60 +360,84 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 subAreaItem.Click(true);
 
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
-                driver.WaitForPageToLoad();
-
-                driver.WaitForTransaction();
-
+                WaitForLoadArea(driver);
                 return true;
             });
         }
 
         internal BrowserCommandResult<bool> OpenSubArea(string area, string subarea, int thinkTime = Constants.DefaultThinkTime)
         {
-            //this.Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions("Open Sub Area"), driver =>
+            return Execute(GetOptions("Open Sub Area"), driver =>
             {
-                area = area.ToLowerString();
-                subarea = subarea.ToLowerString();
-
                 //If the subarea is already in the left hand nav, click it
-                var navSubAreas = OpenSubMenu(subarea, 100).Value;
-
-                if (navSubAreas.ContainsKey(subarea))
+                var success = TryOpenSubArea(subarea);
+                if (!success)
                 {
-                    navSubAreas[subarea].Click(true);
-                    driver.WaitForTransaction();
+                    success = TryOpenArea(area);
+                    if (!success)
+                        throw new InvalidOperationException($"Area with the name '{area}' not found. ");
 
-                    return true;
+                    success = TryOpenSubArea(subarea);
+                    if (!success)
+                        throw new InvalidOperationException($"No subarea with the name '{subarea}' exists inside of '{area}'.");
                 }
 
-                //We didn't find the subarea in the left hand nav. Try to find it
-                var areas = OpenAreas(area).Value;
-
-                IWebElement menuItem = null;
-                bool foundMenuItem = areas.TryGetValue(area, out menuItem);
-
-                if (foundMenuItem)
-                    menuItem.Click(true);
-
-                driver.WaitForTransaction();
-
-                var subAreas = OpenSubMenu(subarea).Value;
-
-                if (!subAreas.ContainsKey(subarea))
-                    throw new InvalidOperationException($"No subarea with the name '{subarea}' exists inside of '{area}'.");
-
-                subAreas[subarea].Click(true);
-
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
-                driver.WaitForPageToLoad();
-
-                driver.WaitForTransaction();
-
+                WaitForLoadArea(driver);
                 return true;
             });
+        }
+
+        private static void WaitForLoadArea(IWebDriver driver)
+        {
+            driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
+            driver.WaitForPageToLoad();
+            driver.WaitForTransaction();
+        }
+        
+        public BrowserCommandResult<bool> OpenSubArea(string subarea)
+        {
+            return Execute(GetOptions("Open Unified Interface Sub-Area"), driver =>
+            {
+                var success = TryOpenSubArea(subarea);
+                WaitForLoadArea(driver);
+                return success;
+            });
+        }
+
+        private bool TryOpenSubArea(string subarea)
+        {
+            subarea = subarea.ToLowerString();
+            var navSubAreas = OpenSubMenu(subarea).Value;
+
+            var found = navSubAreas.TryGetValue(subarea, out var element);
+            if (found)
+                element.Click(true);
+
+            return found;
+        }
+
+        public BrowserCommandResult<bool> OpenArea(string subarea)
+        {
+            return Execute(GetOptions("Open Unified Interface Area"), driver =>
+            {
+                var success = TryOpenArea(subarea);
+                WaitForLoadArea(driver);
+                return success;
+            });
+        }
+
+        private bool TryOpenArea(string area)
+        {
+            area = area.ToLowerString();
+            var areas = OpenAreas(area).Value;
+
+            IWebElement menuItem = null;
+            bool foundMenuItem = areas.TryGetValue(area, out menuItem);
+
+            if (foundMenuItem)
+                menuItem.Click(true);
+
+            return foundMenuItem;
         }
 
         public BrowserCommandResult<Dictionary<string, IWebElement>> OpenAreas(string area, int thinkTime = Constants.DefaultThinkTime)
@@ -425,7 +446,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
 
                 //9.0.2
-                var areas = OpenMenu().Value;
+                var areas = OpenMenu();
                 if (areas != null)
                 {
                     if (!areas.ContainsKey(area))
@@ -436,7 +457,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 //9.1
-                areas = OpenMenuFallback(area).Value;
+                areas = OpenMenuFallback(area);
                 if (!areas.ContainsKey(area))
                 {
                     // In this scenario - 
@@ -445,17 +466,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return areas;
             });
         }
-        public BrowserCommandResult<Dictionary<string, IWebElement>> OpenMenu(int thinkTime = Constants.DefaultThinkTime)
+        public Dictionary<string, IWebElement> OpenMenu(int thinkTime = Constants.DefaultThinkTime)
         {
             return this.Execute(GetOptions("Open Menu"), driver =>
             {
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaButton]));
 
-                var result = GetMenuItemsFrom(driver, AppElements.Xpath[AppReference.Navigation.AreaMenu]);
+                var result = GetMenuItemsFrom(driver, AppReference.Navigation.AreaMenu);
                 return result;
             });
         }
-        public BrowserCommandResult<Dictionary<string, IWebElement>> OpenMenuFallback(string area, int thinkTime = Constants.DefaultThinkTime)
+        public Dictionary<string, IWebElement> OpenMenuFallback(string area, int thinkTime = Constants.DefaultThinkTime)
         {
             return this.Execute(GetOptions("Open Menu"), driver =>
             {
@@ -505,16 +526,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        private static Dictionary<string, IWebElement> GetMenuItemsFrom(IWebDriver driver, string xpathToMenuItemsContainer)
+        private static Dictionary<string, IWebElement> GetMenuItemsFrom(IWebDriver driver, string referenceToMenuItemsContainer)
         {
             var result = new Dictionary<string, IWebElement>();
-            AddMenuItemsFrom(driver, xpathToMenuItemsContainer, result);
+            AddMenuItemsFrom(driver, referenceToMenuItemsContainer, result);
             return result;
         }
 
-        private static void AddMenuItemsFrom(IWebDriver driver, string xpathToMenuItemsContainer, Dictionary<string, IWebElement> dictionary)
+        private static void AddMenuItemsFrom(IWebDriver driver, string referenceToMenuItemsContainer, Dictionary<string, IWebElement> dictionary)
         {
-            driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[xpathToMenuItemsContainer]),
+            driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[referenceToMenuItemsContainer]),
                 TimeSpan.FromSeconds(2),
                 menu => AddMenuItems(menu, dictionary),
                 "The Main Menu is not available."
@@ -540,22 +561,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             }
         }
 
-        internal BrowserCommandResult<Dictionary<string, IWebElement>> OpenSubMenu(string subarea, int thinkTime = Constants.DefaultThinkTime)
+        internal BrowserCommandResult<Dictionary<string, IWebElement>> OpenSubMenu(string subarea)
         {
             return this.Execute(GetOptions($"Open Sub Menu: {subarea}"), driver =>
             {
                 var dictionary = new Dictionary<string, IWebElement>();
 
                 //Sitemap without enableunifiedinterfaceshellrefresh
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.PinnedSitemapEntity])))
+                var hasPinnedSitemapEntity = driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.PinnedSitemapEntity]));
+                if (!hasPinnedSitemapEntity)
                 {
-                    bool isSiteMapLauncherCloseButtonVisible = driver.IsVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherCloseButton]));
-
-                    if (isSiteMapLauncherCloseButtonVisible)
-                    {
-                        // Close SiteMap launcher since it is open
-                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherCloseButton]));
-                    }
+                    // Close SiteMap launcher since it is open
+                    var xpathToLauncherCloseButton = By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherCloseButton]);
+                    driver.ClickWhenAvailable(xpathToLauncherCloseButton);
 
                     driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
 
@@ -566,33 +584,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     foreach (var subItem in subItems)
                     {
                         // Check 'Id' attribute, NULL value == Group Header
-                        if (!String.IsNullOrEmpty(subItem.GetAttribute("Id")))
-                        {
-                            // Filter out duplicate entity keys - click the first one in the list
-                            if (!dictionary.ContainsKey(subItem.Text.ToLowerString()))
-                                dictionary.Add(subItem.Text.ToLowerString(), subItem);
-                        }
+                        var id = subItem.GetAttribute("Id");
+                        if (string.IsNullOrEmpty(id))
+                            continue;
+
+                        // Filter out duplicate entity keys - click the first one in the list
+                        var key = subItem.Text.ToLowerString();
+                        if (!dictionary.ContainsKey(key))
+                            dictionary.Add(key, subItem);
                     }
+                    return dictionary;
                 }
 
-                else
+                //Sitemap with enableunifiedinterfaceshellrefresh enabled
+                var menuShell = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaContainer]));
+
+                //The menu is broke into multiple sections. Gather all items.
+                foreach (IWebElement menuSection in menuShell)
                 {
-                    //Sitemap with enableunifiedinterfaceshellrefresh enabled
-                    var menuShell = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaContainer]));
+                    var menuItems = menuSection.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapMenuItems]));
 
-                    //The menu is broke into multiple sections. Gather all items.
-                    foreach (IWebElement menuSection in menuShell)
+                    foreach (var menuItem in menuItems)
                     {
-                        var menuItems = menuSection.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapMenuItems]));
+                        var text = menuItem.Text.ToLowerString();
+                        if (string.IsNullOrEmpty(text))
+                            continue;
 
-                        foreach (var menuItem in menuItems)
-                        {
-                            if (!String.IsNullOrEmpty(menuItem.Text))
-                            {
-                                if (!dictionary.ContainsKey(menuItem.Text.ToLower()))
-                                    dictionary.Add(menuItem.Text.ToLower(), menuItem);
-                            }
-                        }
+                        if (!dictionary.ContainsKey(text))
+                            dictionary.Add(text, menuItem);
                     }
                 }
 

@@ -268,8 +268,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "App_Shell"    , "//*[@id=\"ApplicationShell\"]"},
 
             //Navigation
-            { "Nav_AreaButton"       , "//button[contains(@data-lp-id,'sitemap-areaBar-more-btn')]"},
-            { "Nav_AreaMenu"       , "//*[@data-lp-id=\"sitemap-areabar-overflow-flyout\"]"},
+            { "Nav_AreaButton"       , "//button[@id='areaSwitcherId']"},
+            { "Nav_AreaMenu"       , "//*[@data-lp-id='sitemap-area-switcher-flyout']"},
             { "Nav_AreaMoreMenu"       , "//ul[@role=\"menubar\"]"},
             { "Nav_SubAreaContainer"       , "//*[@data-id=\"navbar-container\"]/div/ul"},
             { "Nav_WebAppMenuButton"       , "//*[@id=\"TabArrowDivider\"]/a"},
