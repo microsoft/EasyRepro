@@ -19,6 +19,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestMethod]
         public void UCITestOpenOptions()
         {
+            TestSettings.Options.UCIPerformanceMode = false;
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
