@@ -124,7 +124,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (!online)
                 return LoginResult.Success;
 
-            driver.ClickWhenAvailable(By.Id("use_another_account_link"));
+            driver.ClickIfVisible(By.Id("use_another_account_link"));
 
             bool waitingForOtc = false;
             bool success = EnterUserName(driver, username);
@@ -146,8 +146,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             if (!waitingForOtc)
             {
-                ThinkTime(1000);
-                driver.ClickWhenAvailable(By.Id("aadTile"));
+                driver.ClickIfVisible(By.Id("aadTile"));
                 ThinkTime(1000);
 
                 //If expecting redirect then wait for redirect to trigger

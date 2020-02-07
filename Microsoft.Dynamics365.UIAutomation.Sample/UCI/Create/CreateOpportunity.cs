@@ -29,7 +29,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Entity.Save();
             }
-            
         }
 
         [TestMethod]

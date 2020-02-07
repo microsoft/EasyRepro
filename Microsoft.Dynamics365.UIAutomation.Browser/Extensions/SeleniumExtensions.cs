@@ -33,23 +33,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     throw;
             }
         }
-        
+
+        public static IWebElement ClickIfVisible(this ISearchContext driver, By by, TimeSpan? timeout = null)
+            => WaitUntilClickable(driver, by, timeout ?? TimeSpan.FromSeconds(1), e => e.Click());
+
         public static IWebElement ClickWhenAvailable(this ISearchContext driver, By by, TimeSpan? timeout = null, string errorMessage = null)
             => WaitUntilClickable(driver, by, timeout, e => e.Click(), errorMessage ?? "Unable to click element.");
         public static IWebElement ClickWhenAvailable(this ISearchContext driver, By by, string errorMessage)
             => WaitUntilClickable(driver, by, null, e => e.Click(), errorMessage ?? "Unable to click element.");
 
-        public static IWebDriver ClickAndWait(this IWebDriver driver, By by, TimeSpan timeout)
+        public static IWebElement ClickAndWait(this IWebDriver driver, By by, TimeSpan timeout)
         {
             var element = driver.FindElement(by);
+            if (element == null)
+                return null;
 
-            if (element != null)
-            {
-                element.Click();
-                System.Threading.Thread.Sleep((int) timeout.TotalMilliseconds);
-            }
+            element.Click();
+            System.Threading.Thread.Sleep((int) timeout.TotalMilliseconds);
 
-            return driver;
+            return element;
         }
         
         public static void Hover(this IWebElement element, IWebDriver driver, bool ignoreStaleElementException = true)
