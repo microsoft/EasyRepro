@@ -2215,7 +2215,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             driver.RepeatUntil(() =>
                 {
                     ClearFieldValue(dateField);
-                    if(date!= null)
+                    if (date != null)
                         dateField.SendKeys(date);
                 },
                 d => dateField.GetAttribute("value").IsValueEqualsTo(date),
@@ -2655,37 +2655,38 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Gets the value of a Lookup.
         /// </summary>
         /// <param name="control">The lookup field name of the lookup.</param>
-        /// <example>xrmApp.Entity.GetValue(new Lookup { Name = "primarycontactid" });</example>
+        /// <example>xrmApp.Entity.GetValue(new DateTimeControl { Name = "scheduledstart" });</example>
         public BrowserCommandResult<DateTime?> GetValue(DateTimeControl control)
+            => Execute($"Get DateTime Value: {control.Name}", driver => TryGetValue(driver, container: driver, control: control));
+
+        private static DateTime? TryGetValue(IWebDriver driver, ISearchContext container, DateTimeControl control)
         {
             string field = control.Name;
-            return Execute($"Get DateTime Value: {field}", driver =>
-            {
-                driver.WaitForTransaction();
-                var xPath = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeInputUCI].Replace("[FIELD]", field));
+            driver.WaitForTransaction();
 
-                var dateField = driver.WaitUntilAvailable(xPath, $"Field: {field} Does not exist");
-                string strDate = dateField.GetAttribute("value");
-                if (strDate.IsEmptyValue())
-                    return (DateTime?)null;
+            var xpathToDateField = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeInputUCI].Replace("[FIELD]", field));
 
-                var date = DateTime.Parse(strDate);
+            var dateField = container.WaitUntilAvailable(xpathToDateField, $"Field: {field} Does not exist");
+            string strDate = dateField.GetAttribute("value");
+            if (strDate.IsEmptyValue())
+                return null;
 
-                // Try get Time
-                var timeFieldXPath = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field));
-                bool success = driver.TryFindElement(timeFieldXPath, out var timeField);
-                if (!success || timeField == null)
-                    return date;
+            var date = DateTime.Parse(strDate);
 
-                string strTime = timeField.GetAttribute("value");
-                if (strTime.IsEmptyValue())
-                    return date;
+            // Try get Time
+            var timeFieldXPath = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field));
+            bool success = container.TryFindElement(timeFieldXPath, out var timeField);
+            if (!success || timeField == null)
+                return date;
 
-                var time = DateTime.Parse(strTime);
+            string strTime = timeField.GetAttribute("value");
+            if (strTime.IsEmptyValue())
+                return date;
 
-                var result = date.AddHours(time.Hour).AddMinutes(time.Minute).AddSeconds(time.Second);
-                return result;
-            });
+            var time = DateTime.Parse(strTime);
+
+            var result = date.AddHours(time.Hour).AddMinutes(time.Minute).AddSeconds(time.Second);
+            return result;
         }
 
         /// <summary>
@@ -2906,12 +2907,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<DateTime?> GetHeaderValue(DateTimeControl control)
         {
-            return this.Execute(GetOptions($"Get Header DateTime Value {control.Name}"), driver =>
-            {
-                TryExpandHeaderFlyout(driver);
-
-                return GetValue(control);
-            });
+            var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.DateTimeFieldContainer].Replace("[NAME]", control.Name);
+            return Execute(GetOptions($"Get Header DateTime Value {control.Name}"),
+                driver => ExecuteInHeaderContainer(driver, xpathToContainer, 
+                    container => TryGetValue(driver, container, control)));
         }
 
         internal BrowserCommandResult<string> GetStatusFromFooter()
