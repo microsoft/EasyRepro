@@ -92,7 +92,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string RecordSetNavList = "Entity_RecordSetNavList";
             public static string RecordSetNavCollapseIcon = "Entity_RecordSetNavCollapseIcon";
             public static string RecordSetNavCollapseIconParent = "Entity_RecordSetNavCollapseIconParent";
-            public static string FieldControlDateTimeInput = "Entity_FieldControlDateTimeInput";
+            public static string FieldControlDateTimeContainer = "Entity_FieldControlDateTimeContainer";
             public static string FieldControlDateTimeInputUCI     = "Entity_FieldControlDateTimeInputUCI";
             public static string FieldControlDateTimeTimeInputUCI = "Entity_FieldControlDateTimeTimeInputUCI";
             public static string Delete = "Entity_Delete";
@@ -140,6 +140,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 public static string LookupFieldContainer = "Entity_Header_LookupFieldContainer";
                 public static string TextFieldContainer = "Entity_Header_TextFieldContainer";
                 public static string OptionSetFieldContainer = "Entity_Header_OptionSetFieldContainer";
+                public static string DateTimeFieldContainer = "Entity_Header_DateTimeFieldContainer";
             }
         }
     
@@ -355,10 +356,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_MoreTabs", ".//button[@data-id='more_button']" },
             { "Entity_MoreTabsMenu", "//div[@id='__flyoutRootNode']" },
             { "Entity_SubTab", "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]" },
-            { "Entity_FieldControlDateTimeInput","//input[contains(@id,'[FIELD].fieldControl-date-time-input')]" },
-            { "Entity_FieldControlDateTimeInputUCI","//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
-            { "Entity_FieldControlDateTimeTimeInputUCI","//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input" },
-            { "Entity_LookupResultsDropdown", "//*[contains(@data-id, \'[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
+            { "Entity_FieldControlDateTimeContainer","//div[@data-id='[NAME]-FieldSectionItemContainer']" },
+            { "Entity_FieldControlDateTimeInputUCI",".//input[@data-id='[FIELD].fieldControl-date-time-input']" },
+            { "Entity_FieldControlDateTimeTimeInputUCI",".//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input" },
+            { "Entity_LookupResultsDropdown", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
             { "Entity_Footer", "//div[contains(@id,'footerWrapper')]" },
             { "Entity_SubGridTitle", "//div[contains(text(), '[NAME]')]"},
             { "Entity_SubGridContents", "//div[contains(text(), '[NAME]')]/parent::div/parent::div/parent::div"},
@@ -392,6 +393,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Header_LookupFieldContainer", "//div[@data-id='header_[NAME].fieldControl-Lookup_[NAME]']" },
             { "Entity_Header_TextFieldContainer", "//div[@data-id='header_[NAME].fieldControl-text-box-container']" },
             { "Entity_Header_OptionSetFieldContainer", "//div[@data-id='header_[NAME].fieldControl-option-set-container']" },
+            { "Entity_Header_DateTimeFieldContainer","//div[@data-id='header_[NAME]-FieldSectionItemContainer']" },
                         
             //CommandBar
             { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
