@@ -20,7 +20,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
     public static class SeleniumExtensions
     {
         #region Click
-        
+
         public static void Click(this IWebElement element, bool ignoreStaleElementException)
         {
             try
@@ -49,11 +49,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 return null;
 
             element.Click();
-            System.Threading.Thread.Sleep((int) timeout.TotalMilliseconds);
+            System.Threading.Thread.Sleep((int)timeout.TotalMilliseconds);
 
             return element;
         }
-        
+
         public static void Hover(this IWebElement element, IWebDriver driver, bool ignoreStaleElementException = true)
         {
             try
@@ -88,16 +88,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public static void DoubleClick(this IWebDriver driver, By by, bool ignoreStaleElementException = false)
         {
-            try
-            {
-                var element = driver.FindElement(by);
-                driver.DoubleClick(element, ignoreStaleElementException);
-            }
-            catch (StaleElementReferenceException ex)
-            {
-                if (!ignoreStaleElementException)
-                    throw ex;
-            }
+            var element = driver.FindElement(by);
+            driver.DoubleClick(element, ignoreStaleElementException);
         }
 
         #endregion
@@ -144,7 +136,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             var results = ExecuteScript(driver, $"return JSON.stringify({@object});").ToString();
             var jsSerializer = new JavaScriptSerializer();
 
-            jsSerializer.RegisterConverters(new[] {new DynamicJsonConverter()});
+            jsSerializer.RegisterConverters(new[] { new DynamicJsonConverter() });
 
             var jsonObj = new JavaScriptSerializer().Deserialize<T>(results);
 
@@ -216,7 +208,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public static T GetAttribute<T>(this IWebElement element, string attributeName)
         {
             string value = element.GetAttribute(attributeName) ?? string.Empty;
-            return (T) TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value);
+            return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value);
         }
 
         public static string GetAuthority(this IWebDriver driver)
@@ -254,15 +246,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 wait.Until(ExpectedConditions.AlertIsPresent());
                 return true;
             }
-            catch (NoSuchElementException){ }
+            catch (NoSuchElementException) { }
             catch (WebDriverTimeoutException) { }
             return false;
         }
 
-        public static IWebDriver LastWindow(this IWebDriver driver) 
+        public static IWebDriver LastWindow(this IWebDriver driver)
             => driver.SwitchTo().Window(driver.WindowHandles.Last());
 
-        /// <summary>Clears the focus from all elements.</summary>
+        
+        /// <summary>
+        /// Clears the focus from all elements.
+        /// TODO: this implementation of the ClearFocus is clicking somewhere on the body, that may happen in some unwanted point, changing the results of the test.
+        /// Clicking on the label of the current control may have a better result.
+        /// </summary>
         /// <param name="driver">The driver.</param>
         public static void ClearFocus(this IWebDriver driver)
         {
@@ -285,7 +282,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 {
                     try
                     {
-                        state = ((IJavaScriptExecutor) driver).ExecuteScript(@"return document.readyState").ToString();
+                        state = ((IJavaScriptExecutor)driver).ExecuteScript(@"return document.readyState").ToString();
                     }
                     catch (InvalidOperationException)
                     {
@@ -320,7 +317,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     driver.SwitchTo().Window(driver.WindowHandles[0]);
                 }
 
-                state = ((IJavaScriptExecutor) driver).ExecuteScript(@"return document.readyState").ToString();
+                state = ((IJavaScriptExecutor)driver).ExecuteScript(@"return document.readyState").ToString();
                 if (!(state.Equals("complete", StringComparison.InvariantCultureIgnoreCase) || state.Equals("loaded", StringComparison.InvariantCultureIgnoreCase)))
                     throw;
             }
@@ -336,7 +333,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             wait.IgnoreExceptionTypes(typeof(TimeoutException), typeof(NullReferenceException));
             try
             {
-                state = wait.Until(d => (bool) driver.ExecuteScript("return window.UCWorkBlockTracker.isAppIdle()")); // Check to see if UCI is idle
+                state = wait.Until(d => (bool)driver.ExecuteScript("return window.UCWorkBlockTracker.isAppIdle()")); // Check to see if UCI is idle
             }
             catch (Exception)
             {
@@ -426,23 +423,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             element = success ? elements[0] : null;
             return success;
         }
-        
-        
-        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, string exceptionMessage) 
+
+
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, string exceptionMessage)
             => WaitUntilAvailable(driver, by, null, null, exceptionMessage);
 
-        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, Action<IWebElement> successCallback, string exceptionMessage) 
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, Action<IWebElement> successCallback, string exceptionMessage)
             => WaitUntilAvailable(driver, by, null, successCallback, exceptionMessage);
 
-        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, TimeSpan timeout, string exceptionMessage) 
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by, TimeSpan timeout, string exceptionMessage)
             => WaitUntilAvailable(driver, by, timeout, null, exceptionMessage);
 
-        public static IWebElement WaitUntilAvailable(this ISearchContext driver,By by, 
-            TimeSpan? timeout, 
-            Action<IWebElement> successCallback, 
+        public static IWebElement WaitUntilAvailable(this ISearchContext driver, By by,
+            TimeSpan? timeout,
+            Action<IWebElement> successCallback,
             string exceptionMessage)
         {
-            if (string.IsNullOrWhiteSpace(exceptionMessage)) 
+            if (string.IsNullOrWhiteSpace(exceptionMessage))
                 exceptionMessage = $"Unable to find any element by: {by}";
             return WaitUntilAvailable(driver, by, timeout, successCallback, () => throw new InvalidOperationException(exceptionMessage));
         }
@@ -458,21 +455,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             );
         }
 
-        public static IWebElement WaitUntilVisible(this ISearchContext driver, By by, string exceptionMessage) 
+        public static IWebElement WaitUntilVisible(this ISearchContext driver, By by, string exceptionMessage)
             => WaitUntilVisible(driver, by, null, null, exceptionMessage);
-        
-        public static IWebElement WaitUntilVisible(this ISearchContext driver, By by, Action<IWebElement> successCallback, string exceptionMessage) 
+
+        public static IWebElement WaitUntilVisible(this ISearchContext driver, By by, Action<IWebElement> successCallback, string exceptionMessage)
             => WaitUntilVisible(driver, by, null, successCallback, exceptionMessage);
 
-        public static IWebElement WaitUntilVisible(this ISearchContext driver, By by, TimeSpan timeout, string exceptionMessage) 
+        public static IWebElement WaitUntilVisible(this ISearchContext driver, By by, TimeSpan timeout, string exceptionMessage)
             => WaitUntilVisible(driver, by, timeout, null, exceptionMessage);
 
-        public static IWebElement WaitUntilVisible(this ISearchContext driver, By by, 
-            TimeSpan? timeout, 
-            Action<IWebElement> successCallback, 
+        public static IWebElement WaitUntilVisible(this ISearchContext driver, By by,
+            TimeSpan? timeout,
+            Action<IWebElement> successCallback,
             string exceptionMessage)
         {
-            if (string.IsNullOrWhiteSpace(exceptionMessage)) 
+            if (string.IsNullOrWhiteSpace(exceptionMessage))
                 exceptionMessage = $"Unable to find any visible element by: {by}";
             return WaitUntilVisible(driver, by, timeout, successCallback, () => throw new InvalidOperationException(exceptionMessage));
         }
@@ -486,18 +483,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
 
 
-        public static IWebElement WaitUntilClickable(this ISearchContext driver, By by, string exceptionMessage) 
+        public static IWebElement WaitUntilClickable(this ISearchContext driver, By by, string exceptionMessage)
             => WaitUntilClickable(driver, by, null, null, exceptionMessage);
-        
-        public static IWebElement WaitUntilClickable(this ISearchContext driver, By by, Action<IWebElement> successCallback, string exceptionMessage) 
+
+        public static IWebElement WaitUntilClickable(this ISearchContext driver, By by, Action<IWebElement> successCallback, string exceptionMessage)
             => WaitUntilClickable(driver, by, null, successCallback, exceptionMessage);
 
-        public static IWebElement WaitUntilClickable(this ISearchContext driver, By by, TimeSpan timeout, string exceptionMessage) 
+        public static IWebElement WaitUntilClickable(this ISearchContext driver, By by, TimeSpan timeout, string exceptionMessage)
             => WaitUntilClickable(driver, by, timeout, null, exceptionMessage);
 
         public static IWebElement WaitUntilClickable(this ISearchContext driver, By by, TimeSpan? timeout, Action<IWebElement> successCallback, string exceptionMessage)
         {
-            if (string.IsNullOrWhiteSpace(exceptionMessage)) 
+            if (string.IsNullOrWhiteSpace(exceptionMessage))
                 exceptionMessage = $"Unable to find any clickable element by: {by}";
             return WaitUntilClickable(driver, by, timeout, successCallback, () => throw new InvalidOperationException(exceptionMessage));
         }
@@ -517,7 +514,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             TimeSpan? timeout = null,
             Action successCallback = null, Action failureCallback = null)
         {
-            var wait = new DefaultWait<ISearchContext>(driver) {Timeout = timeout ?? Constants.DefaultTimeout};
+            var wait = new DefaultWait<ISearchContext>(driver) { Timeout = timeout ?? Constants.DefaultTimeout };
             wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
 
             bool success = false;
@@ -525,7 +522,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             {
                 success = wait.Until(d => predicate(d));
             }
-            catch (WebDriverTimeoutException){}
+            catch (WebDriverTimeoutException) { }
 
             if (success)
                 successCallback?.Invoke();
@@ -539,8 +536,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             TimeSpan? timeout = null,
             Action<IWebElement> successCallback = null, Action failureCallback = null)
         {
-            var wait = new DefaultWait<ISearchContext>(driver) {Timeout = timeout ?? Constants.DefaultTimeout};
-
+            var wait = new DefaultWait<ISearchContext>(driver)
+            {
+                Timeout = timeout ?? Constants.DefaultTimeout
+            };
             wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
 
             bool success = false;

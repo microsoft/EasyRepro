@@ -105,15 +105,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 
                 DateTime expectedDate = DateTime.Today.AddDays(1).AddHours(10);
              
-                //xrmApp.Entity.SetHeaderValue("scheduledstart",  expectedDate);
-                var start = new DateTimeControl("scheduledstart") { Value =  expectedDate};
-                xrmApp.Entity.SetHeaderValue(start);
+                //xrmApp.Entity.SetHeaderValue("scheduledend",  expectedDate);
+                var end = new DateTimeControl("scheduledend") { Value =  expectedDate};
+                xrmApp.Entity.SetHeaderValue(end);
 
-                DateTime? date = xrmApp.Entity.GetHeaderValue(start);
+                DateTime? date = xrmApp.Entity.GetHeaderValue(end);
                 Assert.AreEqual(expectedDate, date);
                 
-                xrmApp.Entity.ClearHeaderValue(start);
-                date = xrmApp.Entity.GetHeaderValue(start);
+                xrmApp.Entity.ClearHeaderValue(end);
+                date = xrmApp.Entity.GetHeaderValue(end);
                 Assert.AreEqual(null, date);
             }
         }
