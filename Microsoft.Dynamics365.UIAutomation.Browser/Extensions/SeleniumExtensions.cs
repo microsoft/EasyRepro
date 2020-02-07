@@ -77,7 +77,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             try
             {
                 Actions actions = new Actions(driver);
-                actions.DoubleClick(element).Perform();
+                actions.DoubleClick(element).Build().Perform();
             }
             catch (StaleElementReferenceException)
             {
