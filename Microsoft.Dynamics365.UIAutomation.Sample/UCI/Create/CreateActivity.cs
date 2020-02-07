@@ -104,14 +104,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Entity.SetValue("subject", "Appointment "+ TestSettings.GetRandomString(5,10));
                 
                 DateTime expectedDate = DateTime.Today.AddDays(1).AddHours(10);
+                DateTime expectedEndDate = expectedDate.AddHours(2);
+
+                var start = new DateTimeControl("scheduledstart") { Value =  expectedDate};
+                xrmApp.Entity.SetValue(start);
              
-                //xrmApp.Entity.SetHeaderValue("scheduledend",  expectedDate);
-                var end = new DateTimeControl("scheduledend") { Value =  expectedDate};
+                var end = new DateTimeControl("scheduledend") { Value =  expectedEndDate};
                 xrmApp.Entity.SetHeaderValue(end);
 
                 DateTime? date = xrmApp.Entity.GetHeaderValue(end);
-                Assert.AreEqual(expectedDate, date);
+                Assert.AreEqual(expectedEndDate, date);
                 
+                xrmApp.Entity.ClearValue(start);
+
                 xrmApp.Entity.ClearHeaderValue(end);
                 date = xrmApp.Entity.GetHeaderValue(end);
                 Assert.AreEqual(null, date);
