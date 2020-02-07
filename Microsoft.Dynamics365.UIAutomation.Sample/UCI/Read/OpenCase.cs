@@ -3,26 +3,21 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
-using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
-using System.Security;
+using Microsoft.Dynamics365.UIAutomation.Browser;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class OpenCaseUCI
+    public class OpenCaseUCI: TestsBase
     {
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
-
         [TestMethod]
         public void UCITestOpenActiveCase()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
@@ -40,7 +35,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
@@ -61,7 +56,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
@@ -80,6 +75,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Cases");
+
+                xrmApp.Grid.SwitchView("Active Cases");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                LookupItem ownerId = new LookupItem { Name = "ownerid" };
+                string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
+
+                OptionSet priorityCode = new OptionSet { Name = "prioritycode" };
+                string priorityCodeValue = xrmApp.Entity.GetHeaderValue(priorityCode);
+
+                xrmApp.ThinkTime(2000);
+            }
+        }
+
+        [TestMethod]
+        public void UCITestOpenCaseRetrieveHeaderValues_SetLookup()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
@@ -90,15 +111,119 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.OpenRecord(0);
 
-                LookupItem ownerId = new LookupItem() { Name = "ownerid" };
+                LookupItem ownerId = new LookupItem { Name = "ownerid" };
                 string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
 
-                OptionSet priorityCode = new OptionSet() { Name = "prioritycode" };
+                client.Browser.Driver.ClearFocus();
+
+                ownerId.Value = "Angel Rodriguez";
+                xrmApp.Entity.SetHeaderValue(ownerId);
+
+                ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
+                Assert.AreEqual(ownerId.Value, ownerIdValue);
+
+                xrmApp.ThinkTime(2000);
+            }
+        }
+
+
+        [TestMethod]
+        public void UCITestOpenCaseRetrieveHeaderValues_SetOptionSet()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Cases");
+
+                xrmApp.Grid.SwitchView("Active Cases");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                OptionSet priorityCode = new OptionSet { Name = "prioritycode" };
                 string priorityCodeValue = xrmApp.Entity.GetHeaderValue(priorityCode);
+
+                priorityCode.Value = "High";
+                xrmApp.Entity.SetHeaderValue(priorityCode);
+
+                priorityCodeValue = xrmApp.Entity.GetHeaderValue(priorityCode);
+                Assert.AreEqual(priorityCode.Value, priorityCodeValue);
+
+                xrmApp.ThinkTime(2000);
+            }
+        }
+
+        [TestMethod]
+        public void UCITestOpenCase_SetOptionSet()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Cases");
+
+                xrmApp.Grid.SwitchView("Active Cases");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                OptionSet priorityCode = new OptionSet { Name = "prioritycode" };
+                string priorityCodeValue = xrmApp.Entity.GetValue(priorityCode);
+
+                priorityCode.Value = "High";
+                xrmApp.Entity.SetValue(priorityCode);
+
+                priorityCodeValue = xrmApp.Entity.GetValue(priorityCode);
+                Assert.AreEqual(priorityCode.Value, priorityCodeValue);
+
+                xrmApp.ThinkTime(2000);
+            }
+        }
+
+        [TestMethod]
+        public void UCITestOpenCaseRetrieveHeaderValues_SetFields()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Cases");
+
+                xrmApp.Grid.SwitchView("Active Cases");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                LookupItem ownerId = new LookupItem { Name = "ownerid" };
+                string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
+
+                client.Browser.Driver.ClearFocus();
+
+                ownerId.Value = "Angel Rodriguez";
+                xrmApp.Entity.SetHeaderValue(ownerId);
+
+                ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
+                Assert.AreEqual(ownerId.Value, ownerIdValue);
+
+                OptionSet priorityCode = new OptionSet { Name = "prioritycode" };
+                string priorityCodeValue = xrmApp.Entity.GetHeaderValue(priorityCode);
+
+                priorityCode.Value = "High";
+                xrmApp.Entity.SetHeaderValue(priorityCode);
+                priorityCodeValue = xrmApp.Entity.GetHeaderValue(priorityCode);
+                Assert.AreEqual(priorityCode.Value, priorityCodeValue);
 
                 xrmApp.ThinkTime(2000);
 
             }
+
         }
     }
 }

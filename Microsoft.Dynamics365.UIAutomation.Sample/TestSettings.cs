@@ -18,13 +18,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         private static readonly string Type = ConfigurationManager.AppSettings["BrowserType"];
         private static readonly string RemoteType = ConfigurationManager.AppSettings["RemoteBrowserType"];
         private static readonly string RemoteHubServerURL = ConfigurationManager.AppSettings["RemoteHubServer"];
-        private static readonly string DriversPath = ConfigurationManager.AppSettings["DriversPath"];
-        private static readonly bool? UsePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"]);
+        private static readonly string DriversPath = ConfigurationManager.AppSettings["DriversPath"] ?? string.Empty;
+        private static readonly bool UsePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"] ?? "true");
 
         public static BrowserOptions Options = new BrowserOptions
         {
             BrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), Type),
-            PrivateMode = UsePrivateMode ?? true,
+            PrivateMode = UsePrivateMode,
             FireEvents = false,
             Headless = false,
             UserAgent = false,

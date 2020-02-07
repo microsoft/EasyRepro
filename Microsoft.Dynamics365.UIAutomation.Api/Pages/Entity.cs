@@ -1594,9 +1594,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 SwitchToContent();
                 driver.WaitForPageToLoad();
                 driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
-                                            new TimeSpan(0, 0, 30),
-                                            null,
-                                            d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
+                                            TimeSpan.FromSeconds(30),
+                                            "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
                                         );
 
                 return true;
@@ -1640,7 +1639,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 driver.WaitUntilVisible(By.Id("titlefooter_statuscontrol"));
 
                 // Wait until the footer is not equal to 'saving', indicating save is complete or failed
-                driver.WaitFor(x => x.FindElement(By.Id("titlefooter_statuscontrol")).Text != "saving", new TimeSpan(0, 2, 0));
+                driver.WaitUntil(x => x.FindElement(By.Id("titlefooter_statuscontrol")).Text != "saving", new TimeSpan(0, 2, 0));
 
                 var footerText = driver.FindElement(By.Id("titlefooter_statuscontrol")).Text;
 

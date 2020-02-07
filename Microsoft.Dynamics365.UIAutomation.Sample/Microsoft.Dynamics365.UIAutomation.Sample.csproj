@@ -102,6 +102,7 @@
     <Compile Include="UCI\Create\CreateLead.cs" />
     <Compile Include="UCI\Create\CreateActivity.cs" />
     <Compile Include="UCI\Create\CreateOpportunity.cs" />
+    <Compile Include="UCI\TestsBase.cs" />
     <Compile Include="UCI\Delete\DeleteAccount.cs" />
     <Compile Include="UCI\Delete\DeleteCase.cs" />
     <Compile Include="UCI\Delete\DeleteContact.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="UCI\GetValue.cs" />
     <Compile Include="UCI\GlobalSearch\GlobalCategorizedSearch.cs" />
     <Compile Include="UCI\GlobalSearch\GlobalRelevanceSearch.cs" />
+    <Compile Include="UCI\Login\Login.cs" />
     <Compile Include="UCI\Navigation\FormSelector.cs" />
     <Compile Include="UCI\Navigation\GlobalSearch.cs" />
     <Compile Include="UCI\Navigation\OpenNavigation.cs" />

@@ -27,8 +27,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             SwitchToContent();
 
             browser.Driver.WaitUntilVisible(By.Id(Elements.ElementId[Reference.Frames.ViewFrameId]),
-                                            new TimeSpan(0, 0, 1),
-                                            x=> { SwitchToView(); });
+                new TimeSpan(0, 0, 1),
+                x => { SwitchToView(); });
         }
 
         /// <summary>
@@ -40,47 +40,42 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions("Open View Picker"), driver =>
             {
+                var xpathToViewSelector = By.XPath(Elements.Xpath[Reference.Grid.ViewSelector]);
+                driver.ClickWhenAvailable(xpathToViewSelector, TimeSpan.FromSeconds(20), "Unable to click the View Picker");
+
+                var xpathToViewContainer = By.ClassName(Elements.CssClass[Reference.Grid.ViewContainer]);
+                IWebElement viewContainer = driver.WaitUntilVisible(xpathToViewContainer, TimeSpan.FromSeconds(20));
+                if (viewContainer == null)
+                {
+                    //Fix for Firefox not clicking the element in the event above. Issue with the driver. 
+                    driver.ClickWhenAvailable(xpathToViewSelector);
+                    viewContainer = driver.WaitUntilVisible(xpathToViewContainer, TimeSpan.FromSeconds(3), "View Picker menu is not avilable");
+                }
+
                 var dictionary = new Dictionary<string, Guid>();
-
-                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Grid.ViewSelector]),
-                                         new TimeSpan(0,0,20),
-                                         d=> { d.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Grid.ViewSelector])); },
-                                         d=> { throw new Exception("Unable to click the View Picker"); });                
-
-                driver.WaitUntilVisible(By.ClassName(Elements.CssClass[Reference.Grid.ViewContainer]),
-                                        new TimeSpan(0, 0, 20),
-                                        null,
-                                        d => 
-                                        {
-                                            //Fix for Firefox not clicking the element in the event above. Issue with the driver. 
-                                            d.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Grid.ViewSelector]));
-                                            driver.WaitUntilVisible(By.ClassName(Elements.CssClass[Reference.Grid.ViewContainer]), new TimeSpan(0, 0, 3), null, e => { throw new Exception("View Picker menu is not avilable"); });
-
-                                        });
-
-                var viewContainer = driver.FindElement(By.ClassName(Elements.CssClass[Reference.Grid.ViewContainer]));
                 var viewItems = viewContainer.FindElements(By.TagName("li"));
 
                 foreach (var viewItem in viewItems)
                 {
-                    if (viewItem.GetAttribute("role") != null && viewItem.GetAttribute("role") == "menuitem")
-                    {
-                        var links = viewItem.FindElements(By.TagName("a"));
+                    var role = viewItem.GetAttribute("role");
+                    if (role != "menuitem")
+                        continue;
 
-                        if (links != null && links.Count > 1)
-                        {
-                            var title = links[1].GetAttribute("title");
-                            Guid guid;
+                    var links = viewItem.FindElements(By.TagName("a"));
+                    if (links.Count == 0)
+                        continue;
 
-                            if (Guid.TryParse(viewItem.GetAttribute("id"), out guid))
-                            {
-                                //Handle Duplicate View Names
-                                //Temp Fix
-                                if(!dictionary.ContainsKey(title))
-                                    dictionary.Add(title, guid);
-                            }
-                        }
-                    }
+                    var title = links[1].GetAttribute("title"); // TODO: Why is 1 instead 0?
+
+                    var strId = viewItem.GetAttribute("id");
+                    var parseSuccess = Guid.TryParse(strId, out var id);
+                    if (!parseSuccess)
+                        continue;
+
+                    //Handle Duplicate View Names
+                    //Temp Fix
+                    if (!dictionary.ContainsKey(title))
+                        dictionary.Add(title, id);
                 }
 
                 return dictionary;
@@ -137,7 +132,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return this.Execute(GetOptions("OpenChart"), driver =>
             {
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Grid.OpenChart]));
-
                 return true;
             });
         }
@@ -154,7 +148,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return this.Execute(GetOptions("CloseChart"), driver =>
             {
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Grid.CloseChart]));
-
                 return true;
             });
         }
@@ -228,7 +221,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="columnName">Name of the column.</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
         /// <example>xrmBrowser.Grid.Sort("Account Name");</example>
-        public BrowserCommandResult<bool> Sort(string columnName,int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> Sort(string columnName, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
 
@@ -250,7 +243,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="index">The index.</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
         /// <example>xrmBrowser.Grid.OpenRecord(0);</example>
-        public BrowserCommandResult<bool> OpenRecord(int index,int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> OpenRecord(int index, int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
 
@@ -265,7 +258,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 if (rows.Any() && (index) < rows.Count)
                 {
-
                     driver.DoubleClick(rows[index].FindElement(By.XPath(Elements.Xpath[Reference.Grid.GridBodyTableRowCheckbox])));
 
                     clicked = true;
@@ -282,16 +274,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         SwitchToContent();
                         driver.WaitForPageToLoad();
                         driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
-                                                    new TimeSpan(0, 0, 30),
-                                                    null,
-                                                    d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
-                                                );
+                            new TimeSpan(0, 0, 30),
+                            null,
+                            "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
+                        );
                     }
+
                     return true;
                 }
-               else
-               {
-                   throw new InvalidOperationException($"No record with the index '{index}' exists.");
+                else
+                {
+                    throw new InvalidOperationException($"No record with the index '{index}' exists.");
                 }
             });
         }
@@ -310,13 +303,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 //index parameter will be 0 based but the Xpath is 1 based. So we need to increment.
                 index++;
+                var xpathToSelectedRow = By.XPath(Elements.Xpath[Reference.Grid.RowSelect].Replace("[INDEX]", index.ToString()));
+                driver.ClickWhenAvailable(xpathToSelectedRow, $"Row with index {index} is not found");
 
-                var select = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Grid.RowSelect].Replace("[INDEX]", index.ToString())),
-                                                        $"Row with index {index.ToString()} is not found");
-
-                select?.Click();
-                
-                return false;
+                return true;
             });
         }
 
@@ -344,7 +334,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     if (letter.Text == filter.ToString())
                         letter.Click();
                 }
-               
+
                 return true;
             });
         }
@@ -380,7 +370,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return this.Execute(GetOptions("Enable Filter"), driver =>
             {
                 var filter = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Grid.Filter]),
-                                                        "Filter option is not available");
+                    "Filter option is not available");
 
                 filter?.Click();
 
@@ -425,6 +415,5 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 return true;
             });
         }
-
     }
 }

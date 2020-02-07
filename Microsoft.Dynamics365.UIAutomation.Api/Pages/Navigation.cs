@@ -38,26 +38,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions($"Global Search: {searchText}"), driver =>
             {
-                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Navigation.SearchButton]),
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.SearchButton]),
                     new TimeSpan(0, 0, 5),
-                    d => { driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.SearchButton])); },
-                    d => { throw new InvalidOperationException("The Global Search button is not available."); });
+                    "The Global Search button is not available.");
 
-
-                if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Navigation.SearchLabel])))
-                {
-                    driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.SearchLabel]));
-                }
-
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.SearchLabel]), TimeSpan.FromSeconds(1));
+                
                 driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Navigation.Search]),
                     new TimeSpan(0, 0, 5),
-                    d =>
+                    e =>
                     {
-                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.Search])).SendKeys(searchText, true);
-                        Thread.Sleep(500);
-                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.Search])).SendKeys(Keys.Enter);
+                        e.SendKeys(searchText, true);
+                        Browser.ThinkTime(500);
+                        e.SendKeys(Keys.Enter);
                     },
-                    d => { throw new InvalidOperationException("The Global Search text field is not available."); });
+                    "The Global Search text field is not available."
+                    ); 
 
                 return true;
             });
@@ -357,12 +353,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 var subAreas = OpenSubMenu(areas[area]).Value;
 
-                if (!subAreas.Any(x => x.Key==subArea))
+                if (!subAreas.Any(x => x.Key == subArea))
                 {
                     throw new InvalidOperationException($"No subarea with the name '{subArea}' exists inside of '{area}'.");
                 }
 
-                subAreas.FirstOrDefault(x => x.Key==subArea).Value.Click(true);
+                subAreas.FirstOrDefault(x => x.Key == subArea).Value.Click(true);
 
                 SwitchToContent();
                 driver.WaitForPageToLoad();
@@ -371,7 +367,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
-        internal BrowserCommandResult<List<KeyValuePair<string,IWebElement>>> OpenSubMenu(IWebElement area)
+        internal BrowserCommandResult<List<KeyValuePair<string, IWebElement>>> OpenSubMenu(IWebElement area)
         {
             return this.Execute(GetOptions($"Open Sub Menu: {area}"), driver =>
             {
@@ -536,7 +532,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 Browser.ThinkTime(500);
 
-                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.SignOut]));         
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.SignOut]));
                 return true;
             });
         }
@@ -564,15 +560,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     else
                         throw new InvalidOperationException($"App Name {appName} not found.");
 
-                    driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
-                      , new TimeSpan(0, 0, 60),
-                      e =>
-                      {
-                          e.WaitForPageToLoad();
-                          e.SwitchTo().Frame(0);
-                          e.WaitForPageToLoad();
-                      },
-                      f => { throw new Exception("App Load failed. "); });
+                    driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]),
+                                                TimeSpan.FromSeconds(60),
+                                                e =>
+                                                {
+                                                    driver.WaitForPageToLoad();
+                                                    driver.SwitchTo().Frame(0);
+                                                    driver.WaitForPageToLoad();
+                                                },
+                                                "App Load failed."
+                                                );
                 }
 
                 return true;
