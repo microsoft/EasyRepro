@@ -62,6 +62,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.ClearValue(control);
         }
+        
+
+        /// <summary>
+        /// Clears a value from the DateTimeControl provided
+        /// </summary>
+        /// <param name="control"></param>
+        public void ClearHeaderValue(DateTimeControl control)
+        {
+            _client.ClearHeaderValue(control);
+        }
+
+        /// <summary>
+        /// Clears a value from the DateTimeControl provided
+        /// </summary>
+        /// <param name="control"></param>
+        public void ClearValue(DateTimeControl control)
+        {
+            _client.ClearValue(control);
+        }
 
         /// <summary>
         /// Close Record Set Navigator
@@ -159,12 +178,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="control">The date time field name of the lookup.</param>
         /// <example>xrmApp.Entity.GetValue(new DateTimeControl { Name = "estimatedclosedate" });</example>
-        public DateTime GetHeaderValue(DateTimeControl control)
+        public DateTime? GetHeaderValue(DateTimeControl control)
         {
             return _client.GetHeaderValue(control);
         }
-
-
+        
         /// <summary>
         /// Get the object id of the current entity
         /// </summary>
@@ -214,7 +232,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Gets the value of a Lookup.
         /// </summary>
         /// <param name="control">The lookup field name of the lookup.</param>
-        public DateTime GetValue(DateTimeControl control)
+        public DateTime? GetValue(DateTimeControl control)
         {
             return _client.GetValue(control);
         }
@@ -394,6 +412,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Sets the value of a BooleanItem in the header
+        /// </summary>
+        /// <param name="control">The boolean field you want to set.</param>
+        public void SetHeaderValue(DateTimeControl control)
+        {
+            _client.SetHeaderValue(control);
+        }
+
+        /// <summary>
         /// Sets the value of a field
         /// </summary>
         /// <param name="field">The field</param>
@@ -451,6 +478,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public void SetValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
             _client.SetValue(field, date, formatDate, formatTime);
+        }
+
+        /// <summary>
+        /// Sets the value of a Date Field.
+        /// </summary>
+        /// <param name="control">Date field control.</param>
+        public void SetValue(DateTimeControl control)
+        {
+            _client.SetValue(control);
         }
 
         /// <summary>
