@@ -88,14 +88,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Entity.SetValue("name", "Test EasyRepro Opportunity");
 
-                xrmApp.Entity.SetValue("estimatedclosedate", DateTime.Now, "M/d/yyyy h:mm tt");
+                var dateTime = DateTime.Today.AddHours(10).AddMinutes(15);
+                xrmApp.Entity.SetValue("estimatedclosedate", dateTime, "M/d/yyyy", "h:mm tt");
                 xrmApp.ThinkTime(500);
 
                 xrmApp.Entity.Save();
 
                 xrmApp.ThinkTime(2000);            
 
-                var estimatedclosedate = xrmApp.Entity.GetValue("estimatedclosedate");
+                var estimatedclosedate = xrmApp.Entity.GetValue(new DateTimeControl("estimatedclosedate"));
+                Assert.AreEqual(dateTime, estimatedclosedate);
                 xrmApp.ThinkTime(500);
             }
         }

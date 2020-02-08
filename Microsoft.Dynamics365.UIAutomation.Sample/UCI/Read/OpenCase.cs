@@ -101,7 +101,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
@@ -133,7 +133,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
@@ -162,7 +162,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
@@ -191,7 +191,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 

@@ -59,7 +59,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             try
             {
                 Actions action = new Actions(driver);
-                action.MoveToElement(element).Build().Perform();
+                action.MoveToElement(element).Perform();
             }
             catch (StaleElementReferenceException)
             {
@@ -71,13 +71,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         #endregion Click
 
         #region Double Click
-
-        public static void DoubleClick(this IWebDriver driver, IWebElement element, bool ignoreStaleElementException = false)
+        
+        public static void DoubleClick(this IWebDriver driver, IWebElement element, Func<Point> offsetFunc = null, bool ignoreStaleElementException = true)
         {
             try
-            {
-                Actions actions = new Actions(driver);
-                actions.DoubleClick(element).Build().Perform();
+            {  
+                var actions = new Actions(driver);
+                if(offsetFunc == null)
+                    actions =  actions.DoubleClick(element);
+                else 
+                {
+                    var offset = offsetFunc();
+                    actions = actions.MoveToElement(element, offset.X, offset.Y).DoubleClick();
+                }
+                actions.Perform();
             }
             catch (StaleElementReferenceException)
             {
@@ -85,13 +92,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     throw;
             }
         }
-
-        public static void DoubleClick(this IWebDriver driver, By by, bool ignoreStaleElementException = false)
-        {
-            var element = driver.FindElement(by);
-            driver.DoubleClick(element, ignoreStaleElementException);
-        }
-
+        
         #endregion
 
         #region Script Execution
@@ -254,7 +255,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public static IWebDriver LastWindow(this IWebDriver driver)
             => driver.SwitchTo().Window(driver.WindowHandles.Last());
 
-        
+
         /// <summary>
         /// Clears the focus from all elements.
         /// TODO: this implementation of the ClearFocus is clicking somewhere on the body, that may happen in some unwanted point, changing the results of the test.
@@ -619,4 +620,45 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         #endregion Args / Tracing
     }
+}
+
+public static class RelativePositions
+{
+    public static Func<Point> Above(this IWebElement outer, IWebElement inner) =>
+        () =>
+        {
+            int x = outer.Size.Width / 2;
+            int y = (inner.Location.Y - outer.Location.Y) / 2;
+            return new Point(x, y);
+        };
+
+    public static Func<Point> Below(this IWebElement outer, IWebElement inner) =>
+        () =>
+        {
+            int x = outer.Size.Width / 2;
+            var outerEnd = outer.Location + outer.Size;
+            var innerEnd = inner.Location + inner.Size;
+            int dBelow = outerEnd.Y - innerEnd.Y;
+            int y = innerEnd.Y + dBelow / 2;
+            return new Point(x, y);
+        };
+
+    public static Func<Point> LeftTo(this IWebElement outer, IWebElement inner) =>
+        () =>
+        {
+            int x = (inner.Location.X - outer.Location.X) / 2;
+            int y = outer.Size.Height / 2;
+            return new Point(x, y);
+        };
+
+    public static Func<Point> RightTo(this IWebElement outer, IWebElement inner) =>
+        () =>
+        {
+            var outerEnd = outer.Location + outer.Size;
+            var innerEnd = inner.Location + inner.Size;
+            int dRight = outerEnd.X - innerEnd.X;
+            int x = innerEnd.X + dRight / 2; ;
+            int y = outer.Size.Height / 2;
+            return new Point(x, y);
+        };
 }

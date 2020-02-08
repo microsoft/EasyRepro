@@ -187,5 +187,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
             }
         }
+        
+        [TestMethod]
+        public void UCITestOpenContactRelatedEntity_SwitchView()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Contacts");
+
+                xrmApp.ThinkTime(2000);
+
+                xrmApp.Grid.SwitchView("Active Contacts");
+
+                xrmApp.ThinkTime(2000);
+
+                xrmApp.Grid.SwitchView("My Active Contacts");
+                
+                xrmApp.ThinkTime(2000);
+
+                xrmApp.Grid.OpenRecord(1);
+            }
+        }
     }
 }
