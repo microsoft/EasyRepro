@@ -23,6 +23,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         {
             _xrmApp.Navigation.OpenSubArea("Contacts");
 
+            _xrmApp.Grid.SwitchView("Active Contacts");
             _xrmApp.Grid.OpenRecord(0);
 
             string option = _xrmApp.Entity.GetValue(new OptionSet {Name = "preferredcontactmethodcode"});
@@ -33,6 +34,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         public void UCITestGetValueFromLookup()
         {
             _xrmApp.Navigation.OpenSubArea("Accounts");
+
+            _xrmApp.Grid.SwitchView("Active Accounts");
 
             _xrmApp.Grid.OpenRecord(0);
 

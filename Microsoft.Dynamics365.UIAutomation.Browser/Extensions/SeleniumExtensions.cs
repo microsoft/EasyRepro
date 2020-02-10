@@ -626,6 +626,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         #endregion Waits
 
         #region Args / Tracing
+       
+        public static Exception Throw(this IWebDriver driver, string message, Exception innerException = null)
+        {
+            driver.Quit();
+            return new InvalidOperationException(message, innerException);
+        }
+
+        public static Exception Throw<T>(this IWebDriver driver, string message, Exception innerException = null) where T : Exception
+        {
+            driver.Quit();
+            return (T) Activator.CreateInstance(typeof(T), message, innerException);
+        }
 
         public static string ToTraceString(this FindElementEventArgs e)
         {
@@ -648,45 +660,4 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         #endregion Args / Tracing
     }
-}
-
-public static class RelativePositions
-{
-    public static Func<Point> Above(this IWebElement outer, IWebElement inner) =>
-        () =>
-        {
-            int x = outer.Size.Width / 2;
-            int y = (inner.Location.Y - outer.Location.Y) / 2;
-            return new Point(x, y);
-        };
-
-    public static Func<Point> Below(this IWebElement outer, IWebElement inner) =>
-        () =>
-        {
-            int x = outer.Size.Width / 2;
-            var outerEnd = outer.Location + outer.Size;
-            var innerEnd = inner.Location + inner.Size;
-            int dBelow = outerEnd.Y - innerEnd.Y;
-            int y = innerEnd.Y + dBelow / 2;
-            return new Point(x, y);
-        };
-
-    public static Func<Point> LeftTo(this IWebElement outer, IWebElement inner) =>
-        () =>
-        {
-            int x = (inner.Location.X - outer.Location.X) / 2;
-            int y = outer.Size.Height / 2;
-            return new Point(x, y);
-        };
-
-    public static Func<Point> RightTo(this IWebElement outer, IWebElement inner) =>
-        () =>
-        {
-            var outerEnd = outer.Location + outer.Size;
-            var innerEnd = inner.Location + inner.Size;
-            int dRight = outerEnd.X - innerEnd.X;
-            int x = innerEnd.X + dRight / 2; ;
-            int y = outer.Size.Height / 2;
-            return new Point(x, y);
-        };
 }

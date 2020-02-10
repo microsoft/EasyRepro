@@ -12,10 +12,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     public class TestsBase
     {
         protected readonly Uri _xrmUri = new Uri(ConfigurationManager.AppSettings["OnlineCrmUrl"]);
-        protected readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        protected readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        protected readonly SecureString _mfaSecrectKey = ConfigurationManager.AppSettings["MfaSecrectKey"].ToSecureString();
-        protected readonly bool _usePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"]);
+        protected readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"]?.ToSecureString();
+        protected readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"]?.ToSecureString();
+        protected readonly SecureString _mfaSecrectKey = ConfigurationManager.AppSettings["MfaSecrectKey"]?.ToSecureString();
+        protected readonly bool _usePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"] ?? bool.TrueString);
 
         protected XrmApp _xrmApp;
         protected WebClient _client;

@@ -78,6 +78,7 @@
     <Compile Include="DynamicJsonConverter.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
+    <Compile Include="Extensions\RelativePositions.cs" />
     <Compile Include="Extensions\SeleniumExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TimeExtensions.cs" />
