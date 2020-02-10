@@ -7,6 +7,7 @@ using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Support.UI;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -70,21 +71,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         #endregion Click
 
+        public static void Click(this IWebDriver driver, IWebElement element, Func<Point> offsetFunc = null, bool ignoreStaleElementException = true)
+            => driver.Perform(a => a.Click(), element, offsetFunc, ignoreStaleElementException);
+
         #region Double Click
-        
+
         public static void DoubleClick(this IWebDriver driver, IWebElement element, Func<Point> offsetFunc = null, bool ignoreStaleElementException = true)
+            => driver.Perform(a => a.DoubleClick(), element, offsetFunc, ignoreStaleElementException);
+       
+        public static void Perform(this IWebDriver driver, Func<Actions, Actions> action, IWebElement element, Func<Point> offsetFunc = null, bool ignoreStaleElementException = true)
         {
             try
             {  
                 var actions = new Actions(driver);
                 if(offsetFunc == null)
-                    actions =  actions.DoubleClick(element);
+                    actions =  actions.MoveToElement(element);
                 else 
                 {
                     var offset = offsetFunc();
-                    actions = actions.MoveToElement(element, offset.X, offset.Y).DoubleClick();
+                    actions = actions.MoveToElement(element, offset.X, offset.Y);
                 }
-                actions.Perform();
+                action(actions).Perform();
             }
             catch (StaleElementReferenceException)
             {
@@ -92,6 +99,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     throw;
             }
         }
+
         
         #endregion
 
@@ -561,7 +569,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
             return element;
         }
+        
+        public static  ICollection<IWebElement> WaitUntil(this ISearchContext driver, Func<ISearchContext, ICollection<IWebElement>> searchFunc,
+            TimeSpan? timeout = null,
+            Action<ICollection<IWebElement>> successCallback = null, Action failureCallback = null)
+        {
+            ICollection<IWebElement> elements = null;
+            Predicate<ISearchContext> condition = d => 
+            {
+                elements = searchFunc(d);
+                return elements.Count > 0;
+            };
 
+            bool success = driver.WaitUntil(condition);
+            if (success)
+                successCallback?.Invoke(elements);
+            else
+                failureCallback?.Invoke();
+
+            return elements;
+        }
+        
         public static bool RepeatUntil(this IWebDriver driver, Action action, Predicate<IWebDriver> predicate,
             TimeSpan? timeout = null,
             int attemps = Constants.DefaultRetryAttempts,

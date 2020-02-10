@@ -18,6 +18,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         protected readonly bool _usePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"]);
 
         protected XrmApp _xrmApp;
+        protected WebClient _client;
         protected string _timed(string value) => $"{value} {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}";
 
         public virtual void InitTest()
@@ -31,25 +32,46 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             CloseApp();
         }
 
-        public void CreateApp(bool privateMode = true)
+        public XrmApp CreateApp(BrowserOptions options = null)
         {
-            BrowserOptions options = TestSettings.Options;
-            options.PrivateMode = privateMode || _usePrivateMode;
-            options.UCIPerformanceMode = false;
+            options = options ?? TestSettings.Options;
+            SetOptions(options);
 
-            var client = new WebClient(options);
-            _xrmApp = new XrmApp(client);
+            _client = new WebClient(options);
+            _xrmApp = new XrmApp(_client);
 
             _xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
-            _xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+            return _xrmApp;
         }
 
         public void CloseApp()
         {
             _xrmApp.Dispose();
             _xrmApp = null;
+            _client = null;
+        }
+        
+        public virtual void SetOptions(BrowserOptions options)
+        {
+            options.PrivateMode = _usePrivateMode;
+            options.UCIPerformanceMode = false;
         }
 
-        public virtual void NavigateToHomePage() { }
+        public virtual void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Accounts");
+        
+        public virtual void NavigateTo(string appName, string area = null, string subarea = null)
+        {
+            _xrmApp.Navigation.OpenApp(appName);
+
+            var hasArea = !string.IsNullOrWhiteSpace(area);
+            var hasSubArea = !string.IsNullOrWhiteSpace(subarea);
+            if(hasArea && hasSubArea)
+                _xrmApp.Navigation.OpenSubArea(area, subarea);
+            else if(hasArea)
+                _xrmApp.Navigation.OpenArea(area);
+            else if(hasSubArea)
+                _xrmApp.Navigation.OpenSubArea(subarea);
+        }
     }
 }

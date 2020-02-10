@@ -15,7 +15,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestCleanup]
         public override void FinishTest() => base.FinishTest();
 
-        public override void NavigateToHomePage() => _xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
+        public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Contacts");
         [TestMethod]
         public void UCITestDuplicateDetection()
         {

@@ -21,7 +21,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         private static readonly string DriversPath = ConfigurationManager.AppSettings["DriversPath"] ?? string.Empty;
         private static readonly bool UsePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"] ?? "true");
 
-        public static BrowserOptions Options = new BrowserOptions
+        // Once you change this instance will affect all follow tests executions
+        public static BrowserOptions SharedOptions = new BrowserOptions
         {
             BrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), Type),
             PrivateMode = UsePrivateMode,
@@ -34,6 +35,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             UCITestMode = true,
             UCIPerformanceMode = true,
             DriversPath = Path.IsPathRooted(DriversPath) ? DriversPath : Path.Combine(Directory.GetCurrentDirectory(), DriversPath) 
+        };
+
+        // Create a new options instance, copy of the share, to use just in the current test, modifications in test will not affect other tests
+        public static BrowserOptions Options => new BrowserOptions 
+        {
+            BrowserType = SharedOptions.BrowserType,
+            PrivateMode = SharedOptions.PrivateMode,
+            FireEvents = SharedOptions.FireEvents,
+            Headless = SharedOptions.Headless,
+            UserAgent = SharedOptions.UserAgent,
+            DefaultThinkTime = SharedOptions.DefaultThinkTime,
+            RemoteBrowserType = SharedOptions.RemoteBrowserType,
+            RemoteHubServer =SharedOptions.RemoteHubServer,
+            UCITestMode = SharedOptions.UCITestMode,
+            UCIPerformanceMode = SharedOptions.UCIPerformanceMode,
+            DriversPath = SharedOptions.DriversPath
         };
 
         public static string GetRandomString(int minLen, int maxLen)
@@ -78,9 +95,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
 
     public static class UCIAppName
     {
-        public static string Sales = "Sales Hub";
-        public static string CustomerService = "Customer Service Hub";
-        public static string Project = "Project Resource Hub";
-        public static string FieldService = "Field Resource Hub";
+        public const string Sales = "Sales Hub";
+        public const string CustomerService = "Customer Service Hub";
+        public const string Project = "Project Resource Hub";
+        public const string FieldService = "Field Resource Hub";
     }
 }

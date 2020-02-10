@@ -49,7 +49,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 LookupItem acct = new LookupItem();
                 acct.Name = "parentaccountid";
-                acct.Value = "Adventure Works (sample)";
+                acct.Value = "Adventure Works";
 
                 LookupItem contact = new LookupItem();
                 contact.Name = "parentcontactid";

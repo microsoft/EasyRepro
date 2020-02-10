@@ -281,8 +281,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_SiteMapAreaMoreButton", "//button[@data-lp-id=\"sitemap-areaBar-more-btn\"]" },
             { "Nav_SiteMapSingleArea", "//li[translate(@data-text,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = '[NAME]']" },
             { "Nav_AppMenuContainer"       , "//*[@id=\"taskpane-scroll-container\"]"},
-            { "Nav_SettingsLauncherBar"       , "//*[@data-id='[NAME]Launcher']"},
-            { "Nav_SettingsLauncher"       , "//*[@data-id='[NAME]']"},
+            { "Nav_SettingsLauncherBar"       , "//button[@data-id='[NAME]Launcher']"},
+            { "Nav_SettingsLauncher"       , "//div[@id='[NAME]Launcher']"},
             { "Nav_GuidedHelp"       , "//*[@id=\"helpLauncher\"]/button"},
             //{ "Nav_AdminPortal"       , "//*[@id=(\"id-5\")]"},
             { "Nav_AdminPortal"       , "//*[contains(@data-id,'officewaffle')]"},
@@ -299,8 +299,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_SitemapMenuItems", "//li[contains(@data-id,'sitemap-entity')]"},
             { "Nav_SitemapSwitcherButton", "//button[contains(@data-id,'sitemap-areaSwitcher-expand-btn')]"},
             { "Nav_SitemapSwitcherFlyout","//div[contains(@data-lp-id,'sitemap-area-switcher-flyout')]"},
-            { "Nav_UCIAppContainer","//div[contains(@id,'AppLandingPageContentContainer')]"},
-            { "Nav_UCIAppTile", ".//a[contains(@aria-label,'[NAME]')]"},
+            { "Nav_UCIAppContainer","//div[@id='AppLandingPageContentContainer']"},
+            { "Nav_UCIAppTile", "//div[@data-type='app-title' and @title='[NAME]']"},
 
             
             //Grid
@@ -329,7 +329,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_CloseOpportunityWin"       , "//button[contains(@data-id,'MarkAsWon')]"},
             { "Entity_CloseOpportunityLoss"       , "//button[contains(@data-id,'MarkAsLost')]"},
             { "Entity_Delete"       , "//button[contains(@data-id,'Delete')]"},
-            { "Entity_FormContainer"       , "//*[@id=\"tab-section\"]"},
+            { "Entity_FormContainer"       , "//*[@data-id='editFormRoot']"},
             { "Entity_Process"       , "//button[contains(@data-id,'MBPF.ConvertTo')]"},
             { "Entity_Save"       , "//button[contains(@data-id, 'form-save-btn')]"},
             { "Entity_SwitchProcess"       , "//button[contains(@data-id,'SwitchProcess')]"},
@@ -392,7 +392,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Header_FlyoutButton","//button[contains(@id,'headerFieldsExpandButton')]" },
             { "Entity_Header_LookupFieldContainer", "//div[@data-id='header_[NAME].fieldControl-Lookup_[NAME]']" },
             { "Entity_Header_TextFieldContainer", "//div[@data-id='header_[NAME].fieldControl-text-box-container']" },
-            { "Entity_Header_OptionSetFieldContainer", "//div[@data-id='header_[NAME].fieldControl-option-set-container']" },
+            { "Entity_Header_OptionSetFieldContainer", "//div[@data-id='header_[NAME]']" },
             { "Entity_Header_DateTimeFieldContainer","//div[@data-id='header_[NAME]-FieldSectionItemContainer']" },
                         
             //CommandBar

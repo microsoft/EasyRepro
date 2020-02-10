@@ -39,8 +39,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
         public static string ToLowerString(this string value)
         { 
-            char[] trimCharacters = { '', '\r', '\n', '', '', '', '' };
-            return value.Trim()
+            char[] trimCharacters = {
+                '\r', 
+                '\n', 
+                (char) 60644, // 
+                (char) 60932, // 
+                (char) 59540, // 
+                (char) 60038, // 
+                (char) 61424, // 
+                (char) 59902, //
+            };
+
+            return value?.Trim()
                         .Trim(trimCharacters)
                         .Replace("\r", string.Empty)
                         .Replace("\n", string.Empty)

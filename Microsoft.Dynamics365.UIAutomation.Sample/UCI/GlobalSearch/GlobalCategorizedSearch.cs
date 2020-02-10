@@ -12,11 +12,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestMethod]
         public void UCITestGlobalCategorizedSearch()
         {
-            var client = new WebClient(TestSettings.Options);
-            using (var xrmApp = new XrmApp(client))
+            using (var xrmApp = CreateApp())
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
-
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenGlobalSearch();
@@ -27,7 +24,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.GlobalSearch.FilterWith("Account");
 
-                 xrmApp.GlobalSearch.OpenRecord("account", 0);
+                xrmApp.GlobalSearch.OpenRecord("account", 0);
             }
         }
     }
