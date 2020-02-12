@@ -14,13 +14,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"]?.ToSecureString();
         readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"]?.ToSecureString();
         readonly SecureString _mfaSecrectKey = ConfigurationManager.AppSettings["MfaSecrectKey"]?.ToSecureString();
-        readonly bool _usePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"] ?? bool.TrueString);
 
         [TestMethod]
-        public void DoNotUseTheBaseClass()
+        public void I_Hate_TheBaseClass()
         {
             var options = TestSettings.Options;
-            options.PrivateMode = _usePrivateMode;
+            options.PrivateMode = true;
             options.UCIPerformanceMode = false; // <= you can also change other settings here, for this tests only
 
             var client = new WebClient(options);
@@ -37,8 +36,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }  // Note: that here get the Browser closed, xrmApp get disposed
         }
         
-        [TestMethod]
-        public void DoNotUseTheBaseClass_GoToCases_InCustomerServicesApp()
+        [TestMethod, ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
+        public void I_Hate_TheBaseClass_GoToCases_InCustomerServicesApp()
         {
             var options = TestSettings.Options;
             options.PrivateMode = false; // <= this test is not in private mode, ignore config
@@ -46,7 +45,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, "anton@contoso.com".ToSecureString(), "2xTanTan!".ToSecureString(), "WhereIsMyKey?".ToSecureString()); // <= this tests use other credentials, ignore config
+                
+                xrmApp.OnlineLogin.Login(_xrmUri, "anton@contoso.com".ToSecureString(), "2xTanTan!".ToSecureString(), "WhereIsMySecrectKey?".ToSecureString()); // <= this tests use other credentials, ignore config
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService); // <= navigate to another app
 

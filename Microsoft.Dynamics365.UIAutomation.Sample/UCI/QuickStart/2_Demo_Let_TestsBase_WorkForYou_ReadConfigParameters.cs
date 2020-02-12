@@ -1,4 +1,5 @@
-﻿using Microsoft.Dynamics365.UIAutomation.Api.UCI;
+﻿using System;
+using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -29,7 +30,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             } // Note: that here get the Browser closed, xrmApp get disposed
         }
         
-        [TestMethod]
+        [TestMethod, ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
         public void UseTheBaseClass_GoToCases_InCustomerServicesApp()
         {
             var options = TestSettings.Options;
@@ -38,7 +39,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, "anton@contoso.com".ToSecureString(), "2xTanTan!".ToSecureString(), "WhereIsMyKey?".ToSecureString()); // <= this tests use other credentials, ignore config
+                xrmApp.OnlineLogin.Login(_xrmUri, "anton@contoso.com".ToSecureString(), "2xTanTan!".ToSecureString(), "WhereIsMySecrectKey?".ToSecureString()); // <= this tests use other credentials, ignore config
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService); // <= navigate to another app
 

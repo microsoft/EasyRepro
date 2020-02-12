@@ -6,7 +6,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     public class Demo_Let_TestsBase_WorkForYou_CreateApp : TestsBase {
         
         [TestMethod]
-        public void ThisTestUseTheBaseClass()
+        public void UseTheBaseClass()
         {
             var options = TestSettings.Options;
             options.UCIPerformanceMode = false; // <= you can also change other settings here
@@ -23,7 +23,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
         
         [TestMethod]
-        public void ThisTestUseTheBaseClass_GoToCases_InCustomerServicesApp()
+        public void UseTheBaseClass_GoToCases_InCustomerServicesApp()
         {
             var options = TestSettings.Options;
             using (var xrmApp = CreateApp(options))
