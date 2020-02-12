@@ -1,7 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT license.
-
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.Events;
@@ -40,6 +37,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public static IWebElement ClickWhenAvailable(this ISearchContext driver, By by, TimeSpan? timeout = null, string errorMessage = null)
             => WaitUntilClickable(driver, by, timeout, e => e.Click(), errorMessage ?? "Unable to click element.");
+
         public static IWebElement ClickWhenAvailable(this ISearchContext driver, By by, string errorMessage)
             => WaitUntilClickable(driver, by, null, e => e.Click(), errorMessage ?? "Unable to click element.");
 
@@ -50,7 +48,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 return null;
 
             element.Click();
-            System.Threading.Thread.Sleep((int)timeout.TotalMilliseconds);
+            System.Threading.Thread.Sleep((int) timeout.TotalMilliseconds);
 
             return element;
         }
@@ -78,15 +76,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public static void DoubleClick(this IWebDriver driver, IWebElement element, Func<Point> offsetFunc = null, bool ignoreStaleElementException = true)
             => driver.Perform(a => a.DoubleClick(), element, offsetFunc, ignoreStaleElementException);
-       
+
         public static void Perform(this IWebDriver driver, Func<Actions, Actions> action, IWebElement element, Func<Point> offsetFunc = null, bool ignoreStaleElementException = true)
         {
             try
-            {  
+            {
                 var actions = new Actions(driver);
-                if(offsetFunc == null)
-                    actions =  actions.MoveToElement(element);
-                else 
+                if (offsetFunc == null)
+                    actions = actions.MoveToElement(element);
+                else
                 {
                     var offset = offsetFunc();
                     actions = actions.MoveToElement(element, offset.X, offset.Y);
@@ -145,7 +143,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             var results = ExecuteScript(driver, $"return JSON.stringify({@object});").ToString();
             var jsSerializer = new JavaScriptSerializer();
 
-            jsSerializer.RegisterConverters(new[] { new DynamicJsonConverter() });
+            jsSerializer.RegisterConverters(new[] {new DynamicJsonConverter()});
 
             var jsonObj = new JavaScriptSerializer().Deserialize<T>(results);
 
@@ -217,7 +215,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public static T GetAttribute<T>(this IWebElement element, string attributeName)
         {
             string value = element.GetAttribute(attributeName) ?? string.Empty;
-            return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value);
+            return (T) TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value);
         }
 
         public static string GetAuthority(this IWebDriver driver)
@@ -291,7 +289,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 {
                     try
                     {
-                        state = ((IJavaScriptExecutor)driver).ExecuteScript(@"return document.readyState").ToString();
+                        state = ((IJavaScriptExecutor) driver).ExecuteScript(@"return document.readyState").ToString();
                     }
                     catch (InvalidOperationException)
                     {
@@ -326,7 +324,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     driver.SwitchTo().Window(driver.WindowHandles[0]);
                 }
 
-                state = ((IJavaScriptExecutor)driver).ExecuteScript(@"return document.readyState").ToString();
+                state = ((IJavaScriptExecutor) driver).ExecuteScript(@"return document.readyState").ToString();
                 if (!(state.Equals("complete", StringComparison.InvariantCultureIgnoreCase) || state.Equals("loaded", StringComparison.InvariantCultureIgnoreCase)))
                     throw;
             }
@@ -342,7 +340,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             wait.IgnoreExceptionTypes(typeof(TimeoutException), typeof(NullReferenceException));
             try
             {
-                state = wait.Until(d => (bool)driver.ExecuteScript("return window.UCWorkBlockTracker.isAppIdle()")); // Check to see if UCI is idle
+                state = wait.Until(d => (bool) driver.ExecuteScript("return window.UCWorkBlockTracker.isAppIdle()")); // Check to see if UCI is idle
             }
             catch (Exception)
             {
@@ -523,7 +521,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             TimeSpan? timeout = null,
             Action successCallback = null, Action failureCallback = null)
         {
-            var wait = new DefaultWait<ISearchContext>(driver) { Timeout = timeout ?? Constants.DefaultTimeout };
+            var wait = new DefaultWait<ISearchContext>(driver) {Timeout = timeout ?? Constants.DefaultTimeout};
             wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
 
             bool success = false;
@@ -569,13 +567,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
             return element;
         }
-        
-        public static  ICollection<IWebElement> WaitUntil(this ISearchContext driver, Func<ISearchContext, ICollection<IWebElement>> searchFunc,
+
+        public static ICollection<IWebElement> WaitUntil(this ISearchContext driver, Func<ISearchContext, ICollection<IWebElement>> searchFunc,
             TimeSpan? timeout = null,
             Action<ICollection<IWebElement>> successCallback = null, Action failureCallback = null)
         {
             ICollection<IWebElement> elements = null;
-            Predicate<ISearchContext> condition = d => 
+            Predicate<ISearchContext> condition = d =>
             {
                 elements = searchFunc(d);
                 return elements.Count > 0;
@@ -589,7 +587,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
             return elements;
         }
-        
+
         public static bool RepeatUntil(this IWebDriver driver, Action action, Predicate<IWebDriver> predicate,
             TimeSpan? timeout = null,
             int attemps = Constants.DefaultRetryAttempts,
@@ -626,7 +624,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         #endregion Waits
 
         #region Args / Tracing
-       
+
         public static Exception Throw(this IWebDriver driver, string message, Exception innerException = null)
         {
             driver.Quit();

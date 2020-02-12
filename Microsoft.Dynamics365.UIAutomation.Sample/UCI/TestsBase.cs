@@ -1,7 +1,4 @@
-﻿// Created by: Rodriguez Mustelier Angel (rodang)
-// Modify On: 2020-01-23 02:51
-
-using System;
+﻿using System;
 using System.Configuration;
 using System.Security;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
@@ -15,12 +12,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         protected readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"]?.ToSecureString();
         protected readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"]?.ToSecureString();
         protected readonly SecureString _mfaSecrectKey = ConfigurationManager.AppSettings["MfaSecrectKey"]?.ToSecureString();
-        protected readonly bool _usePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"] ?? bool.TrueString);
-
+  
         protected XrmApp _xrmApp;
         protected WebClient _client;
-        protected string _timed(string value) => $"{value} {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}";
-
+      
         public virtual void InitTest()
         {
             CreateApp();
@@ -52,11 +47,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             _client = null;
         }
         
-        public virtual void SetOptions(BrowserOptions options)
-        {
-            options.PrivateMode = _usePrivateMode;
-            options.UCIPerformanceMode = false;
-        }
+        public virtual void SetOptions(BrowserOptions options) { }
 
         public virtual void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Accounts");
         

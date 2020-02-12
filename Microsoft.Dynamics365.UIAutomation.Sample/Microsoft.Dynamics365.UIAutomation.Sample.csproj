@@ -102,6 +102,14 @@
     <Compile Include="UCI\Create\CreateLead.cs" />
     <Compile Include="UCI\Create\CreateActivity.cs" />
     <Compile Include="UCI\Create\CreateOpportunity.cs" />
+    <Compile Include="UCI\QuickStart\1_Demo_TestsClass.cs" />
+    <Compile Include="UCI\QuickStart\3_Demo_Let_TestsBase_WorkForYou_CreateApp.cs" />
+    <Compile Include="UCI\QuickStart\2_Demo_Let_TestsBase_WorkForYou_ReadConfigParameters.cs" />
+    <Compile Include="UCI\QuickStart\4_Demo_Let_TestsBase_WorkForYou_CreateApp_AllTestsUsesDefaultOptions.cs" />
+    <Compile Include="UCI\QuickStart\5_Demo_Let_TestsBase_WorkForYou_CreateApp_AllTestsUsesMyCustomOptions.cs" />
+    <Compile Include="UCI\QuickStart\6_Demo_Let_TestsBase_WorkForYou_CreateApp_NavigateToSameApp_InAllTests.cs" />
+    <Compile Include="UCI\QuickStart\7_Demo_Let_TestsBase_WorkForYou_CreateApp_NavigateToSameArea_InAllTests.cs" />
+    <Compile Include="UCI\QuickStart\QuickStart.cs" />
     <Compile Include="UCI\TestsBase.cs" />
     <Compile Include="UCI\Delete\DeleteAccount.cs" />
     <Compile Include="UCI\Delete\DeleteCase.cs" />

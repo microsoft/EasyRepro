@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
