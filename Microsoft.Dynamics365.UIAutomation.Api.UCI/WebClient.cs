@@ -1303,27 +1303,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         internal BrowserCommandResult<bool> OpenRecord(int index, int thinkTime = Constants.DefaultThinkTime, bool checkRecord = false)
         {
             ThinkTime(thinkTime);
-
             return Execute(GetOptions("Open Grid Record"), driver =>
             {
-                IWebElement control = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
+                var xpathToGrid = By.XPath(AppElements.Xpath[AppReference.Grid.Container]);
+                IWebElement control = driver.WaitUntilAvailable(xpathToGrid);
 
-                var xpathToFind = checkRecord
-                    ? $"//div[@data-id='cell-{index}-1']"
-                    : $"//div[contains(@data-id, 'cell-{index}')]//a";
-                control.ClickWhenAvailable(By.XPath(xpathToFind), "An error occur trying to open the record at position {index}");
+                Func<Actions, Actions> action;
+                if (checkRecord)
+                    action = e => e.Click();
+                else
+                    action = e => e.DoubleClick();
 
-                // Logic equivalent to fix #746 (by @rswafford) 
-                //var xpathToFind = $"//div[@data-id='cell-{index}-1']";
-                //control.WaitUntilClickable(By.XPath(xpathToFind),
-                //    e =>
-                //    {
-                //        e.Click();
-                //        if (!checkRecord)
-                //           driver.DoubleClick(e);
-                //    },
-                //    $"An error occur trying to open the record at position {index}"
-                //    );
+                var xpathToCell = By.XPath($".//div[@data-id='cell-{index}-1']");
+                control.WaitUntilClickable(xpathToCell,
+                    cell =>
+                    {
+                        var emptyDiv = cell.FindElement(By.TagName("div"));
+                        driver.Perform(action, cell, cell.LeftTo(emptyDiv));
+                    },
+                    $"An error occur trying to open the record at position {index}"
+                    );
 
                 driver.WaitForTransaction();
                 return true;
