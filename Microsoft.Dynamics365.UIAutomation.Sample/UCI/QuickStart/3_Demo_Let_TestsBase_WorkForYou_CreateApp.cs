@@ -23,7 +23,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
         
         [TestMethod]
-        public void ThisTestUseTheBaseClass_GoingToCases_InCustomerServicesApp()
+        public void ThisTestUseTheBaseClass_GoToCases_InCustomerServicesApp()
         {
             var options = TestSettings.Options;
             using (var xrmApp = CreateApp(options))

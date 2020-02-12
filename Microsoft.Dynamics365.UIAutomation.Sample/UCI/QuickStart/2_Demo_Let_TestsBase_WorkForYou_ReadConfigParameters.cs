@@ -10,7 +10,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         // Read Config Parameters are now defined in TestsBase everything else still the same
         
         [TestMethod]
-        public void ThisTestDoNotUseTheBaseClass()
+        public void UseTheBaseClass()
         {
             var options = TestSettings.Options;
             options.UCIPerformanceMode = false; // <= you can also change other settings here
@@ -30,7 +30,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
         
         [TestMethod]
-        public void ThisTestDoNotUseTheBaseClass_GoingToCases_InCustomerServicesApp()
+        public void UseTheBaseClass_GoToCases_InCustomerServicesApp()
         {
             var options = TestSettings.Options;
             options.PrivateMode = false; // <= this test is not in private mode, ignore config

@@ -14,7 +14,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
-        public void ThisTestDoNotUseTheBaseClass()
+        public void UseTheBaseClass()
         {
             using (var xrmApp = CreateApp()) // <= CreateApp is now calling Login for you, running with your options
             {
@@ -28,7 +28,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
         
         [TestMethod]
-        public void ThisTestDoNotUseTheBaseClass_GoingToCases_InCustomerServicesApp()
+        public void UseTheBaseClass_GoToCases_InCustomerServicesApp()
         {
             using (var xrmApp = CreateApp())
             {

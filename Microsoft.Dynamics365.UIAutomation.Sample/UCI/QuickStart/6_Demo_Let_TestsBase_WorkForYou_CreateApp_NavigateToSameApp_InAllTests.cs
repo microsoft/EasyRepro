@@ -14,7 +14,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales); // => going to Sale Hub App
 
         [TestMethod]
-        public void ThisTestDoNotUseTheBaseClass()
+        public void UseTheBaseClass()
         {
             // _xrmApp is now an instance variable, instead local
 
@@ -24,7 +24,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
-        public void ThisTestDoNotUseTheBaseClass_GoingToCases_InCustomerServicesApp()
+        public void UseTheBaseClass_GoToCases_InCustomerServicesApp()
         {
             // all test are going now to the same app
 

@@ -17,7 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         readonly bool _usePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"] ?? bool.TrueString);
 
         [TestMethod]
-        public void ThisTestDoNotUseTheBaseClass()
+        public void DoNotUseTheBaseClass()
         {
             var options = TestSettings.Options;
             options.PrivateMode = _usePrivateMode;
@@ -38,7 +38,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
         
         [TestMethod]
-        public void ThisTestDoNotUseTheBaseClass_GoingToCases_InCustomerServicesApp()
+        public void DoNotUseTheBaseClass_GoToCases_InCustomerServicesApp()
         {
             var options = TestSettings.Options;
             options.PrivateMode = false; // <= this test is not in private mode, ignore config
