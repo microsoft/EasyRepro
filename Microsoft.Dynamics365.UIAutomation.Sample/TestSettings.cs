@@ -19,7 +19,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         private static readonly string RemoteType = ConfigurationManager.AppSettings["RemoteBrowserType"];
         private static readonly string RemoteHubServerURL = ConfigurationManager.AppSettings["RemoteHubServer"];
         private static readonly string DriversPath = ConfigurationManager.AppSettings["DriversPath"] ?? string.Empty;
-        private static readonly bool UsePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"] ?? "true");
+        private static readonly bool UsePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"] ?? bool.TrueString);
 
         // Once you change this instance will affect all follow tests executions
         public static BrowserOptions SharedOptions = new BrowserOptions
