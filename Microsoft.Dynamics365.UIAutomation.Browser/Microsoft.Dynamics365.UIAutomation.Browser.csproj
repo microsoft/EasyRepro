@@ -80,6 +80,7 @@
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\SeleniumExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Extensions\TimeExtensions.cs" />
     <Compile Include="ICommandResult.cs" />
     <Compile Include="InteractiveBrowser.cs" />
     <Compile Include="NavigationOperation.cs" />

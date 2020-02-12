@@ -7,6 +7,7 @@ using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Support.UI;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -561,6 +562,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return element;
         }
 
+        public static ICollection<IWebElement> WaitUntil(this ISearchContext driver, Func<ISearchContext, ICollection<IWebElement>> searchFunc,
+            TimeSpan? timeout = null,
+            Action<ICollection<IWebElement>> successCallback = null, Action failureCallback = null)
+        {
+            ICollection<IWebElement> elements = null;
+            Predicate<ISearchContext> condition = d =>
+            {
+                elements = searchFunc(d);
+                return elements.Count > 0;
+            };
+
+            bool success = driver.WaitUntil(condition);
+            if (success)
+                successCallback?.Invoke(elements);
+            else
+                failureCallback?.Invoke();
+
+            return elements;
+        }
         public static bool RepeatUntil(this IWebDriver driver, Action action, Predicate<IWebDriver> predicate,
             TimeSpan? timeout = null,
             int attemps = Constants.DefaultRetryAttempts,
@@ -597,6 +617,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         #endregion Waits
 
         #region Args / Tracing
+
+        public static Exception Throw(this IWebDriver driver, string message, Exception innerException = null)
+        {
+            driver.Quit();
+            return new InvalidOperationException(message, innerException);
+        }
+
+        public static Exception Throw<T>(this IWebDriver driver, string message, Exception innerException = null) where T : Exception
+        {
+            driver.Quit();
+            return (T) Activator.CreateInstance(typeof(T), message, innerException);
+        }
 
         public static string ToTraceString(this FindElementEventArgs e)
         {
