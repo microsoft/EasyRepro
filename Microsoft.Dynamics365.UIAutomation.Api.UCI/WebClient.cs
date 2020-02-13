@@ -12,6 +12,7 @@ using System.Linq;
 using System.Security;
 using System.Threading;
 using System.Web;
+using OpenQA.Selenium.Interactions;
 using OtpNet;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
