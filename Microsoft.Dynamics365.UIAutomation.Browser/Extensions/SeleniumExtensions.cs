@@ -618,18 +618,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         #region Args / Tracing
 
-        public static Exception Throw(this IWebDriver driver, string message, Exception innerException = null)
-        {
-            driver.Quit();
-            return new InvalidOperationException(message, innerException);
-        }
-
-        public static Exception Throw<T>(this IWebDriver driver, string message, Exception innerException = null) where T : Exception
-        {
-            driver.Quit();
-            return (T) Activator.CreateInstance(typeof(T), message, innerException);
-        }
-
         public static string ToTraceString(this FindElementEventArgs e)
         {
             var method = e.FindMethod.ToString();

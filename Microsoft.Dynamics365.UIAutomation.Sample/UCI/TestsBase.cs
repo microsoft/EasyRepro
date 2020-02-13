@@ -22,8 +22,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         public virtual void InitTest()
         {
-            CreateApp();
-            NavigateToHomePage();
+            try
+            {  
+                CreateApp();
+                NavigateToHomePage();
+            }
+            catch
+            {
+                CloseApp();
+                throw;
+            }
         }
 
         public virtual void FinishTest()
