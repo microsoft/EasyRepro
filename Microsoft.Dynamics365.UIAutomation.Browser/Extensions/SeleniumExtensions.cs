@@ -562,25 +562,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return element;
         }
 
-        public static ICollection<IWebElement> WaitUntil(this ISearchContext driver, Func<ISearchContext, ICollection<IWebElement>> searchFunc,
-            TimeSpan? timeout = null,
-            Action<ICollection<IWebElement>> successCallback = null, Action failureCallback = null)
-        {
-            ICollection<IWebElement> elements = null;
-            Predicate<ISearchContext> condition = d =>
-            {
-                elements = searchFunc(d);
-                return elements.Count > 0;
-            };
-
-            bool success = driver.WaitUntil(condition);
-            if (success)
-                successCallback?.Invoke(elements);
-            else
-                failureCallback?.Invoke();
-
-            return elements;
-        }
         public static bool RepeatUntil(this IWebDriver driver, Action action, Predicate<IWebDriver> predicate,
             TimeSpan? timeout = null,
             int attemps = Constants.DefaultRetryAttempts,
