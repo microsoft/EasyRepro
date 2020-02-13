@@ -68,7 +68,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         #region PageWaits
         internal bool WaitForMainPage(TimeSpan timeout, string errorMessage)
-            => WaitForMainPage(timeout, null, () => Browser.Driver.Throw(errorMessage));
+            => WaitForMainPage(timeout, null, () => throw new InvalidOperationException(errorMessage));
 
         internal bool WaitForMainPage(TimeSpan? timeout = null, Action<IWebElement> successCallback = null, Action failureCallback = null)
         {
@@ -163,7 +163,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
            
             if (entered && !success)
-                throw driver.Throw("Somethig got wrong entering the OTC. Please check the MFA-SecrectKey in configuration.");
+                throw new InvalidOperationException("Somethig got wrong entering the OTC. Please check the MFA-SecrectKey in configuration.");
 
             return success ? LoginResult.Success : LoginResult.Failure;
         }
@@ -211,7 +211,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     return true;
 
                 if (mfaSecrectKey == null)
-                    throw driver.Throw("The application is wait for the OTC but your MFA-SecrectKey is not set. Please check your configuration.");
+                    throw new InvalidOperationException("The application is wait for the OTC but your MFA-SecrectKey is not set. Please check your configuration.");
 
                 var oneTimeCode = GenerateOneTimeCode(mfaSecrectKey);
                 SetInputValue(driver, input, oneTimeCode, 1.Seconds());
@@ -222,7 +222,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var message = $"An Error occur entering OTC. Exception: {e.Message}";
                 Trace.TraceInformation(message);
-                throw driver.Throw<InvalidOperationException>(message, e);
+                throw new InvalidOperationException(message, e);
             }
         }
 
@@ -272,7 +272,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             //else we landed on the Web Client main page or app picker page
                             SwitchToDefaultContent(driver);
                     },
-                    () => driver.Throw("Load Main Page Fail.")
+                    () => new InvalidOperationException("Load Main Page Fail.")
                 );
 
                 return LoginResult.Success;

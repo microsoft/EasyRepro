@@ -19,8 +19,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestMethod]
         public void UCITestDuplicateDetection()
         {
-            _xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
-
             _xrmApp.CommandBar.ClickCommand("New");
 
             _xrmApp.Entity.SetValue("firstname", "EasyRepro");

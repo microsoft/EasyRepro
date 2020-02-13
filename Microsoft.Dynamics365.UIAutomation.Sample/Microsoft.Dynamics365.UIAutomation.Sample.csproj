@@ -88,6 +88,7 @@
     <Compile Include="SharedAPI\AzureInsights\UploadTelemetryUCI.cs" />
     <Compile Include="SharedAPI\AzureInsights\OpenLead.cs" />
     <Compile Include="SharedAPI\BrowserTests\BrowserTests.cs" />
+    <Compile Include="UCI\ApiTests\TestsBase_Tests.cs" />
     <Compile Include="UCI\BusinessProcessFlow\BusinessProcessFlowNextStage.cs" />
     <Compile Include="UCI\BusinessProcessFlow\SwitchBusinessProcessFlow.cs" />
     <Compile Include="UCI\CommandBar\CommandButton.cs" />

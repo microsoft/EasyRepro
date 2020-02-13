@@ -18,8 +18,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
       
         public virtual void InitTest()
         {
-            CreateApp();
-            NavigateToHomePage();
+            try
+            {  
+                CreateApp();
+                NavigateToHomePage();
+            }
+            catch
+            {
+                CloseApp();
+                throw;
+            }
         }
 
         public virtual void FinishTest()
@@ -42,14 +50,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         public void CloseApp()
         {
-            _xrmApp.Dispose();
+            _xrmApp?.Dispose();
             _xrmApp = null;
             _client = null;
         }
         
         public virtual void SetOptions(BrowserOptions options) { }
 
-        public virtual void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Accounts");
+        public virtual void NavigateToHomePage() {}
         
         public virtual void NavigateTo(string appName, string area = null, string subarea = null)
         {
