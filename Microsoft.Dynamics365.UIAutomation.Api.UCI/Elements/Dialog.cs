@@ -58,7 +58,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="to">Enum used to assign record to user or team</param>
         /// <param name="userOrTeamName">Name of the user or team to assign to</param>
-        public void Assign(Dialogs.AssignTo to, string userOrTeamName = "")
+        public void Assign(AssignTo to, string userOrTeamName = null)
         {
             _client.AssignDialog(to, userOrTeamName);
         }

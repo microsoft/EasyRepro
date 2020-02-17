@@ -12,6 +12,7 @@ using System.Linq;
 using System.Security;
 using System.Threading;
 using System.Web;
+using OpenQA.Selenium.Interactions;
 using OtpNet;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
@@ -235,6 +236,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (attempts >= Constants.DefaultRetryAttempts)
                         throw;
                 }
+
                 attempts++;
                 ThinkTime(Constants.DefaultRetryDelay);
             }
@@ -901,56 +903,47 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        internal BrowserCommandResult<bool> AssignDialog(Dialogs.AssignTo to, string userOrTeamName)
+        internal BrowserCommandResult<bool> AssignDialog(Dialogs.AssignTo to, string userOrTeamName = null)
         {
+            userOrTeamName = userOrTeamName?.Trim() ?? string.Empty;
             return this.Execute(GetOptions($"Assign to User or Team Dialog"), driver =>
             {
                 var inlineDialog = this.SwitchToDialog();
-                if (inlineDialog)
+                if (!inlineDialog)
+                    return false;
+
+                //Click the Option to Assign to User Or Team
+                var xpathToToggleButton = By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogToggle]);
+                var toggleButton = driver.WaitUntilClickable(xpathToToggleButton, "Me/UserTeam toggle button unavailable");
+
+                if (to == Dialogs.AssignTo.Me)
                 {
-                    if (to != Dialogs.AssignTo.Me)
-                    {
-                        //Click the Option to Assign to User Or Team
-                        driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogToggle]));
-
-                        var toggleButton = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogToggle]), "Me/UserTeam toggle button unavailable");
-                        if (toggleButton.Text == "Me")
-                            toggleButton.Click();
-
-                        //Set the User Or Team
-                        var userOrTeamField = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookup]), "User field unavailable");
-
-                        if (userOrTeamField.FindElements(By.TagName("input")).Count > 0)
-                        {
-                            var input = userOrTeamField.FindElement(By.TagName("input"));
-                            if (input != null)
-                            {
-                                input.Click();
-
-                                driver.WaitForTransaction();
-
-                                input.SendKeys(userOrTeamName, true);
-                            }
-                        }
-
-                        //Pick the User from the list
-                        driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogUserTeamLookupResults]));
-
-                        driver.WaitForTransaction();
-
-                        var container = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogUserTeamLookupResults]));
-                        var records = container.FindElements(By.TagName("li"));
-                        foreach (var record in records)
-                        {
-                            if (record.Text.StartsWith(userOrTeamName, StringComparison.OrdinalIgnoreCase))
-                                record.Click(true);
-                        }
-                    }
-
-                    //Click Assign
-                    var okButton = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogOKButton]));
-                    okButton.Click(true);
+                    if (toggleButton.Text != "Me")
+                        toggleButton.Click();
                 }
+                else
+                {
+                    if (toggleButton.Text == "Me")
+                        toggleButton.Click();
+
+                    //Set the User Or Team
+                    var userOrTeamField = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookup]), "User field unavailable");
+                    var input = userOrTeamField.ClickWhenAvailable(By.TagName("input"), "User field unavailable");
+                    input.SendKeys(userOrTeamName, true);
+                    
+                    ThinkTime(2000);
+
+                    //Pick the User from the list
+                    var container = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogUserTeamLookupResults]));
+                    container.WaitUntil(
+                        c => c.FindElements(By.TagName("li")).FirstOrDefault(r => r.Text.StartsWith(userOrTeamName, StringComparison.OrdinalIgnoreCase)),
+                        successCallback: e => e.Click(true),
+                        failureCallback: () => throw new InvalidOperationException($"None {to} found which match with '{userOrTeamName}'"));
+                }
+
+                //Click Assign
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogOKButton]), TimeSpan.FromSeconds(5),
+                    "Unable to click the OK button in the assign dialog");
 
                 return true;
             });
@@ -1311,27 +1304,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         internal BrowserCommandResult<bool> OpenRecord(int index, int thinkTime = Constants.DefaultThinkTime, bool checkRecord = false)
         {
             ThinkTime(thinkTime);
-
             return Execute(GetOptions("Open Grid Record"), driver =>
             {
-                IWebElement control = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
+                var xpathToGrid = By.XPath(AppElements.Xpath[AppReference.Grid.Container]);
+                IWebElement control = driver.WaitUntilAvailable(xpathToGrid);
 
-                var xpathToFind = checkRecord
-                    ? $"//div[@data-id='cell-{index}-1']"
-                    : $"//div[contains(@data-id, 'cell-{index}')]//a";
-                control.ClickWhenAvailable(By.XPath(xpathToFind), "An error occur trying to open the record at position {index}");
+                Func<Actions, Actions> action;
+                if (checkRecord)
+                    action = e => e.Click();
+                else
+                    action = e => e.DoubleClick();
 
-                // Logic equivalent to fix #746 (by @rswafford) 
-                //var xpathToFind = $"//div[@data-id='cell-{index}-1']";
-                //control.WaitUntilClickable(By.XPath(xpathToFind),
-                //    e =>
-                //    {
-                //        e.Click();
-                //        if (!checkRecord)
-                //           driver.DoubleClick(e);
-                //    },
-                //    $"An error occur trying to open the record at position {index}"
-                //    );
+                var xpathToCell = By.XPath($".//div[@data-id='cell-{index}-1']");
+                control.WaitUntilClickable(xpathToCell,
+                    cell =>
+                    {
+                        var emptyDiv = cell.FindElement(By.TagName("div"));
+                        driver.Perform(action, cell, cell.LeftTo(emptyDiv));
+                    },
+                    $"An error occur trying to open the record at position {index}"
+                    );
 
                 driver.WaitForTransaction();
                 return true;
@@ -2223,6 +2215,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
             );
         }
+
         private void ClearFieldValue(IWebElement field)
         {
             if (field.GetAttribute("value").Length > 0)
@@ -2230,6 +2223,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 field.SendKeys(Keys.Control + "a");
                 field.SendKeys(Keys.Backspace);
             }
+
             ThinkTime(500);
         }
 
@@ -2637,7 +2631,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     expandCollapseButtons.First().Click(true);
                 }
 
-                var returnValue = new MultiValueOptionSet { Name = option.Name };
+                var returnValue = new MultiValueOptionSet {Name = option.Name};
 
                 xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecordLabel].Replace("[NAME]", Elements.ElementId[option.Name]);
                 var labelItems = driver.FindElements(By.XPath(xpath));
@@ -2909,7 +2903,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.DateTimeFieldContainer].Replace("[NAME]", control.Name);
             return Execute(GetOptions($"Get Header DateTime Value {control.Name}"),
-                driver => ExecuteInHeaderContainer(driver, xpathToContainer, 
+                driver => ExecuteInHeaderContainer(driver, xpathToContainer,
                     container => TryGetValue(driver, container, control)));
         }
 

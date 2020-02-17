@@ -7,6 +7,7 @@ using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Support.UI;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -59,7 +60,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             try
             {
                 Actions action = new Actions(driver);
-                action.MoveToElement(element).Build().Perform();
+                action.MoveToElement(element).Perform();
             }
             catch (StaleElementReferenceException)
             {
@@ -70,14 +71,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         #endregion Click
 
+        public static void Click(this IWebDriver driver, IWebElement element, Func<Point> offsetFunc = null, bool ignoreStaleElementException = true)
+            => driver.Perform(a => a.Click(), element, offsetFunc, ignoreStaleElementException);
+
         #region Double Click
 
-        public static void DoubleClick(this IWebDriver driver, IWebElement element, bool ignoreStaleElementException = false)
+        public static void DoubleClick(this IWebDriver driver, IWebElement element, Func<Point> offsetFunc = null, bool ignoreStaleElementException = true)
+            => driver.Perform(a => a.DoubleClick(), element, offsetFunc, ignoreStaleElementException);
+
+        public static void Perform(this IWebDriver driver, Func<Actions, Actions> action, IWebElement element, Func<Point> offsetFunc = null, bool ignoreStaleElementException = true)
         {
             try
             {
-                Actions actions = new Actions(driver);
-                actions.DoubleClick(element).Build().Perform();
+                var actions = new Actions(driver);
+                if (offsetFunc == null)
+                    actions = actions.MoveToElement(element);
+                else
+                {
+                    var offset = offsetFunc();
+                    actions = actions.MoveToElement(element, offset.X, offset.Y);
+                }
+                action(actions).Perform();
             }
             catch (StaleElementReferenceException)
             {
@@ -86,12 +100,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
         }
 
-        public static void DoubleClick(this IWebDriver driver, By by, bool ignoreStaleElementException = false)
-        {
-            var element = driver.FindElement(by);
-            driver.DoubleClick(element, ignoreStaleElementException);
-        }
-
+        
         #endregion
 
         #region Script Execution
