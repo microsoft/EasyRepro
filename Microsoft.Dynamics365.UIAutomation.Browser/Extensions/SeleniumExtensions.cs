@@ -576,7 +576,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             Predicate<ISearchContext> condition = d =>
             {
                 elements = searchFunc(d);
-                return elements.Count > 0;
+                return elements != null && elements.Count > 0;
             };
 
             bool success = driver.WaitUntil(condition);
