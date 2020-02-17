@@ -19,7 +19,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestMethod]
         public void UCITestNewCommandBarButton()
         {
-            _xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
             _xrmApp.CommandBar.ClickCommand("New");
             _xrmApp.ThinkTime(2000);
         }
