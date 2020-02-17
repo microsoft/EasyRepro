@@ -50,7 +50,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (Browser.Options.UCITestMode) queryParams += ",testmode=true";
                 if (Browser.Options.UCIPerformanceMode) queryParams += "&perf=true";
 
-                if (!uri.Contains(queryParams) && !uri.Contains(System.Web.HttpUtility.UrlEncode(queryParams)))
+                if (!uri.Contains(queryParams) && !uri.Contains(HttpUtility.UrlEncode(queryParams)))
                 {
                     var testModeUri = uri + queryParams;
 
@@ -67,37 +67,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public string[] OnlineDomains { get; set; }
 
         #region PageWaits
+        internal bool WaitForMainPage(TimeSpan timeout, string errorMessage)
+            => WaitForMainPage(timeout, null, () => throw new InvalidOperationException(errorMessage));
 
-        internal void WaitForLoginPage()
+        internal bool WaitForMainPage(TimeSpan? timeout = null, Action<IWebElement> successCallback = null, Action failureCallback = null)
         {
-            IWebDriver driver = this.Browser.Driver;
-
-            driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
-                , TimeSpan.FromSeconds(60),
-                e =>
-                {
-                    //determine if we landed on the Unified Client Main page
-                    if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage])))
-                    {
-                        driver.WaitForPageToLoad();
-                        driver.WaitForTransaction();
-                    }
-                    else //else we landed on the Web Client main page or app picker page
-                        SwitchToDefaultContent(driver);
-                },
-                "Login page failed."
-            );
-        }
-
-        internal void WaitForMainPage()
-        {
-            IWebDriver driver = this.Browser.Driver;
-            driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]));
-            driver.WaitForPageToLoad();
-            if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage])))
-            {
-                driver.WaitForTransaction();
-            }
+            IWebDriver driver = Browser.Driver;
+            timeout = timeout ?? Constants.DefaultTimeout;
+            successCallback = successCallback ?? (
+                                  _ => {
+                                      bool isUCI = driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage]));
+                                      if (isUCI)
+                                          driver.WaitForTransaction();
+                                  });
+         
+            var xpathToMainPage = By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]);
+            var element = driver.WaitUntilVisible(xpathToMainPage, timeout, successCallback, failureCallback);
+            return element != null;
         }
 
         #endregion
@@ -133,7 +119,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             bool success = EnterUserName(driver, username);
             if (!success)
             {
-                var isUserAlreadyLogged = IsUserAlreadyLogged(driver);
+                var isUserAlreadyLogged = IsUserAlreadyLogged();
                 if (isUserAlreadyLogged)
                 {
                     SwitchToDefaultContent(driver);
@@ -166,21 +152,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 ThinkTime(1000);
             }
 
-            EnterOneTimeCode(driver, mfaSecrectKey);
+            int attempts = 0;
+            bool entered;
+            do
+            {
+                entered = EnterOneTimeCode(driver, mfaSecrectKey);
+                success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
+                attempts++;
+            }
+            while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
+           
+            if (entered && !success)
+                throw new InvalidOperationException("Somethig got wrong entering the OTC. Please check the MFA-SecrectKey in configuration.");
 
-            ClickStaySignedIn(driver);
-
-            ThinkTime(1000);
-
-            return LoginResult.Success;
+            return success ? LoginResult.Success : LoginResult.Failure;
         }
 
-        private static bool IsUserAlreadyLogged(IWebDriver driver)
-        {
-            var xpathToMainPage = By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]);
-            bool result = driver.HasElement(xpathToMainPage);
-            return result;
-        }
+        private bool IsUserAlreadyLogged() => WaitForMainPage(2.Seconds());
 
         private static string GenerateOneTimeCode(SecureString mfaSecrectKey)
         {
@@ -214,42 +202,39 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             input.Submit();
         }
 
-        private void EnterOneTimeCode(IWebDriver driver, SecureString mfaSecrectKey)
+        private bool EnterOneTimeCode(IWebDriver driver, SecureString mfaSecrectKey)
         {
-            int attempts = 0;
-            while (true)
+            try
             {
-                try
-                {
-                    IWebElement input = GetOtcInput(driver);
-                    if (input != null)
-                    {
-                        var oneTimeCode = GenerateOneTimeCode(mfaSecrectKey);
-                        input.SendKeys(oneTimeCode);
-                        input.Submit();
-                        return;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Trace.TraceInformation($"An Error ocur entering OTC. Attempt {attempts} of {Constants.DefaultRetryAttempts}. Exception: {e}");
-                    if (attempts >= Constants.DefaultRetryAttempts)
-                        throw;
-                }
+                IWebElement input = GetOtcInput(driver); // wait for the dialog, even if key is null, to print the right error
+                if (input == null)
+                    return true;
 
-                attempts++;
-                ThinkTime(Constants.DefaultRetryDelay);
+                if (mfaSecrectKey == null)
+                    throw new InvalidOperationException("The application is wait for the OTC but your MFA-SecrectKey is not set. Please check your configuration.");
+
+                var oneTimeCode = GenerateOneTimeCode(mfaSecrectKey);
+                SetInputValue(driver, input, oneTimeCode, 1.Seconds());
+                input.Submit();
+                return true; // input found & code was entered
+            }
+            catch (Exception e)
+            {
+                var message = $"An Error occur entering OTC. Exception: {e.Message}";
+                Trace.TraceInformation(message);
+                throw new InvalidOperationException(message, e);
             }
         }
+
 
         private static IWebElement GetOtcInput(IWebDriver driver)
             => driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.OneTimeCode]), TimeSpan.FromSeconds(2));
 
-        private static void ClickStaySignedIn(IWebDriver driver)
+        private static bool ClickStaySignedIn(IWebDriver driver)
         {
             var xpath = By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]);
-            driver.WaitUntilVisible(xpath, new TimeSpan(0, 0, 5),
-                e => driver.ClickWhenAvailable(xpath));
+            var element = driver.ClickIfVisible(xpath, 5.Seconds());
+            return element != null;
         }
 
         private static void SwitchToDefaultContent(IWebDriver driver)
@@ -273,7 +258,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.Navigate().GoToUrl(uri);
 
-                WaitForLoginPage();
+                WaitForMainPage(60.Seconds(),
+                    _ =>
+                    {
+                        //determine if we landed on the Unified Client Main page
+                        var isUCI = driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage]));
+                        if (isUCI)
+                        {
+                            driver.WaitForPageToLoad();
+                            driver.WaitForTransaction();
+                        }
+                        else
+                            //else we landed on the Web Client main page or app picker page
+                            SwitchToDefaultContent(driver);
+                    },
+                    () => new InvalidOperationException("Load Main Page Fail.")
+                );
 
                 return LoginResult.Success;
             });
@@ -295,7 +295,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //Insert any additional code as required for the SSO scenario
 
             //Wait for CRM Page to load
-            driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]), TimeSpan.FromSeconds(60), "Login page failed.");
+            WaitForMainPage(TimeSpan.FromSeconds(60), "Login page failed.");
             SwitchToMainFrame(driver);
         }
 
@@ -325,7 +325,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //Insert any additional code as required for the SSO scenario
 
             //Wait for CRM Page to load
-            driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]), TimeSpan.FromSeconds(60), "Login page failed.");
+            WaitForMainPage(TimeSpan.FromSeconds(60), "Login page failed.");
             SwitchToMainFrame(driver);
         }
 
@@ -339,12 +339,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return Execute(GetOptions($"Open App {appName}"), driver =>
             {
+                driver.WaitForPageToLoad();
                 driver.SwitchTo().DefaultContent();
 
                 //Handle left hand Nav in Web Client
-                var success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton) ||
-                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton) ||
-                              TryToClickInAppTile(appName, driver);
+                var success = TryToClickInAppTile(appName, driver) ||
+                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton) ||
+                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton);
+
                 if (!success)
                     throw new InvalidOperationException($"App Name {appName} not found.");
 
@@ -357,36 +359,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         private bool TryOpenAppFromMenu(IWebDriver driver, string appName, string appMenuButton)
         {
-            try
-            {
-                var xpathToAppMenu = By.XPath(AppElements.Xpath[appMenuButton]);
-                bool found = driver.TryFindElement(xpathToAppMenu, out var appMenu);
-                if (found)
-                {
-                    appMenu.Click(true);
-                    OpenAppFromMenu(driver, appName);
-                }
-
-                return found;
-            }
-            catch (Exception e)
-            {
-                throw new InvalidOperationException($"App Button {appMenuButton} not found.", e);
-            }
+            bool found = false;
+            var xpathToAppMenu = By.XPath(AppElements.Xpath[appMenuButton]);
+            driver.WaitUntilClickable(xpathToAppMenu, TimeSpan.FromSeconds(5),
+                        appMenu =>
+                        {
+                            appMenu.Click(true);
+                            OpenAppFromMenu(driver, appName);
+                            found = true;
+                        });
+            return found;
         }
 
         internal void OpenAppFromMenu(IWebDriver driver, string appName)
         {
             var container = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuContainer]));
-
-            var buttons = container.FindElements(By.TagName("button"));
-
-            var button = buttons.FirstOrDefault(x => x.Text.Trim() == appName);
-
-            if (button != null)
-                button.Click(true);
-            else
-                throw new InvalidOperationException($"App Name {appName} not found.");
+            var xpathToButton = "//nav[@aria-hidden='false']//button//*[text()='[TEXT]']".Replace("[TEXT]", appName);
+            container.ClickWhenAvailable(By.XPath(xpathToButton),
+                    TimeSpan.FromSeconds(1),
+                    $"App Name {appName} not found."
+                );
 
             driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
             driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
@@ -394,15 +386,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         private static bool TryToClickInAppTile(string appName, IWebDriver driver)
         {
-            //Switch to frame 0
-            driver.SwitchTo().Frame(0);
-            IWebElement tileContainer;
-            bool success = driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]), out tileContainer);
-            if (success)
-            {
-                var appTile = tileContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName)));
-                appTile.Click(true);
-            }
+            string message = null;
+            driver.WaitUntil(
+                d =>
+                {
+                    try
+                    {
+                        driver.SwitchTo().Frame("AppLandingPage");
+                    }
+                    catch (NoSuchFrameException ex)
+                    {
+                        message = $"Frame AppLandingPage is not loaded. Exception: {ex.Message}";
+                        Trace.TraceWarning(message);
+                        return false;
+                    }
+                    return true;
+                },
+                TimeSpan.FromSeconds(30),
+                failureCallback: () => throw new InvalidOperationException(message)
+                );
+
+            var xpathToAppContainer = By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]);
+            var xpathToappTile = By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName));
+
+            bool success = false;
+            driver.WaitUntilVisible(xpathToAppContainer, TimeSpan.FromSeconds(5),
+                appContainer => success = appContainer.ClickWhenAvailable(xpathToappTile, TimeSpan.FromSeconds(5)) != null
+                );
 
             return success;
         }
@@ -1895,6 +1905,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        private void SetInputValue(IWebDriver driver, IWebElement input, string value, TimeSpan? thinktime = null)
+        {
+            input.SendKeys(Keys.Control + "a");
+            input.SendKeys(Keys.Backspace);
+            driver.WaitForTransaction();
+
+            if (string.IsNullOrWhiteSpace(value))
+                return;
+
+            input.SendKeys(value, true);
+            driver.WaitForTransaction();
+            ThinkTime(thinktime ?? 3.Seconds());
+        }
         /// <summary>
         /// Sets the value of a Lookup, Customer, Owner or ActivityParty Lookup which accepts only a single value.
         /// </summary>
@@ -4145,7 +4168,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal void EnablePerformanceCenter()
         {
-            Browser.Driver.Navigate().GoToUrl(string.Format("{0}&perf=true", Browser.Driver.Url));
+            Browser.Driver.Navigate().GoToUrl($"{Browser.Driver.Url}&perf=true");
             Browser.Driver.WaitForPageToLoad();
             Browser.Driver.WaitForTransaction();
         }
@@ -4155,6 +4178,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         internal void ThinkTime(int milliseconds)
         {
             Browser.ThinkTime(milliseconds);
+        }
+
+        internal void ThinkTime(TimeSpan timespan)
+        {
+            ThinkTime((int)timespan.TotalMilliseconds);
         }
 
         internal void Dispose()

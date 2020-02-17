@@ -299,8 +299,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_SitemapMenuItems", "//li[contains(@data-id,'sitemap-entity')]"},
             { "Nav_SitemapSwitcherButton", "//button[contains(@data-id,'sitemap-areaSwitcher-expand-btn')]"},
             { "Nav_SitemapSwitcherFlyout","//div[contains(@data-lp-id,'sitemap-area-switcher-flyout')]"},
-            { "Nav_UCIAppContainer","//div[contains(@id,'AppLandingPageContentContainer')]"},
-            { "Nav_UCIAppTile", ".//a[contains(@aria-label,'[NAME]')]"},
+            { "Nav_UCIAppContainer","//div[@id='AppLandingPageContentContainer']"},
+            { "Nav_UCIAppTile", "//div[@data-type='app-title' and @title='[NAME]']"},
 
             
             //Grid

@@ -43,6 +43,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.ThinkTime(milliseconds);
         }
+        public void ThinkTime(TimeSpan timespan)
+        {
+            _client.ThinkTime((int)timespan.TotalMilliseconds);
+        }
+
         public void Dispose()
         {
             _client?.Dispose();

@@ -20,7 +20,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI.Login
 
             _xrmApp.CommandBar.ClickCommand("New");
 
-            _xrmApp.Entity.SetValue("name", _timed("Test API Account"));
+            _xrmApp.Entity.SetValue("name", "Test API Account");
             _xrmApp.Entity.SetValue("telephone1", "555-555-5555");
         }
     }
