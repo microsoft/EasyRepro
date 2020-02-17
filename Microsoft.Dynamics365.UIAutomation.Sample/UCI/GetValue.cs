@@ -31,7 +31,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
-        public void UCITestGetValueFromLookup()
+        public void UCITestGetSingleValueFromLookup()
         {
             _xrmApp.Navigation.OpenSubArea("Accounts");
 
@@ -44,6 +44,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             Assert.IsNotNull(lookupValue);
         }
 
+        [TestMethod]
+        public void UCITestGetValueFromLookup_MultiAndSingle_ReturnsTheSameResult()
+        {
+            _xrmApp.Navigation.OpenSubArea("Accounts");
+
+            _xrmApp.Grid.SwitchView("Active Accounts");
+
+            _xrmApp.Grid.OpenRecord(0);
+
+            _xrmApp.ThinkTime(2000);
+            
+            var primaryContactLookupItem = new LookupItem {Name = "primarycontactid"};
+
+            string[] lookupValues = _xrmApp.Entity.GetValue(new[]{ primaryContactLookupItem });
+            Assert.IsNotNull(lookupValues);
+            Assert.AreEqual(1, lookupValues.Length);
+
+            string lookupValue = _xrmApp.Entity.GetValue(primaryContactLookupItem);
+            Assert.IsNotNull(lookupValue);
+            Assert.AreEqual(lookupValue, lookupValues[0]);
+        }
+        
         [TestMethod]
         public void UCITestActivityPartyGetValue()
         {
