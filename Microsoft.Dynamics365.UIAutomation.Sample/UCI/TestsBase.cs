@@ -1,7 +1,4 @@
-﻿// Created by: Rodriguez Mustelier Angel (rodang)
-// Modify On: 2020-01-23 02:51
-
-using System;
+﻿using System;
 using System.Configuration;
 using System.Security;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
@@ -12,14 +9,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     public class TestsBase
     {
         protected readonly Uri _xrmUri = new Uri(ConfigurationManager.AppSettings["OnlineCrmUrl"]);
-        protected readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        protected readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        protected readonly SecureString _mfaSecrectKey = ConfigurationManager.AppSettings["MfaSecrectKey"].ToSecureString();
-        protected readonly bool _usePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"]);
-
+        protected readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"]?.ToSecureString();
+        protected readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"]?.ToSecureString();
+        protected readonly SecureString _mfaSecrectKey = ConfigurationManager.AppSettings["MfaSecrectKey"]?.ToSecureString();
+  
         protected XrmApp _xrmApp;
-        protected string _timed(string value) => $"{value} {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}";
-
+        protected WebClient _client;
+      
         public virtual void InitTest()
         {
             try
@@ -39,25 +35,42 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             CloseApp();
         }
 
-        public void CreateApp(bool privateMode = true)
+        public XrmApp CreateApp(BrowserOptions options = null)
         {
-            BrowserOptions options = TestSettings.Options;
-            options.PrivateMode = privateMode || _usePrivateMode;
-            options.UCIPerformanceMode = false;
+            options = options ?? TestSettings.Options;
+            SetOptions(options);
 
-            var client = new WebClient(options);
-            _xrmApp = new XrmApp(client);
+            _client = new WebClient(options);
+            _xrmApp = new XrmApp(_client);
 
             _xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
-            _xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+            return _xrmApp;
         }
 
         public void CloseApp()
         {
-            _xrmApp.Dispose();
+            _xrmApp?.Dispose();
             _xrmApp = null;
+            _client = null;
         }
+        
+        public virtual void SetOptions(BrowserOptions options) { }
 
-        public virtual void NavigateToHomePage() { }
+        public virtual void NavigateToHomePage() {}
+        
+        public virtual void NavigateTo(string appName, string area = null, string subarea = null)
+        {
+            _xrmApp.Navigation.OpenApp(appName);
+
+            var hasArea = !string.IsNullOrWhiteSpace(area);
+            var hasSubArea = !string.IsNullOrWhiteSpace(subarea);
+            if(hasArea && hasSubArea)
+                _xrmApp.Navigation.OpenSubArea(area, subarea);
+            else if(hasArea)
+                _xrmApp.Navigation.OpenArea(area);
+            else if(hasSubArea)
+                _xrmApp.Navigation.OpenSubArea(subarea);
+        }
     }
 }

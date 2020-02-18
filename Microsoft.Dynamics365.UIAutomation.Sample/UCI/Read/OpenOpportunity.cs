@@ -21,12 +21,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
 
-                xrmApp.Grid.Search("orb");
+                xrmApp.Grid.Search("*Upgrade");
 
                 xrmApp.Grid.OpenRecord(0);
-
             }
-
         }
 
         [TestMethod]
@@ -40,6 +38,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
+                
+                xrmApp.Grid.SwitchView("Open Opportunities");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -63,6 +63,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
+                
+                xrmApp.Grid.SwitchView("Open Opportunities");
 
                 xrmApp.Grid.OpenRecord(0);
 

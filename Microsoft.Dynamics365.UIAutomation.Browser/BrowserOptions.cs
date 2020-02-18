@@ -152,7 +152,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             var options = new EdgeOptions()
             {
-                PageLoadStrategy = PageLoadStrategy.Normal
+                PageLoadStrategy = PageLoadStrategy.Normal,
+                UseInPrivateBrowsing = PrivateMode
             };
 
             return options;

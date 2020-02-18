@@ -21,7 +21,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Leads");
                 
-                xrmApp.Grid.Search("Linda");
+                xrmApp.Grid.Search("David");
 
                 xrmApp.Grid.OpenRecord(0);
                 

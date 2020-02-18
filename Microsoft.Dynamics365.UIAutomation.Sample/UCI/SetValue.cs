@@ -91,7 +91,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(500);
 
                 xrmApp.Entity.SetValue(new LookupItem[] {
-                    new LookupItem { Name = "to", Value = "Adeventure Works (sample)", Index = 0 },
+                    new LookupItem { Name = "to", Value = "Adeventure Works", Index = 0 },
                     new LookupItem { Name = "to", Value = "", Index = 0 } });
                 xrmApp.ThinkTime(500);
 
@@ -122,7 +122,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(500);
 
                 xrmApp.Entity.AddValues(new LookupItem[] {
-                    new LookupItem { Name = "to", Value = "Adventure Works (sample)", Index = 0 },
+                    new LookupItem { Name = "to", Value = "Adventure Works", Index = 0 },
                     new LookupItem { Name = "to", Value = "", Index = 1 } });
                 xrmApp.ThinkTime(500);
 
@@ -149,7 +149,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(500);
 
                 xrmApp.Entity.RemoveValues(new LookupItem[] {
-                    new LookupItem { Name = "to", Value = "Adventure Works (sample)", Index = 0 },
+                    new LookupItem { Name = "to", Value = "Adventure Works", Index = 0 },
                     new LookupItem { Name = "to", Value = "", Index = 0 } });
                 xrmApp.ThinkTime(500);
 
@@ -201,7 +201,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Entity.SetValue("name", "Test EasyRepro Opportunity");
 
-                xrmApp.Entity.SetValue("estimatedclosedate", DateTime.Now, "M/d/yyyy h:mm tt");
+                xrmApp.Entity.SetHeaderValue("estimatedclosedate", DateTime.Now);
                 xrmApp.ThinkTime(500);
 
                 xrmApp.Entity.Save();

@@ -20,13 +20,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
                 xrmApp.Navigation.OpenSubArea("Service", "Cases");
+                
+                xrmApp.Grid.SwitchView("Active Cases");
 
                 xrmApp.Grid.OpenRecord(0);
 
                 //Click the Delete button from the command bar
                 xrmApp.CommandBar.ClickCommand("Delete", "", false); //Set to true if command is a part of the More Commands menu
 
-                xrmApp.Dialogs.ConfirmationDialog(true); //Click OK on the Delete confirmation dialog (false to cancel)
+                xrmApp.Dialogs.ConfirmationDialog(false); //Click OK on the Delete confirmation dialog (false to cancel)
 
                 xrmApp.ThinkTime(3000);
             }

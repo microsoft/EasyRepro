@@ -14,12 +14,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestCleanup]
         public override void FinishTest() => base.FinishTest();
 
-        public override void NavigateToHomePage() => _xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+        public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Accounts");
 
         [TestMethod]
         public void UCITestNewCommandBarButton()
         {
-            _xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
             _xrmApp.CommandBar.ClickCommand("New");
             _xrmApp.ThinkTime(2000);
         }
@@ -33,6 +32,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var includeMoreCommandValues = _xrmApp.CommandBar.GetCommandValues(true).Value;
             int totalCommandCount = includeMoreCommandValues.Count;
 
+            Assert.IsTrue(commandCount <= totalCommandCount);
             _xrmApp.ThinkTime(2000);
         }
     }

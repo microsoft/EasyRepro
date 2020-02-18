@@ -3,6 +3,7 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using Microsoft.Dynamics365.UIAutomation.Browser;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
@@ -15,13 +16,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestCleanup]
         public override void FinishTest() => base.FinishTest();
 
-        public override void NavigateToHomePage() => _xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
+        public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Opportunities");
+
+        public override void SetOptions(BrowserOptions options)
+        {
+            options.PrivateMode = false;
+            options.UCIPerformanceMode = true;
+        }
 
         [TestMethod]
         public void UCITestCloseOpportunity()
         {
-            _xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
-
+            _xrmApp.Grid.SwitchView("Open Opportunities");
+            
             _xrmApp.Grid.OpenRecord(0);
 
             _xrmApp.CommandBar.ClickCommand("Close as Won");

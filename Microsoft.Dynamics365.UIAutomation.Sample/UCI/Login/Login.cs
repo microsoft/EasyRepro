@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI.Login
+namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
     public class Login : TestsBase
@@ -11,7 +11,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI.Login
         [TestCleanup]
         public override void FinishTest() => base.FinishTest();
 
-        public override void NavigateToHomePage() => _xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+        public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Accounts");
 
         [TestMethod]
         public void MultiFactorLogin()
@@ -20,7 +20,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI.Login
 
             _xrmApp.CommandBar.ClickCommand("New");
 
-            _xrmApp.Entity.SetValue("name", "Test API Account");
+            _xrmApp.Entity.SetValue("name", "Test API Account" + TestSettings.GetRandomString(5,5) );
             _xrmApp.Entity.SetValue("telephone1", "555-555-5555");
         }
     }

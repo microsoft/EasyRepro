@@ -40,6 +40,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public static IWebElement ClickWhenAvailable(this ISearchContext driver, By by, TimeSpan? timeout = null, string errorMessage = null)
             => WaitUntilClickable(driver, by, timeout, e => e.Click(), errorMessage ?? "Unable to click element.");
+
         public static IWebElement ClickWhenAvailable(this ISearchContext driver, By by, string errorMessage)
             => WaitUntilClickable(driver, by, null, e => e.Click(), errorMessage ?? "Unable to click element.");
 
@@ -50,7 +51,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 return null;
 
             element.Click();
-            System.Threading.Thread.Sleep((int)timeout.TotalMilliseconds);
+            System.Threading.Thread.Sleep((int) timeout.TotalMilliseconds);
 
             return element;
         }
@@ -145,7 +146,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             var results = ExecuteScript(driver, $"return JSON.stringify({@object});").ToString();
             var jsSerializer = new JavaScriptSerializer();
 
-            jsSerializer.RegisterConverters(new[] { new DynamicJsonConverter() });
+            jsSerializer.RegisterConverters(new[] {new DynamicJsonConverter()});
 
             var jsonObj = new JavaScriptSerializer().Deserialize<T>(results);
 
@@ -217,7 +218,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public static T GetAttribute<T>(this IWebElement element, string attributeName)
         {
             string value = element.GetAttribute(attributeName) ?? string.Empty;
-            return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value);
+            return (T) TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(value);
         }
 
         public static string GetAuthority(this IWebDriver driver)
@@ -263,7 +264,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public static IWebDriver LastWindow(this IWebDriver driver)
             => driver.SwitchTo().Window(driver.WindowHandles.Last());
 
-        
+
         /// <summary>
         /// Clears the focus from all elements.
         /// TODO: this implementation of the ClearFocus is clicking somewhere on the body, that may happen in some unwanted point, changing the results of the test.
@@ -291,7 +292,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 {
                     try
                     {
-                        state = ((IJavaScriptExecutor)driver).ExecuteScript(@"return document.readyState").ToString();
+                        state = ((IJavaScriptExecutor) driver).ExecuteScript(@"return document.readyState").ToString();
                     }
                     catch (InvalidOperationException)
                     {
@@ -326,7 +327,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     driver.SwitchTo().Window(driver.WindowHandles[0]);
                 }
 
-                state = ((IJavaScriptExecutor)driver).ExecuteScript(@"return document.readyState").ToString();
+                state = ((IJavaScriptExecutor) driver).ExecuteScript(@"return document.readyState").ToString();
                 if (!(state.Equals("complete", StringComparison.InvariantCultureIgnoreCase) || state.Equals("loaded", StringComparison.InvariantCultureIgnoreCase)))
                     throw;
             }
@@ -342,7 +343,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             wait.IgnoreExceptionTypes(typeof(TimeoutException), typeof(NullReferenceException));
             try
             {
-                state = wait.Until(d => (bool)driver.ExecuteScript("return window.UCWorkBlockTracker.isAppIdle()")); // Check to see if UCI is idle
+                state = wait.Until(d => (bool) driver.ExecuteScript("return window.UCWorkBlockTracker.isAppIdle()")); // Check to see if UCI is idle
             }
             catch (Exception)
             {
@@ -523,7 +524,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             TimeSpan? timeout = null,
             Action successCallback = null, Action failureCallback = null)
         {
-            var wait = new DefaultWait<ISearchContext>(driver) { Timeout = timeout ?? Constants.DefaultTimeout };
+            var wait = new DefaultWait<ISearchContext>(driver) {Timeout = timeout ?? Constants.DefaultTimeout};
             wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
 
             bool success = false;
@@ -568,6 +569,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 failureCallback?.Invoke();
 
             return element;
+        }
+
+        public static ICollection<IWebElement> WaitUntil(this ISearchContext driver, Func<ISearchContext, ICollection<IWebElement>> searchFunc,
+            TimeSpan? timeout = null,
+            Action<ICollection<IWebElement>> successCallback = null, Action failureCallback = null)
+        {
+            ICollection<IWebElement> elements = null;
+            Predicate<ISearchContext> condition = d =>
+            {
+                elements = searchFunc(d);
+                return elements != null && elements.Count > 0;
+            };
+
+            bool success = driver.WaitUntil(condition);
+            if (success)
+                successCallback?.Invoke(elements);
+            else
+                failureCallback?.Invoke();
+
+            return elements;
         }
 
         public static bool RepeatUntil(this IWebDriver driver, Action action, Predicate<IWebDriver> predicate,
