@@ -4,10 +4,12 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using System;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
-    [TestClass]
+   [TestClass]
     public class GetValueUci : TestsBase
     {
         [TestInitialize]
@@ -56,14 +58,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             _xrmApp.ThinkTime(2000);
             
             var primaryContactLookupItem = new LookupItem {Name = "primarycontactid"};
-
+            
+            string lookupValue = _xrmApp.Entity.GetValue(primaryContactLookupItem);
+            Debug.WriteLine($"Single-Value: {lookupValue ?? "null"}");
+           
             string[] lookupValues = _xrmApp.Entity.GetValue(new[]{ primaryContactLookupItem });
             Assert.IsNotNull(lookupValues);
-            Assert.AreEqual(1, lookupValues.Length);
-
-            string lookupValue = _xrmApp.Entity.GetValue(primaryContactLookupItem);
-            Assert.IsNotNull(lookupValue);
-            Assert.AreEqual(lookupValue, lookupValues[0]);
+            Assert.IsTrue(lookupValues.Length == 0 && lookupValue == string.Empty || string.Equals(lookupValue, lookupValues[0]));
+            
+            Debug.WriteLine($"Multi-Value: {lookupValues.FirstOrDefault() ?? "null"}");
         }
         
         [TestMethod]
