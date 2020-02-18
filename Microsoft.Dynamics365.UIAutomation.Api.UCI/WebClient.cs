@@ -2387,32 +2387,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return lookupValue;
             });
         }
-
-        private static string TryGetValue(IWebElement fieldContainer, LookupItem control)
+        private string TryGetValue(IWebElement fieldContainer, LookupItem control)
         {
-            Exception ex = null;
-            try
-            {
-                bool found = fieldContainer.TryFindElement(By.TagName("input"), out var input);
-                if (found)
-                {
-                    string lookupValue = input.GetAttribute("value");
-                    return lookupValue;
-                }
-
-                found = fieldContainer.TryFindElement(By.XPath(".//label"), out var label);
-                if (found)
-                {
-                    string lookupValue = label.GetAttribute("innerText");
-                    return lookupValue;
-                }
-            }
-            catch (Exception e)
-            {
-                ex = e;
-            }
-
-            throw new InvalidOperationException($"Field: {control.Name} Does not exist", ex);
+            string[] lookupValues = TryGetValue(fieldContainer, new[] { control });
+            string result = string.Join("; ", lookupValues);
+            return result;
         }
 
         /// <summary>
@@ -2427,22 +2406,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var xpathToContainer = By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", controlName));
                 var fieldContainer = driver.WaitUntilAvailable(xpathToContainer);
-                string[] lookupValues = TryGetValue(fieldContainer, controls);
-                return lookupValues;
+                string[] result = TryGetValue(fieldContainer, controls);
+                return result;
             });
         }
 
-        public BrowserCommandResult<string[]> TryGetValue(IWebElement fieldContainer, LookupItem[] controls)
+        private string[] TryGetValue(IWebElement fieldContainer, LookupItem[] controls)
         {
             var controlName = controls.First().Name;
             var xpathToExistingValues = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldExistingValue].Replace("[NAME]", controlName));
             var existingValues = fieldContainer.FindElements(xpathToExistingValues);
 
             var xpathToExpandButton = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldExpandCollapseButton].Replace("[NAME]", controlName));
-            bool expandButtonFound = fieldContainer.TryFindElement(xpathToExpandButton, out var collapseButton);
+            bool expandButtonFound = fieldContainer.TryFindElement(xpathToExpandButton, out var expandButton);
             if (expandButtonFound)
             {
-                collapseButton.Click(true);
+                expandButton.Click(true);
 
                 int count = existingValues.Count;
                 fieldContainer.WaitUntil(fc => fc.FindElements(xpathToExistingValues).Count > count);
@@ -2455,17 +2434,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (existingValues.Count > 0)
                 {
-                    char[] trimCharacters =
-                    {
-                        '', '\r', '\n', '',
-                        '', ''
-                    }; //IE can return line breaks
-                    string[] lookupValues = existingValues.Select(v => v.GetAttribute("innerText").Trim(trimCharacters)).ToArray();
+                    string[] lookupValues = existingValues.Select(v => v.GetAttribute("innerText").ToLowerString()).ToArray(); //IE can return line breaks
                     return lookupValues;
                 }
 
                 if (fieldContainer.FindElements(By.TagName("input")).Any())
-                    return null;
+                    return new string[0];
             }
             catch (Exception e)
             {
