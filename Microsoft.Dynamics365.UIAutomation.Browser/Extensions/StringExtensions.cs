@@ -37,7 +37,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 Marshal.ZeroFreeGlobalAllocUnicode(unmanagedString);
             }
         }
-        public static string ToLowerString(this string value)
+        public static string ToLowerString(this string value) 
+            => value?.TrimSpecialCharacters().ToLower();
+
+        public static string TrimSpecialCharacters(this string value)
         { 
             char[] trimCharacters = {
                 '\r', 
@@ -50,13 +53,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 (char) 59902, //
             };
 
-            return value?.Trim()
-                        .Trim(trimCharacters)
-                        .Replace("\r", string.Empty)
-                        .Replace("\n", string.Empty)
-                        .Replace(Environment.NewLine, string.Empty)
-                        .ToLower();
+            var result = value?.Trim()
+                .Trim(trimCharacters)
+                .Replace("\r", string.Empty)
+                .Replace("\n", string.Empty)
+                .Replace(Environment.NewLine, string.Empty);
+
+            return result;
         }
+
         public static bool Contains(this string source, string value, StringComparison compare)
         {
             return source.IndexOf(value, compare) >= 0;

@@ -1904,13 +1904,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (clearFirst)
                     TryRemoveLookupValue(driver, fieldContainer, control);
 
-                TryToSetValue(fieldContainer, controls);
+                TryToSetValue(driver, fieldContainer, controls);
 
                 return true;
             });
         }
 
-        private void TryToSetValue(ISearchContext fieldContainer, LookupItem[] controls)
+        private void TryToSetValue(IWebDriver driver, ISearchContext fieldContainer, LookupItem[] controls)
         {
             IWebElement input;
             bool found = fieldContainer.TryFindElement(By.TagName("input"), out input);
@@ -1925,6 +1925,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else
                     {
                         input.SendKeys(value, true);
+                        driver.WaitForTransaction();
+                        ThinkTime(3.Seconds());
                         input.SendKeys(Keys.Tab);
                         input.SendKeys(Keys.Enter);
                     }
@@ -2434,7 +2436,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 if (existingValues.Count > 0)
                 {
-                    string[] lookupValues = existingValues.Select(v => v.GetAttribute("innerText").ToLowerString()).ToArray(); //IE can return line breaks
+                    string[] lookupValues = existingValues.Select(v => v.GetAttribute("innerText").TrimSpecialCharacters()).ToArray(); //IE can return line breaks
                     return lookupValues;
                 }
 
@@ -2891,7 +2893,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         if (clearFirst)
                             TryRemoveLookupValue(driver, container, control);
 
-                        TryToSetValue(container, controls);
+                        TryToSetValue(driver, container, controls);
                         return true;
                     }));
         }
