@@ -44,6 +44,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions("Initialize Unified Interface Modes"), driver =>
             {
+                driver.WaitForPageToLoad();
+
                 var uri = driver.Url;
                 var queryParams = "&flags=easyreproautomation=true";
 
