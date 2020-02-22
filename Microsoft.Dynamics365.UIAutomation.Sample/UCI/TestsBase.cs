@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Enable System.Diagnostics Trace/Debug
+#define DEBUG 
+#define TRACE
+
+using System;
 using System.Configuration;
 using System.Security;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
@@ -14,20 +18,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         protected readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"]?.ToSecureString();
         protected readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"]?.ToSecureString();
         protected readonly SecureString _mfaSecrectKey = ConfigurationManager.AppSettings["MfaSecrectKey"]?.ToSecureString();
-  
-        private TracingService _trace;
-        protected TracingService trace => _trace ?? (_trace = new TracingService(GetType(), "BrowserAutomation"));
+        protected readonly TracingService trace;
 
         protected XrmApp _xrmApp;
         protected WebClient _client;
       
-        public TestContext TestContext { get; set; }
+        public TestContext TestContext { get; set; } // VSTest fulfill this property before run each test, remove for NUnit
+        public  virtual string CurrentTestName => TestContext.TestName; // NUnit => replace or override this method with: TestContext.CurrentContext.Test.Name
+
+        protected TestsBase()
+        {
+            trace = new TracingService(GetType(), Constants.DefaultTraceSource);
+            trace.Log("Init Tracing Service - Success");
+        }
         
         public virtual void InitTest()
         {
             try
             {  
-                trace.Log(TestContext.TestName);
+                trace.Log(CurrentTestName);
                 CreateApp();
                 NavigateToHomePage();
             }
@@ -37,11 +46,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 throw;
             }
         }
-
+        
         public virtual void FinishTest()
         {
             CloseApp();
-            trace.Log(TestContext.TestName);
+            trace.Log(CurrentTestName);
         }
 
         public XrmApp CreateApp(BrowserOptions options = null)
