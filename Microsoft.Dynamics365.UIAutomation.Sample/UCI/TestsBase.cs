@@ -22,15 +22,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         protected WebClient _client;
       
         public TestContext TestContext { get; set; }
-
-        private static TestContext _testContext;
-
-        [ClassInitialize]
-        public static void SetupTests(TestContext testContext)
-        {
-            _testContext = testContext;
-        }
-
+        
         public virtual void InitTest()
         {
             try
