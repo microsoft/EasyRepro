@@ -81,9 +81,11 @@
     <Compile Include="Extensions\RelativePositions.cs" />
     <Compile Include="Extensions\SeleniumExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Logs\StringFormater.cs" />
     <Compile Include="Extensions\TimeExtensions.cs" />
     <Compile Include="ICommandResult.cs" />
     <Compile Include="InteractiveBrowser.cs" />
+    <Compile Include="Logs\TracingService.cs" />
     <Compile Include="NavigationOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
