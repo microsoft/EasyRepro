@@ -8,7 +8,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
     public class OnlineLogin : Element
     {
-        private WebClient _client;
+        private readonly WebClient _client;
 
         public OnlineLogin(WebClient client) 
         {
@@ -21,8 +21,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="orgUrl">URL of the organization</param>
         public void Login(Uri orgUrl)
         {
-            _client.Login(orgUrl);
-
+            LoginResult result = _client.Login(orgUrl);
+            if(result == LoginResult.Failure) 
+                throw new InvalidOperationException("Login Failure, please check your configuration");
+            
             _client.InitializeModes();
         }
 
@@ -35,8 +37,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="mfaSecrectKey">SecrectKey for multi-factor authentication</param>
         public void Login(Uri orgUrl, SecureString username, SecureString password, SecureString mfaSecrectKey = null)
         {
-            _client.Login(orgUrl, username, password, mfaSecrectKey);
-
+            LoginResult result = _client.Login(orgUrl, username, password, mfaSecrectKey);
+            if(result == LoginResult.Failure) 
+                throw new InvalidOperationException("Login Failure, please check your configuration");
+            
             _client.InitializeModes();
         }
 
@@ -50,10 +54,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="redirectAction">Actions required during redirect</param>
         public void Login(Uri orgUrl, SecureString username, SecureString password, SecureString mfaSecrectKey, Action<LoginRedirectEventArgs> redirectAction)
         {
-            _client.Login(orgUrl, username, password, mfaSecrectKey, redirectAction);
-
+            LoginResult result = _client.Login(orgUrl, username, password, mfaSecrectKey, redirectAction);
+            if(result == LoginResult.Failure) 
+                throw new InvalidOperationException("Login Failure, please check your configuration");
+            
             _client.InitializeModes();           
         }
-
     }
 }

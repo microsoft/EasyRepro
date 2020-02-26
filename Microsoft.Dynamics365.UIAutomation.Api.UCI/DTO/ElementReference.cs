@@ -183,7 +183,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Login_SignIn", "id(\"cred_sign_in_button\")"},
             { "Login_CrmMainPage", "//*[contains(@id,'crmTopBar')or contains(@data-id,'topBar')]"},
             { "Login_CrmUCIMainPage", "//*[contains(@data-id,'topBar')]"},
-            { "Login_StaySignedIn", "//input[@id=\"idSIButton9\"]"},
+            { "Login_StaySignedIn", "//div[@data-viewid and contains(@data-bind, 'kmsi-view')]//input[@id='idSIButton9']"},
             { "Login_OneTimeCode", "//input[@name='otc']"},
 
 

@@ -165,7 +165,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
            
             if (entered && !success)
-                throw new InvalidOperationException("Somethig got wrong entering the OTC. Please check the MFA-SecrectKey in configuration.");
+                throw new InvalidOperationException("Something got wrong entering the OTC. Please check the MFA-SecrectKey in configuration.");
 
             return success ? LoginResult.Success : LoginResult.Failure;
         }
@@ -274,7 +274,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             //else we landed on the Web Client main page or app picker page
                             SwitchToDefaultContent(driver);
                     },
-                    () => new InvalidOperationException("Load Main Page Fail.")
+                    () => throw new InvalidOperationException("Load Main Page Fail.")
                 );
 
                 return LoginResult.Success;
