@@ -117,7 +117,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public IReadOnlyCollection<FormNotification> GetFormNotifications()
         {
-            return _client.GetFormNotifications();
+            return _client.GetFormNotifications().Value;
         }
 
         /// <summary>
