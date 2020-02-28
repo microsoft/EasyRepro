@@ -205,6 +205,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public static bool HasAttribute(this IWebElement element, string attributeName)
             => element.GetAttribute(attributeName) != null;
 
+        public static bool HasClass(this IWebElement element, string className)
+            => element.GetAttribute("class").Split(' ').Any(c => string.Equals(className, c, StringComparison.CurrentCultureIgnoreCase));
+        
         public static T GetAttribute<T>(this IWebElement element, string attributeName)
         {
             string value = element.GetAttribute(attributeName) ?? string.Empty;

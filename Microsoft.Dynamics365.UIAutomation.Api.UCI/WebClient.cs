@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
@@ -3342,6 +3343,54 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 return true;
             });
+        }
+
+        internal BrowserCommandResult<IReadOnlyCollection<FormNotification>> GetFormNotifications()
+        {
+            return Execute(GetOptions($"Get all form notifications"), driver =>
+            {
+                List<FormNotification> notifications = new List<FormNotification>();
+
+                if (!driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationBar]),
+                    out var notificationBar))
+                {
+                    return notifications;
+                }
+
+                if (notificationBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationExpandButton]), out var expandButton))
+                {
+                    if (!Convert.ToBoolean(notificationBar.GetAttribute("aria-expanded")))
+                        expandButton.Click();
+
+                    notificationBar = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationFlyoutRoot]), TimeSpan.FromSeconds(2), "Failed to open the form notifications");
+                }
+
+                var notificationList = notificationBar.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationList]));
+                var notificationListItems = notificationList.FindElements(By.TagName("li"));
+
+                foreach (var item in notificationListItems)
+                {
+                    var icon = item.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationTypeIcon]));
+
+                    var notification = new FormNotification
+                    {
+                        Message = item.GetAttribute("aria-label")
+                    };
+
+                    if (icon.HasClass("MarkAsLost-symbol"))
+                        notification.Type = FormNotificationType.Error;
+                    else if (icon.HasClass("Warning-symbol"))
+                        notification.Type = FormNotificationType.Warning;
+                    else if (icon.HasClass("InformationIcon-symbol"))
+                        notification.Type = FormNotificationType.Information;
+                    else
+                        throw new InvalidOperationException($"Unknown notification type. Current class: {icon.GetAttribute("class")}");
+
+                    notifications.Add(notification);
+                }
+                return notifications;
+
+            }).Value;
         }
 
         #endregion

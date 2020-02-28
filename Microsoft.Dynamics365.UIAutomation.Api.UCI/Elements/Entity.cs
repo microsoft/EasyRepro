@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
+using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Collections.Generic;
@@ -112,6 +113,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public string GetFooterStatusValue()
         {
             return _client.GetStatusFromFooter();
+        }
+
+        public IReadOnlyCollection<FormNotification> GetFormNotifications()
+        {
+            return _client.GetFormNotifications();
         }
 
         /// <summary>
