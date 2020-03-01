@@ -77,12 +77,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             IWebDriver driver = Browser.Driver;
             timeout = timeout ?? Constants.DefaultTimeout;
             successCallback = successCallback ?? (
-                                  _ => {
+                                  _ =>
+                                  {
                                       bool isUCI = driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage]));
                                       if (isUCI)
                                           driver.WaitForTransaction();
                                   });
-         
+
             var xpathToMainPage = By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]);
             var element = driver.WaitUntilVisible(xpathToMainPage, timeout, successCallback, failureCallback);
             return element != null;
@@ -163,7 +164,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 attempts++;
             }
             while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
-           
+
             if (entered && !success)
                 throw new InvalidOperationException("Somethig got wrong entering the OTC. Please check the MFA-SecrectKey in configuration.");
 
@@ -2062,6 +2063,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var hasRadio = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioContainer].Replace("[NAME]", option.Name)));
                 var hasCheckbox = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
                 var hasList = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldList].Replace("[NAME]", option.Name)));
+                var hasFlipSwitch = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldFlipSwitchLink].Replace("[NAME]", option.Name)));
 
                 if (hasRadio)
                 {
@@ -2101,6 +2103,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         {
                             driver.ClickWhenAvailable(By.Id(unselectedOption.GetAttribute("id")));
                         }
+                    }
+                }
+                else if (hasFlipSwitch)
+                {
+                    var flipSwitchContainer = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldFlipSwitchContainer].Replace("[NAME]", option.Name)));
+                    var link = flipSwitchContainer.FindElement(By.TagName("a"));
+                    var value = bool.Parse(link.GetAttribute("aria-checked"));
+
+                    if (value != option.Value)
+                    {
+                        link.Click();
                     }
                 }
                 else
