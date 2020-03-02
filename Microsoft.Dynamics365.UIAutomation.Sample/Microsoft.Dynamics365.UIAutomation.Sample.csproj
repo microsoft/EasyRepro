@@ -102,6 +102,7 @@
     <Compile Include="UCI\Create\CreateLead.cs" />
     <Compile Include="UCI\Create\CreateActivity.cs" />
     <Compile Include="UCI\Create\CreateOpportunity.cs" />
+    <Compile Include="UCI\FormNotifications\ReadFormNotifications.cs" />
     <Compile Include="UCI\TestsBase.cs" />
     <Compile Include="UCI\Delete\DeleteAccount.cs" />
     <Compile Include="UCI\Delete\DeleteCase.cs" />

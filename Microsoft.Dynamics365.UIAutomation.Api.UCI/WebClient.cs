@@ -3345,7 +3345,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        internal BrowserCommandResult<IReadOnlyCollection<FormNotification>> GetFormNotifications()
+        internal BrowserCommandResult<IReadOnlyList<FormNotification>> GetFormNotifications()
         {
             return Execute(GetOptions($"Get all form notifications"), driver =>
             {
@@ -3357,8 +3357,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     return notifications;
 
                 // If there are multiple notifications, the notifications must be expanded first.
-                var expandButton = notificationBar.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationExpandButton]));
-                if(expandButton != null)
+                if(notificationBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationExpandButton]), out var expandButton))
                 {
                     if (!Convert.ToBoolean(notificationBar.GetAttribute("aria-expanded")))
                         expandButton.Click();

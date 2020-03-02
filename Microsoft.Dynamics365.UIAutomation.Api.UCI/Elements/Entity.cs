@@ -115,7 +115,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.GetStatusFromFooter();
         }
 
-        public IReadOnlyCollection<FormNotification> GetFormNotifications()
+        public IReadOnlyList<FormNotification> GetFormNotifications()
         {
             return _client.GetFormNotifications().Value;
         }
