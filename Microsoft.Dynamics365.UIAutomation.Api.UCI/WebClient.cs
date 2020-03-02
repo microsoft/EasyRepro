@@ -3351,15 +3351,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 List<FormNotification> notifications = new List<FormNotification>();
 
+                // Look for the notification bar, if it doesn't exist there are no notificatios
                 var notificationBar = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationBar]), TimeSpan.FromSeconds(2));
                 if (notificationBar == null)
                     return notifications;
 
-                if (notificationBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationExpandButton]), out var expandButton))
+                // If there are multiple notifications, the notifications must be expanded first.
+                var expandButton = notificationBar.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationExpandButton]));
+                if(expandButton != null)
                 {
                     if (!Convert.ToBoolean(notificationBar.GetAttribute("aria-expanded")))
                         expandButton.Click();
 
+                    // After expansion the list of notifications are now in a different element
                     notificationBar = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationFlyoutRoot]), TimeSpan.FromSeconds(2), "Failed to open the form notifications");
                 }
 
