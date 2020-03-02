@@ -3351,11 +3351,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 List<FormNotification> notifications = new List<FormNotification>();
 
-                if (!driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationBar]),
-                    out var notificationBar))
-                {
+                var notificationBar = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationBar]), TimeSpan.FromSeconds(2));
+                if (notificationBar == null)
                     return notifications;
-                }
 
                 if (notificationBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationExpandButton]), out var expandButton))
                 {
@@ -3376,16 +3374,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         Message = item.GetAttribute("aria-label")
                     };
-
-                    if (icon.HasClass("MarkAsLost-symbol"))
-                        notification.Type = FormNotificationType.Error;
-                    else if (icon.HasClass("Warning-symbol"))
-                        notification.Type = FormNotificationType.Warning;
-                    else if (icon.HasClass("InformationIcon-symbol"))
-                        notification.Type = FormNotificationType.Information;
-                    else
-                        throw new InvalidOperationException($"Unknown notification type. Current class: {icon.GetAttribute("class")}");
-
+                    string classes = icon.GetAttribute("class");
+                    notification.SetTypeFromClass(classes);
                     notifications.Add(notification);
                 }
                 return notifications;
