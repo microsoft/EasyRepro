@@ -19,7 +19,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey); // <= this are now comming from TestsBase, but you can change it for some specific test
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey); // <= this are now comming from TestsBase, but you can change it for some specific test
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales); // <= change this parameters to navigate to another app
 
@@ -39,7 +39,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, "anton@contoso.com".ToSecureString(), "2xTanTan!".ToSecureString(), "WhereIsMySecrectKey?".ToSecureString()); // <= this tests use other credentials, ignore config
+                xrmApp.OnlineLogin.Login(_xrmUri, "anton@contoso.com".ToSecureString(), "2xTanTan!".ToSecureString(), "WhereIsMySecretKey?".ToSecureString()); // <= this tests use other credentials, ignore config
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService); // <= navigate to another app
 

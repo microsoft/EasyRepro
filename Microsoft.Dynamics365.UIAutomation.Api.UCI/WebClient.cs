@@ -103,12 +103,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return Login(uri, username, password);
         }
 
-        internal BrowserCommandResult<LoginResult> Login(Uri orgUri, SecureString username, SecureString password, SecureString mfaSecrectKey = null, Action<LoginRedirectEventArgs> redirectAction = null)
+        internal BrowserCommandResult<LoginResult> Login(Uri orgUri, SecureString username, SecureString password, SecureString mfaSecretKey = null, Action<LoginRedirectEventArgs> redirectAction = null)
         {
-            return Execute(GetOptions("Login"), Login, orgUri, username, password, mfaSecrectKey, redirectAction);
+            return Execute(GetOptions("Login"), Login, orgUri, username, password, mfaSecretKey, redirectAction);
         }
 
-        private LoginResult Login(IWebDriver driver, Uri uri, SecureString username, SecureString password, SecureString mfaSecrectKey = null, Action<LoginRedirectEventArgs> redirectAction = null)
+        private LoginResult Login(IWebDriver driver, Uri uri, SecureString username, SecureString password, SecureString mfaSecretKey = null, Action<LoginRedirectEventArgs> redirectAction = null)
         {
             bool online = !(OnlineDomains != null && !OnlineDomains.Any(d => uri.Host.EndsWith(d)));
             driver.Navigate().GoToUrl(uri);
@@ -159,26 +159,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             bool entered;
             do
             {
-                entered = EnterOneTimeCode(driver, mfaSecrectKey);
+                entered = EnterOneTimeCode(driver, mfaSecretKey);
                 success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
                 attempts++;
             }
             while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
 
             if (entered && !success)
-                throw new InvalidOperationException("Somethig got wrong entering the OTC. Please check the MFA-SecrectKey in configuration.");
+                throw new InvalidOperationException("Something went wrong entering the OTC. Please check the MFA-SecretKey in configuration.");
 
             return success ? LoginResult.Success : LoginResult.Failure;
         }
 
         private bool IsUserAlreadyLogged() => WaitForMainPage(2.Seconds());
 
-        private static string GenerateOneTimeCode(SecureString mfaSecrectKey)
+        private static string GenerateOneTimeCode(SecureString mfaSecretKey)
         {
             // credits:
             // https://dev.to/j_sakamoto/selenium-testing---how-to-sign-in-to-two-factor-authentication-2joi
             // https://www.nuget.org/packages/Otp.NET/
-            string key = mfaSecrectKey?.ToUnsecureString(); // <- this 2FA secret key.
+            string key = mfaSecretKey?.ToUnsecureString(); // <- this 2FA secret key.
 
             byte[] base32Bytes = Base32Encoding.ToBytes(key);
 
@@ -205,7 +205,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             input.Submit();
         }
 
-        private bool EnterOneTimeCode(IWebDriver driver, SecureString mfaSecrectKey)
+        private bool EnterOneTimeCode(IWebDriver driver, SecureString mfaSecretKey)
         {
             try
             {
@@ -213,10 +213,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (input == null)
                     return true;
 
-                if (mfaSecrectKey == null)
-                    throw new InvalidOperationException("The application is wait for the OTC but your MFA-SecrectKey is not set. Please check your configuration.");
+                if (mfaSecretKey == null)
+                    throw new InvalidOperationException("The application is wait for the OTC but your MFA-SecretKey is not set. Please check your configuration.");
 
-                var oneTimeCode = GenerateOneTimeCode(mfaSecrectKey);
+                var oneTimeCode = GenerateOneTimeCode(mfaSecretKey);
                 SetInputValue(driver, input, oneTimeCode, 1.Seconds());
                 input.Submit();
                 return true; // input found & code was entered

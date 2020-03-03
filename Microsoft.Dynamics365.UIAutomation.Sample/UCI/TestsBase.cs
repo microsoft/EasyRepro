@@ -17,9 +17,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         protected readonly Uri _xrmUri = new Uri(ConfigurationManager.AppSettings["OnlineCrmUrl"]);
         protected readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"]?.ToSecureString();
         protected readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"]?.ToSecureString();
-        protected readonly SecureString _mfaSecrectKey = ConfigurationManager.AppSettings["MfaSecrectKey"]?.ToSecureString();
+        protected readonly SecureString _mfaSecretKey = ConfigurationManager.AppSettings["MfaSecretKey"]?.ToSecureString();
         protected readonly TracingService trace;
-
         protected XrmApp _xrmApp;
         protected WebClient _client;
       
@@ -65,6 +64,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             _xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
             
             trace.Log("Success");
+
             return _xrmApp;
         }
 
