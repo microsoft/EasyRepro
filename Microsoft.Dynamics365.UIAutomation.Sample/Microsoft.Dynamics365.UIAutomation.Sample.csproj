@@ -104,6 +104,7 @@
     <Compile Include="UCI\Create\CreateLead.cs" />
     <Compile Include="UCI\Create\CreateActivity.cs" />
     <Compile Include="UCI\Create\CreateOpportunity.cs" />
+    <Compile Include="UCI\FormNotifications\ReadFormNotifications.cs" />
     <Compile Include="UCI\QuickStart\1_Demo_TestsClass.cs" />
     <Compile Include="UCI\QuickStart\3_Demo_Let_TestsBase_WorkForYou_CreateApp.cs" />
     <Compile Include="UCI\QuickStart\2_Demo_Let_TestsBase_WorkForYou_ReadConfigParameters.cs" />

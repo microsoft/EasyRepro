@@ -81,6 +81,8 @@
     <Compile Include="Controls\MultiValueOptionSet.cs" />
     <Compile Include="Controls\BooleanItem.cs" />
     <Compile Include="Controls\OptionSet.cs" />
+    <Compile Include="DTO\FormNotification.cs" />
+    <Compile Include="DTO\FormNotificationType.cs" />
     <Compile Include="DTO\KeyPerformanceIndicator.cs" />
     <Compile Include="Elements\BusinessProcessFlow.cs" />
     <Compile Include="Elements\CommandBar.cs" />

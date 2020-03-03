@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
@@ -3279,6 +3280,47 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 return true;
             });
+        }
+
+        internal BrowserCommandResult<IReadOnlyList<FormNotification>> GetFormNotifications()
+        {
+            return Execute(GetOptions($"Get all form notifications"), driver =>
+            {
+                List<FormNotification> notifications = new List<FormNotification>();
+
+                // Look for the notification bar, if it doesn't exist there are no notificatios
+                var notificationBar = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationBar]), TimeSpan.FromSeconds(2));
+                if (notificationBar == null)
+                    return notifications;
+
+                // If there are multiple notifications, the notifications must be expanded first.
+                if(notificationBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationExpandButton]), out var expandButton))
+                {
+                    if (!Convert.ToBoolean(notificationBar.GetAttribute("aria-expanded")))
+                        expandButton.Click();
+
+                    // After expansion the list of notifications are now in a different element
+                    notificationBar = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationFlyoutRoot]), TimeSpan.FromSeconds(2), "Failed to open the form notifications");
+                }
+
+                var notificationList = notificationBar.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationList]));
+                var notificationListItems = notificationList.FindElements(By.TagName("li"));
+
+                foreach (var item in notificationListItems)
+                {
+                    var icon = item.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationTypeIcon]));
+
+                    var notification = new FormNotification
+                    {
+                        Message = item.GetAttribute("aria-label")
+                    };
+                    string classes = icon.GetAttribute("class");
+                    notification.SetTypeFromClass(classes);
+                    notifications.Add(notification);
+                }
+                return notifications;
+
+            }).Value;
         }
 
         #endregion
