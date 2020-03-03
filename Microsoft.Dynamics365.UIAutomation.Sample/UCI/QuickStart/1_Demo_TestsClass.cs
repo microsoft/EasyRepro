@@ -13,7 +13,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         readonly Uri _xrmUri = new Uri(ConfigurationManager.AppSettings["OnlineCrmUrl"]);
         readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"]?.ToSecureString();
         readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"]?.ToSecureString();
-        readonly SecureString _mfaSecrectKey = ConfigurationManager.AppSettings["MfaSecrectKey"]?.ToSecureString();
+        readonly SecureString _mfaSecretKey = ConfigurationManager.AppSettings["MfaSecretKey"]?.ToSecureString();
 
         [TestMethod]
         public void I_Hate_TheBaseClass()
@@ -25,7 +25,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey); // <= You can use different credentials here, but ensure to convert this ToSecureString
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey); // <= You can use different credentials here, but ensure to convert this ToSecureString
                 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales); // <= change this parameters to navigate to another app
 
@@ -46,7 +46,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             using (var xrmApp = new XrmApp(client))
             {
                 
-                xrmApp.OnlineLogin.Login(_xrmUri, "anton@contoso.com".ToSecureString(), "2xTanTan!".ToSecureString(), "WhereIsMySecrectKey?".ToSecureString()); // <= this tests use other credentials, ignore config
+                xrmApp.OnlineLogin.Login(_xrmUri, "anton@contoso.com".ToSecureString(), "2xTanTan!".ToSecureString(), "WhereIsMySecretKey?".ToSecureString()); // <= this tests use other credentials, ignore config
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService); // <= navigate to another app
 
