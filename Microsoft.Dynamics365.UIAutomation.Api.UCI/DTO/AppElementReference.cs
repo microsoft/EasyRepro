@@ -93,7 +93,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string RecordSetNavCollapseIcon = "Entity_RecordSetNavCollapseIcon";
             public static string RecordSetNavCollapseIconParent = "Entity_RecordSetNavCollapseIconParent";
             public static string FieldControlDateTimeContainer = "Entity_FieldControlDateTimeContainer";
-            public static string FieldControlDateTimeInputUCI     = "Entity_FieldControlDateTimeInputUCI";
+            public static string FieldControlDateTimeInputUCI = "Entity_FieldControlDateTimeInputUCI";
             public static string FieldControlDateTimeTimeInputUCI = "Entity_FieldControlDateTimeTimeInputUCI";
             public static string Delete = "Entity_Delete";
             public static string Assign = "Entity_Assign";
@@ -127,11 +127,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EntityBooleanFieldCheckboxContainer = "Entity_BooleanFieldCheckboxContainer";
             public static string EntityBooleanFieldCheckbox = "Entity_BooleanFieldCheckbox";
             public static string EntityBooleanFieldList = "Entity_BooleanFieldList";
+            public static string EntityBooleanFieldFlipSwitchLink = "Entity_BooleanFieldFlipSwitchLink";
+            public static string EntityBooleanFieldFlipSwitchContainer = "Entity_BooleanFieldFlipSwitchContainer";
             public static string EntityOptionsetStatusCombo = "Entity_OptionsetStatusCombo";
             public static string EntityOptionsetStatusComboButton = "Entity_OptionsetStatusComboButton";
             public static string EntityOptionsetStatusComboList = "Entity_OptionsetStatusComboList";
             public static string EntityOptionsetStatusTextValue = "Entity_OptionsetStatusTextValue";
-            
+
             public static class Header
             {
                 public static string Container = "Entity_Header";
@@ -143,7 +145,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 public static string DateTimeFieldContainer = "Entity_Header_DateTimeFieldContainer";
             }
         }
-    
+
         public static class CommandBar
         {
             public static string Container = "Cmd_Container";
@@ -380,6 +382,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_BooleanFieldCheckboxContainer", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container')]"},
             { "Entity_BooleanFieldCheckbox", "//input[contains(@data-id, '[NAME].fieldControl-checkbox-toggle')]"},
             { "Entity_BooleanFieldList", "//select[contains(@data-id, '[NAME].fieldControl-checkbox-select')]"},
+            { "Entity_BooleanFieldFlipSwitchLink", "//div[contains(@data-id, '[NAME]-FieldSectionItemContainer')]"},
+            { "Entity_BooleanFieldFlipSwitchContainer", "//div[@data-id= '[NAME].fieldControl_container']"},
             { "Entity_OptionSetFieldContainer", "//div[@data-id='[NAME].fieldControl-option-set-container']" },
             { "Entity_OptionsetStatusCombo", "//div[contains(@data-id, '[NAME].fieldControl-pickliststatus-comboBox')]"},
             { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},
