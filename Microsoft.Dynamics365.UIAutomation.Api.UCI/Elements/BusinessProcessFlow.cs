@@ -101,9 +101,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Sets the value of a LookupItem field
         /// </summary>
         /// <param name="field">LookupItem with the schema name of the field to retrieve</param>
-        public void SetValue(LookupItem control, int index = 0)
+        public void SetValue(LookupItem control)
         {
-            _client.SetValue(control, index);
+            _client.SetValue(control);
         }
 
         /// <summary>

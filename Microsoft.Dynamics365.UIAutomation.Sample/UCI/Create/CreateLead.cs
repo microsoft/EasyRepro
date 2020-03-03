@@ -7,30 +7,44 @@ using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class CreateLeadUCI: TestsBase 
+    public class CreateLeadUCI : TestsBase
     {
+        [TestInitialize]
+        public override void InitTest() => base.InitTest();
+
+        [TestCleanup]
+        public override void FinishTest() => base.FinishTest();
+
+        public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Leads");
+
         [TestMethod]
         public void UCITestCreateLead()
         {
-            var client = new WebClient(TestSettings.Options);
-            using (var xrmApp = new XrmApp(client))
-            {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+            _xrmApp.CommandBar.ClickCommand("New");
 
-                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+            _xrmApp.ThinkTime(5000);
 
-                xrmApp.Navigation.OpenSubArea("Sales", "Leads");
+            _xrmApp.Entity.SetValue("subject", TestSettings.GetRandomString(5, 15));
+            _xrmApp.Entity.SetValue("firstname", TestSettings.GetRandomString(5, 10));
+            _xrmApp.Entity.SetValue("lastname", TestSettings.GetRandomString(5, 10));
+        }
 
-                xrmApp.CommandBar.ClickCommand("New");
+        [TestMethod]
+        public void UCITestCreateLead_SetHeaderStatus()
+        {
+            _xrmApp.CommandBar.ClickCommand("New");
 
-                xrmApp.ThinkTime(5000);
+            _xrmApp.ThinkTime(5000);
 
-                xrmApp.Entity.SetValue("subject", TestSettings.GetRandomString(5,15));
-                xrmApp.Entity.SetValue("firstname", TestSettings.GetRandomString(5,10));
-                xrmApp.Entity.SetValue("lastname", TestSettings.GetRandomString(5,10));
+            _xrmApp.Entity.SetValue("subject", TestSettings.GetRandomString(5, 15));
+            _xrmApp.Entity.SetValue("firstname", TestSettings.GetRandomString(5, 10));
+            _xrmApp.Entity.SetValue("lastname", TestSettings.GetRandomString(5, 10));
 
-                xrmApp.Entity.Save();
-            }
+            var status = new OptionSet { Name = "statuscode", Value = "Contacted" };
+            _xrmApp.Entity.SetHeaderValue(status);
+
+            string value = _xrmApp.Entity.GetHeaderValue(status);
+            Assert.AreEqual(status.Value,  value);
         }
     }
 }

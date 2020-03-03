@@ -15,7 +15,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
@@ -23,14 +23,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.CommandBar.ClickCommand("New Case");
 
-                xrmApp.ThinkTime(5000);
+                xrmApp.ThinkTime(2500);
 
-                xrmApp.Entity.SetValue("title", TestSettings.GetRandomString(5,10));
+                xrmApp.Entity.SetValue("title", "Test Case "+ TestSettings.GetRandomString(5,10));
+                
+                xrmApp.ThinkTime(2500);
 
-                LookupItem customer = new LookupItem { Name = "customerid", Value = "Test Lead" };
+                LookupItem customer = new LookupItem { Name = "customerid", Value = "David", Index = 0};
                 xrmApp.Entity.SetValue(customer);
 
+                var customerName = xrmApp.Entity.GetValue(customer);
+                Assert.IsNotNull(customerName);
+                Assert.IsTrue(customerName.Contains("David"));
+
                 xrmApp.Entity.Save();
+                xrmApp.ThinkTime(2500);
             }
         }
     }

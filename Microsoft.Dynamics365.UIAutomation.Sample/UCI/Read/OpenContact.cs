@@ -16,16 +16,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
                 
-                xrmApp.Grid.Search("Anthony");
+                xrmApp.Grid.Search("David");
 
                 xrmApp.Grid.OpenRecord(0);
-                
             }
             
         }
@@ -36,11 +35,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
+                
+                xrmApp.Grid.SwitchView("Active Contacts");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -66,19 +67,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
+                
+                xrmApp.Grid.SwitchView("Active Contacts");
 
                 xrmApp.Grid.OpenRecord(0);
 
-                List<GridItem> rows = xrmApp.Entity.GetSubGridItems("RECENT OPPORTUNITIES");
+                List<GridItem> rows = xrmApp.Entity.GetSubGridItems("Opportunities");
 
-                int rowCount = xrmApp.Entity.GetSubGridItemsCount("RECENT CASES");
+                int rowCount = xrmApp.Entity.GetSubGridItemsCount("Cases");
 
-                xrmApp.Entity.OpenSubGridRecord("RECENT OPPORTUNITIES", 0);
+                if (rows.Count > 0)
+                    xrmApp.Entity.OpenSubGridRecord("Opportunities", 0);
 
                 xrmApp.ThinkTime(500);
             }
@@ -91,7 +95,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -119,7 +123,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -147,7 +151,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
@@ -171,7 +175,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
@@ -185,6 +189,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.ThinkTime(2000);
 
+            }
+        }
+        
+        [TestMethod]
+        public void UCITestOpenContactRelatedEntity_SwitchView()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Contacts");
+
+                xrmApp.ThinkTime(2000);
+
+                xrmApp.Grid.SwitchView("Active Contacts");
+
+                xrmApp.ThinkTime(2000);
+
+                xrmApp.Grid.SwitchView("My Active Contacts");
+                
+                xrmApp.ThinkTime(2000);
+
+                xrmApp.Grid.OpenRecord(1);
             }
         }
     }

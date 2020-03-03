@@ -72,6 +72,31 @@ Change the keys in your `app.config` below to match your environment. Open the T
 <add key="OnlineCrmUrl" value="https://org.crm.dynamics.com/" />
 ```
 
+#### MFA Support
+If the account you are using has MFA (Multi-Factor Authentication) enabled, you will also need to provide an MFA Secret Key.
+You can obtain an MFA secret key for your account using these instructions - you will need Microsoft's Authenticator App to get this working:
+
+<ol >
+<li>Go to your Office365 'My account' page at: <a href="https://portal.office.com/account/" target="_blank">https://portal.office.com/account/</a></li>
+<li>Click on 'Manage security & privacy'</li>
+<li>Click on 'Additional security verification'</li>
+<li>Click on 'Create and manage app passwords'</li>
+<li>On the page which opens, there are two tabs which don't look like tabs. Click on the first of these: 'Additional security verification'</li>
+<li>Click on 'Set up Authenticator app'</li>
+<li>Click on 'Configure app without notifications'</li>
+<li>Make a note of the 'Secret Key' which is displayed</li>
+<li>In the authenticator app, Click the '+' to add an account and select 'work or school account'</li>
+<li>Scan the QR code displayed on the web page</li>
+<li>If the App displays a six-digit code, click 'Next' on the web page</li>
+<li>Click Verify Now on the web page</li>
+<li>Enter the six-digit verification code from the app into the web page</li>
+<li>Add your MFA Secret key from step 8 to your app.config as shown below, in the same section that you add your username and password</li>
+</ol>
+
+```cs
+<add key="MfaSecretKey" value="********" />
+```
+
 #### Supported Browser WebDriver
  The application supports following browser:
   

@@ -88,6 +88,7 @@
     <Compile Include="SharedAPI\AzureInsights\UploadTelemetryUCI.cs" />
     <Compile Include="SharedAPI\AzureInsights\OpenLead.cs" />
     <Compile Include="SharedAPI\BrowserTests\BrowserTests.cs" />
+    <Compile Include="UCI\ApiTests\TestsBase_Tests.cs" />
     <Compile Include="UCI\BusinessProcessFlow\BusinessProcessFlowNextStage.cs" />
     <Compile Include="UCI\BusinessProcessFlow\SwitchBusinessProcessFlow.cs" />
     <Compile Include="UCI\CommandBar\CommandButton.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="UCI\CommandBar\CloseOpportunity.cs" />
     <Compile Include="UCI\CommandBar\DuplicateDetection.cs" />
     <Compile Include="UCI\CommandBar\SelectDashboard.cs" />
+    <Compile Include="ConsoleTraceListener.cs" />
     <Compile Include="UCI\Controls\Grid.cs" />
     <Compile Include="UCI\Create\CreateAccount.cs" />
     <Compile Include="UCI\Create\CreateCase.cs" />
@@ -103,6 +105,14 @@
     <Compile Include="UCI\Create\CreateActivity.cs" />
     <Compile Include="UCI\Create\CreateOpportunity.cs" />
     <Compile Include="UCI\FormNotifications\ReadFormNotifications.cs" />
+    <Compile Include="UCI\QuickStart\1_Demo_TestsClass.cs" />
+    <Compile Include="UCI\QuickStart\3_Demo_Let_TestsBase_WorkForYou_CreateApp.cs" />
+    <Compile Include="UCI\QuickStart\2_Demo_Let_TestsBase_WorkForYou_ReadConfigParameters.cs" />
+    <Compile Include="UCI\QuickStart\4_Demo_Let_TestsBase_WorkForYou_CreateApp_AllTestsUsesDefaultOptions.cs" />
+    <Compile Include="UCI\QuickStart\5_Demo_Let_TestsBase_WorkForYou_CreateApp_AllTestsUsesMyCustomOptions.cs" />
+    <Compile Include="UCI\QuickStart\6_Demo_Let_TestsBase_WorkForYou_CreateApp_NavigateToSameApp_InAllTests.cs" />
+    <Compile Include="UCI\QuickStart\7_Demo_Let_TestsBase_WorkForYou_CreateApp_NavigateToSameArea_InAllTests.cs" />
+    <Compile Include="UCI\QuickStart\QuickStart.cs" />
     <Compile Include="UCI\TestsBase.cs" />
     <Compile Include="UCI\Delete\DeleteAccount.cs" />
     <Compile Include="UCI\Delete\DeleteCase.cs" />

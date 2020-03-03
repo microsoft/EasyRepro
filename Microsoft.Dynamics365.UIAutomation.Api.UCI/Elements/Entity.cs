@@ -440,9 +440,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Sets the value of a Lookup.
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
-        public void SetValue(LookupItem control, int index = 0)
+        public void SetValue(LookupItem control)
         {
-            _client.SetValue(control, index);
+            _client.SetValue(control);
         }
 
         /// <summary>
@@ -450,9 +450,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="controls">The activityparty lookup field name, value or index of the lookup.</param>
         /// <example>xrmApp.Entity.SetValue(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
-        public void SetValue(LookupItem[] controls, int index = 0)
+        public void SetValue(LookupItem[] controls)
         {
-            _client.SetValue(controls, index);
+            _client.SetValue(controls);
         }
 
         /// <summary>
@@ -529,9 +529,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="controls">The activityparty lookup field name, value or index of the lookup.</param>
         /// <example>xrmApp.Entity.AddValues(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
-        public void AddValues(LookupItem[] controls, int index = 0)
+        public void AddValues(LookupItem[] controls)
         {
-            _client.AddValues(controls, index);
+            _client.AddValues(controls);
         }
 
         /// <summary>

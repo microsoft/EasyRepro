@@ -3,6 +3,7 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
+using Microsoft.Dynamics365.UIAutomation.Browser;
 
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
@@ -16,7 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestCleanup]
         public override void FinishTest() => base.FinishTest();
 
-        public override void NavigateToHomePage() => _xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+        public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Accounts");
 
         [TestMethod]
         public void UCITestAssignAccount()
@@ -25,9 +26,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
             _xrmApp.ThinkTime(2000);
 
+             string name = _xrmApp.Entity.GetHeaderValue(new LookupItem{ Name = "ownerid" });
+            Assert.IsNotNull(name);
+            
             _xrmApp.CommandBar.ClickCommand("Assign");
+            _xrmApp.Dialogs.Assign(Dialogs.AssignTo.User, name);
+        }
 
-            _xrmApp.Dialogs.Assign(Dialogs.AssignTo.User, "Grant");
+        [TestMethod]
+        public void UCITestAssignAccount_ToMe()
+        {
+            _xrmApp.Grid.OpenRecord(0);
+
+            _xrmApp.ThinkTime(2000);
+            
+            _xrmApp.CommandBar.ClickCommand("Assign");
+            _xrmApp.Dialogs.Assign(Dialogs.AssignTo.Me);
         }
     }
 }

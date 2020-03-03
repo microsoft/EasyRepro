@@ -93,7 +93,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string RecordSetNavCollapseIcon = "Entity_RecordSetNavCollapseIcon";
             public static string RecordSetNavCollapseIconParent = "Entity_RecordSetNavCollapseIconParent";
             public static string FieldControlDateTimeContainer = "Entity_FieldControlDateTimeContainer";
-            public static string FieldControlDateTimeInputUCI     = "Entity_FieldControlDateTimeInputUCI";
+            public static string FieldControlDateTimeInputUCI = "Entity_FieldControlDateTimeInputUCI";
             public static string FieldControlDateTimeTimeInputUCI = "Entity_FieldControlDateTimeTimeInputUCI";
             public static string Delete = "Entity_Delete";
             public static string Assign = "Entity_Assign";
@@ -127,6 +127,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EntityBooleanFieldCheckboxContainer = "Entity_BooleanFieldCheckboxContainer";
             public static string EntityBooleanFieldCheckbox = "Entity_BooleanFieldCheckbox";
             public static string EntityBooleanFieldList = "Entity_BooleanFieldList";
+            public static string EntityBooleanFieldFlipSwitchLink = "Entity_BooleanFieldFlipSwitchLink";
+            public static string EntityBooleanFieldFlipSwitchContainer = "Entity_BooleanFieldFlipSwitchContainer";
             public static string EntityOptionsetStatusCombo = "Entity_OptionsetStatusCombo";
             public static string EntityOptionsetStatusComboButton = "Entity_OptionsetStatusComboButton";
             public static string EntityOptionsetStatusComboList = "Entity_OptionsetStatusComboList";
@@ -136,7 +138,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string FormNotifcationFlyoutRoot = "Entity_FormNotifcationFlyoutRoot";
             public static string FormNotifcationList = "Entity_FormNotifcationList";
             public static string FormNotifcationTypeIcon = "Entity_FormNotifcationTypeIcon";
-
 
             public static class Header
             {
@@ -149,7 +150,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 public static string DateTimeFieldContainer = "Entity_Header_DateTimeFieldContainer";
             }
         }
-    
+
         public static class CommandBar
         {
             public static string Container = "Cmd_Container";
@@ -283,12 +284,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_WebAppMenuButton"       , "//*[@id=\"TabArrowDivider\"]/a"},
             { "Nav_UCIAppMenuButton"       , "//button[@data-id=\"navbar-switch-app\"]"},
             { "Nav_SiteMapLauncherButton", "//button[@data-lp-id=\"sitemap-launcher\"]" },
-            { "Nav_SiteMapLauncherCloseButton", "//button[@aria-label=\"Close Site Map\"]" },
+            { "Nav_SiteMapLauncherCloseButton", "//button[@data-id='navbutton']" },
             { "Nav_SiteMapAreaMoreButton", "//button[@data-lp-id=\"sitemap-areaBar-more-btn\"]" },
             { "Nav_SiteMapSingleArea", "//li[translate(@data-text,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = '[NAME]']" },
             { "Nav_AppMenuContainer"       , "//*[@id=\"taskpane-scroll-container\"]"},
-            { "Nav_SettingsLauncherBar"       , "//*[@data-id='[NAME]Launcher']"},
-            { "Nav_SettingsLauncher"       , "//*[@data-id='[NAME]']"},
+            { "Nav_SettingsLauncherBar"       , "//button[@data-id='[NAME]Launcher']"},
+            { "Nav_SettingsLauncher"       , "//div[@id='[NAME]Launcher']"},
             { "Nav_GuidedHelp"       , "//*[@id=\"helpLauncher\"]/button"},
             //{ "Nav_AdminPortal"       , "//*[@id=(\"id-5\")]"},
             { "Nav_AdminPortal"       , "//*[contains(@data-id,'officewaffle')]"},
@@ -305,8 +306,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_SitemapMenuItems", "//li[contains(@data-id,'sitemap-entity')]"},
             { "Nav_SitemapSwitcherButton", "//button[contains(@data-id,'sitemap-areaSwitcher-expand-btn')]"},
             { "Nav_SitemapSwitcherFlyout","//div[contains(@data-lp-id,'sitemap-area-switcher-flyout')]"},
-            { "Nav_UCIAppContainer","//div[contains(@id,'AppLandingPageContentContainer')]"},
-            { "Nav_UCIAppTile", ".//a[contains(@aria-label,'[NAME]')]"},
+            { "Nav_UCIAppContainer","//div[@id='AppLandingPageContentContainer']"},
+            { "Nav_UCIAppTile", "//div[@data-type='app-title' and @title='[NAME]']"},
 
             
             //Grid
@@ -335,7 +336,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_CloseOpportunityWin"       , "//button[contains(@data-id,'MarkAsWon')]"},
             { "Entity_CloseOpportunityLoss"       , "//button[contains(@data-id,'MarkAsLost')]"},
             { "Entity_Delete"       , "//button[contains(@data-id,'Delete')]"},
-            { "Entity_FormContainer"       , "//*[@id=\"tab-section\"]"},
+            { "Entity_FormContainer"       , "//*[@data-id='editFormRoot']"},
             { "Entity_Process"       , "//button[contains(@data-id,'MBPF.ConvertTo')]"},
             { "Entity_Save"       , "//button[contains(@data-id, 'form-save-btn')]"},
             { "Entity_SwitchProcess"       , "//button[contains(@data-id,'SwitchProcess')]"},
@@ -386,6 +387,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_BooleanFieldCheckboxContainer", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container')]"},
             { "Entity_BooleanFieldCheckbox", "//input[contains(@data-id, '[NAME].fieldControl-checkbox-toggle')]"},
             { "Entity_BooleanFieldList", "//select[contains(@data-id, '[NAME].fieldControl-checkbox-select')]"},
+            { "Entity_BooleanFieldFlipSwitchLink", "//div[contains(@data-id, '[NAME]-FieldSectionItemContainer')]"},
+            { "Entity_BooleanFieldFlipSwitchContainer", "//div[@data-id= '[NAME].fieldControl_container']"},
             { "Entity_OptionSetFieldContainer", "//div[@data-id='[NAME].fieldControl-option-set-container']" },
             { "Entity_OptionsetStatusCombo", "//div[contains(@data-id, '[NAME].fieldControl-pickliststatus-comboBox')]"},
             { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},
@@ -403,7 +406,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Header_FlyoutButton","//button[contains(@id,'headerFieldsExpandButton')]" },
             { "Entity_Header_LookupFieldContainer", "//div[@data-id='header_[NAME].fieldControl-Lookup_[NAME]']" },
             { "Entity_Header_TextFieldContainer", "//div[@data-id='header_[NAME].fieldControl-text-box-container']" },
-            { "Entity_Header_OptionSetFieldContainer", "//div[@data-id='header_[NAME].fieldControl-option-set-container']" },
+            { "Entity_Header_OptionSetFieldContainer", "//div[@data-id='header_[NAME]']" },
             { "Entity_Header_DateTimeFieldContainer","//div[@data-id='header_[NAME]-FieldSectionItemContainer']" },
                         
             //CommandBar
