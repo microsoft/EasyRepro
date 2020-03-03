@@ -96,6 +96,7 @@
     <Compile Include="UCI\CommandBar\CloseOpportunity.cs" />
     <Compile Include="UCI\CommandBar\DuplicateDetection.cs" />
     <Compile Include="UCI\CommandBar\SelectDashboard.cs" />
+    <Compile Include="ConsoleTraceListener.cs" />
     <Compile Include="UCI\Controls\Grid.cs" />
     <Compile Include="UCI\Create\CreateAccount.cs" />
     <Compile Include="UCI\Create\CreateCase.cs" />
