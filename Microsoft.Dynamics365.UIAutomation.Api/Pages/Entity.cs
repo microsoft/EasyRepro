@@ -476,6 +476,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                         SwitchToDialog();
 
+                        Browser.ThinkTime(500);
+
                         driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.LookUp.Remove])).Click(true);
 
                     }
@@ -970,9 +972,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         text = fieldElement.FindElement(By.TagName("textarea")).GetAttribute("value");
                     }
-                    else
+                    else if (fieldElement.FindElements(By.TagName("input")).Count > 0)
                     {
                         text = fieldElement.FindElement(By.TagName("input")).GetAttribute("value");
+                    }
+                    else
+                    {
+                        text = fieldElement.Text;
                     }
                 }
                 else
@@ -980,6 +986,43 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 return text;
             });
+        }
+
+        /// <summary>
+        /// Get all the available header option values from a dropdown
+        /// </summary>
+        /// <param name="option">The option you want to get values.</param>
+        /// <returns>The list of options</returns>
+        /// <example>xrmBrowser.Entity.GetHeaderOptionValues(new OptionSet { Name = "status"}); </example>
+        public BrowserCommandResult<List<string>> GetHeaderOptionValues(OptionSet option)
+        {
+            return Execute($"Get OptionSet Header Values: {option.Name}",
+                driver =>
+                {
+                    if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.OptionSetFieldContainer_Header]
+                        .Replace("[NAME]", option.Name.ToLower()))))
+                    {
+                        var fieldElement = driver.WaitUntilAvailable(By.XPath(Elements
+                            .Xpath[Reference.Entity.OptionSetFieldContainer_Header]
+                            .Replace("[NAME]", option.Name.ToLower())));
+                        var select = fieldElement;
+
+                        if (fieldElement.TagName != "select")
+                            select = fieldElement.FindElement(By.TagName("select"));
+
+                        var options = select.FindElements(By.TagName("option"));
+                        var list = new List<string>();
+                        foreach (var op in options)
+                        {
+                            list.Add(op.GetAttribute("title"));
+                        }
+
+                        return list;
+                    }
+
+                    throw new InvalidOperationException(
+                        $"Unable to locate OptionSet '{option.Name}' in the header. Please verify the OptionSet exists and try again.");
+                });
         }
 
         /// <summary>
@@ -1169,6 +1212,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
+        /// <summary>
+        /// Returns the Entity Name for the current entity record. 
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Entity.GetEntityName();</example>
+        public BrowserCommandResult<string> GetEntityName(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Get Entity Name for the Current Record"), driver =>
+            {
+                SwitchToContentFrame();
+
+                var entityName = driver.ExecuteScript("return Xrm.Page.data.entity.getEntityName();").ToString();
+
+                return entityName;
+            });
+        }
+
 
         /// <summary>
         /// Returns the state of the tab, either Expanded or Collapsed. 
@@ -1201,6 +1263,40 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
+        /// List all the option values available in the dropdown
+        /// </summary>
+        /// <param name="option">The option you want to get values.</param>
+        /// <returns></returns>
+        /// <example>xrmBrowser.Entity.GetOptionValues(new OptionSet { Name = "status"}); </example>
+        public BrowserCommandResult<List<string>> GetOptionValues(OptionSet option)
+        {
+            return this.Execute($"Get OptionSet Values: {option.Name}", driver =>
+            {
+                driver.WaitUntilVisible(By.Id(option.Name));
+
+                if (driver.HasElement(By.Id(option.Name)))
+                {
+                    var input = driver.ClickWhenAvailable(By.Id(option.Name));
+                    var select = input;
+
+                    if (input.TagName != "select")
+                        select = input.FindElement(By.TagName("select"));
+
+                    var options = select.FindElements(By.TagName("option"));
+                    var list = new List<string>();
+                    foreach (var op in options)
+                    {
+                        list.Add(op.Text);
+                    }
+
+                    return list;
+                }
+
+                throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+            });
+        }
+
+        /// <summary>
         /// Gets the value of a Text/Description field on an Entity form.
         /// </summary>
         /// <param name="field">The field id.</param>
@@ -1222,10 +1318,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         text = fieldElement.FindElement(By.TagName("textarea")).GetAttribute("value");
                     }
-                    else
+                    else if (fieldElement.FindElements(By.TagName("input")).Count > 0)
                     {
                         text = fieldElement.FindElement(By.TagName("input")).GetAttribute("value");
-
+                    } 
+                    else
+                    {
+                        throw new InvalidOperationException($"Field: {field} is not a Text/Description field");
                     }
                 }
                 else
@@ -1495,9 +1594,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 SwitchToContent();
                 driver.WaitForPageToLoad();
                 driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
-                                            new TimeSpan(0, 0, 30),
-                                            null,
-                                            d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
+                                            TimeSpan.FromSeconds(30),
+                                            "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
                                         );
 
                 return true;
@@ -1541,7 +1639,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 driver.WaitUntilVisible(By.Id("titlefooter_statuscontrol"));
 
                 // Wait until the footer is not equal to 'saving', indicating save is complete or failed
-                driver.WaitFor(x => x.FindElement(By.Id("titlefooter_statuscontrol")).Text != "saving", new TimeSpan(0, 2, 0));
+                driver.WaitUntil(x => x.FindElement(By.Id("titlefooter_statuscontrol")).Text != "saving", new TimeSpan(0, 2, 0));
 
                 var footerText = driver.FindElement(By.Id("titlefooter_statuscontrol")).Text;
 
@@ -2178,10 +2276,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmBrowser.Grid.GetSubGridItemsCount("CONTACTS");</example>
         public BrowserCommandResult<int> GetSubGridItemsCount(string subgridName)
         {
-            return this.Execute(GetOptions($"Get Subgrid Items Count for subgrid { subgridName}"), driver =>
+            return this.Execute(GetOptions($"Get Subgrid Items Count for subgrid { subgridName }"), driver =>
             {
-                List<GridItem> rows = GetSubGridItems(subgridName);
-                return rows.Count;
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.SubGrid].Replace("[NAME]", subgridName))))
+                {
+                    throw new NotFoundException($"{ subgridName } subgrid not found. Subgrid names are case sensitive.  Please make sure casing is the same.");
+                }
+
+                //Find the subgrid contents
+                var subGrid = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.SubGrid].Replace("[NAME]", subgridName)));
+
+                var totalCount = subGrid.FindElement(By.XPath(Elements.Xpath[Reference.Entity.SubGridItemsTotal].Replace("[NAME]", subgridName)));
+
+                if (int.TryParse(totalCount.Text, out var ret))
+                {
+                    return ret;
+                }
+                else {
+                    List<GridItem> rows = GetSubGridItems(subgridName);
+                    return rows.Count;
+                }
             });
         }
 

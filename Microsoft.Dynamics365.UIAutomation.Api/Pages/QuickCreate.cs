@@ -542,8 +542,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return this.Execute(GetOptions("Save"), driver =>
             {
                 SwitchToDefault();
-
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.QuickCreate.Save]))?.Click();
+                SwitchToQuickCreateFrame();
+                var errorMessageElements = driver.FindElements(By.ClassName("ms-crm-Inline-Validation"));
+                if (errorMessageElements.Any(p => p.Displayed))
+                    throw new InvalidOperationException(errorMessageElements.First(p => p.Displayed).Text);
                 return true;
             });
         }

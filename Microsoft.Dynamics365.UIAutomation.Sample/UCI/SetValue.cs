@@ -3,26 +3,20 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
-using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
-using System.Security;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class SetValueUci
+    public class SetValueUci : TestsBase
     {
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
-
         [TestMethod]
         public void UCITestSetValue()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -42,7 +36,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -62,11 +56,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.SwitchView("Active Accounts");
 
                 xrmApp.Grid.OpenRecord(0);
                 xrmApp.ThinkTime(500);
@@ -82,7 +78,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -95,7 +91,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(500);
 
                 xrmApp.Entity.SetValue(new LookupItem[] {
-                    new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)", Index = 0 },
+                    new LookupItem { Name = "to", Value = "Adventure Works", Index = 0 },
                     new LookupItem { Name = "to", Value = "", Index = 0 } });
                 xrmApp.ThinkTime(500);
 
@@ -108,12 +104,44 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
+        public void UCITestActivityPartySetValue_CaseSensitive()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Activities");
+
+                xrmApp.Grid.SwitchView("All Phone Calls");
+                xrmApp.ThinkTime(500);
+
+                xrmApp.Grid.OpenRecord(0);
+                xrmApp.ThinkTime(500);
+
+                xrmApp.Entity.SetValue(new [] {
+                    new LookupItem { Name = "to", Value = "Adventure Works", Index = 0 },
+                    new LookupItem { Name = "to", Value = "Nana Bule", Index = 0 } });
+                xrmApp.ThinkTime(500);
+
+                string toValue = xrmApp.Entity.GetValue(new LookupItem { Name = "to" });
+                Assert.IsTrue(toValue.Contains("Adventure Works"));
+                Assert.IsFalse(toValue.Contains("adventure works"));
+
+                Assert.IsTrue(toValue.Contains("Nana Bule"));
+                Assert.IsFalse(toValue.Contains("nana bule"));
+            }
+        }
+
+        [TestMethod]
         public void UCITestActivityPartyAddValues()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -126,7 +154,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(500);
 
                 xrmApp.Entity.AddValues(new LookupItem[] {
-                    new LookupItem { Name = "to", Value = "Adventure Works (sample)", Index = 0 },
+                    new LookupItem { Name = "to", Value = "Adventure Works", Index = 0 },
                     new LookupItem { Name = "to", Value = "", Index = 1 } });
                 xrmApp.ThinkTime(500);
 
@@ -140,7 +168,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -153,7 +181,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(500);
 
                 xrmApp.Entity.RemoveValues(new LookupItem[] {
-                    new LookupItem { Name = "to", Value = "Adventure Works (sample)", Index = 0 },
+                    new LookupItem { Name = "to", Value = "Adventure Works", Index = 0 },
                     new LookupItem { Name = "to", Value = "", Index = 0 } });
                 xrmApp.ThinkTime(500);
 
@@ -167,7 +195,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -193,18 +221,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+                xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
                 xrmApp.ThinkTime(500);
 
-                xrmApp.Grid.OpenRecord(0);
+                xrmApp.CommandBar.ClickCommand("New");
                 xrmApp.ThinkTime(500);
 
-                xrmApp.Entity.SetValue("lastonholdtime", DateTime.Now, "M/d/yyyy h:mm tt");
+                xrmApp.Entity.SetValue("name", "Test EasyRepro Opportunity");
+
+                xrmApp.Entity.SetHeaderValue("estimatedclosedate", DateTime.Now);
                 xrmApp.ThinkTime(500);
+
+                xrmApp.Entity.Save();
+
+                xrmApp.ThinkTime(2000);
             }
         }
     }

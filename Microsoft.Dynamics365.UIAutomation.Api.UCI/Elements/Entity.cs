@@ -62,6 +62,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.ClearValue(control);
         }
+        
+
+        /// <summary>
+        /// Clears a value from the DateTimeControl provided
+        /// </summary>
+        /// <param name="control"></param>
+        public void ClearHeaderValue(DateTimeControl control)
+        {
+            _client.ClearHeaderValue(control);
+        }
+
+        /// <summary>
+        /// Clears a value from the DateTimeControl provided
+        /// </summary>
+        /// <param name="control"></param>
+        public void ClearValue(DateTimeControl control)
+        {
+            _client.ClearValue(control);
+        }
 
         /// <summary>
         /// Close Record Set Navigator
@@ -153,13 +172,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.GetHeaderValue(control);
         }
-
+        
+        /// <summary>
+        /// Gets the value of a DateTime Control from the header
+        /// </summary>
+        /// <param name="control">The date time field name of the lookup.</param>
+        /// <example>xrmApp.Entity.GetValue(new DateTimeControl { Name = "estimatedclosedate" });</example>
+        public DateTime? GetHeaderValue(DateTimeControl control)
+        {
+            return _client.GetHeaderValue(control);
+        }
+        
         /// <summary>
         /// Get the object id of the current entity
         /// </summary>
         public Guid GetObjectId()
         {
             return _client.GetObjectId();
+        }
+
+        /// <summary>
+        /// Get the Entity Name of the current entity
+        /// </summary>
+        public string GetEntityName()
+        {
+            return _client.GetEntityName();
         }
 
         /// <summary>
@@ -186,6 +223,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="control">The lookup field name of the lookup.</param>
         public string GetValue(LookupItem control)
+        {
+            return _client.GetValue(control);
+        }
+
+        
+        /// <summary>
+        /// Gets the value of a Lookup.
+        /// </summary>
+        /// <param name="control">The lookup field name of the lookup.</param>
+        public DateTime? GetValue(DateTimeControl control)
         {
             return _client.GetValue(control);
         }
@@ -267,6 +314,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.OpenSubGridRecord(subgridName, index);
         }
 
+        public void AddSubgridItem(string subgridName)
+        {
+            _client.ClickSubgridAddButton(subgridName);
+        }
+
         /// <summary>
         /// Saves the entity
         /// </summary>
@@ -274,6 +326,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.Save();
             _client.HandleSaveDialog();
+            _client.Browser.Driver.WaitForTransaction();
         }
 
         /// <summary>
@@ -350,11 +403,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="field">Date field name.</param>
         /// <param name="date">DateTime value.</param>
-        /// <param name="format">Datetime format matching Short Date & Time formatting personal options.</param>
+        /// <param name="formatDate">Datetime format matching Short Date formatting personal options.</param>
+        /// <param name="formatTime">Datetime format matching Short Time formatting personal options.</param>
         /// <example>xrmApp.Entity.SetHeaderValue("birthdate", DateTime.Parse("11/1/1980"));</example>
-        public void SetHeaderValue(string field, DateTime date, string format = "M/d/yyyy h:mm tt")
+        public void SetHeaderValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
-            _client.SetHeaderValue(field, date, format);
+            _client.SetHeaderValue(field, date, formatDate, formatTime);
+        }
+
+        /// <summary>
+        /// Sets the value of a BooleanItem in the header
+        /// </summary>
+        /// <param name="control">The boolean field you want to set.</param>
+        public void SetHeaderValue(DateTimeControl control)
+        {
+            _client.SetHeaderValue(control);
         }
 
         /// <summary>
@@ -371,9 +434,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Sets the value of a Lookup.
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
-        public void SetValue(LookupItem control, int index = 0)
+        public void SetValue(LookupItem control)
         {
-            _client.SetValue(control, index);
+            _client.SetValue(control);
         }
 
         /// <summary>
@@ -381,9 +444,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="controls">The activityparty lookup field name, value or index of the lookup.</param>
         /// <example>xrmApp.Entity.SetValue(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
-        public void SetValue(LookupItem[] controls, int index = 0)
+        public void SetValue(LookupItem[] controls)
         {
-            _client.SetValue(controls, index);
+            _client.SetValue(controls);
         }
 
         /// <summary>
@@ -409,11 +472,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="field">Date field name.</param>
         /// <param name="date">DateTime value.</param>
-        /// <param name="format">Datetime format matching Short Date & Time formatting personal options.</param>
+        /// <param name="formatDate">Datetime format matching Short Date formatting personal options.</param>
+        /// <param name="formatTime">Datetime format matching Short Time formatting personal options.</param>
         /// <example>xrmApp.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
-        public void SetValue(string field, DateTime date, string format = "M/d/yyyy h:mm tt")
+        public void SetValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
-            _client.SetValue(field, date, format);
+            _client.SetValue(field, date, formatDate, formatTime);
+        }
+
+        /// <summary>
+        /// Sets the value of a Date Field.
+        /// </summary>
+        /// <param name="control">Date field control.</param>
+        public void SetValue(DateTimeControl control)
+        {
+            _client.SetValue(control);
         }
 
         /// <summary>
@@ -450,9 +523,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="controls">The activityparty lookup field name, value or index of the lookup.</param>
         /// <example>xrmApp.Entity.AddValues(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
-        public void AddValues(LookupItem[] controls, int index = 0)
+        public void AddValues(LookupItem[] controls)
         {
-            _client.AddValues(controls, index);
+            _client.AddValues(controls);
         }
 
         /// <summary>

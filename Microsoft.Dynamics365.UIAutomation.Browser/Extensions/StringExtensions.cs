@@ -37,19 +37,41 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 Marshal.ZeroFreeGlobalAllocUnicode(unmanagedString);
             }
         }
-        public static string ToLowerString(this string value)
-        {
-            return value.Trim()
-                        .Replace("\r", string.Empty)
-                        .Replace("\n", string.Empty)
-                        .Replace(Environment.NewLine, string.Empty)
-                        .ToLower();
+        public static string ToLowerString(this string value) 
+            => value?.TrimSpecialCharacters().ToLower();
+
+        public static string TrimSpecialCharacters(this string value)
+        { 
+            char[] trimCharacters = {
+                '\r', 
+                '\n', 
+                (char) 60644, // 
+                (char) 60932, // 
+                (char) 59540, // 
+                (char) 60038, // 
+                (char) 61424, // 
+                (char) 59902, //
+            };
+
+            var result = value?.Trim()
+                .Trim(trimCharacters)
+                .Replace("\r", string.Empty)
+                .Replace("\n", string.Empty)
+                .Replace(Environment.NewLine, string.Empty);
+
+            return result;
         }
+
         public static bool Contains(this string source, string value, StringComparison compare)
         {
             return source.IndexOf(value, compare) >= 0;
         }
+        
+        public static bool IsEmptyValue(this string fieldValue)
+            => string.IsNullOrWhiteSpace(fieldValue?.Trim('-')); // null, Empty or "---"
 
+        public static bool IsValueEqualsTo(this string fieldValue, string expected)
+            => fieldValue == expected || (fieldValue.IsEmptyValue() && expected.IsEmptyValue());
     }
 
     public static class BoolExtensions
@@ -69,4 +91,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return AsString(@bool, trueCondition, string.Empty);
         }
     }
+
+    public static class ObjectExtensions
+    {
+        public static double ToDouble(this object obj)
+        {
+            double ret;
+
+            if (!double.TryParse(obj.ToString(), out ret))
+                ret = 0;
+
+            return ret;
+        }
+    }
+
 }

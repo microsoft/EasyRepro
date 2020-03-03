@@ -99,6 +99,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Nav_SearchLabel"       , "id(\"findHintText\")"},
             { "Nav_Search"       , "id(\"search\")"},
             { "Nav_StartSearch"       , "id(\"findCriteriaButton\")"},
+            { "Nav_OpenAppTabArrowDivider", "//*[@id=\"TabArrowDivider\"]/a" },
+            { "Nav_OpenAppContainer", "//*[@id=\"taskpane-scroll-container\"]" },
+            
 
             { "Nav_Tab_Summary",      "//li[contains(@data-id,\"tablist-SUMMARY_TAB\")]" },
             { "Nav_Tab_Details",      "//li[contains(@data-id,\"tablist-DETAILS_TAB\")]" },
@@ -176,6 +179,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Entity_SubGrid_Row"                  ,"//div[@id='[NAME]_divDataArea']/div/table/tbody/tr" },
             { "Entity_SubGrid_Cell"                 ,"//div[@id='[NAME]_divDataArea']/div/table/tbody/tr/td" },
             { "Entity_SubGrid_RowDeleteButton"      ,"//a[contains(@id,'gridBodyTable_delete_[RECORDID]')]" },
+            { "Entity_SubGrid_ItemsTotal"           ,"//span[@id='[NAME]_ItemsTotal']" },
 
             //Related MenuItems
             { "Related_Popout",                 "//li[contains(@data-id,\"tablist-tab_related\")]" },
@@ -246,6 +250,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             { "Login_SignIn", "id(\"cred_sign_in_button\")"},
             { "Login_CrmMainPage", "id(\"crmTopBar\")"},
             { "Login_StaySignedIn", "id(\"idSIButton9\")"},
+            { "Login_OneTimeCode", "//input[@name='otc']"},
 
             //Notification           
             { "Notification_AppMessageBar", "id(\"crmAppMessageBar\")"},
@@ -374,6 +379,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             //Process
             { "Process_Category", "WorkflowCategory"},
             { "Process_Entity", "PrimaryEntity"},
+
+            //Login
+            { "Login_TaggingId", "navTabAppSwitcherImage_TabAppSwitcherNode"},
 
     };
 
@@ -613,6 +621,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string SummaryTab = "Nav_Tab_Summary";
             public static string DetailsTab = "Nav_Tab_Details";
             public static string PerfTab = "Nav_Tab_Perf";
+            public static string OpenAppTabDivider = "Nav_OpenAppTabArrowDivider";
+            public static string OpenAppContainer = "Nav_OpenAppContainer";
         }
         public static class Grid
         {
@@ -696,6 +706,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string SubGridRow = "Entity_SubGrid_Row";
             public static string SubGridCell = "Entity_SubGrid_Cell";
             public static string SubGridRowDeleteButton = "Entity_SubGrid_RowDeleteButton";
+            public static string SubGridItemsTotal = "Entity_SubGrid_ItemsTotal";
         }
         public static class MenuRelated
         {
@@ -853,6 +864,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string SignIn = "Login_SignIn";
             public static string CrmMainPage = "Login_CrmMainPage";
             public static string StaySignedIn = "Login_StaySignedIn";
+            public static string TaggingId = "Login_TaggingId";
         }
         public static class Report
         {

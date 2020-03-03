@@ -28,9 +28,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             get
             {
                 bool isGuidedHelpEnabled = false;
-                bool.TryParse(
-                    this.Browser.Driver.ExecuteScript("return Xrm.Internal.isFeatureEnabled('FCB.GuidedHelp') && Xrm.Internal.isGuidedHelpEnabledForUser();").ToString(),
-                    out isGuidedHelpEnabled);
+                try
+                {
+                    bool.TryParse(
+                        this.Browser.Driver.ExecuteScript("return Xrm.Internal.isFeatureEnabled('FCB.GuidedHelp') && Xrm.Internal.isGuidedHelpEnabledForUser();").ToString(),
+                        out isGuidedHelpEnabled);
+                }
+                catch (System.NullReferenceException)
+                {
+                    // do nothing
+                }
+
 
                 return isGuidedHelpEnabled;
             }

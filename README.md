@@ -54,13 +54,23 @@ Selenium is a set of different software tools each with a different approach to 
 Although we don't have specific commands to cover the above funcationality, we have generic commands that will allow you to still interact with those features. 
 
 ## Known Issues #
-- Edge Browser is currently not supported due to known bug that is planned for future release.
+- Microsoft Edge Browser, based on Chromium, is currently not supported.
 - Firefox has sometimes been inconsistent with testing results.  The click command is inconsistent. This is a known issue and has been reported to that team that manages that driver. 
 - IE Driver has a 32-bit version and a 64-bit version. If you're using the 32-bit version on 64-bit windows with 64-bit IE then the driver will not work as intended.  Use the appropriate version of IE Driver with the specific version of IE. 
 
 ## Setup #
 #### Install Instructions:
 The Sample project should have NUGET packages added and you just need to build the solution and restore the packages.  For the specific browser drivers, you can add them using NUGET. The default driver is Chrome and the NUGET package is already installed on the Sample project.   
+
+#### Run the Sample Project
+
+Change the keys in your `app.config` below to match your environment. Open the Test explorer window. Right click and run one test to ensure everything works. Trying the `CreateAccount` test under `Microsoft.Dynamics365.UIAutomation.Sample.Web` is a good start.
+
+```cs
+<add key="OnlineUsername" value="name@name.onmicrosoft.com" />
+<add key="OnlinePassword" value="*********" />
+<add key="OnlineCrmUrl" value="https://org.crm.dynamics.com/" />
+```
 
 #### Supported Browser WebDriver
  The application supports following browser:

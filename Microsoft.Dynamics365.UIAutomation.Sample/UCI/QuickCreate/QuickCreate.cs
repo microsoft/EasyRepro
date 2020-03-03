@@ -2,26 +2,21 @@
 // Licensed under the MIT license. 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
-using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
-using System.Security;
+using Microsoft.Dynamics365.UIAutomation.Browser;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class QuickCreateContactUCI
+    public class QuickCreateContactUCI: TestsBase
     {
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
-
         [TestMethod]
         public void UCITestQuickCreateContact()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -41,23 +36,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestMethod]
         public void UCITestQuickCreateCase()
         {
-            var client = new WebClient(TestSettings.Options);
-            using (var xrmApp = new XrmApp(client))
+            using (var xrmApp = CreateApp())
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
-
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
                 xrmApp.Navigation.QuickCreate("case");
 
-                xrmApp.QuickCreate.SetValue(new LookupItem { Name = "customerid", Value = "" });
+                xrmApp.QuickCreate.SetValue(new LookupItem { Name = "customerid", Value = "Adventure" });
 
                 xrmApp.QuickCreate.SetValue("title", TestSettings.GetRandomString(5, 10));
 
-                xrmApp.QuickCreate.SetValue(new OptionSet() { Name = "casetypecode", Value = "Problem" });
+                xrmApp.QuickCreate.SetValue(new OptionSet { Name = "casetypecode", Value = "Problem" });
 
                 xrmApp.QuickCreate.Save();
-
+                
+                xrmApp.ThinkTime(5.Seconds());
             }
         }
 
@@ -67,7 +60,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 

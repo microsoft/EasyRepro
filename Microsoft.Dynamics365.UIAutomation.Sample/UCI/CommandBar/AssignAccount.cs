@@ -4,40 +4,44 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using System;
-using System.Security;
 
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class AssignAccountUCI
+    public class AssignAccount : TestsBase
     {
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
+        [TestInitialize]
+        public override void InitTest() => base.InitTest();
+
+        [TestCleanup]
+        public override void FinishTest() => base.FinishTest();
+
+        public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Accounts");
 
         [TestMethod]
         public void UCITestAssignAccount()
         {
-            var client = new WebClient(TestSettings.Options);
-            using (var xrmApp = new XrmApp(client))
-            {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+            _xrmApp.Grid.OpenRecord(0);
 
-                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+            _xrmApp.ThinkTime(2000);
 
-                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+             string name = _xrmApp.Entity.GetHeaderValue(new LookupItem{ Name = "ownerid" });
+            Assert.IsNotNull(name);
+            
+            _xrmApp.CommandBar.ClickCommand("Assign");
+            _xrmApp.Dialogs.Assign(Dialogs.AssignTo.User, name);
+        }
 
-                xrmApp.Grid.OpenRecord(0);
+        [TestMethod]
+        public void UCITestAssignAccount_ToMe()
+        {
+            _xrmApp.Grid.OpenRecord(0);
 
-                xrmApp.ThinkTime(2000);
-
-                xrmApp.CommandBar.ClickCommand("Assign");
-
-               xrmApp.Dialogs.Assign(Dialogs.AssignTo.User, "Grant");
-
-            }
+            _xrmApp.ThinkTime(2000);
+            
+            _xrmApp.CommandBar.ClickCommand("Assign");
+            _xrmApp.Dialogs.Assign(Dialogs.AssignTo.Me);
         }
     }
 }

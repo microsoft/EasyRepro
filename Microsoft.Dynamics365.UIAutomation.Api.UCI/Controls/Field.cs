@@ -69,6 +69,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Returns if the field is required.
+        /// </summary>
+        public bool IsRequired
+        {
+            get
+            {
+                if (containerElement.HasElement(By.XPath(AppElements.Xpath[AppReference.Field.Required])))
+                {
+                    var required = containerElement.FindElement(By.XPath(AppElements.Xpath[AppReference.Field.Required]));
+
+                    if (required.GetAttribute("aria-required") == "true")
+                        return true;
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Returns if the field is visible.
         /// </summary>
         public bool IsVisible {
