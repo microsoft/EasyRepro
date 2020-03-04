@@ -90,11 +90,11 @@ You can obtain an MFA secret key for your account using these instructions - you
 <li>If the App displays a six-digit code, click 'Next' on the web page</li>
 <li>Click Verify Now on the web page</li>
 <li>Enter the six-digit verification code from the app into the web page</li>
-<li>Add your MFA Secret key from step 8 to your app.config as shown below, in the same section that you add your username and password</li>
+<li>Add your MFA Secret key from step 8 <i>with the spaces removed</i>to your app.config as shown below, in the same section that you add your username and password</li>
 </ol>
 
 ```cs
-<add key="MfaSecretKey" value="********" />
+<add key="MfaSecretKey" value="MfaSecretKeyWithSpacesRemoved" />
 ```
 
 #### Supported Browser WebDriver
