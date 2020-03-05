@@ -406,8 +406,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                     return true;
                 },
-                TimeSpan.FromSeconds(30),
-                failureCallback: () => throw new InvalidOperationException(message)
+                TimeSpan.FromSeconds(30) // Removed failure callback. A thrown exception here will cause a browser failure which is not desired.
                 );
 
             var xpathToAppContainer = By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]);
