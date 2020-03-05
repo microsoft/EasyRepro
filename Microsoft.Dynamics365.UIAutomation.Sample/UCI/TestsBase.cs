@@ -61,7 +61,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             _client = new WebClient(options);
             _xrmApp = new XrmApp(_client);
 
-            _xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+            _xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
             
             trace.Log("Success");
 
