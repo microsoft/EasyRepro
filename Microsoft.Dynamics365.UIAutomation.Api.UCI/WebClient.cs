@@ -357,7 +357,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 Thread.Sleep(1000);
                 WaitForMainPage();
                 InitializeModes();
-                return true;
+
+                // Wait for app page elements to be visible (shell and sitemapLauncherButton)
+                var shell = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
+                var sitemapLauncherButton = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+
+                success = shell != null && sitemapLauncherButton != null;
+
+                if (!success)
+                    throw new InvalidOperationException($"App '{appName}' was found but app page was not loaded.");
+
+                return success;
             });
         }
 
@@ -369,28 +379,29 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         appMenu =>
                         {
                             appMenu.Click(true);
-                            OpenAppFromMenu(driver, appName);
-                            found = true;
+                            found = OpenAppFromMenu(driver, appName);
                         });
             return found;
         }
 
-        internal void OpenAppFromMenu(IWebDriver driver, string appName)
+        internal bool OpenAppFromMenu(IWebDriver driver, string appName)
         {
             var container = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuContainer]));
             var xpathToButton = "//nav[@aria-hidden='false']//button//*[text()='[TEXT]']".Replace("[TEXT]", appName);
-            container.ClickWhenAvailable(By.XPath(xpathToButton),
-                    TimeSpan.FromSeconds(1),
-                    $"App Name {appName} not found."
-                );
+            var button = container.ClickWhenAvailable(By.XPath(xpathToButton),
+                                TimeSpan.FromSeconds(1)
+                            );
 
-            driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
-            driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+            var success = (button != null);
+            if (!success)
+                Trace.TraceWarning($"App Name '{appName}' not found.");
+
+            return success;
         }
 
         private static bool TryToClickInAppTile(string appName, IWebDriver driver)
         {
-            string message = null;
+            string message = "Frame AppLandingPage is not loaded.";
             driver.WaitUntil(
                 d =>
                 {
@@ -400,13 +411,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                     catch (NoSuchFrameException ex)
                     {
-                        message = $"Frame AppLandingPage is not loaded. Exception: {ex.Message}";
+                        message = $"{message} Exception: {ex.Message}";
                         Trace.TraceWarning(message);
                         return false;
                     }
                     return true;
                 },
-                TimeSpan.FromSeconds(30) // Removed failure callback. A thrown exception here will cause a browser failure which is not desired.
+                TimeSpan.FromSeconds(30)
                 );
 
             var xpathToAppContainer = By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]);
@@ -416,6 +427,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             driver.WaitUntilVisible(xpathToAppContainer, TimeSpan.FromSeconds(5),
                 appContainer => success = appContainer.ClickWhenAvailable(xpathToappTile, TimeSpan.FromSeconds(5)) != null
                 );
+
+            if (!success)
+                Trace.TraceWarning(message);
 
             return success;
         }
