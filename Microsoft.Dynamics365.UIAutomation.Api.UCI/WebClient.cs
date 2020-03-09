@@ -551,7 +551,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return areas;
             });
         }
-
+        
         public Dictionary<string, IWebElement> OpenMenu(int thinkTime = Constants.DefaultThinkTime)
         {
             return Execute(GetOptions("Open Menu"), driver =>
@@ -639,7 +639,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             }
         }
 
-        private static Dictionary<string, IWebElement> GetSubAreaMenuItems(IWebDriver driver)
+        public static Dictionary<string, IWebElement> GetSubAreaMenuItems(IWebDriver driver)
         {
             var dictionary = new Dictionary<string, IWebElement>();
 
