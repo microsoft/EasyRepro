@@ -1069,22 +1069,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> ClickCommand(string name, string subname = "", bool moreCommands = false, int thinkTime = Constants.DefaultThinkTime)
         {
-            ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Click Command"), driver =>
+            return Execute(GetOptions($"Click Command"), driver =>
             {
-                IWebElement ribbon = null;
-
                 //Find the button in the CommandBar
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container])))
-                    ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]));
+                var ribbon = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]),
+                    TimeSpan.FromSeconds(5));
 
                 if (ribbon == null)
                 {
-                    if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid])))
-                        ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid]));
-                    else
-                        throw new InvalidOperationException("Unable to find the ribbon.");
+                    ribbon = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid]),
+                        TimeSpan.FromSeconds(5),
+                        "Unable to find the ribbon.");
                 }
 
                 //Get the CommandBar buttons
@@ -3307,7 +3302,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     return notifications;
 
                 // If there are multiple notifications, the notifications must be expanded first.
-                if(notificationBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationExpandButton]), out var expandButton))
+                if (notificationBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationExpandButton]), out var expandButton))
                 {
                     if (!Convert.ToBoolean(notificationBar.GetAttribute("aria-expanded")))
                         expandButton.Click();
