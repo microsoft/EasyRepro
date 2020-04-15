@@ -133,6 +133,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EntityOptionsetStatusComboButton = "Entity_OptionsetStatusComboButton";
             public static string EntityOptionsetStatusComboList = "Entity_OptionsetStatusComboList";
             public static string EntityOptionsetStatusTextValue = "Entity_OptionsetStatusTextValue";
+            public static string FormNotifcationBar = "Entity_FormNotifcationBar";
+            public static string FormNotifcationExpandButton = "Entity_FormNotifcationExpandButton"; 
+            public static string FormNotifcationFlyoutRoot = "Entity_FormNotifcationFlyoutRoot";
+            public static string FormNotifcationList = "Entity_FormNotifcationList";
+            public static string FormNotifcationTypeIcon = "Entity_FormNotifcationTypeIcon";
 
             public static class Header
             {
@@ -389,6 +394,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},
             { "Entity_OptionsetStatusComboList", "//ul[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_list')]"},
             { "Entity_OptionsetStatusTextValue", "//span[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_text-value')]"},
+            { "Entity_FormNotifcationBar", "//div[@data-id='notificationWrapper']" },
+            { "Entity_FormNotifcationExpandButton", ".//span[@id='notificationExpandIcon']" },
+            { "Entity_FormNotifcationFlyoutRoot", "//div[@id='__flyoutRootNode']" },
+            { "Entity_FormNotifcationList", ".//ul[@data-id='notificationList']" },
+            { "Entity_FormNotifcationTypeIcon", ".//span[contains(@id,'notification_icon_')]" },
 
             //Entity Header
             { "Entity_Header", "//div[contains(@data-id,'form-header')]"},
