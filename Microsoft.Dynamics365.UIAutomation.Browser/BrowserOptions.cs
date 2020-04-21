@@ -32,6 +32,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.UCITestMode = true;
             this.UCIPerformanceMode = false;
             this.AppInsightsKey = string.Empty;
+            this.DisableExtensions = false;
+            this.DisableFeatures = false;
+            this.DisablePopupBlocking = false;
+            this.DisableSettingsWindow = false;
+            this.EnableJavascript = false;
+            this.NoSandbox = false;
+            this.DisableGpu = false;
+            this.DumpDom = false;
+            this.EnableAutomation = false;
+            this.DisableImplSidePainting = false;
+            this.DisableDevShmUsage = false;
+            this.DisableInfoBars = false;
+            this.Headless = false;
+            this.TestTypeBrowser = false;
         }
 
         public BrowserType RemoteBrowserType { get; set; }
@@ -53,9 +67,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public string TraceSource { get; set; }
         public bool HideDiagnosticWindow { get; set; }
         public bool Headless { get; set; }
+        public bool DisableExtensions { get; set; }
+        public bool DisableFeatures { get; set; }
+        public bool DisablePopupBlocking { get; set; }
+        public bool DisableSettingsWindow { get; set; }
+        public bool EnableJavascript { get; set; }
+        public bool NoSandbox { get; set; }
+        public bool DisableGpu { get; set; }
+        public bool DumpDom { get; set; }
+        public bool EnableAutomation { get; set; }
+        public bool DisableImplSidePainting { get; set; }
+        public bool DisableDevShmUsage { get; set; }
+        public bool DisableInfoBars { get; set; }
+        public bool TestTypeBrowser { get; set; }
         public bool UserAgent { get; set; }
         public string UserAgentValue { get; set; }
         public int DefaultThinkTime { get; set; }
+
         /// <summary>
         /// Gets or sets the browser height when <see cref="StartMaximized"/> is <see langword="false" />. Both <see cref="Height"/> and <see cref="Width"/> must be set.
         /// </summary>
@@ -103,6 +131,72 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             if (UserAgent && !string.IsNullOrEmpty(UserAgentValue))
             {
                 options.AddArgument("--user-agent=" + UserAgentValue);
+            }
+
+            if (this.DisableExtensions)
+            {
+                options.AddArgument("--disable-extensions");
+            }
+
+            if (this.DisableFeatures)
+            {
+                options.AddArgument("--disable-features");
+            }
+
+            if (this.DisablePopupBlocking)
+            {
+                options.AddArgument("--disable-popup-blocking");
+            }
+
+            if (this.DisableSettingsWindow)
+            {
+                options.AddArgument("--disable-settings-window");
+            }
+
+            if (this.DisableImplSidePainting)
+            {
+                options.AddArgument("--disable-impl-side-painting");
+            }
+
+            if (this.EnableJavascript)
+            {
+                options.AddArgument("--enable-javascript");
+            }
+
+            if (this.NoSandbox)
+            {
+                options.AddArgument("--no-sandbox");
+            }
+
+            if (this.DisableGpu)
+            {
+                options.AddArgument("--disable-gpu");
+            }
+
+            if (this.DumpDom)
+            {
+                options.AddArgument("--dump-dom");
+            }
+
+            if (this.EnableAutomation)
+            {
+                options.AddArgument("--enable-automation");
+            }
+
+            if (this.DisableDevShmUsage)
+            {
+                options.AddArgument("--disable-dev-shm-usage");
+            }
+
+            if (this.DisableInfoBars)
+            {
+                options.AddArgument("disable-infobars");
+            }
+
+            if (this.TestTypeBrowser)
+            {
+                options.AddArgument("test-type");
+                options.AddArgument("test-type=browser");
             }
 
             return options;

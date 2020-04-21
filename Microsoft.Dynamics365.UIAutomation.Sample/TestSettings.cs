@@ -34,7 +34,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             RemoteHubServer = new Uri(RemoteHubServerURL),
             UCITestMode = true,
             UCIPerformanceMode = true,
-            DriversPath = Path.IsPathRooted(DriversPath) ? DriversPath : Path.Combine(Directory.GetCurrentDirectory(), DriversPath) 
+            DriversPath = Path.IsPathRooted(DriversPath) ? DriversPath : Path.Combine(Directory.GetCurrentDirectory(), DriversPath), 
+            DisableExtensions = false,
+            DisableFeatures = false,
+            DisablePopupBlocking = false,
+            DisableSettingsWindow = false,
+            EnableJavascript = false,
+            NoSandbox = false,
+            DisableGpu = false,
+            DumpDom = false,
+            EnableAutomation = false,
+            DisableImplSidePainting = false,
+            DisableDevShmUsage = false,
+            DisableInfoBars = false,
+            TestTypeBrowser = false
         };
 
         // Create a new options instance, copy of the share, to use just in the current test, modifications in test will not affect other tests
@@ -47,10 +60,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             UserAgent = SharedOptions.UserAgent,
             DefaultThinkTime = SharedOptions.DefaultThinkTime,
             RemoteBrowserType = SharedOptions.RemoteBrowserType,
-            RemoteHubServer =SharedOptions.RemoteHubServer,
+            RemoteHubServer = SharedOptions.RemoteHubServer,
             UCITestMode = SharedOptions.UCITestMode,
             UCIPerformanceMode = SharedOptions.UCIPerformanceMode,
-            DriversPath = SharedOptions.DriversPath
+            DriversPath = SharedOptions.DriversPath,
+            DisableExtensions = SharedOptions.DisableExtensions,
+            DisableFeatures = SharedOptions.DisableFeatures,
+            DisablePopupBlocking = SharedOptions.DisablePopupBlocking,
+            DisableSettingsWindow = SharedOptions.DisableSettingsWindow,
+            EnableJavascript = SharedOptions.EnableJavascript,
+            NoSandbox = SharedOptions.NoSandbox,
+            DisableGpu = SharedOptions.DisableGpu,
+            DumpDom = SharedOptions.DumpDom,
+            EnableAutomation = SharedOptions.EnableAutomation,
+            DisableImplSidePainting = SharedOptions.DisableImplSidePainting,
+            DisableDevShmUsage = SharedOptions.DisableDevShmUsage,
+            DisableInfoBars = SharedOptions.DisableInfoBars,
+            TestTypeBrowser = SharedOptions.TestTypeBrowser
         };
 
         public static string GetRandomString(int minLen, int maxLen)
