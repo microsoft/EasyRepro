@@ -67,7 +67,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public string TraceSource { get; set; }
         public bool HideDiagnosticWindow { get; set; }
         public bool Headless { get; set; }
-
         public bool DisableExtensions { get; set; }
         public bool DisableFeatures { get; set; }
         public bool DisablePopupBlocking { get; set; }
@@ -84,6 +83,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool UserAgent { get; set; }
         public string UserAgentValue { get; set; }
         public int DefaultThinkTime { get; set; }
+
         /// <summary>
         /// Gets or sets the browser height when <see cref="StartMaximized"/> is <see langword="false" />. Both <see cref="Height"/> and <see cref="Width"/> must be set.
         /// </summary>
