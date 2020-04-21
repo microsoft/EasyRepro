@@ -124,6 +124,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EntityBooleanFieldRadioContainer = "Entity_BooleanFieldRadioContainer";
             public static string EntityBooleanFieldRadioTrue = "Entity_BooleanFieldRadioTrue";
             public static string EntityBooleanFieldRadioFalse = "Entity_BooleanFieldRadioFalse";
+            public static string EntityBooleanFieldButtonContainer = "Entity_BooleanFieldButton";
+            public static string EntityBooleanFieldButtonTrue = "Entity_BooleanFieldButtonTrue";
+            public static string EntityBooleanFieldButtonFalse = "Entity_BooleanFieldButtonFalse";
             public static string EntityBooleanFieldCheckboxContainer = "Entity_BooleanFieldCheckboxContainer";
             public static string EntityBooleanFieldCheckbox = "Entity_BooleanFieldCheckbox";
             public static string EntityBooleanFieldList = "Entity_BooleanFieldList";
@@ -134,7 +137,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EntityOptionsetStatusComboList = "Entity_OptionsetStatusComboList";
             public static string EntityOptionsetStatusTextValue = "Entity_OptionsetStatusTextValue";
             public static string FormNotifcationBar = "Entity_FormNotifcationBar";
-            public static string FormNotifcationExpandButton = "Entity_FormNotifcationExpandButton"; 
+            public static string FormNotifcationExpandButton = "Entity_FormNotifcationExpandButton";
             public static string FormNotifcationFlyoutRoot = "Entity_FormNotifcationFlyoutRoot";
             public static string FormNotifcationList = "Entity_FormNotifcationList";
             public static string FormNotifcationTypeIcon = "Entity_FormNotifcationTypeIcon";
@@ -389,6 +392,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_BooleanFieldList", "//select[contains(@data-id, '[NAME].fieldControl-checkbox-select')]"},
             { "Entity_BooleanFieldFlipSwitchLink", "//div[contains(@data-id, '[NAME]-FieldSectionItemContainer')]"},
             { "Entity_BooleanFieldFlipSwitchContainer", "//div[@data-id= '[NAME].fieldControl_container']"},
+            { "Entity_BooleanFieldButton", "//div[contains(@data-id, '[NAME].fieldControl_container')]"},
+            { "Entity_BooleanFieldButtonTrue", ".//label[contains(@class, 'first-child')]"},
+            { "Entity_BooleanFieldButtonFalse", ".//label[contains(@class, 'last-child')]"},
             { "Entity_OptionSetFieldContainer", "//div[@data-id='[NAME].fieldControl-option-set-container']" },
             { "Entity_OptionsetStatusCombo", "//div[contains(@data-id, '[NAME].fieldControl-pickliststatus-comboBox')]"},
             { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},

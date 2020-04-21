@@ -565,7 +565,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return areas;
             });
         }
-        
+
         public Dictionary<string, IWebElement> OpenMenu(int thinkTime = Constants.DefaultThinkTime)
         {
             return Execute(GetOptions("Open Menu"), driver =>
@@ -2073,6 +2073,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var hasCheckbox = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
                 var hasList = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldList].Replace("[NAME]", option.Name)));
                 var hasFlipSwitch = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldFlipSwitchLink].Replace("[NAME]", option.Name)));
+                var flipSwitch = hasFlipSwitch ? fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldFlipSwitchContainer].Replace("[NAME]", option.Name))) : null;
+                var hasButton = flipSwitch != null ? flipSwitch.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldButtonTrue])) : false; 
+                hasFlipSwitch = hasButton ? false : hasFlipSwitch; //flipeSwitch and button have the same container reference, so if it has a button it is not a flipSwitch
 
                 if (hasRadio)
                 {
@@ -2123,6 +2126,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (value != option.Value)
                     {
                         link.Click();
+                    }
+                }
+                else if (hasButton)
+                {
+                    var container = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldButtonContainer].Replace("[NAME]", option.Name)));
+                    var trueButton = container.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldButtonTrue]));
+                    var falseButton = container.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldButtonFalse]));
+
+                    if (option.Value)
+                    {
+                        trueButton.Click();
+                    }
+                    else
+                    {
+                        falseButton.Click();
                     }
                 }
                 else
@@ -2185,11 +2203,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 dateField.Click(); // close calendar
 
             driver.RepeatUntil(() =>
-                {
-                    ClearFieldValue(dateField);
-                    if (date != null)
-                        dateField.SendKeys(date);
-                },
+            {
+                ClearFieldValue(dateField);
+                if (date != null)
+                    dateField.SendKeys(date);
+            },
                 d => dateField.GetAttribute("value").IsValueEqualsTo(date),
                 TimeSpan.FromSeconds(9), 3,
                 failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
@@ -2222,11 +2240,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             driver.WaitForTransaction();
 
             driver.RepeatUntil(() =>
-                {
-                    timeField.Clear();
-                    timeField.Click();
-                    timeField.SendKeys(time);
-                },
+            {
+                timeField.Clear();
+                timeField.Click();
+                timeField.SendKeys(time);
+            },
                 d => timeField.GetAttribute("value").IsValueEqualsTo(time),
                 TimeSpan.FromSeconds(9), 3,
                 failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {time}. Actual: {timeField.GetAttribute("value")}")
