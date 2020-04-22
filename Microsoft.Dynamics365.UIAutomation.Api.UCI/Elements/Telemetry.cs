@@ -52,8 +52,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var properties = new Dictionary<string, string>();
                 var metrics = new Dictionary<string, double>();
 
-                if (additionalProperties != null) properties = additionalProperties;
-                if (additionalMetrics != null) metrics = additionalMetrics;
+                if (additionalMetrics != null && additionalMetrics.Count > 0)
+                    metrics = metrics.Merge(additionalMetrics);
+
+                if (additionalProperties != null && additionalProperties.Count > 0)
+                    properties = properties.Merge(additionalProperties);
 
                 properties.Add("StartTime", x.StartTime.Value.ToLongDateString());
                 properties.Add("EndTime", x.StopTime.Value.ToLongDateString());
