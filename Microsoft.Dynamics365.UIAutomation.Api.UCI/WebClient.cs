@@ -2159,6 +2159,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="formatDate">Datetime format matching Short Date formatting personal options.</param>
         /// <param name="formatTime">Datetime format matching Short Time formatting personal options.</param>
         /// <example>xrmApp.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
+        /// <example>xrmApp.Entity.SetValue("new_actualclosedatetime", DateTime.Now, "MM/dd/yyyy", "hh:mm tt");</example>
+        /// <example>xrmApp.Entity.SetHeaderValue("estimatedclosedate", DateTime.Now);</example>
         public BrowserCommandResult<bool> SetValue(string field, DateTime value, string formatDate = null, string formatTime = null)
         {
             var control = new DateTimeControl(field)
