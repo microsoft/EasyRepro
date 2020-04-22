@@ -412,7 +412,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="formatDate">Datetime format matching Short Date formatting personal options.</param>
         /// <param name="formatTime">Datetime format matching Short Time formatting personal options.</param>
         /// <example>xrmApp.Entity.SetHeaderValue("birthdate", DateTime.Parse("11/1/1980"));</example>
-        /// <example>xrmApp.Entity.SetValue("new_actualclosedatetime", DateTime.Now, "MM/dd/yyyy", "hh:mm tt");</example>
+        /// <example>xrmApp.Entity.SetHeaderValue("new_actualclosedatetime", DateTime.Now, "MM/dd/yyyy", "hh:mm tt");</example>
         /// <example>xrmApp.Entity.SetHeaderValue("estimatedclosedate", DateTime.Now);</example>
         public void SetHeaderValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
@@ -484,7 +484,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="formatTime">Datetime format matching Short Time formatting personal options.</param>
         /// <example>xrmApp.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
         /// <example>xrmApp.Entity.SetValue("new_actualclosedatetime", DateTime.Now, "MM/dd/yyyy", "hh:mm tt");</example>
-        /// <example>xrmApp.Entity.SetHeaderValue("estimatedclosedate", DateTime.Now);</example>
+        /// <example>xrmApp.Entity.SetValue("estimatedclosedate", DateTime.Now);</example>
         public void SetValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
             _client.SetValue(field, date, formatDate, formatTime);
