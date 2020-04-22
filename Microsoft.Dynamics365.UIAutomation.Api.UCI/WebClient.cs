@@ -2073,9 +2073,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var hasCheckbox = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
                 var hasList = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldList].Replace("[NAME]", option.Name)));
                 var hasFlipSwitch = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldFlipSwitchLink].Replace("[NAME]", option.Name)));
-                var flipSwitch = hasFlipSwitch ? fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldFlipSwitchContainer].Replace("[NAME]", option.Name))) : null;
-                var hasButton = flipSwitch != null ? flipSwitch.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldButtonTrue])) : false; 
-                hasFlipSwitch = hasButton ? false : hasFlipSwitch; //flipeSwitch and button have the same container reference, so if it has a button it is not a flipSwitch
+
+                // Need to validate whether control is FlipSwitch or Button
+                IWebElement flipSwitchContainer = null;
+                var flipSwitch = hasFlipSwitch ? fieldContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldFlipSwitchContainer].Replace("[NAME]", option.Name)), out flipSwitchContainer) : false;
+                var hasButton = flipSwitchContainer != null ? flipSwitchContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldButtonTrue])) : false;
+                hasFlipSwitch = hasButton ? false : hasFlipSwitch; //flipSwitch and button have the same container reference, so if it has a button it is not a flipSwitch
 
                 if (hasRadio)
                 {
@@ -2119,7 +2122,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
                 else if (hasFlipSwitch)
                 {
-                    var flipSwitchContainer = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldFlipSwitchContainer].Replace("[NAME]", option.Name)));
+                    // flipSwitchContainer should exist based on earlier TryFindElement logic
                     var link = flipSwitchContainer.FindElement(By.TagName("a"));
                     var value = bool.Parse(link.GetAttribute("aria-checked"));
 
