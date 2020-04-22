@@ -2180,9 +2180,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             TrySetTime(driver, container, control);
 
             if (container is IWebElement parent)
+            {
                 parent.Click(true);
+                driver.ClearFocus(); // Close Calendar
+                driver.ClearFocus(); // Close Header control
+            }
             else
+            {
                 driver.ClearFocus();
+            }
 
             return true;
         }
