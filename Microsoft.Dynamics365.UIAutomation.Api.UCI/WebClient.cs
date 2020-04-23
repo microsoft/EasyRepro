@@ -2707,7 +2707,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Returns the Form Name of the entity
         /// </summary>
-        /// <returns>Entity Name of the Entity</returns>
+        /// <returns>Form Name of the Entity</returns>
         internal BrowserCommandResult<string> GetFormName(int thinkTime = Constants.DefaultThinkTime)
         {
             return this.Execute(GetOptions($"Get Form Name"), driver =>
@@ -2719,7 +2719,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (string.IsNullOrEmpty(formName))
                 {
-                    throw new NotFoundException("Unable to retrieve Entity Name for this entity");
+                    throw new NotFoundException("Unable to retrieve Form Name for this entity");
                 }
 
                 return formName;
