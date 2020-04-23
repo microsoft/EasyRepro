@@ -71,6 +71,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public static class Entity
         {
             public static string Form = "Entity_FormContainer";
+            public static string FormSelector = "Entity_FormSelector";
+            public static string HeaderTitle = "Entity_HeaderTitle";
             public static string Save = "Entity_Save";
             public static string TextFieldContainer = "Entity_TextFieldContainer";
             public static string TextFieldValue = "Entity_TextFieldValue";
@@ -340,6 +342,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_CloseOpportunityLoss"       , "//button[contains(@data-id,'MarkAsLost')]"},
             { "Entity_Delete"       , "//button[contains(@data-id,'Delete')]"},
             { "Entity_FormContainer"       , "//*[@data-id='editFormRoot']"},
+            { "Entity_FormSelector"       , "//*[@data-id='form-selector']"},
+            { "Entity_HeaderTitle"       , "//*[@data-id='header_title']"},
             { "Entity_Process"       , "//button[contains(@data-id,'MBPF.ConvertTo')]"},
             { "Entity_Save"       , "//button[contains(@data-id, 'form-save-btn')]"},
             { "Entity_SwitchProcess"       , "//button[contains(@data-id,'SwitchProcess')]"},
