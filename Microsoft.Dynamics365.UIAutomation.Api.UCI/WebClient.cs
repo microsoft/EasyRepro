@@ -15,6 +15,7 @@ using System.Threading;
 using System.Web;
 using OpenQA.Selenium.Interactions;
 using OtpNet;
+using OpenQA.Selenium.Support.Extensions;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -2702,6 +2703,51 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return entityName;
             });
         }
+
+        /// <summary>
+        /// Returns the Form Name of the entity
+        /// </summary>
+        /// <returns>Entity Name of the Entity</returns>
+        internal BrowserCommandResult<string> GetFormName(int thinkTime = Constants.DefaultThinkTime)
+        {
+            return this.Execute(GetOptions($"Get Form Name"), driver =>
+            {
+                // Wait for form selector visible
+                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.FormSelector]));
+
+                string formName = driver.ExecuteScript("return Xrm.Page.ui.formContext.ui.formSelector.getCurrentItem().getLabel();").ToString();
+
+                if (string.IsNullOrEmpty(formName))
+                {
+                    throw new NotFoundException("Unable to retrieve Entity Name for this entity");
+                }
+
+                return formName;
+            });
+        }
+
+        /// <summary>
+        /// Returns the Header Title of the entity
+        /// </summary>
+        /// <returns>Header Title of the Entity</returns>
+        internal BrowserCommandResult<string> GetHeaderTitle(int thinkTime = Constants.DefaultThinkTime)
+        {
+            return this.Execute(GetOptions($"Get Header Title"), driver =>
+            {
+                // Wait for form selector visible
+                var headerTitle = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderTitle]), new TimeSpan(0,0,5));
+
+                var headerTitleName = headerTitle?.Text;
+
+                if (string.IsNullOrEmpty(headerTitleName))
+                {
+                    throw new NotFoundException("Unable to retrieve Header Title for this entity");
+                }
+
+                return headerTitleName;
+            });
+        }
+
 
         internal BrowserCommandResult<List<GridItem>> GetSubGridItems(string subgridName)
         {

@@ -206,6 +206,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Get the Form Name of the current entity
+        /// </summary>
+        public string GetFormName()
+        {
+            return _client.GetFormName();
+        }
+        
+        /// <summary>
+        /// Get the Header Title of the current entity
+        /// </summary>
+        public string GetHeaderTitle()
+        {
+            return _client.GetHeaderTitle();
+        }
+
+        /// <summary>
         /// Retrieve the items from a subgrid
         /// </summary>
         /// <param name="subgridName">Label of the subgrid to retrieve items from</param>
