@@ -380,7 +380,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         public void SetHeaderValue(LookupItem control)
         {
-            _client.SetHeaderValue(control);            
+            _client.SetHeaderValue(control);
         }
 
         /// <summary>
