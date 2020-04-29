@@ -115,6 +115,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.GetStatusFromFooter();
         }
 
+        /// <summary>
+        /// Gets the value of the message, if present, from the footer
+        /// </summary>
+        /// <returns>Message from the footer of the entity record</returns>
+        /// <returns>NULL if no message present</returns>
+        public string GetFooterMessageValue()
+        {
+            return _client.GetMessageFromFooter();
+        }
+
         public IReadOnlyList<FormNotification> GetFormNotifications()
         {
             return _client.GetFormNotifications().Value;
