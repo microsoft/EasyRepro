@@ -2962,17 +2962,44 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Get Status value from footer"), driver =>
             {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter])))
-                    throw new NotFoundException("Unable to find footer on the form");
+                IWebElement footer;
+                var footerExists = driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]), out footer);
 
-                var footer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]));
+                IWebElement status;
+                footer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FooterStatusValue]), out status);
 
-                var status = footer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FooterStatusValue]));
+                if (footerExists)
+                {
+                    if (String.IsNullOrEmpty(status.Text))
+                        return "unknown";
 
-                if (String.IsNullOrEmpty(status.Text))
-                    return "unknown";
+                    return status.Text;
+                }
+                else
+                    throw new NoSuchElementException("Unable to find the footer on the entity form");
+            });
+        }
 
-                return status.Text;
+        internal BrowserCommandResult<string> GetMessageFromFooter()
+        {
+            return this.Execute(GetOptions($"Get Message value from footer"), driver =>
+            {
+                IWebElement footer;
+                var footerExists = driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]), out footer);
+
+                if (footerExists)
+                {
+                    IWebElement message;
+                    footer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FooterMessageValue]), out message);
+
+                    if (String.IsNullOrEmpty(message.Text))
+                        return string.Empty;
+
+                    return message.Text;
+                }
+                else
+                    throw new NoSuchElementException("Unable to find the footer on the entity form");
+
             });
         }
 

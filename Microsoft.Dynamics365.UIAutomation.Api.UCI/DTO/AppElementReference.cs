@@ -123,6 +123,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string DuplicateDetectionGridRows = "Entity_DuplicateDetectionGridRows";
             public static string DuplicateDetectionIgnoreAndSaveButton = "Entity_DuplicateDetectionIgnoreAndSaveButton";
             public static string FooterStatusValue = "Entity_FooterStatusField";
+            public static string FooterMessageValue = "Entity_FooterMessage";
             public static string EntityBooleanFieldRadioContainer = "Entity_BooleanFieldRadioContainer";
             public static string EntityBooleanFieldRadioTrue = "Entity_BooleanFieldRadioTrue";
             public static string EntityBooleanFieldRadioFalse = "Entity_BooleanFieldRadioFalse";
@@ -388,6 +389,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_DuplicateDetectionGridRows", "//div[contains(@class,'data-selectable')]" },
             { "Entity_DuplicateDetectionIgnoreAndSaveButton", "//button[contains(@data-id,'ignore_save')]"},
             { "Entity_FooterStatusField",".//span[contains(@role,'status')]"},
+            { "Entity_FooterMessage",".//span[contains(@data-id,'footer-message')]"},
             { "Entity_BooleanFieldRadioContainer", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container') and contains(@role,'radiogroup')]"},
             { "Entity_BooleanFieldRadioTrue", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-second')]"},
             { "Entity_BooleanFieldRadioFalse", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-first')]"},
