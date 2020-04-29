@@ -2256,6 +2256,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 timeField.Clear();
                 timeField.Click();
                 timeField.SendKeys(time);
+                timeField.SendKeys(Keys.Tab);
             },
                 d => timeField.GetAttribute("value").IsValueEqualsTo(time),
                 TimeSpan.FromSeconds(9), 3,
@@ -2387,6 +2388,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 Field returnField = new Field(driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field))));
                 returnField.Name = field;
 
+                driver.ClearFocus();
                 return returnField;
             });
         }
@@ -2410,7 +2412,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         var timefields = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field)));
                         if (timefields.Any())
                         {
-                            text = $" {timefields.First().GetAttribute("value")}";
+                            text += $" {timefields.First().GetAttribute("value")}";
                         }
                     }
                 }
@@ -2422,6 +2424,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     throw new Exception($"Field with name {field} does not exist.");
                 }
+
+                driver.ClearFocus();
 
                 return text;
             });
@@ -2440,6 +2444,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var xpathToContainer = AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", controlName);
                 IWebElement fieldContainer = driver.WaitUntilAvailable(By.XPath(xpathToContainer));
                 string lookupValue = TryGetValue(fieldContainer, control);
+
+                driver.ClearFocus();
+
                 return lookupValue;
             });
         }
@@ -2463,6 +2470,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var xpathToContainer = By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", controlName));
                 var fieldContainer = driver.WaitUntilAvailable(xpathToContainer);
                 string[] result = TryGetValue(fieldContainer, controls);
+
+                driver.ClearFocus();
+
                 return result;
             });
         }
@@ -2518,6 +2528,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var xpathToFieldContainer = AppElements.Xpath[AppReference.Entity.OptionSetFieldContainer].Replace("[NAME]", controlName);
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(xpathToFieldContainer));
                 string result = TryGetValue(fieldContainer, control);
+
+                driver.ClearFocus();
                 return result;
             });
         }
@@ -2593,6 +2605,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                     throw new InvalidOperationException($"Field: {option.Name} Does not exist");
 
+                driver.ClearFocus();
                 return check;
             });
         }
@@ -2624,6 +2637,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     returnValue.Values = labelItems.Select(x => x.Text).ToArray();
                 }
 
+                driver.ClearFocus();
                 return returnValue;
             });
         }
@@ -2664,6 +2678,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var time = DateTime.Parse(strTime);
 
             var result = date.AddHours(time.Hour).AddMinutes(time.Minute).AddSeconds(time.Second);
+
+            driver.ClearFocus();
             return result;
         }
 
@@ -2874,6 +2890,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.LookupFieldContainer].Replace("[NAME]", controlName);
                 string lookupValue = ExecuteInHeaderContainer(driver, xpathToContainer, container => TryGetValue(container, control));
+
+                driver.ClearFocus(); // Close Header
+
                 return lookupValue;
             });
         }
@@ -2885,6 +2904,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return Execute(GetOptions($"Get Header Activityparty LookupItem Value {controlName}"), driver =>
             {
                 string[] lookupValues = ExecuteInHeaderContainer(driver, xpathToContainer, container => TryGetValue(container, controls));
+
+                driver.ClearFocus(); // Close Header
+
                 return lookupValues;
             });
         }
@@ -2962,6 +2984,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 SetValue(field, value);
 
+                driver.ClearFocus(); // Close Header
+
                 return true;
             });
         }
@@ -2969,13 +2993,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         internal BrowserCommandResult<bool> SetHeaderValue(LookupItem control)
         {
             var controlName = control.Name;
+            bool isHeader = true;
+            bool removeAll = true;
             var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.LookupFieldContainer].Replace("[NAME]", controlName);
             return Execute(GetOptions($"Set Header LookupItem Value {controlName}"),
                 driver => ExecuteInHeaderContainer(driver, xpathToContainer,
                     fieldContainer =>
                     {
-                        TryRemoveLookupValue(driver, fieldContainer, control);
+                        TryRemoveLookupValue(driver, fieldContainer, control, removeAll, isHeader);
                         TrySetValue(driver, fieldContainer, control);
+
+                        driver.ClearFocus(); // Close Header
+
                         return true;
                     }));
         }
@@ -2993,6 +3022,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             TryRemoveLookupValue(driver, container, control);
 
                         TryToSetValue(driver, container, controls);
+
+                        driver.ClearFocus(); // Close Header
+
                         return true;
                     }));
         }
@@ -3006,6 +3038,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     container =>
                     {
                         TrySetValue(container, control);
+
+                        driver.ClearFocus(); // Close Header
+
                         return true;
                     }));
         }
@@ -3018,6 +3053,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 SetValue(control);
 
+                driver.ClearFocus(); // Close Header
+
                 return true;
             });
         }
@@ -3029,6 +3066,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 TryExpandHeaderFlyout(driver);
 
                 SetValue(control);
+
+                driver.ClearFocus(); // Close Header
 
                 return true;
             });
@@ -3087,7 +3126,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        private static void TryRemoveLookupValue(IWebDriver driver, IWebElement fieldContainer, LookupItem control, bool removeAll = true)
+        private static void TryRemoveLookupValue(IWebDriver driver, IWebElement fieldContainer, LookupItem control, bool removeAll = true, bool isHeader = false)
         {
             var controlName = control.Name;
             fieldContainer.Hover(driver);
@@ -3104,7 +3143,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var count = existingValues.Count;
                 fieldContainer.WaitUntil(x => x.FindElements(xpathDeleteExistingValues).Count > count);
             }
-            else
+            else if (!isHeader && !success)
             {
                 var xpathToHoveExistingValue = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", controlName));
                 var found = fieldContainer.TryFindElement(xpathToHoveExistingValue, out var existingList);
