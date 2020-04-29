@@ -2256,6 +2256,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 timeField.Clear();
                 timeField.Click();
                 timeField.SendKeys(time);
+                timeField.SendKeys(Keys.Tab);
             },
                 d => timeField.GetAttribute("value").IsValueEqualsTo(time),
                 TimeSpan.FromSeconds(9), 3,
@@ -2411,7 +2412,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         var timefields = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field)));
                         if (timefields.Any())
                         {
-                            text = $" {timefields.First().GetAttribute("value")}";
+                            text += $" {timefields.First().GetAttribute("value")}";
                         }
                     }
                 }
