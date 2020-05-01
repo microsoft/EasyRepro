@@ -9,7 +9,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO
         private static readonly Dictionary<string, FormNotificationType> _classToTypeMap = new Dictionary<string, FormNotificationType>{
             {"markaslost-symbol", FormNotificationType.Error},
             {"warning-symbol", FormNotificationType.Warning},
-            {"informationicon-symbol", FormNotificationType.Information}
+            {"informationicon-symbol", FormNotificationType.Information},
+            {"locked-symbol", FormNotificationType.Locked}
         };
 
 
