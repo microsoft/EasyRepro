@@ -139,6 +139,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EntityOptionsetStatusComboButton = "Entity_OptionsetStatusComboButton";
             public static string EntityOptionsetStatusComboList = "Entity_OptionsetStatusComboList";
             public static string EntityOptionsetStatusTextValue = "Entity_OptionsetStatusTextValue";
+            public static string FormMessageBar = "Entity_FormMessageBar";
+            public static string FormMessageBarTypeIcon = "Entity_FormMessageBarTypeIcon";
             public static string FormNotifcationBar = "Entity_FormNotifcationBar";
             public static string FormNotifcationExpandButton = "Entity_FormNotifcationExpandButton";
             public static string FormNotifcationFlyoutRoot = "Entity_FormNotifcationFlyoutRoot";
@@ -234,10 +236,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string AssignDialogOKButton = "AssignDialog_OKButton";
             public static string AssignDialogToggle = "AssignDialog_ToggleField";
             public static string ConfirmButton = "Dialog_ConfirmButton";
+            public static string CancelButton = "Dialog_CancelButton";
+            public static string PublishConfirmButton = "Dialog_PublishConfirmButton";
+            public static string PublishCancelButton = "Dialog_PublishCancelButton";
+            public static string SetStateDialog = "Dialog_SetStateDialog";
+            public static string SetStateActionButton = "Dialog_SetStateActionButton";
+            public static string SetStateCancelButton = "Dialog_SetStateCancelButton";
             public static string SwitchProcessDialog = "Entity_SwitchProcessDialog";
             public static string SwitchProcessDialogOK = "Entity_SwitchProcessDialogOK";
             public static string ActiveProcessGridControlContainer = "Entity_ActiveProcessGridControlContainer";
-            public static string CancelButton = "Dialog_CancelButton";
+
             public static string SwitchProcessContainer = "Dialog_SwitchProcessContainer";
         }
 
@@ -408,11 +416,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},
             { "Entity_OptionsetStatusComboList", "//ul[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_list')]"},
             { "Entity_OptionsetStatusTextValue", "//span[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_text-value')]"},
-            { "Entity_FormNotifcationBar", "//div[@data-id='notificationWrapper']" },
+            { "Entity_FormMessageBar", "//*[@id=\"notificationMessageAndButtons\"]/div/div/span" },
+            { "Entity_FormMessageBarTypeIcon", ".//span[contains(@data-id,'formReadOnlyIcon')]" },
+            { "Entity_FormNotifcationBar", "//div[contains(@data-id, 'notificationWrapper')]" },
+            { "Entity_FormNotifcationTypeIcon", ".//span[contains(@id,'notification_icon_')]" },            
             { "Entity_FormNotifcationExpandButton", ".//span[@id='notificationExpandIcon']" },
             { "Entity_FormNotifcationFlyoutRoot", "//div[@id='__flyoutRootNode']" },
             { "Entity_FormNotifcationList", ".//ul[@data-id='notificationList']" },
-            { "Entity_FormNotifcationTypeIcon", ".//span[contains(@id,'notification_icon_')]" },
 
             //Entity Header
             { "Entity_Header", "//div[contains(@data-id,'form-header')]"},
@@ -494,6 +504,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Dialog_DescriptionId", "//input[contains(@data-id,'description_id')]" },
             { "Dialog_ConfirmButton" , "//*[@id=\"confirmButton\"]" },
             { "Dialog_CancelButton" , "//*[@id=\"cancelButton\"]" },
+            { "Dialog_SetStateDialog" , "//div[@data-id=\"SetStateDialog\"]" },
+            { "Dialog_SetStateActionButton" , ".//button[@data-id=\"ok_id\"]" },
+            { "Dialog_SetStateCancelButton" , ".//button[@data-id=\"cancel_id\"]" },
+            { "Dialog_PublishConfirmButton" , "//*[@data-id=\"ok_id\"]" },
+            { "Dialog_PublishCancelButton" , "//*[@data-id=\"cancel_id\"]" },
             { "Dialog_SwitchProcessContainer" , "//div[contains(@id,'switchProcess_id-FieldSectionItemContainer')]" },
             { "Entity_ActiveProcessGridControlContainer"       , "//div[contains(@data-lp-id,'activeProcessGridControlContainer')]"},
             { "Entity_SwitchProcessDialogOK"       , "//button[contains(@data-id,'ok_id')]"},

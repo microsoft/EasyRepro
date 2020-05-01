@@ -4,6 +4,7 @@
     {
         Information,
         Warning,
-        Error
+        Error,
+        Locked
     }
 }

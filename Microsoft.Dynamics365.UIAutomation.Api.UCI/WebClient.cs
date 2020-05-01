@@ -915,6 +915,65 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> SetStateDialog(bool clickOkButton)
+        {
+            //Passing true clicks the Activate/Deactivate button.  Passing false clicks the Cancel button.
+            return this.Execute(GetOptions($"Interact with Set State Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (inlineDialog)
+                {
+                    //Wait until the buttons are available to click
+                    var dialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.SetStateDialog]));
+
+                    if (
+                        !(dialog?.FindElements(By.TagName("button")).Count >
+                          0)) return true;
+
+                    //Click the Activate/Deactivate or Cancel button
+                    IWebElement buttonToClick;
+                    if (clickOkButton)
+                        buttonToClick = dialog.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.SetStateActionButton]));
+                    else
+                        buttonToClick = dialog.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.SetStateCancelButton]));
+
+                    buttonToClick.Click();
+                }
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> PublishDialog(bool ClickConfirmButton)
+        {
+            //Passing true clicks the confirm button.  Passing false clicks the Cancel button.
+            return this.Execute(GetOptions($"Confirm or Cancel Publish Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (inlineDialog)
+                {
+                    //Wait until the buttons are available to click
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.PublishConfirmButton]));
+
+                    if (
+                        !(dialogFooter?.FindElements(By.XPath(AppElements.Xpath[AppReference.Dialogs.PublishConfirmButton])).Count >
+                          0)) return true;
+
+                    //Click the Confirm or Cancel button
+                    IWebElement buttonToClick;
+                    if (ClickConfirmButton)
+                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.PublishConfirmButton]));
+                    else
+                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.PublishCancelButton]));
+
+                    buttonToClick.Click();
+                }
+
+                return true;
+            });
+        }
+
+
         internal BrowserCommandResult<bool> AssignDialog(Dialogs.AssignTo to, string userOrTeamName = null)
         {
             userOrTeamName = userOrTeamName?.Trim() ?? string.Empty;
@@ -3484,37 +3543,70 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 List<FormNotification> notifications = new List<FormNotification>();
 
-                // Look for the notification bar, if it doesn't exist there are no notificatios
+                // Look for notificationMessageAndButtons bar
+                var notificationMessage = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormMessageBar]), TimeSpan.FromSeconds(2));
+
+                if (notificationMessage != null)
+                {
+                    IWebElement icon = null;
+
+                    try
+                    {
+                        icon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormMessageBarTypeIcon]));
+                    }
+                    catch(NoSuchElementException)
+                    {
+                        // Swallow the exception
+                    }
+
+                    if (icon != null)
+                    {
+                        var notification = new FormNotification
+                        {
+                            Message = notificationMessage?.Text
+                        };
+                        string classes = icon.GetAttribute("class");
+                        notification.SetTypeFromClass(classes);
+                        notifications.Add(notification);
+                    }
+                }
+
+                // Look for the notification wrapper, if it doesn't exist there are no notificatios
                 var notificationBar = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationBar]), TimeSpan.FromSeconds(2));
                 if (notificationBar == null)
                     return notifications;
-
-                // If there are multiple notifications, the notifications must be expanded first.
-                if (notificationBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationExpandButton]), out var expandButton))
+                else
                 {
-                    if (!Convert.ToBoolean(notificationBar.GetAttribute("aria-expanded")))
-                        expandButton.Click();
-
-                    // After expansion the list of notifications are now in a different element
-                    notificationBar = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationFlyoutRoot]), TimeSpan.FromSeconds(2), "Failed to open the form notifications");
-                }
-
-                var notificationList = notificationBar.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationList]));
-                var notificationListItems = notificationList.FindElements(By.TagName("li"));
-
-                foreach (var item in notificationListItems)
-                {
-                    var icon = item.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationTypeIcon]));
-
-                    var notification = new FormNotification
+                    // If there are multiple notifications, the notifications must be expanded first.
+                    if (notificationBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationExpandButton]), out var expandButton))
                     {
-                        Message = item.GetAttribute("aria-label")
-                    };
-                    string classes = icon.GetAttribute("class");
-                    notification.SetTypeFromClass(classes);
-                    notifications.Add(notification);
+                        if (!Convert.ToBoolean(notificationBar.GetAttribute("aria-expanded")))
+                            expandButton.Click();
+
+                        // After expansion the list of notifications are now in a different element
+                        notificationBar = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationFlyoutRoot]), TimeSpan.FromSeconds(2), "Failed to open the form notifications");
+                    }
+
+                    var notificationList = notificationBar.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationList]));
+                    var notificationListItems = notificationList.FindElements(By.TagName("li"));
+
+                    foreach (var item in notificationListItems)
+                    {
+                        var icon = item.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationTypeIcon]));
+
+                        var notification = new FormNotification
+                        {
+                            Message = item.GetAttribute("aria-label")
+                        };
+                        string classes = icon.GetAttribute("class");
+                        notification.SetTypeFromClass(classes);
+                        notifications.Add(notification);
+                    }
+
+                    driver.ClearFocus(); // Close the Notification flyout
+
+                    return notifications;
                 }
-                return notifications;
 
             }).Value;
         }
