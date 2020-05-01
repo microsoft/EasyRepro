@@ -1629,28 +1629,75 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        public BrowserCommandResult<bool> ClickRelatedCommand(string name, string subName = null)
+        public BrowserCommandResult<bool> ClickRelatedCommand(string name, string subName = null, bool moreCommands = false, string gridName = null)
         {
             return this.Execute(GetOptions("Click Related Tab Command"), driver =>
             {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
-                    throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
-
-                driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
-
-                driver.WaitForTransaction();
-
-                if (subName != null)
+                //Look for Button
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
                 {
-                    if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
-                        throw new NotFoundException($"{subName} button not found");
-
-                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
 
                     driver.WaitForTransaction();
-                }
 
-                return true;
+                    if (subName != null)
+                    {
+                        if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
+                            throw new NotFoundException($"{subName} button not found");
+
+                        driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+
+                        driver.WaitForTransaction();
+                    }
+
+                    return true;
+
+                }
+                else
+                {
+                    //Check if we should be looking under More Commands (OverflowButton)
+                    if (moreCommands && gridName != null)
+                    {
+                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer].Replace("[NAME]", gridName)))) //Look for Button in Overflow
+                        {
+                            var Overflow = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer].Replace("[NAME]", gridName)));
+                            if (!Overflow.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton])))
+                                throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
+                            Overflow.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton])).Click(true);
+
+                            if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", name))))
+                            {
+                                driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", name))).Click(true);
+
+                                driver.WaitForTransaction();
+
+                                if (subName != null)
+                                {
+                                    if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
+                                        throw new NotFoundException($"{subName} button not found");
+
+                                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+
+                                    driver.WaitForTransaction();
+                                }
+
+                                return true;
+
+                            }
+                            return true;
+                        }
+                        else
+                        {
+                            throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
+                        }
+
+                    }
+                    else
+                    {
+                        throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
+                    }
+
+                }
             });
         }
 

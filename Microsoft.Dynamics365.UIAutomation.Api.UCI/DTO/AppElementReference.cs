@@ -258,6 +258,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             public static string CommandBarButton = "Related_CommandBarButton";
             public static string CommandBarSubButton = "Related_CommandBarSubButton";
+            public static string CommandBarOverflowContainer = "Related_CommandBarOverflowContainer";
+            public static string CommandBarOverflowButton = "Related_CommandBarOverflowButton";
         }
 
         public static class Field
@@ -466,7 +468,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_CloseStageButton","//button[contains(@id,'stageContentClose')]"},
 
             //Related Grid
-            { "Related_CommandBarButton", "//button[contains(., '[NAME]') and contains(@data-id,'SubGrid')]"},
+            { "Related_CommandBarButton", "//button[contains(., '[NAME]') and contains(.,'SubGrid')]"},
+            { "Related_CommandBarOverflowContainer", "//li[contains(@id, '[NAME]') and contains(@id,'OverflowButton')]"},
+            { "Related_CommandBarOverflowButton", ".//button[contains(@data-id, 'OverflowButton')]"},
             { "Related_CommandBarSubButton" ,"//button[contains(., '[NAME]')]"},
 
             //Field
