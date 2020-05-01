@@ -365,7 +365,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_TextFieldLookupFieldContainer", "//div[@data-id='[NAME].fieldControl-Lookup_[NAME]']" },
             { "Entity_RecordSetNavigatorOpen", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
             { "Entity_RecordSetNavigator", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
-            { "Entity_RecordSetNavList", "//ul[contains(@data-id, 'recordSetNaveList')]" },
+            { "Entity_RecordSetNavList", "//ul[contains(@data-id, 'recordSetNavList')]" },
             { "Entity_RecordSetNavCollapseIcon", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
             { "Entity_RecordSetNavCollapseIconParent", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
             { "Entity_TabList", "//ul[@id=\"tablist\"]" },
