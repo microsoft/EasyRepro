@@ -1965,11 +1965,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             driver.WaitForTransaction();
 
             if (string.IsNullOrWhiteSpace(value))
+            {
+                input.Click(true);
                 return;
+            }
+
+            if (string.IsNullOrEmpty(value))
+            {
+                input.Click(true);
+                return;
+            }
 
             input.SendKeys(value, true);
             driver.WaitForTransaction();
-            ThinkTime(thinktime ?? 3.Seconds());
         }
 
         /// <summary>
@@ -2061,9 +2069,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             string value = control.Value;
             if (value == null)
-                throw new InvalidOperationException($"No value has been provided for the LookupItem {control.Name}. Please provide a value or an empty string and try again.");
+                control.Value = string.Empty;
+                // throw new InvalidOperationException($"No value has been provided for the LookupItem {control.Name}. Please provide a value or an empty string and try again.");
 
-            if (value == string.Empty)
+            if (control.Value == string.Empty)
                 SetLookupByIndex(container, control);
             else
                 SetLookUpByValue(container, control);
@@ -3136,8 +3145,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         TryRemoveLookupValue(driver, fieldContainer, control, removeAll, isHeader);
                         TrySetValue(driver, fieldContainer, control);
 
-                        driver.ClearFocus(); // Close Header
-
                         return true;
                     }));
         }
@@ -3156,8 +3163,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         TryToSetValue(driver, container, controls);
 
-                        driver.ClearFocus(); // Close Header
-
                         return true;
                     }));
         }
@@ -3172,8 +3177,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         TrySetValue(container, control);
 
-                        driver.ClearFocus(); // Close Header
-
                         return true;
                     }));
         }
@@ -3186,8 +3189,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 SetValue(control);
 
-                driver.ClearFocus(); // Close Header
-
                 return true;
             });
         }
@@ -3199,8 +3200,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 TryExpandHeaderFlyout(driver);
 
                 SetValue(control);
-
-                driver.ClearFocus(); // Close Header
 
                 return true;
             });
