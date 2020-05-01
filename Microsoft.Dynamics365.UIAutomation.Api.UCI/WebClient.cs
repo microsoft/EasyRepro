@@ -3603,8 +3603,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         notifications.Add(notification);
                     }
 
-                    driver.ClearFocus(); // Close the Notification flyout
-
+                    if (notificationBar != null)
+                    {
+                        notificationBar = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationBar]), TimeSpan.FromSeconds(2));
+                        notificationBar.Click(true); // Collapse the notification bar
+                    }
                     return notifications;
                 }
 
