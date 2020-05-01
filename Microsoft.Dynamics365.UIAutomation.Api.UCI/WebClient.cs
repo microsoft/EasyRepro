@@ -1936,7 +1936,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return Execute(GetOptions("Set Value"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
+                // Must initialize the quick create form context
+                // If this is not done -- element input will go to the main form due to new flyout design
+                var quickCreateFormContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                var fieldContainer = quickCreateFormContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.TextFieldContainer].Replace("[NAME]", field)));
 
                 IWebElement input;
                 bool found = fieldContainer.TryFindElement(By.TagName("input"), out input);
@@ -1952,7 +1955,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Needed to transfer focus out of special fields (email or phone)
                 var label = fieldContainer.ClickIfVisible(By.TagName("label"));
                 if (label == null)
-                    driver.ClearFocus();
+                    fieldContainer.SendKeys(Keys.Escape);
 
                 return true;
             });

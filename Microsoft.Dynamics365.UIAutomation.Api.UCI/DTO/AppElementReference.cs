@@ -251,9 +251,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public static class QuickCreate
         {
+            public static string QuickCreateFormContext = "QuickCreate_FormContext";
             public static string SaveButton = "QuickCreate_SaveButton";
             public static string SaveAndCloseButton = "QuickCreate_SaveAndCloseButton";
             public static string CancelButton = "QuickCreate_CancelButton";
+            public static string TextFieldContainer = "QuickCreate_TextFieldContainer";
         }
 
         public static class Lookup
@@ -514,10 +516,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SwitchProcessDialogOK"       , "//button[contains(@data-id,'ok_id')]"},
             { "SwitchProcess_Container" , "//section[contains(@id, 'popupContainer')]" },
 			
-            //QuickCreate 
+            //QuickCreate
+            { "QuickCreate_FormContext" , "//section[contains(@data-id,'quickCreateRoot')]" },
             { "QuickCreate_SaveButton" , "//button[contains(@id,'quickCreateSaveBtn')]" },
             { "QuickCreate_SaveAndCloseButton", "//button[contains(@id,'quickCreateSaveAndCloseBtn')]"},
             { "QuickCreate_CancelButton", "//button[contains(@id,'quickCreateCancelBtn')]"},
+            { "QuickCreate_TextFieldContainer", ".//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
+
 
             //Lookup
             { "Lookup_RelatedEntityLabel", "//li[contains(@title,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]" },
