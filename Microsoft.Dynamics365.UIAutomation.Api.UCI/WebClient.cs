@@ -1995,7 +1995,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForTransaction();
 
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
+                // Must initialize the quick create form context
+                // If this is not done -- element input will go to the main form due to new flyout design
+                var quickCreateFormContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                var fieldContainer = quickCreateFormContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.TextFieldContainer].Replace("[NAME]", control.Name)));
 
                 TryRemoveLookupValue(driver, fieldContainer, control);
                 TrySetValue(driver, fieldContainer, control);
