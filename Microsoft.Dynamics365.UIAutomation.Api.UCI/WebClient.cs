@@ -1109,6 +1109,30 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<string> GetBusinessProcessErrorText(int waitTimeInSeconds)
+        {
+
+            return this.Execute(GetOptions($"Get Business Process Error Text"), driver =>
+            {
+                string errorDetails = string.Empty;
+                var errorDialog = driver.WaitUntilAvailable(By.XPath("//div[contains(@data-id,'errorDialogdialog')]"), new TimeSpan(0, 0, waitTimeInSeconds));
+
+                // Is error dialog present?
+                if (errorDialog != null)
+                {
+                    var errorDetailsElement = errorDialog.FindElement(By.XPath(".//*[contains(@data-id,'errorDialog_subtitle')]"));
+
+                    if (errorDetailsElement != null)
+                    {
+                        if (!String.IsNullOrEmpty(errorDetailsElement.Text))
+                            errorDetails = errorDetailsElement.Text;
+                    }
+                }
+
+                return errorDetails;
+            });
+        }
+
         private static ICollection<IWebElement> GetListItems(IWebElement container, LookupItem control)
         {
             var name = control.Name;

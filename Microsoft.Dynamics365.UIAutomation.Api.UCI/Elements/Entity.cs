@@ -107,6 +107,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Gets test from a Business Process Error, if present
+        /// <paramref name="waitTimeInSeconds"/>Number of seconds to wait for the error dialog. Default value is 120 seconds</param>
+        /// </summary>
+        /// <example>var errorText = xrmApp.Entity.GetBusinessProcessError(int waitTimeInSeconds);</example>
+        public string GetBusinessProcessError(int waitTimeInSeconds = 120)
+        {
+            _client.Browser.Driver.WaitForTransaction();
+            return _client.GetBusinessProcessErrorText(waitTimeInSeconds);
+        }
+
+        /// <summary>
         /// Gets the value of the status from the footer
         /// </summary>
         /// <returns>Status of the entity record</returns>
