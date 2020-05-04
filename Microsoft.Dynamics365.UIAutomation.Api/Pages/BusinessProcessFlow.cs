@@ -1029,7 +1029,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
         /// <example>xrmBrowser.BusinessProcessFlow.SetValue(new CompositeControl {Id = "fullname", Fields = fields});</example>
-        public new BrowserCommandResult<bool> SetValue(CompositeControl control)
+        public BrowserCommandResult<bool> SetValue(CompositeControl control)
         {
             return this.Execute(GetOptions($"Set BPF CompositeControl Value: {control.Id}"), driver =>
             {

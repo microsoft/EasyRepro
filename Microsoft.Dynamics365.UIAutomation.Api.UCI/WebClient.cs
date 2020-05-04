@@ -1115,7 +1115,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var xpathToItems = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", name));
 
             //wait for complete the search
-            container.WaitUntil(d => d.FindVisible(By.XPath("//li/div/label/span"))?.Text?.Equals(control.Value, StringComparison.OrdinalIgnoreCase) == true);
+            container.WaitUntil(d => d.FindVisible(By.XPath(".//li/div/label/span"))?.Text?.Equals(control.Value, StringComparison.OrdinalIgnoreCase) == true);
 
             ICollection<IWebElement> result = container.WaitUntil(
                 d => d.FindElements(xpathToItems),
@@ -1932,14 +1932,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="field">The field</param>
         /// <param name="value">The value</param>
         /// <example>xrmApp.Entity.SetValue("firstname", "Test");</example>
-        internal BrowserCommandResult<bool> SetValue(string field, string value)
+        internal BrowserCommandResult<bool> SetValue(string field, string value, FormContextType formContextType)
         {
             return Execute(GetOptions("Set Value"), driver =>
             {
-                // Must initialize the quick create form context
-                // If this is not done -- element input will go to the main form due to new flyout design
-                var quickCreateFormContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
-                var fieldContainer = quickCreateFormContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.TextFieldContainer].Replace("[NAME]", field)));
+
+                IWebElement fieldContainer = null;
+
+                if (formContextType == FormContextType.QuickCreate)
+                {
+                    // Initialize the quick create form context
+                    // If this is not done -- element input will go to the main form due to new flyout design
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
+                }
+                else if (formContextType == FormContextType.Entity)
+                {
+                    // Initialize the entity form context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContainer]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
+                }
+                else if (formContextType == FormContextType.BusinessProcessFlow)
+                {
+                    // TBD
+                }
+                else if (formContextType == FormContextType.Header)
+                {
+                    // TBD
+                }
 
                 IWebElement input;
                 bool found = fieldContainer.TryFindElement(By.TagName("input"), out input);
@@ -1989,16 +2009,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmApp.Entity.SetValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
         /// The default index position is 0, which will be the first result record in the lookup results window. Suppy a value > 0 to select a different record if multiple are present.
-        internal BrowserCommandResult<bool> SetValue(LookupItem control)
+        internal BrowserCommandResult<bool> SetValue(LookupItem control, FormContextType formContextType)
         {
             return Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
             {
                 driver.WaitForTransaction();
 
-                // Must initialize the quick create form context
-                // If this is not done -- element input will go to the main form due to new flyout design
-                var quickCreateFormContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
-                var fieldContainer = quickCreateFormContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.TextFieldContainer].Replace("[NAME]", control.Name)));
+                IWebElement fieldContainer = null;
+
+                if (formContextType == FormContextType.QuickCreate)
+                {
+                    // Initialize the quick create form context
+                    // If this is not done -- element input will go to the main form due to new flyout design
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", control.Name)));
+                }
+                else if (formContextType == FormContextType.Entity)
+                {
+                    // Initialize the entity form context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContainer]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", control.Name)));
+                }
+                else if (formContextType == FormContextType.BusinessProcessFlow)
+                {
+                    // TBD
+                }
+                else if (formContextType == FormContextType.Header)
+                {
+                    // TBD
+                }
+
 
                 TryRemoveLookupValue(driver, fieldContainer, control);
                 TrySetValue(driver, fieldContainer, control);
@@ -2024,7 +2064,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="controls">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmApp.Entity.SetValue(new Lookup[] { Name = "to", Value = "Rene Valdes (sample)" }, { Name = "to", Value = "Alpine Ski House (sample)" } );</example>
         /// The default index position is 0, which will be the first result record in the lookup results window. Suppy a value > 0 to select a different record if multiple are present.
-        internal BrowserCommandResult<bool> SetValue(LookupItem[] controls, bool clearFirst = true)
+        internal BrowserCommandResult<bool> SetValue(LookupItem[] controls, FormContextType formContext, bool clearFirst = true)
         {
             var control = controls.First();
             var controlName = control.Name;
@@ -2135,12 +2175,35 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="control">The option you want to set.</param>
         /// <example>xrmApp.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
-        public BrowserCommandResult<bool> SetValue(OptionSet control)
+        public BrowserCommandResult<bool> SetValue(OptionSet control, FormContextType formContextType)
         {
             var controlName = control.Name;
             return Execute(GetOptions($"Set OptionSet Value: {controlName}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.OptionSetFieldContainer].Replace("[NAME]", controlName)));
+                IWebElement fieldContainer = null;
+
+                if (formContextType == FormContextType.QuickCreate)
+                {
+                    // Initialize the quick create form context
+                    // If this is not done -- element input will go to the main form due to new flyout design
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", controlName)));
+                }
+                else if (formContextType == FormContextType.Entity)
+                {
+                    // Initialize the entity form context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContainer]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", controlName)));
+                }
+                else if (formContextType == FormContextType.BusinessProcessFlow)
+                {
+                    // TBD
+                }
+                else if (formContextType == FormContextType.Header)
+                {
+                    // TBD
+                }
+
                 TrySetValue(fieldContainer, control);
                 return true;
             });
@@ -2185,11 +2248,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="option">The boolean field name.</param>
         /// <example>xrmApp.Entity.SetValue(new BooleanItem { Name = "donotemail", Value = true });</example>
-        public BrowserCommandResult<bool> SetValue(BooleanItem option)
+        public BrowserCommandResult<bool> SetValue(BooleanItem option, FormContextType formContextType)
         {
             return this.Execute(GetOptions($"Set BooleanItem Value: {option.Name}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
+                IWebElement fieldContainer = null;
+
+                if (formContextType == FormContextType.QuickCreate)
+                {
+                    // Initialize the quick create form context
+                    // If this is not done -- element input will go to the main form due to new flyout design
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
+                }
+                else if (formContextType == FormContextType.Entity)
+                {
+                    // Initialize the entity form context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContainer]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
+                }
+                else if (formContextType == FormContextType.BusinessProcessFlow)
+                {
+                    // TBD
+                }
+                else if (formContextType == FormContextType.Header)
+                {
+                    // TBD
+                }
 
                 var hasRadio = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioContainer].Replace("[NAME]", option.Name)));
                 var hasCheckbox = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
@@ -2286,7 +2371,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
         /// <example>xrmApp.Entity.SetValue("new_actualclosedatetime", DateTime.Now, "MM/dd/yyyy", "hh:mm tt");</example>
         /// <example>xrmApp.Entity.SetValue("estimatedclosedate", DateTime.Now);</example>
-        public BrowserCommandResult<bool> SetValue(string field, DateTime value, string formatDate = null, string formatTime = null)
+        public BrowserCommandResult<bool> SetValue(string field, DateTime value, FormContextType formContext, string formatDate = null, string formatTime = null)
         {
             var control = new DateTimeControl(field)
             {
@@ -2294,38 +2379,57 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 DateFormat = formatDate,
                 TimeFormat = formatTime
             };
-            return SetValue(control);
+            return SetValue(control, formContext);
         }
 
-        public BrowserCommandResult<bool> SetValue(DateTimeControl control)
+        public BrowserCommandResult<bool> SetValue(DateTimeControl control, FormContextType formContext)
             => Execute(GetOptions($"Set Date/Time Value: {control.Name}"),
-                driver => TrySetValue(driver, container: driver, control: control));
+                driver => TrySetValue(driver, container: driver, control: control, formContext));
 
-        private bool TrySetValue(IWebDriver driver, ISearchContext container, DateTimeControl control)
+        private bool TrySetValue(IWebDriver driver, ISearchContext container, DateTimeControl control, FormContextType formContext)
         {
-            TrySetDateValue(driver, container, control);
-            TrySetTime(driver, container, control);
+            TrySetDateValue(driver, container, control, formContext);
+            TrySetTime(driver, container, control, formContext);
 
             if (container is IWebElement parent)
             {
                 parent.Click(true);
-                driver.ClearFocus(); // Close Calendar
-                driver.ClearFocus(); // Close Header control
-            }
-            else
-            {
-                driver.ClearFocus();
+                parent.SendKeys(Keys.Escape); // Close Calendar
+                parent.SendKeys(Keys.Escape); // Close Header control
             }
 
             return true;
         }
 
-        private void TrySetDateValue(IWebDriver driver, ISearchContext container, DateTimeControl control)
+        private void TrySetDateValue(IWebDriver driver, ISearchContext container, DateTimeControl control, FormContextType formContextType)
         {
             string controlName = control.Name;
+            IWebElement fieldContainer = null;
             var xpathToInput = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeInputUCI].Replace("[FIELD]", controlName));
-            var dateField = container.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
-            TrySetDateValue(driver, dateField, control.DateAsString);
+
+            if (formContextType == FormContextType.QuickCreate)
+            {
+                // Initialize the quick create form context
+                // If this is not done -- element input will go to the main form due to new flyout design
+                var formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+            }
+            else if (formContextType == FormContextType.Entity)
+            {
+                // Initialize the entity form context
+                var formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContainer]));
+                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+            }
+            else if (formContextType == FormContextType.BusinessProcessFlow)
+            {
+                // TBD
+            }
+            else if (formContextType == FormContextType.Header)
+            {
+                // TBD
+            }
+
+            TrySetDateValue(driver, fieldContainer, control.DateAsString);
         }
 
         private void TrySetDateValue(IWebDriver driver, IWebElement dateField, string date)
@@ -2358,15 +2462,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             ThinkTime(500);
         }
 
-        private static void TrySetTime(IWebDriver driver, ISearchContext container, DateTimeControl control)
+        private static void TrySetTime(IWebDriver driver, ISearchContext container, DateTimeControl control, FormContextType formContext)
         {
             By timeFieldXPath = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", control.Name));
             var success = container.TryFindElement(timeFieldXPath, out var timeField);
             if (success)
-                TrySetTime(driver, timeField, control.TimeAsString);
+                TrySetTime(driver, timeField, control.TimeAsString, formContext);
         }
 
-        private static void TrySetTime(IWebDriver driver, IWebElement timeField, string time)
+        private static void TrySetTime(IWebDriver driver, IWebElement timeField, string time, FormContextType formContext)
         {
             // click & wait until the time get updated after change/clear the date
             timeField.Click();
@@ -2392,17 +2496,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be set/removed</param>
         /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
         /// <returns>True on success</returns>
-        internal BrowserCommandResult<bool> SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
+        internal BrowserCommandResult<bool> SetValue(MultiValueOptionSet option, FormContextType formContextType, bool removeExistingValues = false)
         {
             return this.Execute(GetOptions($"Set MultiValueOptionSet Value: {option.Name}"), driver =>
             {
                 if (removeExistingValues)
                 {
-                    RemoveMultiOptions(option);
+                    RemoveMultiOptions(option, formContextType);
                 }
                 else
                 {
-                    AddMultiOptions(option);
+                    AddMultiOptions(option, formContextType);
                 }
 
                 return true;
@@ -2414,15 +2518,39 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be removed</param>
         /// <returns></returns>
-        private BrowserCommandResult<bool> RemoveMultiOptions(MultiValueOptionSet option)
+        private BrowserCommandResult<bool> RemoveMultiOptions(MultiValueOptionSet option, FormContextType formContextType)
         {
             return this.Execute(GetOptions($"Remove Multi Select Value: {option.Name}"), driver =>
             {
-                string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name]);
+                IWebElement fieldContainer = null;
+
+                if (formContextType == FormContextType.QuickCreate)
+                {
+                    // Initialize the quick create form context
+                    // If this is not done -- element input will go to the main form due to new flyout design
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name])));
+                }
+                else if (formContextType == FormContextType.Entity)
+                {
+                    // Initialize the entity form context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContainer]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name])));
+                }
+                else if (formContextType == FormContextType.BusinessProcessFlow)
+                {
+                    // TBD
+                }
+                else if (formContextType == FormContextType.Header)
+                {
+                    // TBD
+                }
+
                 // If there is already some pre-selected items in the div then we must determine if it
                 // actually exists and simulate a set focus event on that div so that the input textbox
                 // becomes visible.
-                var listItems = driver.FindElements(By.XPath(xpath));
+                string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name]);
+                var listItems = fieldContainer.FindElements(By.XPath(xpath));
                 if (listItems.Any())
                 {
                     listItems.First().SendKeys("");
@@ -2431,7 +2559,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // If there are large number of options selected then a small expand collapse 
                 // button needs to be clicked to expose all the list elements.
                 xpath = AppElements.Xpath[AppReference.MultiSelect.ExpandCollapseButton].Replace("[NAME]", Elements.ElementId[option.Name]);
-                var expandCollapseButtons = driver.FindElements(By.XPath(xpath));
+                var expandCollapseButtons = fieldContainer.FindElements(By.XPath(xpath));
                 if (expandCollapseButtons.Any())
                 {
                     expandCollapseButtons.First().Click(true);
@@ -2441,7 +2569,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 foreach (var optionValue in option.Values)
                 {
                     xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.SelectedRecordButton].Replace("[NAME]", Elements.ElementId[option.Name]), optionValue);
-                    var listItemObjects = driver.FindElements(By.XPath(xpath));
+                    var listItemObjects = fieldContainer.FindElements(By.XPath(xpath));
                     var loopCounts = listItemObjects.Any() ? listItemObjects.Count : 0;
 
                     for (int i = 0; i < loopCounts; i++)
@@ -2449,7 +2577,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         // With every click of the button, the underlying DOM changes and the
                         // entire collection becomes stale, hence we only click the first occurance of
                         // the button and loop back to again find the elements and anyother occurance
-                        driver.FindElements(By.XPath(xpath)).First().Click(true);
+                        fieldContainer.FindElements(By.XPath(xpath)).First().Click(true);
                     }
                 }
 
@@ -2462,25 +2590,49 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be set</param>
         /// <returns></returns>
-        private BrowserCommandResult<bool> AddMultiOptions(MultiValueOptionSet option)
+        private BrowserCommandResult<bool> AddMultiOptions(MultiValueOptionSet option, FormContextType formContextType)
         {
             return this.Execute(GetOptions($"Add Multi Select Value: {option.Name}"), driver =>
             {
+                IWebElement fieldContainer = null;
+
+                if (formContextType == FormContextType.QuickCreate)
+                {
+                    // Initialize the quick create form context
+                    // If this is not done -- element input will go to the main form due to new flyout design
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name])));
+                }
+                else if (formContextType == FormContextType.Entity)
+                {
+                    // Initialize the entity form context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContainer]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name])));
+                }
+                else if (formContextType == FormContextType.BusinessProcessFlow)
+                {
+                    // TBD
+                }
+                else if (formContextType == FormContextType.Header)
+                {
+                    // TBD
+                }
+
                 string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name]);
                 // If there is already some pre-selected items in the div then we must determine if it
                 // actually exists and simulate a set focus event on that div so that the input textbox
                 // becomes visible.
-                var listItems = driver.FindElements(By.XPath(xpath));
+                var listItems = fieldContainer.FindElements(By.XPath(xpath));
                 if (listItems.Any())
                 {
                     listItems.First().SendKeys("");
                 }
 
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch].Replace("[NAME]", Elements.ElementId[option.Name])));
+                fieldContainer.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch].Replace("[NAME]", Elements.ElementId[option.Name])));
                 foreach (var optionValue in option.Values)
                 {
                     xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.FlyoutList].Replace("[NAME]", Elements.ElementId[option.Name]), optionValue);
-                    var flyout = driver.FindElements(By.XPath(xpath));
+                    var flyout = fieldContainer.FindElements(By.XPath(xpath));
                     if (flyout.Any())
                     {
                         flyout.First().Click(true);
@@ -2492,7 +2644,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // behind the flyout control.
                 //driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", Elements.ElementId[option.Name])));
                 xpath = AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", Elements.ElementId[option.Name]);
-                var divElements = driver.FindElements(By.XPath(xpath));
+                var divElements = fieldContainer.FindElements(By.XPath(xpath));
                 if (divElements.Any())
                 {
                     divElements.First().Click(true);
@@ -2509,7 +2661,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 Field returnField = new Field(driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field))));
                 returnField.Name = field;
 
-                driver.ClearFocus();
+                returnField.containerElement.SendKeys(Keys.Escape);
                 return returnField;
             });
         }
@@ -3130,9 +3282,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 TryExpandHeaderFlyout(driver);
 
-                SetValue(field, value);
-
-                driver.ClearFocus(); // Close Header
+                SetValue(field, value, FormContextType.Header);
 
                 return true;
             });
@@ -3193,7 +3343,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 TryExpandHeaderFlyout(driver);
 
-                SetValue(control);
+                SetValue(control, FormContextType.Header);
 
                 return true;
             });
@@ -3205,7 +3355,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 TryExpandHeaderFlyout(driver);
 
-                SetValue(control);
+                SetValue(control, FormContextType.Header);
 
                 return true;
             });
@@ -3236,24 +3386,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.DateTimeFieldContainer].Replace("[NAME]", control.Name);
             return ExecuteInHeaderContainer(driver, xpathToContainer,
-                container => TrySetValue(driver, container, control));
+                container => TrySetValue(driver, container, control, FormContextType.Header));
         }
 
-        internal BrowserCommandResult<bool> ClearValue(DateTimeControl control)
+        internal BrowserCommandResult<bool> ClearValue(DateTimeControl control, FormContextType formContextType)
             => Execute(GetOptions($"Clear Field: {control.Name}"),
-                driver => TrySetValue(driver, container: driver, control: new DateTimeControl(control.Name))); // Pass an empty control
+                driver => TrySetValue(driver, container: driver, control: new DateTimeControl(control.Name), formContextType)); // Pass an empty control
 
-        internal BrowserCommandResult<bool> ClearValue(string fieldName)
+        internal BrowserCommandResult<bool> ClearValue(string fieldName, FormContextType formContextType)
         {
             return this.Execute(GetOptions($"Clear Field {fieldName}"), driver =>
             {
-                SetValue(fieldName, string.Empty);
+                SetValue(fieldName, string.Empty, formContextType);
 
                 return true;
             });
         }
 
-        internal BrowserCommandResult<bool> ClearValue(LookupItem control, bool removeAll = true)
+        internal BrowserCommandResult<bool> ClearValue(LookupItem control, FormContextType formContextType, bool removeAll = true)
         {
             var controlName = control.Name;
             return Execute(GetOptions($"Clear Field {controlName}"), driver =>
@@ -3332,22 +3482,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             existingValue.Click(true);
         }
 
-        internal BrowserCommandResult<bool> ClearValue(OptionSet control)
+        internal BrowserCommandResult<bool> ClearValue(OptionSet control, FormContextType formContextType)
         {
             return this.Execute(GetOptions($"Clear Field {control.Name}"), driver =>
             {
                 control.Value = "-1";
-                SetValue(control);
+                SetValue(control, formContextType);
 
                 return true;
             });
         }
 
-        internal BrowserCommandResult<bool> ClearValue(MultiValueOptionSet control)
+        internal BrowserCommandResult<bool> ClearValue(MultiValueOptionSet control, FormContextType formContextType)
         {
             return this.Execute(GetOptions($"Clear Field {control.Name}"), driver =>
             {
-                RemoveMultiOptions(control);
+                RemoveMultiOptions(control, formContextType);
 
                 return true;
             });
@@ -3391,7 +3541,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return Execute(GetOptions($"Add values {controls.First().Name}"), driver =>
             {
-                SetValue(controls, false);
+                SetValue(controls, FormContextType.Entity, false);
 
                 return true;
             });
@@ -3402,7 +3552,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return Execute(GetOptions($"Remove values {controls.First().Name}"), driver =>
             {
                 foreach (var control in controls)
-                    ClearValue(control, false);
+                    ClearValue(control, FormContextType.Entity, false);
 
                 return true;
             });
@@ -3469,7 +3619,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 //Click in the field and enter values
                 control.Value = searchCriteria;
-                SetValue(control);
+                SetValue(control, FormContextType.Entity);
 
                 driver.WaitForTransaction();
 
@@ -3735,9 +3885,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Close Opportunity"), driver =>
             {
-                SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.ActualRevenueId], revenue.ToString(CultureInfo.CurrentCulture));
-                SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.CloseDateId], closeDate);
-                SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
+                //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.ActualRevenueId], revenue.ToString(CultureInfo.CurrentCulture));
+                //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.CloseDateId], closeDate);
+                //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
 
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]),
                     TimeSpan.FromSeconds(5),
@@ -4349,7 +4499,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     records[index].Click(true);
 
-                    driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.Form]),
+                    driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContainer]),
                         TimeSpan.FromSeconds(30),
                         "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
                     );

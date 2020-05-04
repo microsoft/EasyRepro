@@ -70,7 +70,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public static class Entity
         {
-            public static string Form = "Entity_FormContainer";
+            public static string FormContainer = "Entity_FormContainer";
             public static string FormSelector = "Entity_FormSelector";
             public static string HeaderTitle = "Entity_HeaderTitle";
             public static string Save = "Entity_Save";
@@ -364,7 +364,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_TextFieldValue", ".//input[contains(@data-id, \'[NAME].fieldControl\')]" },
             { "Entity_TextFieldLookup", ".//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
             { "Entity_TextFieldLookupSearchButton", ".//button[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_search')]" },
-            { "Entity_TextFieldLookupMenu", ".//div[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]') and contains(@data-id,'tabContainer')]" },
+            { "Entity_TextFieldLookupMenu", "//div[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]') and contains(@data-id,'tabContainer')]" },
             { "Entity_LookupFieldExistingValue", ".//*[@data-id='[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag']" },
             { "Entity_LookupFieldDeleteExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]" },
             { "Entity_LookupFieldExpandCollapseButton", ".//button[contains(@data-id,'[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse')]/descendant::label[not(text()='+0')]" },
@@ -413,7 +413,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_BooleanFieldButton", "//div[contains(@data-id, '[NAME].fieldControl_container')]"},
             { "Entity_BooleanFieldButtonTrue", ".//label[contains(@class, 'first-child')]"},
             { "Entity_BooleanFieldButtonFalse", ".//label[contains(@class, 'last-child')]"},
-            { "Entity_OptionSetFieldContainer", "//div[@data-id='[NAME].fieldControl-option-set-container']" },
+            { "Entity_OptionSetFieldContainer", ".//div[@data-id='[NAME].fieldControl-option-set-container']" },
             { "Entity_OptionsetStatusCombo", "//div[contains(@data-id, '[NAME].fieldControl-pickliststatus-comboBox')]"},
             { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},
             { "Entity_OptionsetStatusComboList", "//ul[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_list')]"},
@@ -459,13 +459,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Timeline_SaveAndClose", "//button[contains(@data-id,\"[NAME].SaveAndClose\")]" },
 
             //MultiSelect
-            { "MultiSelect_DivContainer",     "//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]/div/div/div" },
-            { "MultiSelect_InputSearch",     "//div[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_InputSearch\")]" },
-            { "MultiSelect_SelectedRecord",  "//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li" },
-            { "MultiSelect_SelectedRecord_Button",  "//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li[descendant::label[text()=\"{0}\"]]/descendant::button" },
-            { "MultiSelect_SelectedRecord_Label",  "//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]/descendant::label" },
-            { "MultiSelect_FlyoutList",      "//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//li[descendant::label[text()=\"{0}\"]]" },
-            { "MultiSelect_ExpandCollapseButton", "//button[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse\")]/descendant::label[not(text()=\"+0\")]" },
+            { "MultiSelect_DivContainer",     ".//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]/div/div/div" },
+            { "MultiSelect_InputSearch",     ".//div[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_InputSearch\")]" },
+            { "MultiSelect_SelectedRecord",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li" },
+            { "MultiSelect_SelectedRecord_Button",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li[descendant::label[text()=\"{0}\"]]/descendant::button" },
+            { "MultiSelect_SelectedRecord_Label",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]/descendant::label" },
+            { "MultiSelect_FlyoutList",      ".//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//li[descendant::label[text()=\"{0}\"]]" },
+            { "MultiSelect_ExpandCollapseButton", ".//button[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse\")]/descendant::label[not(text()=\"+0\")]" },
 
             //Dashboard
             { "Dashboard_Selector"       , "//span[contains(@id, 'Dashboard_Selector')]"},
@@ -521,8 +521,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "QuickCreate_SaveButton" , "//button[contains(@id,'quickCreateSaveBtn')]" },
             { "QuickCreate_SaveAndCloseButton", "//button[contains(@id,'quickCreateSaveAndCloseBtn')]"},
             { "QuickCreate_CancelButton", "//button[contains(@id,'quickCreateCancelBtn')]"},
-            { "QuickCreate_TextFieldContainer", ".//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
-
 
             //Lookup
             { "Lookup_RelatedEntityLabel", "//li[contains(@title,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]" },
