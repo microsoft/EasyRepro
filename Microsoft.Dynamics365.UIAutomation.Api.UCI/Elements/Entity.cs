@@ -31,7 +31,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="field"></param>
         public void ClearValue(string field)
         {
-            _client.ClearValue(field);
+            _client.ClearValue(field, FormContextType.Entity);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.ClearValue(new LookupItem { Name = "to" });</example>
         public void ClearValue(LookupItem control)
         {
-            _client.ClearValue(control);
+            _client.ClearValue(control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control"></param>
         public void ClearValue(OptionSet control)
         {
-            _client.ClearValue(control);
+            _client.ClearValue(control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control"></param>
         public void ClearValue(MultiValueOptionSet control)
         {
-            _client.ClearValue(control);
+            _client.ClearValue(control, FormContextType.Entity);
         }
         
 
@@ -80,7 +80,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control"></param>
         public void ClearValue(DateTimeControl control)
         {
-            _client.ClearValue(control);
+            _client.ClearValue(control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -461,7 +461,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="value">The value</param>
         public void SetValue(string field, string value)
         {
-            _client.SetValue(field, value);
+            _client.SetValue(field, value, FormContextType.Entity);
         }
 
         /// <summary>
@@ -470,7 +470,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         public void SetValue(LookupItem control)
         {
-            _client.SetValue(control);
+            _client.SetValue(control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -480,7 +480,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.SetValue(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
         public void SetValue(LookupItem[] controls)
         {
-            _client.SetValue(controls);
+            _client.SetValue(controls, FormContextType.Entity);
         }
 
         /// <summary>
@@ -489,7 +489,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The option you want to set.</param>
         public void SetValue(OptionSet optionSet)
         {
-            _client.SetValue(optionSet);
+            _client.SetValue(optionSet, FormContextType.Entity);
         }
 
         /// <summary>
@@ -498,7 +498,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The boolean field name.</param>
         public void SetValue(BooleanItem option)
         {
-            _client.SetValue(option);
+            _client.SetValue(option, FormContextType.Entity);
         }
 
         /// <summary>
@@ -513,7 +513,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.SetValue("estimatedclosedate", DateTime.Now);</example>
         public void SetValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
-            _client.SetValue(field, date, formatDate, formatTime);
+            _client.SetValue(field, date, FormContextType.Entity, formatDate, formatTime);
         }
 
         /// <summary>
@@ -522,7 +522,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">Date field control.</param>
         public void SetValue(DateTimeControl control)
         {
-            _client.SetValue(control);
+            _client.SetValue(control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -532,7 +532,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
         public void SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
-            _client.SetValue(option, removeExistingValues);
+            _client.SetValue(option, FormContextType.Entity, removeExistingValues);
         }
         
         /// <summary>

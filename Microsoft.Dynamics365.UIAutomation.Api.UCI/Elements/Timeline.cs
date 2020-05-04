@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
@@ -67,7 +68,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="subject">Subject of the email</param>
         public void AddEmailSubject(string subject)
         {
-            _client.SetValue(Elements.ElementId[Reference.Timeline.EmailSubject], subject);
+           _client.SetValue(Elements.ElementId[Reference.Timeline.EmailSubject], subject);
         }
 
         /// <summary>
@@ -76,7 +77,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="toOptions">Object of type MultiValueOptionSet containing name of the Field and the values to be set</param>
         public void AddEmailContacts(MultiValueOptionSet toOptions)
         {
-            _client.SetValue(toOptions);
+           _client.SetValue(toOptions);
         }
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="duration">The duration as text</param>
         public void AddEmailDuration(string duration)
         {
-            _client.SetValue(Elements.ElementId[Reference.Timeline.EmailDuration], duration);
+           _client.SetValue(Elements.ElementId[Reference.Timeline.EmailDuration], duration);
         }
 
         /// <summary>
@@ -106,7 +107,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <returns></returns>
         public bool RemoveEmail(MultiValueOptionSet emailOptions)
         {
-            return _client.SetValue(emailOptions, true);
+            return _client.SetValue(emailOptions, FormContextType.Entity, true);
         }
 
         /// <summary>

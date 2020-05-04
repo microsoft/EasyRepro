@@ -804,7 +804,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Sets the value of a Composite control on a QuickCreate form.
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
-        public new BrowserCommandResult<bool> SetValue(CompositeControl control)
+        public BrowserCommandResult<bool> SetValue(CompositeControl control)
         {
             return this.Execute(GetOptions($"Set QuickCreate ConpositeControl Value: {control.Id}"), driver =>
             {

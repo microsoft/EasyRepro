@@ -70,9 +70,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public static class Entity
         {
-            public static string Form = "Entity_FormContainer";
+            public static string FormContext = "Entity_FormContainer";
             public static string FormSelector = "Entity_FormSelector";
             public static string HeaderTitle = "Entity_HeaderTitle";
+            public static string HeaderContext = "Entity_HeaderContext";
             public static string Save = "Entity_Save";
             public static string TextFieldContainer = "Entity_TextFieldContainer";
             public static string TextFieldValue = "Entity_TextFieldValue";
@@ -215,6 +216,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string NextStageButton = "BPF_NextStageButton_UCI";
             public static string SetActiveButton = "BPF_SetActiveButton";
             public static string BusinessProcessFlowFieldName = "BPF_FieldName_UCI";
+            public static string BusinessProcessFlowFormContext = "BPF_FormContext";
             public static string TextFieldContainer = "BPF_TextFieldContainer";
             public static string BooleanFieldContainer = "BPF_BooleanFieldContainer";
             public static string DateTimeFieldContainer = "BPF_DateTimeFieldContainer";
@@ -251,6 +253,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public static class QuickCreate
         {
+            public static string QuickCreateFormContext = "QuickCreate_FormContext";
             public static string SaveButton = "QuickCreate_SaveButton";
             public static string SaveAndCloseButton = "QuickCreate_SaveAndCloseButton";
             public static string CancelButton = "QuickCreate_CancelButton";
@@ -355,22 +358,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_FormContainer"       , "//*[@data-id='editFormRoot']"},
             { "Entity_FormSelector"       , "//*[@data-id='form-selector']"},
             { "Entity_HeaderTitle"       , "//*[@data-id='header_title']"},
+            { "Entity_HeaderContext"       , ".//div[@data-id='headerFieldsFlyout']"},
             { "Entity_Process"       , "//button[contains(@data-id,'MBPF.ConvertTo')]"},
             { "Entity_Save"       , "//button[contains(@data-id, 'form-save-btn')]"},
             { "Entity_SwitchProcess"       , "//button[contains(@data-id,'SwitchProcess')]"},
-            { "Entity_TextFieldContainer", "//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
-            { "Entity_TextFieldValue", "//input[contains(@data-id, \'[NAME].fieldControl\')]" },
-            { "Entity_TextFieldLookup", "//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
-            { "Entity_TextFieldLookupSearchButton", "//button[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_search')]" },
+            { "Entity_TextFieldContainer", ".//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
+            { "Entity_TextFieldValue", ".//input[contains(@data-id, \'[NAME].fieldControl\')]" },
+            { "Entity_TextFieldLookup", ".//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
+            { "Entity_TextFieldLookupSearchButton", ".//button[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_search')]" },
             { "Entity_TextFieldLookupMenu", "//div[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]') and contains(@data-id,'tabContainer')]" },
-            { "Entity_LookupFieldExistingValue", "//*[@data-id='[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag']" },
-            { "Entity_LookupFieldDeleteExistingValue", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]" },
-            { "Entity_LookupFieldExpandCollapseButton", "//button[contains(@data-id,'[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse')]/descendant::label[not(text()='+0')]" },
-            { "Entity_LookupFieldNoRecordsText", "//*[@data-id=\'[NAME].fieldControl-LookupResultsDropdown_[NAME]_No_Records_Text']" },
-            { "Entity_LookupFieldResultList", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
-            { "Entity_LookupFieldResultListItem", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_resultsContainer')]" },
-            { "Entity_LookupFieldHoverExistingValue", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList')]" },
-            { "Entity_TextFieldLookupFieldContainer", "//div[@data-id='[NAME].fieldControl-Lookup_[NAME]']" },
+            { "Entity_LookupFieldExistingValue", ".//*[@data-id='[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag']" },
+            { "Entity_LookupFieldDeleteExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]" },
+            { "Entity_LookupFieldExpandCollapseButton", ".//button[contains(@data-id,'[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse')]/descendant::label[not(text()='+0')]" },
+            { "Entity_LookupFieldNoRecordsText", ".//*[@data-id=\'[NAME].fieldControl-LookupResultsDropdown_[NAME]_No_Records_Text']" },
+            { "Entity_LookupFieldResultList", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
+            { "Entity_LookupFieldResultListItem", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_resultsContainer')]" },
+            { "Entity_LookupFieldHoverExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList')]" },
+            { "Entity_TextFieldLookupFieldContainer", ".//div[@data-id='[NAME].fieldControl-Lookup_[NAME]']" },
             { "Entity_RecordSetNavigatorOpen", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
             { "Entity_RecordSetNavigator", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
             { "Entity_RecordSetNavList", "//ul[contains(@data-id, 'recordSetNavList')]" },
@@ -411,7 +415,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_BooleanFieldButton", "//div[contains(@data-id, '[NAME].fieldControl_container')]"},
             { "Entity_BooleanFieldButtonTrue", ".//label[contains(@class, 'first-child')]"},
             { "Entity_BooleanFieldButtonFalse", ".//label[contains(@class, 'last-child')]"},
-            { "Entity_OptionSetFieldContainer", "//div[@data-id='[NAME].fieldControl-option-set-container']" },
+            { "Entity_OptionSetFieldContainer", ".//div[@data-id='[NAME].fieldControl-option-set-container']" },
             { "Entity_OptionsetStatusCombo", "//div[contains(@data-id, '[NAME].fieldControl-pickliststatus-comboBox')]"},
             { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},
             { "Entity_OptionsetStatusComboList", "//ul[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_list')]"},
@@ -457,13 +461,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Timeline_SaveAndClose", "//button[contains(@data-id,\"[NAME].SaveAndClose\")]" },
 
             //MultiSelect
-            { "MultiSelect_DivContainer",     "//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]/div/div/div" },
-            { "MultiSelect_InputSearch",     "//div[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_InputSearch\")]" },
-            { "MultiSelect_SelectedRecord",  "//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li" },
-            { "MultiSelect_SelectedRecord_Button",  "//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li[descendant::label[text()=\"{0}\"]]/descendant::button" },
-            { "MultiSelect_SelectedRecord_Label",  "//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]/descendant::label" },
-            { "MultiSelect_FlyoutList",      "//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//li[descendant::label[text()=\"{0}\"]]" },
-            { "MultiSelect_ExpandCollapseButton", "//button[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse\")]/descendant::label[not(text()=\"+0\")]" },
+            { "MultiSelect_DivContainer",     ".//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]/div/div/div" },
+            { "MultiSelect_InputSearch",     ".//div[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_InputSearch\")]" },
+            { "MultiSelect_SelectedRecord",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li" },
+            { "MultiSelect_SelectedRecord_Button",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li[descendant::label[text()=\"{0}\"]]/descendant::button" },
+            { "MultiSelect_SelectedRecord_Label",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]/descendant::label" },
+            { "MultiSelect_FlyoutList",      ".//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//li[descendant::label[text()=\"{0}\"]]" },
+            { "MultiSelect_ExpandCollapseButton", ".//button[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse\")]/descendant::label[not(text()=\"+0\")]" },
 
             //Dashboard
             { "Dashboard_Selector"       , "//span[contains(@id, 'Dashboard_Selector')]"},
@@ -476,10 +480,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_NextStageButton_UCI"     , "//button[contains(@data-id,'nextButtonContainer')]" },
             { "BPF_SetActiveButton", "//button[contains(@data-id,'setActiveButton')]" },
             { "BPF_FieldName_UCI"     , "//input[contains(@id,'[NAME]')]" },
-            { "BPF_TextFieldContainer", "//div[contains(@data-lp-id, \'header_process_[NAME]\')]" },
-            { "BPF_BooleanFieldContainer", "//input[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-toggle\')]" },
-            { "BPF_DateTimeFieldContainer", "//input[contains(@data-id, \'[NAME].fieldControl-date-time-input\')]" },
-            { "BPF_FieldControlDateTimeInputUCI","//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
+            { "BPF_FormContext"     , "//div[contains(@id, \'ProcessStageControl-processHeaderStageFlyoutInnerContainer\')]" },
+            { "BPF_TextFieldContainer", ".//div[contains(@data-lp-id, \'header_process_[NAME]\')]" },
+            { "BPF_BooleanFieldContainer", ".//input[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-toggle\')]" },
+            { "BPF_DateTimeFieldContainer", ".//input[contains(@data-id, \'[NAME].fieldControl-date-time-input\')]" },
+            { "BPF_FieldControlDateTimeInputUCI",".//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
             { "BPF_PinStageButton","//button[contains(@id,'stageDockModeButton')]"},
             { "BPF_CloseStageButton","//button[contains(@id,'stageContentClose')]"},
 
@@ -514,7 +519,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SwitchProcessDialogOK"       , "//button[contains(@data-id,'ok_id')]"},
             { "SwitchProcess_Container" , "//section[contains(@id, 'popupContainer')]" },
 			
-            //QuickCreate 
+            //QuickCreate
+            { "QuickCreate_FormContext" , "//section[contains(@data-id,'quickCreateRoot')]" },
             { "QuickCreate_SaveButton" , "//button[contains(@id,'quickCreateSaveBtn')]" },
             { "QuickCreate_SaveAndCloseButton", "//button[contains(@id,'quickCreateSaveAndCloseBtn')]"},
             { "QuickCreate_CancelButton", "//button[contains(@id,'quickCreateCancelBtn')]"},
