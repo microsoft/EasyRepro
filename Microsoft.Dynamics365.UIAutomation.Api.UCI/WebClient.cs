@@ -1932,7 +1932,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="field">The field</param>
         /// <param name="value">The value</param>
         /// <example>xrmApp.Entity.SetValue("firstname", "Test");</example>
-        internal BrowserCommandResult<bool> SetValue(string field, string value, FormContextType formContextType)
+        internal BrowserCommandResult<bool> SetValue(string field, string value, FormContextType formContextType = FormContextType.Entity)
         {
             return Execute(GetOptions("Set Value"), driver =>
             {
@@ -2496,7 +2496,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be set/removed</param>
         /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
         /// <returns>True on success</returns>
-        internal BrowserCommandResult<bool> SetValue(MultiValueOptionSet option, FormContextType formContextType, bool removeExistingValues = false)
+        internal BrowserCommandResult<bool> SetValue(MultiValueOptionSet option, FormContextType formContextType = FormContextType.Entity, bool removeExistingValues = false)
         {
             return this.Execute(GetOptions($"Set MultiValueOptionSet Value: {option.Name}"), driver =>
             {
