@@ -255,7 +255,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SaveButton = "QuickCreate_SaveButton";
             public static string SaveAndCloseButton = "QuickCreate_SaveAndCloseButton";
             public static string CancelButton = "QuickCreate_CancelButton";
-            public static string TextFieldContainer = "QuickCreate_TextFieldContainer";
         }
 
         public static class Lookup
