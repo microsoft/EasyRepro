@@ -3,8 +3,9 @@
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class Demo_Let_TestsBase_WorkForYou_CreateApp_AllTestsUsesDefaultOptions : TestsBase {
-        
+    public class Lab_TestsBase_CreateApp_AllTestsUsesDefaultOptions : TestsBase {
+
+        [TestCategory("Labs - TestsBase")]
         [TestMethod]
         public void UseTheBaseClass()
         {
@@ -18,7 +19,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
             } // Note: that here get the Browser closed, CreateApp
         }
-        
+
+        [TestCategory("Labs - TestsBase")]
         [TestMethod]
         public void UseTheBaseClass_GoToCases_InCustomerServicesApp()
         {

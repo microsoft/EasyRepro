@@ -6,10 +6,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class Demo_Let_TestsBase_WorkForYou_ReadConfigParameters : TestsBase {
+    public class Lab_TestsBase_ReadConfigParameters : TestsBase {
 
         // Read Config Parameters are now defined in TestsBase everything else still the same
-        
+        [TestCategory("Labs - TestsBase")]
         [TestMethod]
         public void UseTheBaseClass()
         {
@@ -29,7 +29,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                
             } // Note: that here get the Browser closed, xrmApp get disposed
         }
-        
+
+        [TestCategory("Labs - TestsBase")]
         [TestMethod, ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
         public void UseTheBaseClass_GoToCases_InCustomerServicesApp()
         {

@@ -3,48 +3,45 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
+using Microsoft.Dynamics365.UIAutomation.Browser;
+using System;
+using System.Security;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class CreateLeadUCI : TestsBase
+    public class CreateLeadUCI
     {
-        [TestInitialize]
-        public override void InitTest() => base.InitTest();
 
-        [TestCleanup]
-        public override void FinishTest() => base.FinishTest();
-
-        public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Leads");
+        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
+        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
+        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
         public void UCITestCreateLead()
         {
-            _xrmApp.CommandBar.ClickCommand("New");
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-            _xrmApp.ThinkTime(5000);
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-            _xrmApp.Entity.SetValue("subject", TestSettings.GetRandomString(5, 15));
-            _xrmApp.Entity.SetValue("firstname", TestSettings.GetRandomString(5, 10));
-            _xrmApp.Entity.SetValue("lastname", TestSettings.GetRandomString(5, 10));
-        }
+                xrmApp.Navigation.OpenSubArea("Sales", "Leads");
 
-        [TestMethod]
-        public void UCITestCreateLead_SetHeaderStatus()
-        {
-            _xrmApp.CommandBar.ClickCommand("New");
+                xrmApp.CommandBar.ClickCommand("New");
 
-            _xrmApp.ThinkTime(5000);
+                xrmApp.ThinkTime(5000);
 
-            _xrmApp.Entity.SetValue("subject", TestSettings.GetRandomString(5, 15));
-            _xrmApp.Entity.SetValue("firstname", TestSettings.GetRandomString(5, 10));
-            _xrmApp.Entity.SetValue("lastname", TestSettings.GetRandomString(5, 10));
+                xrmApp.Entity.SetValue("subject", TestSettings.GetRandomString(5,15));
+                xrmApp.Entity.SetValue("firstname", TestSettings.GetRandomString(5,10));
+                xrmApp.Entity.SetValue("lastname", TestSettings.GetRandomString(5,10));
 
-            var status = new OptionSet { Name = "statuscode", Value = "Contacted" };
-            _xrmApp.Entity.SetHeaderValue(status);
+                xrmApp.Entity.Save();
 
-            string value = _xrmApp.Entity.GetHeaderValue(status);
-            Assert.AreEqual(status.Value,  value);
+            }
+            
         }
     }
 }

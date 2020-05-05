@@ -21,6 +21,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
+                xrmApp.Grid.SwitchView("Active Accounts");
+
                 xrmApp.Grid.Sort("Main Phone");
             }
         }

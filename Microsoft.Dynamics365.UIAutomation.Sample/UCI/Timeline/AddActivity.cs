@@ -1,11 +1,19 @@
 ﻿using Microsoft.Dynamics365.UIAutomation.Api.UCI;
+using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Security;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class AddActivity: TestsBase
+    public class AddActivity
     {
+        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
+        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
+        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
+
         [TestMethod]
         public void UCITestAccountAddAppointment()
         {
@@ -17,6 +25,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.SwitchView("Active Accounts");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -40,6 +50,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
+                xrmApp.Grid.SwitchView("Active Accounts");
+
                 xrmApp.Grid.OpenRecord(0);
 
                 xrmApp.Timeline.ClickEmailMenuItem();
@@ -49,18 +61,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
                 {
                     Name = Reference.Timeline.EmailBcc,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
+                    Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
                 });
                 xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
                 {
                     Name = Reference.Timeline.EmailCC,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
+                    Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
                 });
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Reference.Timeline.EmailTo,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
-                });
+                // This fails as it already has a value.
+                //xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
+                //{
+                //    Name = Reference.Timeline.EmailTo,
+                //    Values = new string[] { "Test Contact", "Jay Zee3" },
+                //});
 
                 xrmApp.Timeline.SaveAndCloseEmail();
 
@@ -80,6 +93,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
+                xrmApp.Grid.SwitchView("Active Accounts");
+
                 xrmApp.Grid.OpenRecord(0);
 
                 xrmApp.Timeline.ClickEmailMenuItem();
@@ -89,18 +104,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
                 {
                     Name = Reference.Timeline.EmailBcc,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
+                    Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
                 });
                 xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
                 {
                     Name = Reference.Timeline.EmailCC,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
+                    Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
                 });
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Reference.Timeline.EmailTo,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
-                });
+                // This fails as it already has a value.
+                //xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
+                //{
+                //    Name = Reference.Timeline.EmailTo,
+                //    Values = new string[] { "Test Contact", "Jay Zee3" },
+                //});
 
                 var multiselectedItems = xrmApp.Timeline.GetEmail(
                     new MultiValueOptionSet()
@@ -113,6 +129,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
+        [TestCategory("Fail - Bug")]
         public void UCITestAccountRemoveMultiSelectEmail()
         {
             var client = new WebClient(TestSettings.Options);
@@ -124,6 +141,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
+                xrmApp.Grid.SwitchView("Active Accounts");
+
                 xrmApp.Grid.OpenRecord(0);
 
                 xrmApp.Timeline.ClickEmailMenuItem();
@@ -132,15 +151,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
                 xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
                 {
-                    Name = Reference.Timeline.EmailTo,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
+                    Name = Reference.Timeline.EmailCC,
+                    Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
                 });
 
+                // This fails with the exception of OpenQA.Selenium.ElementNotInteractableException: element not interactable
                 var success = xrmApp.Timeline.RemoveEmail(
                     new MultiValueOptionSet()
                     {
-                        Name = Reference.Timeline.EmailTo,
-                        Values = new string[] { "Test Contact", "Jay Zee3" },
+                        Name = Reference.Timeline.EmailCC,
+                        Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
                     });
 
                 xrmApp.ThinkTime(3000);
@@ -159,6 +179,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.SwitchView("Active Accounts");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -181,6 +203,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.SwitchView("Active Accounts");
 
                 xrmApp.Grid.OpenRecord(0);
 

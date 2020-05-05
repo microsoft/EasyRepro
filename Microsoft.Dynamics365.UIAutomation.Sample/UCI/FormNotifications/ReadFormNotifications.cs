@@ -20,13 +20,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         public override void NavigateToHomePage() => _xrmApp.Navigation.OpenSubArea("Sales", "Leads");
 
-
+        [TestCategory("Fail - Bug")]
         [TestMethod]
         public void UCITestReadFormNotifications()
         {
             _xrmApp.CommandBar.ClickCommand("New");
             
-            _xrmApp.Entity.SetValue("lastname", "Test");
+            _xrmApp.Entity.SetValue("lastname", "Vong (sample)");
             
             _xrmApp.ThinkTime(5000);
             _xrmApp.Entity.Save();

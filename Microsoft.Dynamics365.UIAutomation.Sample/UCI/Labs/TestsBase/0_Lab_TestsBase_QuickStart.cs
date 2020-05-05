@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass] // NUnit =>  [TestFixture] 
-    public class Demo_QuickStart : TestsBase
+    public class Lab_TestsBase_QuickStart : TestsBase
     {
         [TestInitialize]
         public override void InitTest() => base.InitTest(); // here is _xrmApp initialized before each tests
@@ -17,6 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         // Optional: this will override the default parameters values & from  this app.config
         public override void SetOptions(BrowserOptions options) => options.UCIPerformanceMode = false; // => set options for all tests in this class
 
+        [TestCategory("Labs - TestsBase")]
         [TestMethod]
         public void TestCreateAccount()
         {
@@ -26,6 +27,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             Assert.IsNotNull("Replace this line with your test code");
         }
 
+        [TestCategory("Labs - TestsBase")]
         [TestMethod]
         public void TestOpenAccount()
         {

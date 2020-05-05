@@ -7,39 +7,32 @@ using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Security;
 
-
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class AssignAccountUCI
+    public class GlobalSearchUci
     {
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
+        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"]);
 
-        [TestCategory("Fail - DynamicData")]
         [TestMethod]
-        public void UCITestAssignAccount()
+        public void UCITestGlobalSearch()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+                xrmApp.Navigation.OpenGlobalSearch();
 
-                xrmApp.Grid.OpenRecord(0);
+                xrmApp.GlobalSearch.Search("Test");
 
-                xrmApp.ThinkTime(2000);
+                xrmApp.GlobalSearch.FilterWith("Account");
 
-                xrmApp.CommandBar.ClickCommand("Assign");
-
-                // Fail - DynamicData: Need to set an actual user here
-                xrmApp.Dialogs.Assign(Dialogs.AssignTo.User, "Grant");
-
+                 xrmApp.GlobalSearch.OpenRecord("account", 0);
             }
         }
     }
