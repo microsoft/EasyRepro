@@ -2739,10 +2739,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Get Field"), driver =>
             {
-                Field returnField = new Field(driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field))));
+                var fieldElement = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
+                Field returnField = new Field(fieldElement);
                 returnField.Name = field;
 
-                returnField.containerElement.SendKeys(Keys.Escape);
+                IWebElement fieldLabel = null;
+                try
+                {
+                    fieldLabel = fieldElement.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLabel].Replace("[NAME]", field)));
+                }
+                catch (NoSuchElementException)
+                {
+                    // Swallow
+                }
+
+                if (fieldLabel != null)
+                {
+                    returnField.Label = fieldLabel.Text;
+                }
+
                 return returnField;
             });
         }
