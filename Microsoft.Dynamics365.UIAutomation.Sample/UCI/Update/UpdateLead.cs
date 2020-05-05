@@ -30,6 +30,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Leads");
 
+                xrmApp.Grid.SwitchView("Open Leads");
+
                 xrmApp.Grid.OpenRecord(0);
 
                 xrmApp.ThinkTime(3000);
@@ -54,20 +56,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Leads");
 
+                xrmApp.Grid.SwitchView("Open Leads");
+
                 xrmApp.Grid.OpenRecord(0);
-
-                LookupItem acct = new LookupItem();
-                acct.Name = "parentaccountid";
-                acct.Value = "Test Account";
-
-                LookupItem contact = new LookupItem();
-                contact.Name = "parentcontactid";
-                contact.Value = "EasyRepro";
 
                 xrmApp.BusinessProcessFlow.SelectStage("Qualify");
 
-                xrmApp.BusinessProcessFlow.SetValue(acct);
-                xrmApp.BusinessProcessFlow.SetValue(contact);
                 xrmApp.BusinessProcessFlow.SetValue("budgetamount", "1000");
 
                 xrmApp.ThinkTime(3000);

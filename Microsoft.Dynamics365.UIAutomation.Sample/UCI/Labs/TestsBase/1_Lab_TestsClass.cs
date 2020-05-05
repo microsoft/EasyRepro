@@ -8,13 +8,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class Demo_TestsClass {
+    public class Lab_TestsClass {
 
         readonly Uri _xrmUri = new Uri(ConfigurationManager.AppSettings["OnlineCrmUrl"]);
         readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"]?.ToSecureString();
         readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"]?.ToSecureString();
         readonly SecureString _mfaSecretKey = ConfigurationManager.AppSettings["MfaSecretKey"]?.ToSecureString();
 
+        [TestCategory("Labs - TestsBase")]
         [TestMethod]
         public void NotUsing_TheBaseClass()
         {
@@ -35,7 +36,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
             }  // Note: that here get the Browser closed, xrmApp get disposed
         }
-        
+
+        [TestCategory("Labs - TestsBase")]
         [TestMethod, ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
         public void NotUsing_TheBaseClass_GoToCases_InCustomerServicesApp()
         {

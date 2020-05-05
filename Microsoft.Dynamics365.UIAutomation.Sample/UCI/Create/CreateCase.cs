@@ -33,12 +33,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.CommandBar.ClickCommand("New Case");
 
-                xrmApp.ThinkTime(5000);
+                xrmApp.ThinkTime(4000);
 
                 xrmApp.Entity.SetValue("title", TestSettings.GetRandomString(5,10));
 
-                LookupItem customer = new LookupItem { Name = "customerid", Value = "Maria Campbell" };
-                xrmApp.Entity.SetValue(customer);
+                // To work around the bug below, clearvalue first to initalize the field and then set it
+                xrmApp.Entity.ClearValue(new LookupItem { Name = "customerid"});
+                
+                // Bug - System.InvalidOperationException: No Results Matching maria campbell Were Found. #769
+                xrmApp.Entity.SetValue(new LookupItem { Name = "customerid", Value = "maria campbell", Index = 0 });
+                
+                xrmApp.ThinkTime(5000);
 
                 xrmApp.Entity.Save();
             }

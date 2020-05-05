@@ -30,6 +30,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
 
+                xrmApp.Grid.SwitchView("Open Opportunities");
+
                 xrmApp.Grid.OpenRecord(0);
                 xrmApp.ThinkTime(3000);
 

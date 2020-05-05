@@ -1,17 +1,23 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Dynamics365.UIAutomation.Browser;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class Demo_Let_TestsBase_WorkForYou_CreateApp : TestsBase {
-        
+    public class Lab_TestsBase_CreateApp_AllTestsUsesMyCustomOptions : TestsBase
+    {
+        public override void SetOptions(BrowserOptions options)
+        {
+            // <= test in this class use my custom options
+            options.PrivateMode = false;
+            options.UCIPerformanceMode = false;
+        }
+
+        [TestCategory("Labs - TestsBase")]
         [TestMethod]
         public void UseTheBaseClass()
         {
-            var options = TestSettings.Options;
-            options.UCIPerformanceMode = false; // <= you can also change other settings here
-
-            using (var xrmApp = CreateApp(options)) // <= CreateApp is now calling Login for you, with your options
+            using (var xrmApp = CreateApp()) // <= CreateApp is now calling Login for you, running with your options
             {
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales); // <= change this parameters to navigate to another app
 
@@ -19,17 +25,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 Assert.IsNotNull("Replace this line with your test code");  
 
-            }  // Note: that here get the Browser closed, xrmApp get disposed
+            } // Note: that here get the Browser closed, CreateApp
         }
-        
+
+        [TestCategory("Labs - TestsBase")]
         [TestMethod]
         public void UseTheBaseClass_GoToCases_InCustomerServicesApp()
         {
-            var options = TestSettings.Options;
-            using (var xrmApp = CreateApp(options))
+            using (var xrmApp = CreateApp())
             {
-                // now all tests uses the same credentials
-
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService); // <= navigate to another app
 
                 xrmApp.Navigation.OpenSubArea("Service", "Cases"); // <= navigate to another area 

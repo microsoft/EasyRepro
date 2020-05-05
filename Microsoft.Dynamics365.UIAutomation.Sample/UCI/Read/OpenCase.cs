@@ -78,8 +78,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 LookupItem ownerId = new LookupItem() { Name = "ownerId" };
                 string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
 
-
-
                 xrmApp.ThinkTime(2000);
 
             }

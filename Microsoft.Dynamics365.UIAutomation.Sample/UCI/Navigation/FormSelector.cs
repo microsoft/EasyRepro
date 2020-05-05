@@ -25,11 +25,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.OpenRecord(0);
 
-                xrmApp.Entity.SelectForm("Account");
+                xrmApp.Entity.SelectForm("Account for Interactive experience");
 
                 xrmApp.ThinkTime(3000);
 
-                xrmApp.Entity.SelectForm("Sales Insights");
+                xrmApp.Entity.SelectForm("Account");
 
                 xrmApp.ThinkTime(3000);
             }

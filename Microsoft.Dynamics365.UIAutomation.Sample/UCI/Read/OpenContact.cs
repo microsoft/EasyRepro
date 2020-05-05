@@ -166,6 +166,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Fail - Bug")]
         [TestMethod]
         public void UCITestOpenContactRetrieveHeaderValues()
         {
@@ -180,6 +181,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.RelatedGrid.OpenGridRow(0);
 
+                // Bug: Fails to resolve ownerid
+                // OpenQA.Selenium.NoSuchElementException: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@data-id='header_ownerId.fieldControl-Lookup_ownerId']"}
                 LookupItem ownerId = new LookupItem() { Name = "ownerid" };
                 string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
 
@@ -190,6 +193,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Fail - Bug")]
         [TestMethod]
         public void UCITestOpenContactRelatedEntity()
         {
@@ -206,6 +210,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Entity.SelectTab("Related", "Leads");
 
+                // Bug: OpenQA.Selenium.NotFoundException: Excel Templates button not found. Button names are case sensitive. Please check for proper casing of button name.
                 xrmApp.RelatedGrid.ClickCommand("Excel Templates", "View All My Templates");
 
                 xrmApp.ThinkTime(2000);

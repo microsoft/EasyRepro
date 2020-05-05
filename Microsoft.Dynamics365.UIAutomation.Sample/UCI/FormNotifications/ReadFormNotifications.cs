@@ -20,7 +20,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         public override void NavigateToHomePage() => _xrmApp.Navigation.OpenSubArea("Sales", "Leads");
 
-
+        [TestCategory("Fail - Bug")]
         [TestMethod]
         public void UCITestReadFormNotifications()
         {

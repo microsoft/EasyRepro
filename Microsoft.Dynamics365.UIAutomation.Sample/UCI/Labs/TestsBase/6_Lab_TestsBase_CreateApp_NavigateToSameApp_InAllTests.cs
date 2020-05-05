@@ -3,7 +3,7 @@
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class Demo_Let_TestsBase_WorkForYou_CreateApp_NavigateToSameApp_InAllTests : TestsBase
+    public class Lab_TestsBase_CreateApp_NavigateToSameApp_InAllTests : TestsBase
     {
         [TestInitialize]
         public override void InitTest() => base.InitTest(); // here is xrmApp initialized before each tests
@@ -13,6 +13,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales); // => going to Sale Hub App
 
+        [TestCategory("Labs - TestsBase")]
         [TestMethod]
         public void UseTheBaseClass()
         {
@@ -23,6 +24,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             Assert.IsNotNull("Replace this line with your test code");
         }
 
+        [TestCategory("Labs - TestsBase")]
         [TestMethod]
         public void UseTheBaseClass_GoToCases_InCustomerServicesApp()
         {
