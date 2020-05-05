@@ -3,175 +3,85 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
-using System;
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using System;
+using System.Security;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class OpenCaseUCI : TestsBase
+    public class OpenCaseUCI
     {
-        [TestInitialize]
-        public override void InitTest() => base.InitTest();
-
-        [TestCleanup]
-        public override void FinishTest() => base.FinishTest();
-
-        public override void NavigateToHomePage() => NavigateTo(UCIAppName.CustomerService, "Service", "Cases");
+        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
+        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
         public void UCITestOpenActiveCase()
         {
-            _xrmApp.Grid.Search("*Service");
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
-            _xrmApp.Grid.OpenRecord(0);
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                xrmApp.Navigation.OpenSubArea("Service", "Cases");
+
+                xrmApp.Grid.Search("Service Requested");
+
+                xrmApp.Grid.OpenRecord(0);
+            }
         }
 
         [TestMethod]
         public void UCITestOpenCase()
         {
-            _xrmApp.Grid.SwitchView("Active Cases");
-            _xrmApp.Grid.OpenRecord(0);
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
-            Field ticketNumber = _xrmApp.Entity.GetField("ticketnumber");
-            Assert.IsNotNull(ticketNumber);
-            
-            Field subject = _xrmApp.Entity.GetField("subjectid");
-            Assert.IsNotNull(subject);
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
-            Field description = _xrmApp.Entity.GetField("description");
-            Assert.IsNotNull(description);
+                xrmApp.Navigation.OpenSubArea("Service", "Cases");
 
-            Field mobilePhone = _xrmApp.Entity.GetField("mobilephone");
-            Assert.IsNotNull(mobilePhone);
+                xrmApp.Grid.SwitchView("Active Cases");
+
+                xrmApp.Grid.OpenRecord(0);
+            }
         }
 
         [TestMethod]
-        public void UCITestOpenCaseById()
-        {
-            _xrmApp.Grid.SwitchView("Active Cases");
-            _xrmApp.Grid.OpenRecord(0);
-            string number = _xrmApp.Entity.GetValue("ticketnumber");
-            Assert.IsNotNull(number);
-
-            // For proper test usage, please update the recordId below to a valid Case recordId
-            Guid recordId = _xrmApp.Entity.GetObjectId();
-
-            _xrmApp.Navigation.OpenSubArea("Service", "Cases");
-
-            string firstCaseNumber = number;
-            _xrmApp.Entity.OpenEntity("incident", recordId);
-            number = _xrmApp.Entity.GetValue("ticketnumber");
-            Assert.IsNotNull(number);
-            Assert.AreEqual(firstCaseNumber, number);
-        }
-
-        [TestMethod]
+        [TestCategory("Bug")]
         public void UCITestOpenCaseRetrieveHeaderValues()
         {
-            _xrmApp.Grid.SwitchView("Active Cases");
-
-            _xrmApp.Grid.OpenRecord(0);
-
-            LookupItem ownerId = new LookupItem {Name = "ownerid"};
-            string ownerIdValue = _xrmApp.Entity.GetHeaderValue(ownerId);
-
-            OptionSet priorityCode = new OptionSet {Name = "prioritycode"};
-            string priorityCodeValue = _xrmApp.Entity.GetHeaderValue(priorityCode);
-
-            _xrmApp.ThinkTime(2000);
-        }
-
-        [TestMethod]
-        public void UCITestOpenCaseRetrieveHeaderValues_SetLookup()
-        {
-            _xrmApp.Grid.SwitchView("Active Cases");
-
-            _xrmApp.Grid.OpenRecord(0);
-
-            LookupItem ownerId = new LookupItem {Name = "ownerid"};
-            string ownerIdValue = _xrmApp.Entity.GetHeaderValue(ownerId);
-
-            _client.Browser.Driver.ClearFocus();
-
-            ownerId.Value = "Angel Rodriguez";
-            _xrmApp.Entity.SetHeaderValue(ownerId);
-
-            ownerIdValue = _xrmApp.Entity.GetHeaderValue(ownerId);
-            Assert.AreEqual(ownerId.Value, ownerIdValue);
-
-            _xrmApp.ThinkTime(2000);
-        }
-
-
-        [TestMethod]
-        public void UCITestOpenCaseRetrieveHeaderValues_SetOptionSet()
-        {
-            _xrmApp.Grid.SwitchView("Active Cases");
-
-            _xrmApp.Grid.OpenRecord(0);
-
-            OptionSet priorityCode = new OptionSet
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
             {
-                Name = "prioritycode",
-                Value = "High"
-            };
-            
-            _xrmApp.Entity.SetHeaderValue(priorityCode);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
-           string priorityCodeValue = _xrmApp.Entity.GetHeaderValue(priorityCode);
-            Assert.AreEqual(priorityCode.Value, priorityCodeValue);
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
-            _xrmApp.ThinkTime(2000);
-        }
+                xrmApp.Navigation.OpenSubArea("Service", "Cases");
 
-        [TestMethod]
-        public void UCITestOpenCase_SetOptionSet()
-        {
-            _xrmApp.Grid.SwitchView("Active Cases");
+                xrmApp.Grid.SwitchView("Active Cases");
 
-            _xrmApp.Grid.OpenRecord(0);
+                xrmApp.Grid.OpenRecord(0);
 
-            OptionSet priorityCode = new OptionSet
-            {
-                Name = "prioritycode",
-                Value = "High"
-            };
-            _xrmApp.Entity.SetValue(priorityCode);
+                OptionSet priorityCode = new OptionSet() { Name = "prioritycode" };
+                string priorityCodeValue = xrmApp.Entity.GetHeaderValue(priorityCode);
 
-            string priorityCodeValue = _xrmApp.Entity.GetValue(priorityCode);
-            Assert.AreEqual(priorityCode.Value, priorityCodeValue);
+                // Bug: Fails to resolve ownerid
+                // OpenQA.Selenium.NoSuchElementException: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@data-id='header_ownerId.fieldControl-Lookup_ownerId']"}
+                LookupItem ownerId = new LookupItem() { Name = "ownerId" };
+                string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
 
-            _xrmApp.ThinkTime(2000);
-        }
 
-        [TestMethod]
-        public void UCITestOpenCase_SetHeaderValues()
-        {
-            _xrmApp.Grid.SwitchView("Active Cases");
 
-            _xrmApp.Grid.OpenRecord(0);
+                xrmApp.ThinkTime(2000);
 
-            LookupItem ownerId = new LookupItem {Name = "ownerid"};
-            ownerId.Value = _xrmApp.Entity.GetHeaderValue(ownerId);
-            
-            _client.Browser.Driver.ClearFocus();
-            
-            _xrmApp.Entity.SetHeaderValue(ownerId);
-
-            var ownerIdValue = _xrmApp.Entity.GetHeaderValue(ownerId);
-            Assert.AreEqual(ownerId.Value, ownerIdValue);
-
-            OptionSet priorityCode = new OptionSet
-            {
-                Name = "prioritycode",
-                Value = "High"
-            };
-            _xrmApp.Entity.SetHeaderValue(priorityCode);
-            string priorityCodeValue = _xrmApp.Entity.GetHeaderValue(priorityCode);
-            Assert.AreEqual(priorityCode.Value, priorityCodeValue);
-
-            _xrmApp.ThinkTime(2000);
+            }
         }
     }
 }

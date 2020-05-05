@@ -26,7 +26,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         {
             _xrmApp.CommandBar.ClickCommand("New");
             
-            _xrmApp.Entity.SetValue("lastname", "Test");
+            _xrmApp.Entity.SetValue("lastname", "Vong (sample)");
             
             _xrmApp.ThinkTime(5000);
             _xrmApp.Entity.Save();

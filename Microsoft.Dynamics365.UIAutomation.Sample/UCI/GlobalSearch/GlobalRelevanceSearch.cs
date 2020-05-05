@@ -4,6 +4,11 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 
+/*
+ * This requires Relevance Search to be enabled.  To enable Relevance Search review the following article:
+ * https://docs.microsoft.com/en-us/power-platform/admin/configure-relevance-search-organization#enable-relevance-search
+ */
+
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
@@ -23,11 +28,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.GlobalSearch.ChangeSearchType("Relevance Search");
 
-                xrmApp.GlobalSearch.Search("Test");
+                xrmApp.GlobalSearch.Search("Adventure");
 
                 xrmApp.GlobalSearch.Filter("Record Type", "Accounts");
 
-                 xrmApp.GlobalSearch.OpenRecord("account", 0);
+                xrmApp.GlobalSearch.OpenRecord("account", 0);
             }
         }
     }

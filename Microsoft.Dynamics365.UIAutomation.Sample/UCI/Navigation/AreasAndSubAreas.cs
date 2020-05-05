@@ -14,7 +14,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     public class AreasAndSubAreasUci : TestsBase
     {
         /// <summary>
-        /// Test that only those areas that are expected apear on the are menu
+        /// Test that only those areas that are expected appear on the are menu
         /// </summary>
         [TestMethod]
         public void TestExpectedAreasArePresent()
@@ -23,8 +23,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             using (var xrmApp = new XrmApp(client))
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
+                
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-                List<string> expectedAreas = new List<string> { "case management", "training" };
+                List<string> expectedAreas = new List<string> { "Accounts", "Contacts" };
 
                 Dictionary<string, IWebElement> areas = client.OpenMenu();
 
@@ -50,7 +52,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-                List<string> expectedSubAreas = new List<string> { "home","recent","pinned","cases","contacts","accounts","queues","knowledge articles","dashboards","activities","social profiles"};
+                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+
+                List<string> expectedSubAreas = new List<string> { "Home","Recent","Pinned","Dashboards","Activities","Accounts","Contacts","Social Profiles","Cases","Queues","Knowledge Articles"};
 
                 Dictionary<string, IWebElement> subAreaMenuItems = WebClient.GetSubAreaMenuItems(client.Browser.Driver);
 

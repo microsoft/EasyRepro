@@ -16,7 +16,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         readonly SecureString _mfaSecretKey = ConfigurationManager.AppSettings["MfaSecretKey"]?.ToSecureString();
 
         [TestMethod]
-        public void I_Hate_TheBaseClass()
+        public void NotUsing_TheBaseClass()
         {
             var options = TestSettings.Options;
             options.PrivateMode = true;
@@ -37,7 +37,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
         
         [TestMethod, ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
-        public void I_Hate_TheBaseClass_GoToCases_InCustomerServicesApp()
+        public void NotUsing_TheBaseClass_GoToCases_InCustomerServicesApp()
         {
             var options = TestSettings.Options;
             options.PrivateMode = false; // <= this test is not in private mode, ignore config

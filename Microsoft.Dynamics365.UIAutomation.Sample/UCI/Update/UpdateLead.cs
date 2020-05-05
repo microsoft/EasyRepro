@@ -3,19 +3,27 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
+using Microsoft.Dynamics365.UIAutomation.Browser;
+using System;
+using System.Security;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class UpdateLeadUCI: TestsBase
+    public class UpdateLeadUCI
     {
+
+        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
+        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
+
         [TestMethod]
         public void UCITestUpdateActiveLead()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -39,7 +47,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -49,17 +57,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 LookupItem acct = new LookupItem();
                 acct.Name = "parentaccountid";
-                acct.Value = "Adventure Works";
+                acct.Value = "Test Account";
 
                 LookupItem contact = new LookupItem();
                 contact.Name = "parentcontactid";
-                contact.Value = "Nancy Anderson (sample)";
+                contact.Value = "EasyRepro";
 
                 xrmApp.BusinessProcessFlow.SelectStage("Qualify");
 
                 xrmApp.BusinessProcessFlow.SetValue(acct);
                 xrmApp.BusinessProcessFlow.SetValue(contact);
-                xrmApp.BusinessProcessFlow.SetValue("budgetamount", "100.00");
+                xrmApp.BusinessProcessFlow.SetValue("budgetamount", "1000");
 
                 xrmApp.ThinkTime(3000);
             }
