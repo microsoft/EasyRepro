@@ -76,6 +76,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string HeaderContext = "Entity_HeaderContext";
             public static string Save = "Entity_Save";
             public static string TextFieldContainer = "Entity_TextFieldContainer";
+            public static string TextFieldLabel = "Entity_TextFieldLabel";
             public static string TextFieldValue = "Entity_TextFieldValue";
             public static string TextFieldLookup = "Entity_TextFieldLookup";
             public static string TextFieldLookupSearchButton = "Entity_TextFieldLookupSearchButton";
@@ -363,6 +364,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Save"       , "//button[contains(@data-id, 'form-save-btn')]"},
             { "Entity_SwitchProcess"       , "//button[contains(@data-id,'SwitchProcess')]"},
             { "Entity_TextFieldContainer", ".//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
+            { "Entity_TextFieldLabel", ".//label[contains(@id, \'[NAME]-field-label\')]" },
             { "Entity_TextFieldValue", ".//input[contains(@data-id, \'[NAME].fieldControl\')]" },
             { "Entity_TextFieldLookup", ".//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
             { "Entity_TextFieldLookupSearchButton", ".//button[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_search')]" },

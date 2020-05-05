@@ -50,6 +50,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets or sets the Label of the field.
+        /// </summary>
+        /// <value>The field label</value>
+        public string Label { get; set; }
+
+        /// <summary>
         /// Returns if the field is read only.
         /// </summary>
         public bool IsReadOnly
