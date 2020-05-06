@@ -28,7 +28,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         private string _timeAsString;
         public string TimeAsString { 
-            get =>  _timeAsString ?? (_timeAsString = string.IsNullOrWhiteSpace(TimeFormat) ? Value?.ToShortTimeString() : Value?.ToString(TimeFormat));
+            get =>  _timeAsString ?? (_timeAsString = string.IsNullOrWhiteSpace(TimeFormat) ? Value?.ToShortTimeString().ToUpper() : Value?.ToString(TimeFormat)).ToUpper();
             set => _timeAsString = value;
         }
     }
