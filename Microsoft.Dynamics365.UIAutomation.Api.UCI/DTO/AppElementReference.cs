@@ -382,7 +382,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_RecordSetNavList", "//ul[contains(@data-id, 'recordSetNavList')]" },
             { "Entity_RecordSetNavCollapseIcon", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
             { "Entity_RecordSetNavCollapseIconParent", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
-            { "Entity_TabList", "//ul[@id=\"tablist\"]" },
+            { "Entity_TabList", "//ul[contains(@id, \"tablist\")]" },
             { "Entity_Tab", ".//li[@title='{0}']" },
             { "Entity_MoreTabs", ".//button[@data-id='more_button']" },
             { "Entity_MoreTabsMenu", "//div[@id='__flyoutRootNode']" },
