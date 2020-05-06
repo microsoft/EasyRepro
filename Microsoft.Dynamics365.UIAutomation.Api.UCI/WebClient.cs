@@ -1713,66 +1713,76 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        public BrowserCommandResult<bool> ClickRelatedCommand(string name, string subName = null, bool moreCommands = false, string gridName = null)
+        public BrowserCommandResult<bool> ClickRelatedCommand(string name, string subName = null)
         {
             return this.Execute(GetOptions("Click Related Tab Command"), driver =>
             {
-                //Look for Button
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
+                // Locate Related Command Bar Button List
+                var relatedCommandBarButtonList = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButtonList]));
+
+                // Validate list has provided command bar button
+                if (relatedCommandBarButtonList.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
                 {
-                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
+                    relatedCommandBarButtonList.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
 
                     driver.WaitForTransaction();
 
                     if (subName != null)
                     {
-                        if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
-                            throw new NotFoundException($"{subName} button not found");
+                        //Look for Overflow flyout
+                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]))) 
+                        {
+                            var overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
 
-                        driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+                            if (!overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
+                                throw new NotFoundException($"{subName} button not found");
 
-                        driver.WaitForTransaction();
+                            overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+
+                            driver.WaitForTransaction();
+                        }
                     }
 
                     return true;
-
                 }
                 else
                 {
-                    //Check if we should be looking under More Commands (OverflowButton)
-                    if (moreCommands && gridName != null)
-                    {
-                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer].Replace("[NAME]", gridName)))) //Look for Button in Overflow
-                        {
-                            var Overflow = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer].Replace("[NAME]", gridName)));
-                            if (!Overflow.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton])))
-                                throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
-                            Overflow.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton])).Click(true);
+                    // Button was not found, check if we should be looking under More Commands (OverflowButton)
+                    var moreCommands = relatedCommandBarButtonList.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton]));
 
-                            if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", name))))
+                    if (moreCommands)
+                    {
+                        var overFlowButton = relatedCommandBarButtonList.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton]));
+                        overFlowButton.Click(true);
+
+                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]))) //Look for Overflow
+                        {
+                            var overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
+
+                            if (overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
                             {
-                                driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", name))).Click(true);
+                                overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
 
                                 driver.WaitForTransaction();
 
                                 if (subName != null)
                                 {
-                                    if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
+                                    overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
+
+                                    if (!overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
                                         throw new NotFoundException($"{subName} button not found");
 
-                                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+                                    overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
 
                                     driver.WaitForTransaction();
                                 }
 
                                 return true;
-
                             }
-                            return true;
                         }
                         else
                         {
-                            throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
+                            throw new NotFoundException($"{name} button not found in the More Commands container. Button names are case sensitive. Please check for proper casing of button name.");
                         }
 
                     }
@@ -1780,8 +1790,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
                     }
-
                 }
+
+                return true;
             });
         }
 
