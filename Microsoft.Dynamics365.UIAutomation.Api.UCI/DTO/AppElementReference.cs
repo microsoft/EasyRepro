@@ -119,6 +119,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SubGridHeaders = "Entity_SubGridHeaders";
             public static string SubGridRecordCheckbox = "Entity_SubGridRecordCheckbox";
             public static string SubGridAddButton = "Entity_SubGridAddButton";
+            public static string SubGridSection = "Entity_SubGridSection";
+            public static string SubGridSelectAll = "Entity_SubGridSelectAll";
             public static string FieldLookupButton = "Entity_FieldLookupButton";
             public static string SearchButtonIcon = "Entity_SearchButtonIcon";
             public static string DuplicateDetectionWindowMarker = "Entity_DuplicateDetectionWindowMarker";
@@ -400,6 +402,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SubGridHeaders",".//div[contains(@class,'grid-header-text')]"},
             { "Entity_SubGridRecordCheckbox","//div[contains(@data-id,'cell-[INDEX]-1') and contains(@data-lp-id,'[NAME]')]"},
             { "Entity_SubGridAddButton", "//button[contains(@data-id,'[NAME].AddNewStandard')]/parent::li/parent::ul[contains(@data-lp-id, 'commandbar-SubGridStandard:[NAME]')]" },
+            { "Entity_SubGridSection", "//section[@*[contains(.,'[NAME]')]]"},
+            { "Entity_SubGridSelectAll", ".//button[@*[contains(.,'Select All')]]"},
             { "Entity_FieldLookupButton","//button[contains(@data-id,'[NAME]_search')]" },
             { "Entity_SearchButtonIcon", "//span[contains(@data-id,'microsoftIcon_searchButton')]" },
             { "Entity_DuplicateDetectionWindowMarker","//div[contains(@data-id,'ManageDuplicates')]"},

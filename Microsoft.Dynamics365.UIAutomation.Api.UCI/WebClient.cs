@@ -1812,6 +1812,29 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        public BrowserCommandResult<bool> ClickSubgridSelectAll(string sectionName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Click Select All Button on subgrid in section: {sectionName}"), driver =>
+            {
+                //Look for Section
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridSection].Replace("[NAME]", sectionName))))
+                {
+                    var section = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridSection].Replace("[NAME]", sectionName)));
+
+                    if (!section.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridSelectAll])))
+                        throw new NotFoundException("Select All button not found");
+
+                    section.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridSelectAll])).Click(true);
+
+                    driver.WaitForTransaction();
+                }
+
+                return true;
+            });
+        }
+
         #endregion
 
         #region Entity
