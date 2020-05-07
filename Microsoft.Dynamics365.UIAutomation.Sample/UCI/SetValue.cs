@@ -76,9 +76,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Grid.OpenRecord(0);
                 xrmApp.ThinkTime(500);
 
-                // In order to set the Primary Contact, that contact must be listed as an Account contact
-                xrmApp.RelatedGrid.ClickCommand("Add Existing Contact",null, true, "Contacts");
-
                 // Need to handle the Lookup Records window and select a record 
                 // Feature Request #854
 
