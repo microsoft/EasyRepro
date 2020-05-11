@@ -131,7 +131,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 // This experience is broken if one of the following is true:
                 // 1. The subgrid label is hidden: Issue #818
                 // 2. If the subgrid shows as a card rather than a table: Issue #843
-                xrmApp.Entity.GetSubGridItems("CONTACTS");
+                xrmApp.Entity.SubGrid.GetSubGridItems("CONTACTS");
 
                 xrmApp.ThinkTime(3000);
             }

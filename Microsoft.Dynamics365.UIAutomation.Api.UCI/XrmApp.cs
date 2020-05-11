@@ -28,6 +28,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public BusinessProcessFlow BusinessProcessFlow => this.GetElement<BusinessProcessFlow>(_client);
         public Dashboard Dashboard => this.GetElement<Dashboard>(_client);
         public RelatedGrid RelatedGrid => this.GetElement<RelatedGrid>(_client);
+
         public GlobalSearch GlobalSearch => this.GetElement<GlobalSearch>(_client);
 		public QuickCreate QuickCreate => this.GetElement<QuickCreate>(_client);
         public Lookup Lookup => this.GetElement<Lookup>(_client);

@@ -11,9 +11,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     {
         private readonly WebClient _client;
 
+        public SubGrid SubGrid => this.GetElement<SubGrid>(_client);
+        public RelatedGrid RelatedGrid => this.GetElement<RelatedGrid>(_client);
+
         public Entity(WebClient client) : base()
         {
             _client = client;
+        }
+
+        public T GetElement<T>(WebClient client)
+    where T : Element
+        {
+            return (T)Activator.CreateInstance(typeof(T), new object[] { client });
         }
 
         /// <summary>
@@ -246,6 +255,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Retrieve the items from a subgrid
         /// </summary>
         /// <param name="subgridName">Label of the subgrid to retrieve items from</param>
+        [Obsolete("GetSubGridItems(string subgridName)is deprecated, please use the equivalent Entity.SubGrid.<Method> instead.")]
         public List<GridItem> GetSubGridItems(string subgridName)
         {
             return _client.GetSubGridItems(subgridName);
@@ -256,6 +266,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="subgridName">Label of the subgrid to retrieve items from</param>
         /// <returns></returns>
+        [Obsolete("GetSubGridItemsCount(string subgridName) is deprecated, please use the equivalent Entity.SubGrid.<Method> instead.")]
         public int GetSubGridItemsCount(string subgridName)
         {
             return _client.GetSubGridItemsCount(subgridName);
@@ -352,11 +363,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="subgridName">Label of the subgrid</param>
         /// <param name="index">Index of the record to open</param>
+        [Obsolete("OpenSubGridRecord(string subgridName, int index = 0) is deprecated, please use the equivalent Entity.SubGrid.<Method> instead.")]
         public void OpenSubGridRecord(string subgridName, int index = 0)
         {
             _client.OpenSubGridRecord(subgridName, index);
         }
 
+        [Obsolete("AddSubgridItem(string subgridName) is deprecated, please use the equivalent Entity.SubGrid.<Method> instead.")]
         public void AddSubgridItem(string subgridName)
         {
             _client.ClickSubgridAddButton(subgridName);

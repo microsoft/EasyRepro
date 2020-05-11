@@ -87,6 +87,7 @@
     <Compile Include="DTO\KeyPerformanceIndicator.cs" />
     <Compile Include="Elements\BusinessProcessFlow.cs" />
     <Compile Include="Elements\CommandBar.cs" />
+    <Compile Include="Elements\Subgrid.cs" />
     <Compile Include="Elements\Telemetry.cs" />
     <Compile Include="Elements\Dashboard.cs" />
     <Compile Include="Elements\Dialog.cs" />
