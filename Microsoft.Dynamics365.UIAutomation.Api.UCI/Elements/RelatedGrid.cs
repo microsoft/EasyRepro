@@ -21,7 +21,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="index">Index of the record to open</param>
         public void OpenGridRow(int index)
         {
-            _client.OpenGridRow(index);
+            _client.OpenRelatedGridRow(index);
         }
 
         /// <summary>

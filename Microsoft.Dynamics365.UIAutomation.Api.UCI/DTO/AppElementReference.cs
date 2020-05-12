@@ -114,6 +114,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EntityFooter = "Entity_Footer";
             public static string SubGridTitle = "Entity_SubGridTitle";
             public static string SubGridContents = "Entity_SubGridContents";
+            public static string SubGridList = "Entity_SubGridList";
+            public static string EditableSubGridList = "Entity_EditableSubGridList";
+            public static string EditableSubGridListCells = "Entity_EditableSubGridListCells";
+            public static string EditableSubGridListCellRows = "Entity_EditableSubGridListCellRows";
             public static string SubGridCells = "Entity_SubGridCells";
             public static string SubGridRows = "Entity_SubGridRows";
             public static string SubGridHeaders = "Entity_SubGridHeaders";
@@ -393,8 +397,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_FieldControlDateTimeTimeInputUCI",".//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input" },
             { "Entity_LookupResultsDropdown", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
             { "Entity_Footer", "//div[contains(@id,'footerWrapper')]" },
-            { "Entity_SubGridTitle", "//div[contains(text(), '[NAME]')]"},
-            { "Entity_SubGridContents", "//div[contains(text(), '[NAME]')]/parent::div/parent::div/parent::div"},
+            { "Entity_SubGridTitle", "//div[contains(text(), '[NAME]')]" },
+            { "Entity_SubGridContents", "//div[@id=\"dataSetRoot_[NAME]\"]" },
+            { "Entity_SubGridList", ".//ul[contains(@id, \"[NAME]-GridList\")]" },
+            { "Entity_EditableSubGridList", ".//div[contains(@data-lp-id, \"[NAME]\") and contains(@class, 'editableGrid') and not(contains(@class, 'readonly'))]" },
+            { "Entity_EditableSubGridListCells", ".//div[contains(@wj-part, 'cells') and contains(@class, 'wj-cells') and contains(@role, 'grid')]" },
+            { "Entity_EditableSubGridListCellRows", ".//div[contains(@class, 'wj-row') and contains(@role, 'row')]" },
             { "Entity_SubGridCells",".//div[contains(@role,'gridcell')]"},
             { "Entity_SubGridRows",".//div[contains(@class,'wj-row')]"},
             { "Entity_SubGridHeaders",".//div[contains(@class,'grid-header-text')]"},

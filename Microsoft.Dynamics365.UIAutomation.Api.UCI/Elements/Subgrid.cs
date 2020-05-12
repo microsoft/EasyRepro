@@ -16,8 +16,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client = client;
         }
 
-
-
         public void AddSubgridItem(string subgridName)
         {
             _client.ClickSubgridAddButton(subgridName);
@@ -28,15 +26,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="name">Name of the button to click</param>
         /// <param name="subName">Name of the submenu button to click</param>
-        public void ClickCommand(string name, string subName = null)
+        public void ClickCommand(string subGridName, string name, string subName = null)
         {
-            _client.ClickRelatedCommand(name, subName);
+            _client.ClickSubGridCommand(subGridName, name, subName);
         }
 
         /// <summary>
         /// Retrieve the items from a subgrid
         /// </summary>
-        /// <param name="subgridName">Label of the subgrid to retrieve items from</param>
+        /// <param name="subgridName">schemaName of the SubGrid control to retrieve items from</param>
         public List<GridItem> GetSubGridItems(string subgridName)
         {
             return _client.GetSubGridItems(subgridName);
@@ -45,7 +43,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Retrieves the number of rows from a subgrid
         /// </summary>
-        /// <param name="subgridName">Label of the subgrid to retrieve items from</param>
+        /// <param name="subgridName">schemaName of the SubGrid control</param>
         /// <returns></returns>
         public int GetSubGridItemsCount(string subgridName)
         {
@@ -53,18 +51,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Opens a record from a subgrid
-        /// </summary>
-        /// <param name="index">Index of the record to open</param>
-        public void OpenGridRow(int index)
-        {
-            _client.OpenGridRow(index);
-        }
-
-        /// <summary>
         /// Open a record on a subgrid
         /// </summary>
-        /// <param name="subgridName">Label of the subgrid</param>
+        /// <param name="subgridName">schemaName of the SubGrid control</param>
         /// <param name="index">Index of the record to open</param>
         public void OpenSubGridRecord(string subgridName, int index = 0)
         {

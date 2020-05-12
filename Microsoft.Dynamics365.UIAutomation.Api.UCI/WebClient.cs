@@ -520,7 +520,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var strSelected = element.GetAttribute("aria-selected");
                 bool.TryParse(strSelected, out var selected);
                 if (!selected)
+                {
                     element.Click(true);
+                }
+                else
+                {
+                    // This will result in navigating back to the desired subArea -- even if already selected.
+                    // Example: If context is an Account entity record, then a call to OpenSubArea("Sales", "Accounts"),
+                    // this will click on the Accounts subArea and go back to the grid view
+                    element.Click(true);
+                }
             }
             return found;
         }
@@ -1687,7 +1696,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="index">The index.</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        public BrowserCommandResult<bool> OpenGridRow(int index, int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> OpenRelatedGridRow(int index, int thinkTime = Constants.DefaultThinkTime)
         {
             ThinkTime(thinkTime);
 
@@ -1811,6 +1820,90 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
+        public BrowserCommandResult<bool> ClickSubGridCommand(string subGridName, string name, string subName = null)
+        {
+            return this.Execute(GetOptions("Click SubGrid Command"), driver =>
+            {
+                // Locate Related Command Bar Button List
+                var relatedCommandBarButtonList = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButtonList]));
+
+                // Validate list has provided command bar button
+                if (relatedCommandBarButtonList.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
+                {
+                    relatedCommandBarButtonList.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
+
+                    driver.WaitForTransaction();
+
+                    if (subName != null)
+                    {
+                        //Look for Overflow flyout
+                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer])))
+                        {
+                            var overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
+
+                            if (!overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
+                                throw new NotFoundException($"{subName} button not found");
+
+                            overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+
+                            driver.WaitForTransaction();
+                        }
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    // Button was not found, check if we should be looking under More Commands (OverflowButton)
+                    var moreCommands = relatedCommandBarButtonList.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton]));
+
+                    if (moreCommands)
+                    {
+                        var overFlowButton = relatedCommandBarButtonList.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton]));
+                        overFlowButton.Click(true);
+
+                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]))) //Look for Overflow
+                        {
+                            var overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
+
+                            if (overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
+                            {
+                                overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
+
+                                driver.WaitForTransaction();
+
+                                if (subName != null)
+                                {
+                                    overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
+
+                                    if (!overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
+                                        throw new NotFoundException($"{subName} button not found");
+
+                                    overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+
+                                    driver.WaitForTransaction();
+                                }
+
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            throw new NotFoundException($"{name} button not found in the More Commands container. Button names are case sensitive. Please check for proper casing of button name.");
+                        }
+
+                    }
+                    else
+                    {
+                        throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
+                    }
+                }
+
+                return true;
+            });
+        }
+
 
         #endregion
 
@@ -3209,20 +3302,69 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Open Subgrid record for subgrid {subgridName}"), driver =>
             {
-                //Find the Grid
+                // Find the SubGrid
                 var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
 
-                //Get the GridName
-                string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", String.Empty);
+                // Find list of SubGrid records
+                IWebElement subGridRecordList = null;
+                var foundGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
 
-                //cell-0 is the checkbox for each record
-                var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
+                // Read Only Grid Found
+                if (subGridRecordList != null && foundGrid)
+                {
+                    var subGridRecords = subGridRecordList.FindElements(By.TagName("li"));
 
-                driver.DoubleClick(checkBox);
+                    if (subGridRecords == null)
+                        throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
 
-                driver.WaitForTransaction();
+                    if (index + 1 > subGridRecords.Count)
+                        throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {subGridRecords.Count}. Expected: {index + 1}");
+
+                    subGridRecords[index].Click(true);
+                    driver.WaitForTransaction();
+
+                    return true;
+                }
+                else if(!foundGrid)
+                {
+                    // Read Only Grid Not Found
+                   var foundEditableGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+
+                    if (foundEditableGrid)
+                    {
+                        var editableGridListCells = subGridRecordList.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]));
+
+                        var editableGridCellRows = editableGridListCells.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]));
+
+                        var editableGridCellRow = editableGridCellRows[index + 1].FindElements(By.XPath("./div"));
+
+                        Actions actions = new Actions(driver);
+                        actions.DoubleClick(editableGridCellRow[0]).Perform();
+
+                        driver.WaitForTransaction();
+
+                        return true;
+                    }
+                    else
+                    {
+                        // Editable Grid Not Found
+                        // Check for special 'Related' grid form control
+                        // This opens a limited form view in-line on the grid
+
+                        //Get the GridName
+                        string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", String.Empty);
+
+                        //cell-0 is the checkbox for each record
+                        var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
+
+                        driver.DoubleClick(checkBox);
+
+                        driver.WaitForTransaction();
+                    }
+                }
 
                 return true;
+
             });
         }
 
