@@ -113,7 +113,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
-        [TestCategory("Fail - Bug")]
         public void UCITestOpenSubGridRecord()
         {
             var client = new WebClient(TestSettings.Options);
