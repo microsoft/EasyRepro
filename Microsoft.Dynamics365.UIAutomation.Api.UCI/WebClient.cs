@@ -81,7 +81,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             successCallback = successCallback ?? (
                                   _ =>
                                   {
-                                      driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage]), new TimeSpan(0,0,2));
+                                      driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage]), new TimeSpan(0,0,5));
                                       bool isUCI = driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage]));
                                       if (isUCI)
                                           driver.WaitForTransaction();
@@ -174,7 +174,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return success ? LoginResult.Success : LoginResult.Failure;
         }
 
-        private bool IsUserAlreadyLogged() => WaitForMainPage(2.Seconds());
+        private bool IsUserAlreadyLogged() => WaitForMainPage(10.Seconds());
 
         private static string GenerateOneTimeCode(SecureString mfaSecretKey)
         {
@@ -1372,6 +1372,46 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     // TBD
                 }
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SwitchSubGridView(string subGridName, string viewName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            ThinkTime(thinkTime);
+
+            return Execute(GetOptions($"Switch SubGrid View"), driver =>
+            {
+                // Initialize required variables
+                IWebElement viewPicker = null;
+
+                // Find the SubGrid
+                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subGridName)));
+
+                var foundPicker = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridViewPickerButton]), out viewPicker);
+
+                if (foundPicker)
+                {
+                    viewPicker.Click(true);
+
+                    // Locate the ViewSelector flyout
+                    var viewPickerFlyout = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridViewPickerFlyout]), new TimeSpan(0,0,2));
+
+                    var viewItems = viewPickerFlyout.FindElements(By.TagName("li"));
+
+
+                    //Is the button in the ribbon?
+                    if (viewItems.Any(x => x.GetAttribute("aria-label").Equals(viewName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        viewItems.FirstOrDefault(x => x.GetAttribute("aria-label").Equals(viewName, StringComparison.OrdinalIgnoreCase)).Click(true);
+                    }
+
+                }
+                else
+                    throw new NotFoundException($"Unable to locate the viewPicker for SubGrid {subGridName}");
 
                 driver.WaitForTransaction();
 

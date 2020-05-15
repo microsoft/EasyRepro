@@ -54,5 +54,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenSubGridRecord(subgridName, index);
         }
+
+        /// <summary>
+        /// Switches the View on a SubGrid
+        /// </summary>
+        /// <param name="subgridName">schemaName of the SubGrid control</param>
+        /// <param name="viewName">Name of the view to select</param>
+        public void SwitchView(string subgridName, string viewName)
+        {
+            _client.SwitchSubGridView(subgridName, viewName);
+        }
     }
 }
