@@ -1227,6 +1227,87 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> ClickCommand(string name, string subname = null, string subSecondName = null, int thinkTime = Constants.DefaultThinkTime)
+        {
+            return Execute(GetOptions($"Click Command"), driver =>
+            {
+                //Find the button in the CommandBar
+                var ribbon = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]),
+                    TimeSpan.FromSeconds(5));
+
+                if (ribbon == null)
+                {
+                    ribbon = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid]),
+                        TimeSpan.FromSeconds(5),
+                        "Unable to find the ribbon.");
+                }
+
+                //Get the CommandBar buttons
+                var items = ribbon.FindElements(By.TagName("li"));
+
+                //Is the button in the ribbon?
+                if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    items.FirstOrDefault(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)).Click(true);
+                    driver.WaitForTransaction();
+                }
+                else
+                {
+                    //Is the button in More Commands?
+                    if (items.Any(x => x.GetAttribute("aria-label").Equals("More Commands", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        //Click More Commands
+                        items.FirstOrDefault(x => x.GetAttribute("aria-label").Equals("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                        driver.WaitForTransaction();
+
+                        //Click the button
+                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Button].Replace("[NAME]", name))))
+                        {
+                            driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Button].Replace("[NAME]", name))).Click(true);
+                            driver.WaitForTransaction();
+                        }
+                        else
+                            throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
+                    }
+                    else
+                        throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
+                }
+
+                if (!string.IsNullOrEmpty(subname))
+                {
+                    var submenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.MoreCommandsMenu]));
+
+                    var subbutton = submenu.FindElements(By.TagName("button")).FirstOrDefault(x => x.Text == subname);
+
+                    if (subbutton != null)
+                    {
+                        subbutton.Click(true);
+                    }
+                    else
+                        throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
+
+                    if (!string.IsNullOrEmpty(subname))
+                    {
+                        var subSecondmenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.MoreCommandsMenu]));
+
+                        var subSecondbutton = subSecondmenu.FindElements(By.TagName("button")).FirstOrDefault(x => x.Text == subSecondName);
+
+                        if (subSecondbutton != null)
+                        {
+                            subSecondbutton.Click(true);
+                        }
+                        else
+                            throw new InvalidOperationException($"No sub command with the name '{subSecondName}' exists inside of Commandbar.");
+                    }
+                }
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+
         /// <summary>
         /// Returns the values of CommandBar objects
         /// </summary>
@@ -1723,7 +1804,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        public BrowserCommandResult<bool> ClickRelatedCommand(string name, string subName = null)
+        public BrowserCommandResult<bool> ClickRelatedCommand(string name, string subName = null, string subSecondName = null)
         {
             return this.Execute(GetOptions("Click Related Tab Command"), driver =>
             {
@@ -1740,7 +1821,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (subName != null)
                     {
                         //Look for Overflow flyout
-                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]))) 
+                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer])))
                         {
                             var overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
 
@@ -1750,6 +1831,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
 
                             driver.WaitForTransaction();
+                        }
+
+                        if (subSecondName != null)
+                        {
+                            //Look for Overflow flyout
+                            if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer])))
+                            {
+                                var overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
+
+                                if (!overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
+                                    throw new NotFoundException($"{subName} button not found");
+
+                                overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+
+                                driver.WaitForTransaction();
+                            }
                         }
                     }
 
@@ -1785,6 +1882,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                                     overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
 
                                     driver.WaitForTransaction();
+
+                                    if (subSecondName != null)
+                                    {
+                                        overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
+
+                                        if (!overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
+                                            throw new NotFoundException($"{subName} button not found");
+
+                                        overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+
+                                        driver.WaitForTransaction();
+                                    }
                                 }
 
                                 return true;
@@ -1810,6 +1919,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         #region Subgrid
 
+        /// This method is obsolete. Do not use.
         public BrowserCommandResult<bool> ClickSubgridAddButton(string subgridName, int thinkTime = Constants.DefaultThinkTime)
         {
             ThinkTime(thinkTime);
@@ -1897,7 +2007,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                                         driver.WaitForTransaction();
                                     }
                                     else
-                                        throw new InvalidOperationException($"No command with the name '{subSecondName}' exists under the {subName} command inside of {subGridName} Commandbar.");
+                                        throw new InvalidOperationException($"No command with the name '{subSecondName}' exists under the {subName} command inside of {name} on the {subGridName} SubGrid Commandbar.");
                                 }
                             }
 

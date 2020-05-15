@@ -29,9 +29,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="name">Name of the button to click</param>
         /// <param name="subName">Name of the submenu button to click</param>
-        public void ClickCommand(string name, string subName = null)
+        public void ClickCommand(string name, string subName = null, string subSecondName = null)
         {
-            _client.ClickRelatedCommand(name, subName);
+            _client.ClickRelatedCommand(name, subName, subSecondName);
         }
     }
 }

@@ -86,20 +86,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.OpenRecord(0);
 
-                // This experience is broken if one of the following is true:
-                // 1. The subgrid label is hidden: Issue #818
-                // 2. If the subgrid shows as a card rather than a table: Issue #843
-                List<GridItem> rows = xrmApp.Entity.SubGrid.GetSubGridItems("RECENT OPPORTUNITIES");
+                List<GridItem> rows = xrmApp.Entity.SubGrid.GetSubGridItems("contactopportunitiesgrid");
 
-                // This experience is broken if one of the following is true:
-                // 1. The subgrid label is hidden: Issue #818
-                // 2. If the subgrid shows as a card rather than a table: Issue #843
-                int rowCount = xrmApp.Entity.SubGrid.GetSubGridItemsCount("RECENT CASES");
+                int rowCount = xrmApp.Entity.SubGrid.GetSubGridItemsCount("contactcasessgrid");
 
-                // This experience is broken if one of the following is true:
-                // 1. The subgrid label is hidden: Issue #818
-                // 2. If the subgrid shows as a card rather than a table: Issue #843
-                xrmApp.Entity.SubGrid.OpenSubGridRecord("RECENT OPPORTUNITIES", 0);
+                xrmApp.Entity.SubGrid.OpenSubGridRecord("contactopportunitiesgrid", 0);
 
                 xrmApp.ThinkTime(500);
             }
