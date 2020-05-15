@@ -1821,10 +1821,95 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        public BrowserCommandResult<bool> ClickSubGridCommand(string subGridName, string name, string subName = null)
+        public BrowserCommandResult<bool> ClickSubGridCommand(string subGridName, string name, string subName = null, string subSecondName = null)
         {
             return this.Execute(GetOptions("Click SubGrid Command"), driver =>
             {
+                // Initialize required local variables
+                IWebElement subGridCommandBar = null;
+
+                // Find the SubGrid
+                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subGridName)));
+
+                if (subGrid == null)
+                    throw new NotFoundException($"Unable to locate subgrid contents for {subGridName} subgrid.");
+
+                // Check if ReadOnlyGrid was found
+                if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandBar].Replace("[NAME]", subGridName)), out subGridCommandBar))
+                {
+                    // Locate subGrid command list
+                    //var foundCommands = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+
+                    var items = subGridCommandBar.FindElements(By.TagName("li"));
+
+                    //Is the button in the ribbon?
+                    if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        items.FirstOrDefault(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)).Click(true);
+                        driver.WaitForTransaction();
+                    }
+                    else
+                    {
+                        //Is the button in More Commands Overflow?
+                        if (items.Any(x => x.GetAttribute("aria-label").Equals("More Commands", StringComparison.OrdinalIgnoreCase)))
+                        {
+                            //Click More Commands
+                            items.FirstOrDefault(x => x.GetAttribute("aria-label").Equals("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                            driver.WaitForTransaction();
+
+                            // Locate the overflow button (More Commands flyout)
+                            var overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
+
+                            //Click the primary button, if found
+                            if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name))))
+                            {
+                                overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name))).Click(true);
+                                driver.WaitForTransaction();
+                            }
+                            else
+                                throw new InvalidOperationException($"No command with the name '{name}' exists inside of {subGridName} Commandbar.");
+
+                            if (subName != null)
+                            {
+                                // Locate the sub-button flyout if subName present
+                                overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
+
+                                //Click the primary button, if found
+                                if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))))
+                                {
+                                    overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))).Click(true);
+                                    driver.WaitForTransaction();
+                                }
+                                else
+                                    throw new InvalidOperationException($"No command with the name '{subName}' exists under the {name} command inside of {subGridName} Commandbar.");
+
+                                // Check if we need to go to a 3rd level
+                                if (subSecondName != null)
+                                {
+                                    // Locate the sub-button flyout if subSecondName present
+                                    overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
+
+                                    //Click the primary button, if found
+                                    if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))))
+                                    {
+                                        overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))).Click(true);
+                                        driver.WaitForTransaction();
+                                    }
+                                    else
+                                        throw new InvalidOperationException($"No command with the name '{subSecondName}' exists under the {subName} command inside of {subGridName} Commandbar.");
+                                }
+                            }
+
+                            return true;
+                        }
+                        else
+                            throw new InvalidOperationException($"No command with the name '{name}' exists inside of {subGridName} CommandBar.");
+                    }
+                }
+
+                return true;
+
+                /*
                 // Locate Related Command Bar Button List
                 var relatedCommandBarButtonList = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButtonList]));
 
@@ -1901,6 +1986,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 return true;
+                */
+
             });
         }
 
@@ -2612,36 +2699,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         private static void TrySetTime(IWebDriver driver, ISearchContext container, DateTimeControl control, FormContextType formContextType)
         {
-            IWebElement fieldContainer = null;
             By timeFieldXPath = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", control.Name));
+
+            IWebElement formContext = null;
 
             if (formContextType == FormContextType.QuickCreate)
             {
+                //IWebDriver formContext;
                 // Initialize the quick create form context
                 // If this is not done -- element input will go to the main form due to new flyout design
-                var formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
-                fieldContainer = formContext.WaitUntilAvailable(timeFieldXPath, $"DateTime Field: '{control.Name}' does not exist");
+                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
             }
             else if (formContextType == FormContextType.Entity)
             {
                 // Initialize the entity form context
-                var formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]));
-                fieldContainer = formContext.WaitUntilAvailable(timeFieldXPath, $"DateTime Field: '{control.Name}' does not exist");
+                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]));
             }
             else if (formContextType == FormContextType.BusinessProcessFlow)
             {
                 // Initialize the Business Process Flow context
-                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
-                fieldContainer = formContext.WaitUntilAvailable(timeFieldXPath, $"DateTime Field: '{control.Name}' does not exist");
+                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
             }
             else if (formContextType == FormContextType.Header)
             {
                 // Initialize the Header context
-                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderContext]));
-                fieldContainer = formContext.WaitUntilAvailable(timeFieldXPath, $"DateTime Field: '{control.Name}' does not exist");
+                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderContext]));
             }
 
-            var success = fieldContainer.TryFindElement(timeFieldXPath, out var timeField);
+            var success = formContext.TryFindElement(timeFieldXPath, out var timeField);
             if (success)
                 TrySetTime(driver, timeField, control.TimeAsString);
 
@@ -2878,8 +2963,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var input = fieldContainer.FindElement(By.TagName("input"));
                     if (input != null)
                     {
-                        IWebElement fieldValue = input.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldValue].Replace("[NAME]", field)));
-                        text = fieldValue.GetAttribute("value").ToString();
+                        //IWebElement fieldValue = input.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldValue].Replace("[NAME]", field)));
+                        text = input.GetAttribute("value").ToString();
 
                         // Needed if getting a date field which also displays time as there isn't a date specifc GetValue method
                         var timefields = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field)));
@@ -2897,8 +2982,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     throw new Exception($"Field with name {field} does not exist.");
                 }
-
-                driver.ClearFocus();
 
                 return text;
             });
@@ -3242,58 +3325,169 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Get Subgrid Items for Subgrid {subgridName}"), driver =>
             {
+                // Initialize return object
                 List<GridItem> subGridRows = new List<GridItem>();
 
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridTitle].Replace("[NAME]", subgridName))))
-                    throw new NotFoundException($"{subgridName} subgrid not found. Subgrid names are case sensitive.  Please make sure casing is the same.");
+                // Initialize required local variables
+                IWebElement subGridRecordList = null;
+                List<string> columns = new List<string>();
+                List<string> cellValues = new List<string>();
+                GridItem item = new GridItem();
 
-                //Find the subgrid contents
+                // Find the SubGrid
                 var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
 
-                //Find the columns
-                List<string> columns = new List<string>();
+                if (subGrid == null)
+                    throw new NotFoundException($"Unable to locate subgrid contents for {subgridName} subgrid.");
 
-                var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeaders]));
-
-                foreach (IWebElement headerCell in headerCells)
+                // Check if ReadOnlyGrid was found
+                if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList))
                 {
-                    columns.Add(headerCell.Text);
-                }
+                    // Locate record list
+                    var foundRecords = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
 
-                //Find the rows
-                var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRows]));
-
-                //Process each row
-                foreach (IWebElement row in rows)
-                {
-                    List<string> cellValues = new List<string>();
-                    GridItem item = new GridItem();
-
-                    //Get the entityId and entity Type
-                    if (row.GetAttribute("data-lp-id") != null)
+                    if (foundRecords)
                     {
-                        var rowAttributes = row.GetAttribute("data-lp-id").Split('|');
-                        item.Id = Guid.Parse(rowAttributes[3]);
-                        item.EntityName = rowAttributes[4];
-                    }
+                        var subGridRecordRows = subGridRecordList.FindElements(By.TagName("li"));
 
-                    var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
-
-                    if (cells.Count > 0)
-                    {
-                        foreach (IWebElement thisCell in cells)
-                            cellValues.Add(thisCell.Text);
-
-                        for (int i = 0; i < columns.Count; i++)
+                        foreach (IWebElement recordRow in subGridRecordRows)
                         {
-                            //The first cell is always a checkbox for the record.  Ignore the checkbox.
-                            item[columns[i]] = cellValues[i + 1];
+                            var recordLabels = recordRow.FindElements(By.TagName("label"));
+
+                            foreach(IWebElement label in recordLabels)
+                            {
+                                if (label.GetAttribute("id") != null)
+                                {
+                                    var headerLabelId = label.GetAttribute("id").ToString();
+
+                                    var frontLength = (43 + (subgridName.Length) + 15);
+                                    var rearLength = 37;
+                                    // Trim calculated frontLength
+                                    var headerLabel = headerLabelId.Remove(0, frontLength);
+
+                                    // Trim calculated rearLength
+                                    headerLabel = headerLabel.Remove((headerLabel.Length - rearLength), rearLength);
+                                    columns.Add(headerLabel);
+
+                                    var rowText = label.Text;
+                                    cellValues.Add(rowText);
+                                }
+                            }
+
+
+                            for (int i = 0; i < columns.Count; i++)
+                            {
+                                item[columns[i]] = cellValues[i];
+                            }
+
+                            subGridRows.Add(item);
                         }
 
-                        subGridRows.Add(item);
                     }
+                    else
+                        throw new NotFoundException($"Unable to locate record list for subgrid {subgridName}");
+                  
+                }
+                // Attempt to locate the editable grid list
+                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList))
+                {
+                    //Find the columns
+                    var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersEditable]));
+
+                    foreach (IWebElement headerCell in headerCells)
+                    {
+                        var headerTitle = headerCell.GetAttribute("title");
+                        columns.Add(headerTitle);
+                    }
+
+                    //Find the rows
+                    var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridDataRowsEditable]));
+
+                    //Process each row
+                    foreach (IWebElement row in rows)
+                    {
+                        var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
+
+                        if (cells.Count > 0)
+                        {
+                            foreach (IWebElement thisCell in cells)
+                                cellValues.Add(thisCell.Text);
+
+                            for (int i = 0; i < columns.Count; i++)
+                            {
+                                //The first cell is always a checkbox for the record.  Ignore the checkbox.
+                                if (i == 0)
+                                {
+                                    // Do Nothing
+                                }
+                                else
+                                {
+                                    item[columns[i]] = cellValues[i];
+                                }
+                            }
+
+                            subGridRows.Add(item);
+                        }
+                    }
+
+                    return subGridRows;
+
+                }
+                // Special 'Related' high density grid control for entity forms
+                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHighDensityList].Replace("[NAME]", subgridName)), out subGridRecordList))
+                {
+                    //Find the columns
+                    var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersHighDensity]));
+
+                    foreach (IWebElement headerCell in headerCells)
+                    {
+                        var headerTitle = headerCell.GetAttribute("data-id");
+                        columns.Add(headerTitle);
+                    }
+
+                    //Find the rows
+                    var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRowsHighDensity]));
+
+                    //Process each row
+                    foreach (IWebElement row in rows)
+                    {
+                        //Get the entityId and entity Type
+                        if (row.GetAttribute("data-lp-id") != null)
+                        {
+                            var rowAttributes = row.GetAttribute("data-lp-id").Split('|');
+                            item.Id = Guid.Parse(rowAttributes[3]);
+                            item.EntityName = rowAttributes[4];
+                        }
+
+                        var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
+
+                        if (cells.Count > 0)
+                        {
+                            foreach (IWebElement thisCell in cells)
+                                cellValues.Add(thisCell.Text);
+
+                            for (int i = 0; i < columns.Count; i++)
+                            {
+                                //The first cell is always a checkbox for the record.  Ignore the checkbox.
+                                if (i == 0)
+                                {
+                                    // Do Nothing
+                                }
+                                else
+                                {
+                                    item[columns[i]] = cellValues[i];
+                                }
+
+                            }
+
+                            subGridRows.Add(item);
+                        }
+                    }
+
+                    return subGridRows;
                 }
 
+                // Return rows object
                 return subGridRows;
             });
         }

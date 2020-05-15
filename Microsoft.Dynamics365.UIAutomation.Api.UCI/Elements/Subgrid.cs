@@ -16,19 +16,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client = client;
         }
 
-        public void AddSubgridItem(string subgridName)
-        {
-            _client.ClickSubgridAddButton(subgridName);
-        }
-
         /// <summary>
         /// Clicks a button in the subgrid menu
         /// </summary>
         /// <param name="name">Name of the button to click</param>
         /// <param name="subName">Name of the submenu button to click</param>
-        public void ClickCommand(string subGridName, string name, string subName = null)
+        public void ClickCommand(string subGridName, string name, string subName = null, string subSecondName = null)
         {
-            _client.ClickSubGridCommand(subGridName, name, subName);
+            _client.ClickSubGridCommand(subGridName, name, subName, subSecondName);
         }
 
         /// <summary>

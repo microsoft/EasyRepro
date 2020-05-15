@@ -181,7 +181,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Login_UserId", "//input[@type='email']"},
             { "Login_Password", "//input[@type='password']"},
             { "Login_SignIn", "id(\"cred_sign_in_button\")"},
-            { "Login_CrmMainPage", "//*[contains(@id,'crmTopBar')or contains(@data-id,'topBar')]"},
+            { "Login_CrmMainPage", "//*[contains(@id,'crmTopBar') or contains(@data-id,'topBar')]"},
             { "Login_CrmUCIMainPage", "//*[contains(@data-id,'topBar')]"},
             { "Login_StaySignedIn", "//input[@id=\"idSIButton9\"]"},
             { "Login_OneTimeCode", "//input[@name='otc']"},

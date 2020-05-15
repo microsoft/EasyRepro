@@ -369,7 +369,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.OpenSubGridRecord(subgridName, index);
         }
 
-        [Obsolete("AddSubgridItem(string subgridName) is deprecated, please use the equivalent Entity.SubGrid.<Method> instead.")]
+        [Obsolete("AddSubgridItem(string subgridName) is deprecated, please use the Entity.SubGrid.ClickCommand(string buttonName) instead.")]
         public void AddSubgridItem(string subgridName)
         {
             _client.ClickSubgridAddButton(subgridName);
