@@ -1353,7 +1353,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        internal BrowserCommandResult<bool> SwitchView(string viewName, int thinkTime = Constants.DefaultThinkTime)
+        internal BrowserCommandResult<bool> SwitchView(string viewName, string subViewName = null, int thinkTime = Constants.DefaultThinkTime)
         {
             ThinkTime(thinkTime);
 
@@ -1367,6 +1367,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new InvalidOperationException($"No view with the name '{key}' exists.");
 
                 view.Click(true);
+
+                if (subViewName != null)
+                {
+                    // TBD
+                }
+
+                driver.WaitForTransaction();
+
                 return true;
             });
         }
