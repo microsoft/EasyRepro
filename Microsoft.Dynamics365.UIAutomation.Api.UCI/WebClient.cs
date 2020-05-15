@@ -81,6 +81,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             successCallback = successCallback ?? (
                                   _ =>
                                   {
+                                      driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage]), new TimeSpan(0,0,2));
                                       bool isUCI = driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage]));
                                       if (isUCI)
                                           driver.WaitForTransaction();
