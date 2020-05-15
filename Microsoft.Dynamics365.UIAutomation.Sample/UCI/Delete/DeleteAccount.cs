@@ -35,7 +35,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Grid.OpenRecord(0);
 
                 //Click the Delete button from the command bar
-                xrmApp.CommandBar.ClickCommand("Delete", "", false); //Set to true if command is a part of the More Commands menu
+                xrmApp.CommandBar.ClickCommand("Delete");
 
                 // Need to be careful here as setting this value to true can be a destructive practice if we are not creating a record first.
                 xrmApp.Dialogs.ConfirmationDialog(false); //Click OK on the Delete confirmation dialog (false to cancel)
