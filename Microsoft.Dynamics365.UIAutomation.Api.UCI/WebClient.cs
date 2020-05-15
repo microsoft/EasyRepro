@@ -5062,6 +5062,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //Select the dashboard
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dashboard.DashboardItemUCI].Replace("[NAME]", dashboardName)));
 
+                // Wait for Dashboard to load
+                driver.WaitForTransaction();
+
                 return true;
             });
         }
