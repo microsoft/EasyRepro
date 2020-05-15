@@ -31,10 +31,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenAndClickPopoutMenu(Reference.Timeline.Popout, Reference.Timeline.PopoutAppointment, 4000);
             _client.ThinkTime(4000);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentSubject], subject);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentLocation], location);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentDescription], description);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentDuration], duration);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentSubject], subject, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentLocation], location, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentDescription], description, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentDuration], duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -131,10 +131,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenAndClickPopoutMenu(Reference.Timeline.Popout, Reference.Timeline.PopoutPhoneCall, 4000);
             _client.ThinkTime(4000);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallSubject], subject);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallNumber], phoneNumber);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallDescription], description);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallDuration], duration);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallSubject], subject, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallNumber], phoneNumber, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallDescription], description, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallDuration], duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -155,9 +155,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenAndClickPopoutMenu(Reference.Timeline.Popout, Reference.Timeline.PopoutTask, 4000);
             _client.ThinkTime(4000);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.TaskSubject], subject);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.TaskDescription], description);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.TaskDuration], duration);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.TaskSubject], subject, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.TaskDescription], description, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.TaskDuration], duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
