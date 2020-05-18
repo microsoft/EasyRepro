@@ -38,7 +38,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 xrmBrowser.ThinkTime(2000);
 
                 xrmBrowser.Entity.SetValue("title", "Test API Case");
-                xrmBrowser.Entity.SelectLookup("customerid", 0);
+
+                var customerLookup = new LookupItem { Name = "customerid", Index = 0 };
+                xrmBrowser.Entity.SelectLookup(customerLookup);
 
                 xrmBrowser.CommandBar.ClickCommand("Save & Close");
                 xrmBrowser.ThinkTime(10000);
