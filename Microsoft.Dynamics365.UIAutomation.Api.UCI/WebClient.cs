@@ -81,14 +81,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             successCallback = successCallback ?? (
                                   _ =>
                                   {
-                                      driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage]), new TimeSpan(0,0,5));
                                       bool isUCI = driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage]));
                                       if (isUCI)
                                           driver.WaitForTransaction();
                                   });
 
             var xpathToMainPage = By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]);
-            var element = driver.WaitUntilVisible(xpathToMainPage, timeout, successCallback, failureCallback);
+            var element = driver.WaitUntilAvailable(xpathToMainPage, timeout, successCallback, failureCallback);
             return element != null;
         }
 
