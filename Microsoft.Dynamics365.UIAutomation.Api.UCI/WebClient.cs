@@ -2959,28 +2959,30 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     // Initialize the quick create form context
                     // If this is not done -- element input will go to the main form due to new flyout design
                     var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name])));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
                 else if (formContextType == FormContextType.Entity)
                 {
                     // Initialize the entity form context
                     var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name])));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
                 else if (formContextType == FormContextType.BusinessProcessFlow)
                 {
                     // Initialize the Business Process Flow context
                     var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name])));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
                 else if (formContextType == FormContextType.Header)
                 {
                     // Initialize the Header context
                     var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderContext]));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name])));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
 
-                string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name]);
+
+                
+                string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", option.Name);
                 // If there is already some pre-selected items in the div then we must determine if it
                 // actually exists and simulate a set focus event on that div so that the input textbox
                 // becomes visible.
@@ -2990,27 +2992,45 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     listItems.First().SendKeys("");
                 }
 
-                fieldContainer.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch].Replace("[NAME]", Elements.ElementId[option.Name])));
+                fieldContainer.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch].Replace("[NAME]", option.Name)));
                 foreach (var optionValue in option.Values)
                 {
-                    xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.FlyoutList].Replace("[NAME]", Elements.ElementId[option.Name]), optionValue);
+                    xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.FlyoutList].Replace("[NAME]", option.Name), optionValue);
                     var flyout = fieldContainer.FindElements(By.XPath(xpath));
                     if (flyout.Any())
                     {
                         flyout.First().Click(true);
                     }
+                    else
+                    {
+                        var input = fieldContainer.FindElement(By.TagName("input"));
+                        input.SendKeys(optionValue);
+
+                        var searchFlyout = fieldContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.Flyout].Replace("[NAME]", option.Name)));
+                        ThinkTime(2000);
+                        var searchResultList = searchFlyout.FindElements(By.TagName("li"));
+
+                        // Is the item in search results?
+                        if (searchResultList.Any(x => x.GetAttribute("aria-label").Contains(optionValue, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            searchResultList.FirstOrDefault(x => x.GetAttribute("aria-label").Contains(optionValue, StringComparison.OrdinalIgnoreCase)).Click(true);
+                            driver.WaitForTransaction();
+                        }
+                    }    
                 }
 
                 // Click on the div containing textbox so that the floyout collapses or else the flyout
                 // will interfere in finding the next multiselect control which by chance will be lying
                 // behind the flyout control.
                 //driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", Elements.ElementId[option.Name])));
-                xpath = AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", Elements.ElementId[option.Name]);
+                xpath = AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name);
                 var divElements = fieldContainer.FindElements(By.XPath(xpath));
                 if (divElements.Any())
                 {
                     divElements.First().Click(true);
                 }
+
+                fieldContainer.SendKeys(Keys.Escape);
 
                 return true;
             });

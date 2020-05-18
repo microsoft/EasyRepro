@@ -202,6 +202,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SelectedRecord = "MultiSelect_SelectedRecord";
             public static string SelectedRecordButton = "MultiSelect_SelectedRecord_Button";
             public static string SelectedRecordLabel = "MultiSelect_SelectedRecord_Label";
+            public static string Flyout = "MultiSelect_Flyout";
             public static string FlyoutList = "MultiSelect_FlyoutList";
             public static string ExpandCollapseButton = "MultiSelect_ExpandCollapseButton";
         }
@@ -492,12 +493,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Timeline_SaveAndClose", "//button[contains(@data-id,\"[NAME].SaveAndClose\")]" },
 
             //MultiSelect
-            { "MultiSelect_DivContainer",     ".//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]/div/div/div" },
+            { "MultiSelect_DivContainer",     ".//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]" },
             { "MultiSelect_InputSearch",     ".//div[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_InputSearch\")]" },
             { "MultiSelect_SelectedRecord",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li" },
             { "MultiSelect_SelectedRecord_Button",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li[descendant::label[text()=\"{0}\"]]/descendant::button" },
             { "MultiSelect_SelectedRecord_Label",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]/descendant::label" },
-            { "MultiSelect_FlyoutList",      ".//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//li[descendant::label[text()=\"{0}\"]]" },
+            { "MultiSelect_Flyout",      "//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//ul" },
+            { "MultiSelect_FlyoutList",      "//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//li[descendant::label[contains(text(), \"{0}\")]]" },
             { "MultiSelect_ExpandCollapseButton", ".//button[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse\")]/descendant::label[not(text()=\"+0\")]" },
 
             //Dashboard

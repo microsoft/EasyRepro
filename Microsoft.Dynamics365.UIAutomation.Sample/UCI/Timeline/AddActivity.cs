@@ -60,18 +60,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
                 xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
                 {
-                    Name = Reference.Timeline.EmailBcc,
+                    Name = Elements.ElementId[Reference.Timeline.EmailBcc],
                     Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
                 });
                 xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
                 {
-                    Name = Reference.Timeline.EmailCC,
+                    Name = Elements.ElementId[Reference.Timeline.EmailCC],
                     Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
                 });
                 // This fails as it already has a value.
                 //xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
                 //{
-                //    Name = Reference.Timeline.EmailTo,
+                //    Name = Elements.ElementId[Reference.Timeline.EmailTo],
                 //    Values = new string[] { "Test Contact", "Jay Zee3" },
                 //});
 
