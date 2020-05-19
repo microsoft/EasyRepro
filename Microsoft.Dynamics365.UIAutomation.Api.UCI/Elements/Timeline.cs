@@ -75,9 +75,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Opens the multiselect control and adds the contacts to the To, CC or BCC line.
         /// </summary>
         /// <param name="toOptions">Object of type MultiValueOptionSet containing name of the Field and the values to be set</param>
-        public void AddEmailContacts(MultiValueOptionSet toOptions)
+        /// <param name="removeExistingValues">Remove any existing values in the To, CC, or BCC lines, if present</param>         
+        public void AddEmailContacts(MultiValueOptionSet toOptions, bool removeExistingValues = false)
         {
-           _client.SetValue(toOptions);
+           _client.SetValue(toOptions,FormContextType.Entity, removeExistingValues);
         }
 
         /// <summary>

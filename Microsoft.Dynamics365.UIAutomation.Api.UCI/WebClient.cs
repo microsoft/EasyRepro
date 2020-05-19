@@ -2858,10 +2858,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     RemoveMultiOptions(option, formContextType);
                 }
-                else
-                {
-                    AddMultiOptions(option, formContextType);
-                }
+
+                
+                AddMultiOptions(option, formContextType);
 
                 return true;
             });
@@ -2883,60 +2882,54 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     // Initialize the quick create form context
                     // If this is not done -- element input will go to the main form due to new flyout design
                     var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name])));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
                 else if (formContextType == FormContextType.Entity)
                 {
                     // Initialize the entity form context
                     var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name])));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
                 else if (formContextType == FormContextType.BusinessProcessFlow)
                 {
                     // Initialize the Business Process Flow context
                     var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name])));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
                 else if (formContextType == FormContextType.Header)
                 {
                     // Initialize the Header context
                     var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderContext]));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name])));
-                }
-
-                // If there is already some pre-selected items in the div then we must determine if it
-                // actually exists and simulate a set focus event on that div so that the input textbox
-                // becomes visible.
-                string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name]);
-                var listItems = fieldContainer.FindElements(By.XPath(xpath));
-                if (listItems.Any())
-                {
-                    listItems.First().SendKeys("");
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
 
                 // If there are large number of options selected then a small expand collapse 
                 // button needs to be clicked to expose all the list elements.
-                xpath = AppElements.Xpath[AppReference.MultiSelect.ExpandCollapseButton].Replace("[NAME]", Elements.ElementId[option.Name]);
+                var xpath = AppElements.Xpath[AppReference.MultiSelect.ExpandCollapseButton].Replace("[NAME]", option.Name);
                 var expandCollapseButtons = fieldContainer.FindElements(By.XPath(xpath));
                 if (expandCollapseButtons.Any())
                 {
                     expandCollapseButtons.First().Click(true);
                 }
-
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch].Replace("[NAME]", Elements.ElementId[option.Name])));
-                foreach (var optionValue in option.Values)
+                else
                 {
-                    xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.SelectedRecordButton].Replace("[NAME]", Elements.ElementId[option.Name]), optionValue);
-                    var listItemObjects = fieldContainer.FindElements(By.XPath(xpath));
-                    var loopCounts = listItemObjects.Any() ? listItemObjects.Count : 0;
+                    // Hover the field to expose the Select Record buttons
+                    fieldContainer.Hover(driver, true);
+                }
+                    
 
-                    for (int i = 0; i < loopCounts; i++)
-                    {
-                        // With every click of the button, the underlying DOM changes and the
-                        // entire collection becomes stale, hence we only click the first occurance of
-                        // the button and loop back to again find the elements and anyother occurance
-                        fieldContainer.FindElements(By.XPath(xpath)).First().Click(true);
-                    }
+                xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.SelectedRecordButton].Replace("[NAME]", option.Name));
+                var listItemObjects = fieldContainer.FindElements(By.XPath(xpath));
+                var loopCounts = listItemObjects.Any() ? listItemObjects.Count : 0;
+
+                for (int i = 0; i < loopCounts; i++)
+                {
+                    // With every click of the button, the underlying DOM changes and the
+                    // entire collection becomes stale, hence we only click the first occurance of
+                    // the button and loop back to again find the elements and anyother occurance
+                    listItemObjects[0].FindElement(By.TagName("button")).Click(true);
+                    driver.WaitForTransaction();
+                    listItemObjects = fieldContainer.FindElements(By.XPath(xpath));
                 }
 
                 return true;
@@ -3005,11 +2998,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         var input = fieldContainer.FindElement(By.TagName("input"));
                         input.SendKeys(optionValue);
-
-                        var searchFlyout = fieldContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.Flyout].Replace("[NAME]", option.Name)));
                         ThinkTime(2000);
+                        var searchFlyout = fieldContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.Flyout].Replace("[NAME]", option.Name)));
+                        ThinkTime(2000);  
                         var searchResultList = searchFlyout.FindElements(By.TagName("li"));
 
+                        
                         // Is the item in search results?
                         if (searchResultList.Any(x => x.GetAttribute("aria-label").Contains(optionValue, StringComparison.OrdinalIgnoreCase)))
                         {
@@ -3030,7 +3024,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     divElements.First().Click(true);
                 }
 
-                fieldContainer.SendKeys(Keys.Escape);
+                fieldContainer.Click(true);
 
                 return true;
             });

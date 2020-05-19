@@ -496,7 +496,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "MultiSelect_DivContainer",     ".//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]" },
             { "MultiSelect_InputSearch",     ".//div[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_InputSearch\")]" },
             { "MultiSelect_SelectedRecord",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li" },
-            { "MultiSelect_SelectedRecord_Button",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li[descendant::label[text()=\"{0}\"]]/descendant::button" },
+            { "MultiSelect_SelectedRecord_Button",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]\") and contains(@data-id, 'SelectedRecordList')]//li" },
             { "MultiSelect_SelectedRecord_Label",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]/descendant::label" },
             { "MultiSelect_Flyout",      "//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//ul" },
             { "MultiSelect_FlyoutList",      "//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//li[descendant::label[contains(text(), \"{0}\")]]" },
