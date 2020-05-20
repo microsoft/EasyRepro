@@ -2756,6 +2756,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 parent.SendKeys(Keys.Escape); // Close Header control
             }
 
+            TryCloseHeaderFlyout(driver);
+
             return true;
         }
 
@@ -3868,6 +3870,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 SetValue(field, value, FormContextType.Header);
 
+                TryCloseHeaderFlyout(driver);
                 return true;
             });
         }
@@ -3885,6 +3888,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         TryRemoveLookupValue(driver, fieldContainer, control, removeAll, isHeader);
                         TrySetValue(driver, fieldContainer, control);
 
+                        TryCloseHeaderFlyout(driver);
                         return true;
                     }));
         }
@@ -3903,6 +3907,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         TryToSetValue(driver, container, controls);
 
+                        TryCloseHeaderFlyout(driver);
                         return true;
                     }));
         }
@@ -3917,6 +3922,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         TrySetValue(container, control);
 
+                        TryCloseHeaderFlyout(driver);
                         return true;
                     }));
         }
@@ -3929,6 +3935,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 SetValue(control, FormContextType.Header);
 
+                TryCloseHeaderFlyout(driver);
                 return true;
             });
         }
@@ -3941,6 +3948,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 SetValue(control, FormContextType.Header);
 
+                TryCloseHeaderFlyout(driver);
                 return true;
             });
         }
@@ -4170,6 +4178,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             bool expanded = bool.Parse(headerFlyoutButton.GetAttribute("aria-expanded"));
 
             if (!expanded)
+                headerFlyoutButton.Click(true);
+        }
+
+        internal void TryCloseHeaderFlyout(IWebDriver driver)
+        {
+            bool hasHeader = driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.Header.Container]));
+            if (!hasHeader)
+                throw new NotFoundException("Unable to find header on the form");
+
+            var xPath = By.XPath(AppElements.Xpath[AppReference.Entity.Header.FlyoutButton]);
+            var headerFlyoutButton = driver.FindElement(xPath);
+            bool expanded = bool.Parse(headerFlyoutButton.GetAttribute("aria-expanded"));
+
+            if (expanded)
                 headerFlyoutButton.Click(true);
         }
 
