@@ -132,6 +132,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SubGridHeadersHighDensity = "Entity_SubGridHeadersHighDensity";
             public static string SubGridHeadersEditable = "Entity_SubGridHeadersEditable";
             public static string SubGridRecordCheckbox = "Entity_SubGridRecordCheckbox";
+            public static string SubGridSearchBox = "Entity_SubGridSearchBox";
             public static string SubGridAddButton = "Entity_SubGridAddButton";
             public static string FieldLookupButton = "Entity_FieldLookupButton";
             public static string SearchButtonIcon = "Entity_SearchButtonIcon";
@@ -428,6 +429,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SubGridHeadersHighDensity",".//div[contains(@class, 'wj-colheaders') and contains(@wj-part, 'chcells')]/div/div"},
             { "Entity_SubGridHeadersEditable",".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Header')]/div"},
             { "Entity_SubGridRecordCheckbox","//div[contains(@data-id,'cell-[INDEX]-1') and contains(@data-lp-id,'[NAME]')]"},
+            { "Entity_SubGridSearchBox",".//div[contains(@data-id, 'data-set-quickFind-container')]"},
             { "Entity_SubGridAddButton", "//button[contains(@data-id,'[NAME].AddNewStandard')]/parent::li/parent::ul[contains(@data-lp-id, 'commandbar-SubGridStandard:[NAME]')]" },
             { "Entity_FieldLookupButton","//button[contains(@data-id,'[NAME]_search')]" },
             { "Entity_SearchButtonIcon", "//span[contains(@data-id,'microsoftIcon_searchButton')]" },

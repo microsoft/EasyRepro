@@ -56,6 +56,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Performs a Search on the subgrid
+        /// </summary>
+        /// <param name="searchCriteria">Search term</param>
+        /// <param name="clearByDefault">Determines whether to clear the search field before supplying the search term</param>
+        public void Search(string subGridName, string searchCriteria, bool clearField = false)
+        {
+            _client.SearchSubGrid(subGridName, searchCriteria, clearField);
+        }
+
+        /// <summary>
         /// Switches the View on a SubGrid
         /// </summary>
         /// <param name="subgridName">schemaName of the SubGrid control</param>

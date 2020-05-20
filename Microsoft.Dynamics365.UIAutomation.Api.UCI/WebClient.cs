@@ -2083,6 +2083,41 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> SearchSubGrid(string subGridName, string searchCriteria, bool clearByDefault = false)
+        {
+            return this.Execute(GetOptions($"Search SubGrid {subGridName}"), driver =>
+            {
+                IWebElement subGridSearchField = null;
+                // Find the SubGrid
+                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subGridName)));
+                if (subGrid != null)
+                {
+                    var foundSearchField = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridSearchBox]), out subGridSearchField);
+                    if (foundSearchField)
+                    {
+                        var inputElement = subGridSearchField.FindElement(By.TagName("input"));
+
+                        if (clearByDefault)
+                        {
+                            inputElement.Clear();
+                        }
+
+                        inputElement.SendKeys(searchCriteria);
+
+                        var startSearch = subGridSearchField.FindElement(By.TagName("button"));
+                        startSearch.Click(true);
+
+                        driver.WaitForTransaction();
+                    }
+                    else
+                        throw new NotFoundException($"Unable to locate the search box for subgrid {subGridName}. Please validate that view search is enabled for this subgrid");
+                }
+                else
+                    throw new NotFoundException($"Unable to locate subgrid with name {subGridName}");
+
+                return true;
+            });
+        }
 
         #endregion
 
