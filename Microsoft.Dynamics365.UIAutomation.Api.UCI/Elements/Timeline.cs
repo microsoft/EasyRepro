@@ -132,10 +132,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenAndClickPopoutMenu(Reference.Timeline.Popout, Reference.Timeline.PopoutPhoneCall, 4000);
             _client.ThinkTime(4000);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallSubject], subject);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallNumber], phoneNumber);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallDescription], description);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallDuration], duration);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallSubject], subject, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallNumber], phoneNumber, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallDescription], description, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallDuration], duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
