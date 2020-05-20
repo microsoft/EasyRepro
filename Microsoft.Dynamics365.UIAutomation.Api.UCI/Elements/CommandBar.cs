@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
@@ -19,10 +20,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="name">Name of button to click</param>
         /// <param name="subname">Name of button on submenu to click</param>
-        public void ClickCommand(string name, string subname = "", bool moreCommands = false)
+        /// <param name="subSecondName">Name of button on submenu (3rd level) to click</param>
+        public void ClickCommand(string name, string subname = null, string subSecondName = null)
         {
-            _client.ClickCommand(name, subname, moreCommands);
+            _client.ClickCommand(name, subname, subSecondName);
         }
+
 
 
         /// <summary>

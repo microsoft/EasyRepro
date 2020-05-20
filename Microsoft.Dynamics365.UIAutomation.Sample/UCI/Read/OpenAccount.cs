@@ -113,7 +113,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
-        [TestCategory("Fail - Bug")]
         public void UCITestOpenSubGridRecord()
         {
             var client = new WebClient(TestSettings.Options);
@@ -128,10 +127,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.OpenRecord(0);
 
-                // This experience is broken if one of the following is true:
-                // 1. The subgrid label is hidden: Issue #818
-                // 2. If the subgrid shows as a card rather than a table: Issue #843
-                xrmApp.Entity.GetSubGridItems("CONTACTS");
+                // Reference schema name of the SubGrid
+                xrmApp.Entity.SubGrid.GetSubGridItems("Contacts");
 
                 xrmApp.ThinkTime(3000);
             }

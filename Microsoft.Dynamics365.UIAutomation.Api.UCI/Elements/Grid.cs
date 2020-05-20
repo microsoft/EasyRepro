@@ -18,9 +18,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Switches the view to the view supplied
         /// </summary>
         /// <param name="viewName">Name of the view to select</param>
-        public void SwitchView(string viewName)
+        public void SwitchView(string viewName, string subViewName = null)
         {
-            _client.SwitchView(viewName);
+            _client.SwitchView(viewName, subViewName);
         }
 
         /// <summary>
