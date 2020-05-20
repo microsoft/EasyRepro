@@ -107,7 +107,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Grid_FirstRow", "id(\"gridBodyTable\")/tbody/tr[1]"},
 
             //Entity
-            { "Entity_Form"       , "id(\"tablist\")"},
+            { "Entity_Form"       , "//*[contains(@id, \"tablist\")]"},
             { "Entity_Close"       , "id(\"closeButton\")"},
             { "Entity_Save"       , "id(\"savefooter_statuscontrol\")"},
             { "Entity_FormSelector", "//*[@data-id=\"form-selector\"]" },
