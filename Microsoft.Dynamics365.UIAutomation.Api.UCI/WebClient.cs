@@ -2083,6 +2083,37 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> ClickSubgridSelectAll(string subGridName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Click Select All Button on subgrid: {subGridName}"), driver =>
+            {
+
+                // Find the SubGrid
+                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subGridName)));
+
+                if (subGrid != null)
+                {
+                    var subGridButtons = subGrid.FindElements(By.TagName("button"));
+
+                    //Is the button in the ribbon?
+                    if (subGridButtons.Any(x => x.GetAttribute("title").Equals("Select All", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        subGridButtons.FirstOrDefault(x => x.GetAttribute("title").Equals("Select All", StringComparison.OrdinalIgnoreCase)).Click(true);
+                        driver.WaitForTransaction();
+                    }
+                    else
+                        throw new NotFoundException("Select All button not found. Please make sure the grid is displayed. Card layout is not supported for Select All.");
+                }
+                else
+                    throw new NotFoundException($"Unable to locate subgrid with name {subGridName}");
+
+
+                return true;
+            });
+        }
+
         internal BrowserCommandResult<bool> SearchSubGrid(string subGridName, string searchCriteria, bool clearByDefault = false)
         {
             return this.Execute(GetOptions($"Search SubGrid {subGridName}"), driver =>

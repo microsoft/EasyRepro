@@ -27,6 +27,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Select all records in a subgrid
+        /// </summary>
+        /// <param name="subGridName">Schema name of the subgrid to select all</param>
+        /// <param name="thinkTime">Additional time to wait, if required</param>
+        public void ClickSubgridSelectAll(string subGridName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            _client.ClickSubgridSelectAll(subGridName, thinkTime);
+        }
+
+        /// <summary>
         /// Retrieve the items from a subgrid
         /// </summary>
         /// <param name="subgridName">schemaName of the SubGrid control to retrieve items from</param>
