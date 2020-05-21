@@ -1219,7 +1219,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else
                         throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
 
-                    if (!string.IsNullOrEmpty(subname))
+                    if (!string.IsNullOrEmpty(subSecondName))
                     {
                         var subSecondmenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.MoreCommandsMenu]));
 
