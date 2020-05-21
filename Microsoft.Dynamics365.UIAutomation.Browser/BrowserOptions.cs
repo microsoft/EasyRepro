@@ -17,6 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public BrowserOptions()
         {
             this.DriversPath = Path.Combine(Directory.GetCurrentDirectory()); //, @"Drivers\");
+            this.DownloadsPath = null;
             this.BrowserType = BrowserType.IE;
             this.PageLoadTimeout = new TimeSpan(0, 3, 0);
             this.CommandTimeout = new TimeSpan(0, 10, 0);
@@ -53,6 +54,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public BrowserType BrowserType { get; set; }
         public BrowserCredentials Credentials { get; set; }
         public string DriversPath { get; set; }
+        public string DownloadsPath { get; set; }
         public bool PrivateMode { get; set; }
         public bool CleanSession { get; set; }
         public TimeSpan PageLoadTimeout { get; set; }
@@ -199,9 +201,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 options.AddArgument("test-type=browser");
             }
 
+            if (!string.IsNullOrEmpty(DownloadsPath))
+            {
+                options.AddUserProfilePreference("download.default_directory", DownloadsPath);
+            }
+
             return options;
         }
-        
+
         public virtual InternetExplorerOptions ToInternetExplorer()
         {
 
@@ -226,18 +233,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 IgnoreZoomLevel = true,
                 EnablePersistentHover = true,
                 BrowserCommandLineArguments = this.PrivateMode ? "-private" : ""
-               
+
             };
-            
+
             return options;
         }
 
-        public  virtual FirefoxOptions ToFireFox()
+        public virtual FirefoxOptions ToFireFox()
         {
             var options = new FirefoxOptions()
             {
                 UseLegacyImplementation = false
             };
+
+            if (!string.IsNullOrEmpty(DownloadsPath))
+            {
+                options.SetPreference("browser.download.folderList", 2);
+                options.SetPreference("browser.download.dir", DownloadsPath);
+                options.SetPreference("browser.helperApps.neverAsk.saveToDisk", "text/csv,application/java-archive, application/x-msexcel,application/excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml,application/vnd.microsoft.portable-executable");
+            }
 
             return options;
         }
