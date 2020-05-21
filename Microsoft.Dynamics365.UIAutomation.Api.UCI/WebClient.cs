@@ -1219,7 +1219,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else
                         throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
 
-                    if (!string.IsNullOrEmpty(subname))
+                    if (!string.IsNullOrEmpty(subSecondName))
                     {
                         var subSecondmenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.MoreCommandsMenu]));
 
@@ -1244,9 +1244,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Returns the values of CommandBar objects
         /// </summary>
-        /// <param name="moreCommands">The moreCommands</param>
+        /// <param name="includeMoreCommandsValues">Whether or not to check the more commands overflow list</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        /// <example>xrmBrowser.Related.ClickCommand("ADD NEW CASE");</example>
+        /// <example>xrmApp.CommandBar.GetCommandValues();</example>
         internal BrowserCommandResult<List<string>> GetCommandValues(bool includeMoreCommandsValues = false, int thinkTime = Constants.DefaultThinkTime)
         {
             ThinkTime(thinkTime);
@@ -1926,7 +1926,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (subGrid == null)
                     throw new NotFoundException($"Unable to locate subgrid contents for {subGridName} subgrid.");
 
-                // Check if ReadOnlyGrid was found
+                // Check if grid commandBar was found
                 if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandBar].Replace("[NAME]", subGridName)), out subGridCommandBar))
                 {
                     // Locate subGrid command list
@@ -1999,87 +1999,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                 }
 
-                return true;
-
-                /*
-                // Locate Related Command Bar Button List
-                var relatedCommandBarButtonList = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButtonList]));
-
-                // Validate list has provided command bar button
-                if (relatedCommandBarButtonList.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
-                {
-                    relatedCommandBarButtonList.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
-
-                    driver.WaitForTransaction();
-
-                    if (subName != null)
-                    {
-                        //Look for Overflow flyout
-                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer])))
-                        {
-                            var overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
-
-                            if (!overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
-                                throw new NotFoundException($"{subName} button not found");
-
-                            overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
-
-                            driver.WaitForTransaction();
-                        }
-                    }
-
-                    return true;
-                }
-                else
-                {
-                    // Button was not found, check if we should be looking under More Commands (OverflowButton)
-                    var moreCommands = relatedCommandBarButtonList.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton]));
-
-                    if (moreCommands)
-                    {
-                        var overFlowButton = relatedCommandBarButtonList.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton]));
-                        overFlowButton.Click(true);
-
-                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]))) //Look for Overflow
-                        {
-                            var overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
-
-                            if (overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
-                            {
-                                overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
-
-                                driver.WaitForTransaction();
-
-                                if (subName != null)
-                                {
-                                    overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
-
-                                    if (!overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
-                                        throw new NotFoundException($"{subName} button not found");
-
-                                    overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
-
-                                    driver.WaitForTransaction();
-                                }
-
-                                return true;
-                            }
-                        }
-                        else
-                        {
-                            throw new NotFoundException($"{name} button not found in the More Commands container. Button names are case sensitive. Please check for proper casing of button name.");
-                        }
-
-                    }
-                    else
-                    {
-                        throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
-                    }
-                }
-
-                return true;
-                */
-
+                return true;                                            
             });
         }
 
