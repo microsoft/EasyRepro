@@ -2269,11 +2269,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 SetInputValue(driver, input, value);
 
-                // Needed to transfer focus out of special fields (email or phone)
-                var label = fieldContainer.ClickIfVisible(By.TagName("label"));
-                if (label == null)
-                    fieldContainer.SendKeys(Keys.Escape);
-
                 return true;
             });
         }
