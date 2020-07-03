@@ -152,6 +152,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EntityBooleanFieldList = "Entity_BooleanFieldList";
             public static string EntityBooleanFieldFlipSwitchLink = "Entity_BooleanFieldFlipSwitchLink";
             public static string EntityBooleanFieldFlipSwitchContainer = "Entity_BooleanFieldFlipSwitchContainer";
+            public static string EntityBooleanFieldToggle = "Entity_BooleanFieldToggle";
             public static string EntityOptionsetStatusCombo = "Entity_OptionsetStatusCombo";
             public static string EntityOptionsetStatusComboButton = "Entity_OptionsetStatusComboButton";
             public static string EntityOptionsetStatusComboList = "Entity_OptionsetStatusComboList";
@@ -449,6 +450,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_BooleanFieldButton", "//div[contains(@data-id, '[NAME].fieldControl_container')]"},
             { "Entity_BooleanFieldButtonTrue", ".//label[contains(@class, 'first-child')]"},
             { "Entity_BooleanFieldButtonFalse", ".//label[contains(@class, 'last-child')]"},
+            { "Entity_BooleanFieldToggle", "//div[contains(@data-id, '[NAME].fieldControl-toggle-container')]"},
             { "Entity_OptionSetFieldContainer", ".//div[@data-id='[NAME].fieldControl-option-set-container']" },
             { "Entity_OptionsetStatusCombo", "//div[contains(@data-id, '[NAME].fieldControl-pickliststatus-comboBox')]"},
             { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},

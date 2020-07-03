@@ -2588,6 +2588,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var hasRadio = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioContainer].Replace("[NAME]", option.Name)));
                 var hasCheckbox = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
                 var hasList = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldList].Replace("[NAME]", option.Name)));
+                var hasToggle = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldToggle].Replace("[NAME]", option.Name)));
                 var hasFlipSwitch = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldFlipSwitchLink].Replace("[NAME]", option.Name)));
 
                 // Need to validate whether control is FlipSwitch or Button
@@ -2595,6 +2596,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var flipSwitch = hasFlipSwitch ? fieldContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldFlipSwitchContainer].Replace("[NAME]", option.Name)), out flipSwitchContainer) : false;
                 var hasButton = flipSwitchContainer != null ? flipSwitchContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldButtonTrue])) : false;
                 hasFlipSwitch = hasButton ? false : hasFlipSwitch; //flipSwitch and button have the same container reference, so if it has a button it is not a flipSwitch
+                hasFlipSwitch = hasToggle ? false : hasFlipSwitch; //flipSwitch and Toggle have the same container reference, so if it has a Toggle it is not a flipSwitch
 
                 if (hasRadio)
                 {
@@ -2634,6 +2636,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         {
                             driver.ClickWhenAvailable(By.Id(unselectedOption.GetAttribute("id")));
                         }
+                    }
+                }
+                else if (hasToggle)
+                {
+                    var toggle = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldToggle].Replace("[NAME]", option.Name)));
+                    var link = toggle.FindElement(By.TagName("button"));
+                    var value = bool.Parse(link.GetAttribute("aria-checked"));
+
+                    if (value != option.Value)
+                    {
+                        link.Click();
                     }
                 }
                 else if (hasFlipSwitch)
