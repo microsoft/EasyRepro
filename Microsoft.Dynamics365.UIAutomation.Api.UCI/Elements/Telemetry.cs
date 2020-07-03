@@ -81,7 +81,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             ShowHidePerformanceWidget();
 
             Dictionary<string, string> metadata = GetMetadataMarkers();
-            Dictionary<string, double> markers = GetPerformanceMarkers(metadata["PageName"]);
+            Dictionary<string, double> markers = GetPerformanceMarkers(GetRecentPageName());
 
             ShowHidePerformanceWidget();
 
@@ -123,6 +123,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             telemetry = null;
         }
 
+        internal string GetRecentPageName()
+        {
+            return _client.Browser.Driver.FindElement(By.XPath("//div[@data-id='performance-widget']//div[contains(@style, '253, 253, 253')]/span[1]")).Text;
+        }
         internal Dictionary<string, double> GetPerformanceMarkers(string page)
         {
             SelectPerformanceWidgetPage(page);
