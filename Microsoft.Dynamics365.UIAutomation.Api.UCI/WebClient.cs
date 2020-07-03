@@ -3241,6 +3241,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var hasRadio = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioContainer].Replace("[NAME]", option.Name)));
                 var hasCheckbox = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
                 var hasList = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldList].Replace("[NAME]", option.Name)));
+                var hasToggle = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldToggle].Replace("[NAME]", option.Name)));
 
                 if (hasRadio)
                 {
@@ -3264,6 +3265,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         check = int.Parse(selectedOption.GetAttribute("value")) == 1;
                     }
+                }
+                else if (hasToggle)
+                {
+                    var toggle = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldToggle].Replace("[NAME]", option.Name)));
+                    var link = toggle.FindElement(By.TagName("button"));
+
+                    check = bool.Parse(link.GetAttribute("aria-checked"));
                 }
                 else
                     throw new InvalidOperationException($"Field: {option.Name} Does not exist");
