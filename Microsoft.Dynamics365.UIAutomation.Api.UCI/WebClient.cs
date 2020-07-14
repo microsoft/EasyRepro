@@ -1960,46 +1960,46 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             }
                             else
                                 throw new InvalidOperationException($"No command with the name '{name}' exists inside of {subGridName} Commandbar.");
-
-                            if (subName != null)
-                            {
-                                // Locate the sub-button flyout if subName present
-                                overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
-
-                                //Click the primary button, if found
-                                if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))))
-                                {
-                                    overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))).Click(true);
-                                    driver.WaitForTransaction();
-                                }
-                                else
-                                    throw new InvalidOperationException($"No command with the name '{subName}' exists under the {name} command inside of {subGridName} Commandbar.");
-
-                                // Check if we need to go to a 3rd level
-                                if (subSecondName != null)
-                                {
-                                    // Locate the sub-button flyout if subSecondName present
-                                    overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
-
-                                    //Click the primary button, if found
-                                    if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))))
-                                    {
-                                        overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))).Click(true);
-                                        driver.WaitForTransaction();
-                                    }
-                                    else
-                                        throw new InvalidOperationException($"No command with the name '{subSecondName}' exists under the {subName} command inside of {name} on the {subGridName} SubGrid Commandbar.");
-                                }
-                            }
-
-                            return true;
                         }
                         else
                             throw new InvalidOperationException($"No command with the name '{name}' exists inside of {subGridName} CommandBar.");
                     }
-                }
 
-                return true;                                            
+                    if (subName != null)
+                    {
+                        // Locate the sub-button flyout if subName present
+                        var overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
+
+                        //Click the primary button, if found
+                        if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))))
+                        {
+                            overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))).Click(true);
+                            driver.WaitForTransaction();
+                        }
+                        else
+                            throw new InvalidOperationException($"No command with the name '{subName}' exists under the {name} command inside of {subGridName} Commandbar.");
+
+                        // Check if we need to go to a 3rd level
+                        if (subSecondName != null)
+                        {
+                            // Locate the sub-button flyout if subSecondName present
+                            overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
+
+                            //Click the primary button, if found
+                            if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))))
+                            {
+                                overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))).Click(true);
+                                driver.WaitForTransaction();
+                            }
+                            else
+                                throw new InvalidOperationException($"No command with the name '{subSecondName}' exists under the {subName} command inside of {name} on the {subGridName} SubGrid Commandbar.");
+                        }
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Unable to locate the Commandbar for the {subGrid} SubGrid.");
+
+                return true;
             });
         }
 
