@@ -119,20 +119,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Related_Common_Activities",      "//div[contains(@data-id,\"form-tab-relatedEntity-navActivities\")]" },
 
             //Timeline
-            { "Timeline_Add_Popout",               "//li[contains(@id,\"notescontrol-action_bar_add_command\")]" },
-            { "Timeline_Add_Popout_Appointment",   "//li[contains(@id,\"notescontrol-appointment\")]" },
-            { "Timeline_Add_Popout_Email",         "//li[contains(@id,\"notescontrol-email\")]" },
-            { "Timeline_Add_Popout_PhoneCall",     "//li[contains(@id,\"notescontrol-phonecall\")]" },
-            { "Timeline_Add_Popout_Task",          "//li[contains(@id,\"notescontrol-task\")]" },
-            { "Timeline_Add_Popout_Note",          "//li[contains(@id,\"notescontrol-notes\")]" },
-            { "Timeline_Add_Popout_Post",          "//li[contains(@id,\"notescontrol-post\")]" },
+            { "Timeline_Add_Popout",               "//button[contains(@id,\"notescontrol-action_bar_add_command\")]" },
+            { "Timeline_Add_Popout_Appointment",   "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_appointment\")]" },
+            { "Timeline_Add_Popout_Email",         "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_email\")]" },
+            { "Timeline_Add_Popout_PhoneCall",     "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_phonecall\")]" },
+            { "Timeline_Add_Popout_Task",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_task\")]" },
+            { "Timeline_Add_Popout_Note",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_notes\")]" },
+            { "Timeline_Add_Popout_Post",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_post\")]" },
 
             { "Timeline_Post_Text",                "id(\"create_post_postText\")" },
             { "Timeline_Post_Add",                 "id(\"create_post_add_btn\")" },
             { "Timeline_Post_Cancel",              "id(\"create_post_cancel_btn\")" },
 
             { "Timeline_Note_Title",               "id(\"create_note_medium_title\")" },
-            { "Timeline_Note_Text",                "id(\"create_note_notesText\")" },
+            { "Timeline_Note_Text",                "//iframe[contains(@class, \"fullPageContentEditorFrame\")]" },
+            { "Timeline_Note_TextBody",            "//body[contains(@class, 'cke_wysiwyg_frame')]" },
             { "Timeline_Note_Add",                 "id(\"create_note_add_btn\")" },
             { "Timeline_Note_Cancel",              "id(\"create_note_cancel_btn\")" },
 
@@ -594,6 +595,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             public static string NoteTitle = "Timeline_Note_Title";
             public static string NoteText = "Timeline_Note_Text";
+            public static string NoteTextBody = "Timeline_Note_TextBody";
             public static string NoteAdd = "Timeline_Note_Add";
             public static string NoteCancel = "Timeline_Note_Cancel";
 
