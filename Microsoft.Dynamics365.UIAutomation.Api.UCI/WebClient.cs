@@ -4605,13 +4605,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else
                     {
                         driver.SwitchTo().Frame(inputbox);
-                        driver.SwitchTo().Frame(0);
-                        var inputBoxBody = driver.FindElements(By.TagName("body"));
-                        inputBoxBody[0].Click(true);
-                        inputBoxBody[0].SendKeys(value);
 
-                        driver.SwitchTo().ParentFrame();
-                        driver.SwitchTo().ParentFrame();
+                        driver.WaitUntilAvailable(By.TagName("iframe"));
+                        driver.SwitchTo().Frame(0);
+
+                        var inputBoxBody = driver.WaitUntilAvailable(By.TagName("body"));
+                        inputBoxBody.Click(true);
+                        inputBoxBody.SendKeys(value);
+
+                        driver.SwitchTo().DefaultContent();
                     }
 
                     return true;
