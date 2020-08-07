@@ -34,6 +34,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Clicks 'Ignore And Save' or 'Cancel' on the Duplicate Detection dialog.  true = Ignore And Save, false = Cancel
+        /// </summary>
+        /// <param name="clickConfirmButton"></param>
+        /// <returns></returns>
+        public bool DuplicateDetection(bool clickSaveOrCancel)
+        {
+            return _client.DuplicateDetection(clickSaveOrCancel);
+        }
+
+        /// <summary>
         /// Clicks OK or Cancel on the Set State (Activate / Deactivate) dialog.  true = OK, false = Cancel
         /// </summary>
         /// <param name="clickOkButton"></param>
