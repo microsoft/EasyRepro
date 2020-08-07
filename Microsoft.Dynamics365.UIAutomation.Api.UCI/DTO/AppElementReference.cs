@@ -257,6 +257,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string AssignDialogToggle = "AssignDialog_ToggleField";
             public static string ConfirmButton = "Dialog_ConfirmButton";
             public static string CancelButton = "Dialog_CancelButton";
+            public static string DuplicateDetectionIgnoreSaveButton = "DuplicateDetectionDialog_IgnoreAndSaveButton";
+            public static string DuplicateDetectionCancelButton = "DuplicateDetectionDialog_CancelButton";
             public static string PublishConfirmButton = "Dialog_PublishConfirmButton";
             public static string PublishCancelButton = "Dialog_PublishCancelButton";
             public static string SetStateDialog = "Dialog_SetStateDialog";
@@ -547,6 +549,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Dialog_DescriptionId", "//input[contains(@data-id,'description_id')]" },
             { "Dialog_ConfirmButton" , "//*[@id=\"confirmButton\"]" },
             { "Dialog_CancelButton" , "//*[@id=\"cancelButton\"]" },
+            { "DuplicateDetectionDialog_IgnoreAndSaveButton" , "//button[contains(@data-id, 'ignore_save')]" },
+            { "DuplicateDetectionDialog_CancelButton" , "//button[contains(@data-id, 'close_dialog')]" },
             { "Dialog_SetStateDialog" , "//div[@data-id=\"SetStateDialog\"]" },
             { "Dialog_SetStateActionButton" , ".//button[@data-id=\"ok_id\"]" },
             { "Dialog_SetStateCancelButton" , ".//button[@data-id=\"cancel_id\"]" },

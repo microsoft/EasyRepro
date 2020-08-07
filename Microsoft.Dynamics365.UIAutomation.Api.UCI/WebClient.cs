@@ -926,6 +926,50 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> DuplicateDetection(bool clickSaveOrCancel)
+        {
+            string operationType;
+
+            if (clickSaveOrCancel)
+            {
+                operationType = "Ignore and Save";
+            }
+            else
+                operationType = "Cancel";
+
+            //Passing true clicks the Ignore and Save button.  Passing false clicks the Cancel button.
+            return this.Execute(GetOptions($"{operationType} Duplicate Detection Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (inlineDialog)
+                {
+                    //Wait until the buttons are available to click
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DuplicateDetectionIgnoreSaveButton]));
+
+                    if (
+                        !(dialogFooter?.FindElements(By.XPath(AppElements.Xpath[AppReference.Dialogs.DuplicateDetectionIgnoreSaveButton])).Count >
+                          0)) return true;
+
+                    //Click the Confirm or Cancel button
+                    IWebElement buttonToClick;
+                    if (clickSaveOrCancel)
+                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DuplicateDetectionIgnoreSaveButton]));
+                    else
+                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DuplicateDetectionCancelButton]));
+
+                    buttonToClick.Click();
+                }
+
+                if (clickSaveOrCancel)
+                {
+                    // Wait for Save before proceeding
+                    driver.WaitForTransaction();
+                }
+
+                return true;
+            });
+        }
+
         internal BrowserCommandResult<bool> SetStateDialog(bool clickOkButton)
         {
             //Passing true clicks the Activate/Deactivate button.  Passing false clicks the Cancel button.
