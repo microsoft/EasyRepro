@@ -3537,6 +3537,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             }
 
                             subGridRows.Add(item);
+
+                            // Flush Item and Cell Values To Get New Rows
+                            cellValues = new List<string>();
+                            item = new GridItem();
                         }
 
                     }
@@ -3583,6 +3587,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             }
 
                             subGridRows.Add(item);
+
+                            // Flush Item and Cell Values To Get New Rows
+                            cellValues = new List<string>();
+                            item = new GridItem();
                         }
                     }
 
@@ -3637,6 +3645,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             }
 
                             subGridRows.Add(item);
+
+                            // Flush Item and Cell Values To Get New Rows
+                            cellValues = new List<string>();
+                            item = new GridItem();
                         }
                     }
 
