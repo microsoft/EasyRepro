@@ -2600,6 +2600,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 IWebElement fieldContainer = null;
 
+                // ensure that the option.Name value is lowercase -- will cause XPath lookup issues
+                option.Name = option.Name.ToLowerInvariant();
+
                 if (formContextType == FormContextType.QuickCreate)
                 {
                     // Initialize the quick create form context
@@ -3149,8 +3152,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 IWebElement fieldContainer = driver.WaitUntilAvailable(By.XPath(xpathToContainer));
                 string lookupValue = TryGetValue(fieldContainer, control);
 
-                driver.ClearFocus();
-
                 return lookupValue;
             });
         }
@@ -3174,8 +3175,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var xpathToContainer = By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", controlName));
                 var fieldContainer = driver.WaitUntilAvailable(xpathToContainer);
                 string[] result = TryGetValue(fieldContainer, controls);
-
-                driver.ClearFocus();
 
                 return result;
             });
@@ -3233,7 +3232,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(xpathToFieldContainer));
                 string result = TryGetValue(fieldContainer, control);
 
-                driver.ClearFocus();
                 return result;
             });
         }
@@ -3317,7 +3315,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                     throw new InvalidOperationException($"Field: {option.Name} Does not exist");
 
-                driver.ClearFocus();
                 return check;
             });
         }
@@ -3349,7 +3346,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     returnValue.Values = labelItems.Select(x => x.Text).ToArray();
                 }
 
-                driver.ClearFocus();
                 return returnValue;
             });
         }
@@ -3391,7 +3387,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             var result = date.AddHours(time.Hour).AddMinutes(time.Minute).AddSeconds(time.Second);
 
-            driver.ClearFocus();
             return result;
         }
 
@@ -3775,8 +3770,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.LookupFieldContainer].Replace("[NAME]", controlName);
                 string lookupValue = ExecuteInHeaderContainer(driver, xpathToContainer, container => TryGetValue(container, control));
 
-                driver.ClearFocus(); // Close Header
-
                 return lookupValue;
             });
         }
@@ -3788,8 +3781,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return Execute(GetOptions($"Get Header Activityparty LookupItem Value {controlName}"), driver =>
             {
                 string[] lookupValues = ExecuteInHeaderContainer(driver, xpathToContainer, container => TryGetValue(container, controls));
-
-                driver.ClearFocus(); // Close Header
 
                 return lookupValues;
             });
