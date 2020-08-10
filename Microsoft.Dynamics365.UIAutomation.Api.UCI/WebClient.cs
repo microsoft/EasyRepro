@@ -4701,6 +4701,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         #region BusinessProcessFlow
 
+        internal BrowserCommandResult<Field> BPFGetField(string field)
+        {
+            return this.Execute(GetOptions($"Get Field"), driver =>
+            {
+                var fieldElement = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.TextFieldContainer].Replace("[NAME]", field)));
+                Field returnField = new Field(fieldElement);
+                returnField.Name = field;
+
+                IWebElement fieldLabel = null;
+                try
+                {
+                    fieldLabel = fieldElement.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.TextFieldLabel].Replace("[NAME]", field)));
+                }
+                catch (NoSuchElementException)
+                {
+                    // Swallow
+                }
+
+                if (fieldLabel != null)
+                {
+                    returnField.Label = fieldLabel.Text;
+                }
+
+                return returnField;
+            });
+        }
+
         /// <summary>
         /// Set Value
         /// </summary>
