@@ -1892,7 +1892,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                             !optionValue && selectedValue == options.FirstOrDefault(a => a.GetAttribute("value") == "1")?.GetAttribute("title"))
                         {
                             driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower())));
-                            driver.ClearFocus();
                         }
                     }
                     else if (hasCheckbox)
