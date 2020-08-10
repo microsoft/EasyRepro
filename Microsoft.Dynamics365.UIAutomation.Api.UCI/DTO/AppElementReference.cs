@@ -236,6 +236,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string BusinessProcessFlowFieldName = "BPF_FieldName_UCI";
             public static string BusinessProcessFlowFormContext = "BPF_FormContext";
             public static string TextFieldContainer = "BPF_TextFieldContainer";
+            public static string TextFieldLabel = "BPF_TextFieldLabel";
             public static string BooleanFieldContainer = "BPF_BooleanFieldContainer";
             public static string DateTimeFieldContainer = "BPF_DateTimeFieldContainer";
             public static string FieldControlDateTimeInputUCI = "BPF_FieldControlDateTimeInputUCI";
@@ -521,6 +522,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_FieldName_UCI"     , "//input[contains(@id,'[NAME]')]" },
             { "BPF_FormContext"     , "//div[contains(@id, \'ProcessStageControl-processHeaderStageFlyoutInnerContainer\')]" },
             { "BPF_TextFieldContainer", ".//div[contains(@data-lp-id, \'header_process_[NAME]\')]" },
+            { "BPF_TextFieldLabel", "//label[contains(@id, \'header_process_[NAME]-field-label\')]" },
             { "BPF_BooleanFieldContainer", ".//input[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-toggle\')]" },
             { "BPF_DateTimeFieldContainer", ".//input[contains(@data-id, \'[NAME].fieldControl-date-time-input\')]" },
             { "BPF_FieldControlDateTimeInputUCI",".//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },

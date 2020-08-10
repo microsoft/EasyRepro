@@ -15,6 +15,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client = client;
         }
 
+        public Field GetField(string field)
+        {
+            return _client.BPFGetField(field);
+        }
+
         /// <summary>
         /// Retrieves the value of a text field
         /// </summary>
