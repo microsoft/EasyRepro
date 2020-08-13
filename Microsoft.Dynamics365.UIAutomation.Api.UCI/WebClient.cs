@@ -46,8 +46,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions("Initialize Unified Interface Modes"), driver =>
             {
-                driver.SwitchTo().DefaultContent();
-
+                SwitchToDefaultContent(driver);
+                
                 // Wait for main page to load before attempting this. If you don't do this it might still be authenticating and the URL will be wrong
                 WaitForMainPage();
 
