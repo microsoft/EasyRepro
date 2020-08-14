@@ -3,6 +3,7 @@
 
 using OpenQA.Selenium;
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using System;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -66,7 +67,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     var readOnly = containerElement.FindElement(By.XPath(AppElements.Xpath[AppReference.Field.ReadOnly]));
 
-                    if(readOnly.HasAttribute("readonly"))
+                    if (readOnly.HasAttribute("aria-readonly"))
+                    {
+                        // TwoOption / Text / Lookup Condition
+                        bool isReadOnly = Convert.ToBoolean(readOnly.GetAttribute("aria-readonly"));
+                        if (isReadOnly)
+                            return true;
+                    }
+                    else if (readOnly.HasAttribute("readonly"))
+                        return true;
+                }
+                else if (containerElement.HasElement(By.TagName("select")))
+                {
+                    // Option Set Condition
+                    var readOnlySelect = containerElement.FindElement(By.TagName("select"));
+
+                    if (readOnlySelect.HasAttribute("disabled"))
+                        return true;
+
+                }
+                else if (containerElement.HasElement(By.TagName("input")))
+                {
+                    // DateTime condition
+                    var readOnlyInput = containerElement.FindElement(By.TagName("input"));
+
+                    if (readOnlyInput.HasAttribute("disabled"))
                         return true;
                 }
 
