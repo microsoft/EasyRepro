@@ -253,6 +253,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 public static string CloseDateId = "Dialog_CloseDate";
                 public static string DescriptionId = "Dialog_Description";
             }
+            public static class CloseActivity
+            {
+                public static string Close = "CloseActivityDialog_CloseButton";
+                public static string Cancel = "CloseActivityDialog_CancelButton";
+            }
             public static string AssignDialogUserTeamLookupResults = "AssignDialog_UserTeamLookupResults";
             public static string AssignDialogOKButton = "AssignDialog_OKButton";
             public static string AssignDialogToggle = "AssignDialog_ToggleField";
@@ -268,7 +273,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SwitchProcessDialog = "Entity_SwitchProcessDialog";
             public static string SwitchProcessDialogOK = "Entity_SwitchProcessDialogOK";
             public static string ActiveProcessGridControlContainer = "Entity_ActiveProcessGridControlContainer";
-
+            public static string DialogContext = "Dialog_DialogContext";
             public static string SwitchProcessContainer = "Dialog_SwitchProcessContainer";
         }
 
@@ -546,6 +551,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "AssignDialog_OKButton" , "//button[contains(@data-id, 'ok_id')]" },
             { "CloseOpportunityDialog_OKButton" , "//button[contains(@data-id, 'ok_id')]" },
             { "CloseOpportunityDialog_CancelButton" , "//button[contains(@data-id, 'cancel_id')]" },
+            { "CloseActivityDialog_CloseButton" , ".//button[contains(@data-id, 'ok_id')]" },
+            { "CloseActivityDialog_CancelButton" , ".//button[contains(@data-id, 'cancel_id')]" },
+            { "Dialog_DialogContext", "//div[contains(@id,'dialogView') and contains(@role, 'dialog')]" },
             { "Dialog_ActualRevenue", "//input[contains(@data-id,'actualrevenue_id')]" },
             { "Dialog_CloseDate", "//input[contains(@data-id,'closedate_id')]" },
             { "Dialog_DescriptionId", "//input[contains(@data-id,'description_id')]" },
