@@ -2333,6 +2333,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         private void SetInputValue(IWebDriver driver, IWebElement input, string value, TimeSpan? thinktime = null)
         {
+            driver.WaitForTransaction();
+            input.SendKeys(Keys.Control + "a");
             input.SendKeys(Keys.Control + "a");
             input.SendKeys(Keys.Backspace);
             driver.WaitForTransaction();
