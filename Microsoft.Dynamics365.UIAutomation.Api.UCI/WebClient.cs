@@ -1780,7 +1780,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        public BrowserCommandResult<bool> Sort(string columnName, int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> Sort(string columnName, string sortOptionButtonText, int thinkTime = Constants.DefaultThinkTime)
         {
             ThinkTime(thinkTime);
 
@@ -1791,7 +1791,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (sortCol == null)
                     throw new InvalidOperationException($"Column: {columnName} Does not exist");
                 else
+                {
                     sortCol.Click(true);
+                    driver.WaitUntilClickable(By.XPath($@"//button[@name='{sortOptionButtonText}']")).Click(true);
+                }
 
                 driver.WaitForTransaction();
                 return true;
