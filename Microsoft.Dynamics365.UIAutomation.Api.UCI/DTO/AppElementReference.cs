@@ -292,6 +292,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string ViewRows = "Lookup_ViewRows";
             public static string LookupResultRows = "Lookup_ResultRows";
             public static string NewButton = "Lookup_NewButton";
+            public static string RecordList = "Lookup_RecordList";
         }
 
         public static class Related
@@ -583,6 +584,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Lookup_ViewRows", "//li[contains(@data-id,'viewLineContainer')]"},
             { "Lookup_ResultRows", "//li[contains(@data-id,'LookupResultsDropdown') and contains(@data-id,'resultsContainer')]"},
             { "Lookup_NewButton", "//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]" },
+            { "Lookup_RecordList", ".//div[contains(@id,'RecordList') and contains(@role,'presentation')]" },
 
             //Performance Width
             { "Performance_Widget","//div[@data-id='performance-widget']/div"},
