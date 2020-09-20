@@ -2336,25 +2336,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         private void SetInputValue(IWebDriver driver, IWebElement input, string value, TimeSpan? thinktime = null)
         {
-            driver.WaitForTransaction();
-            input.SendKeys(Keys.Control + "a");
-            input.SendKeys(Keys.Control + "a");
-            input.SendKeys(Keys.Backspace);
-            driver.WaitForTransaction();
-
-            if (string.IsNullOrWhiteSpace(value))
+            // Repeat set value if expected value is not set
+            // Do this to ensure that the static placeholder '---' is removed 
+            driver.RepeatUntil(() =>
             {
-                input.Click(true);
-                return;
-            }
+                input.Clear();
+                input.Click();
+                input.SendKeys(Keys.Control + "a");
+                input.SendKeys(Keys.Control + "a");
+                input.SendKeys(Keys.Backspace);
+                input.SendKeys(value);
+                driver.WaitForTransaction();
+            },
+                d => input.GetAttribute("value").IsValueEqualsTo(value),
+                TimeSpan.FromSeconds(9), 3,
+                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {value}. Actual: {input.GetAttribute("value")}")
+            );
 
-            if (string.IsNullOrEmpty(value))
-            {
-                input.Click(true);
-                return;
-            }
-
-            input.SendKeys(value, true);
             driver.WaitForTransaction();
         }
 
