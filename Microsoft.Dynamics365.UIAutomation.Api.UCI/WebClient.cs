@@ -2696,13 +2696,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             TrySetDateValue(driver, container, control, formContext);
             TrySetTime(driver, container, control, formContext);
 
-            if (container is IWebElement parent)
-            {
-                parent.Click(true);
-                parent.SendKeys(Keys.Escape); // Close Calendar
-                parent.SendKeys(Keys.Escape); // Close Header control
-            }
-
             TryCloseHeaderFlyout(driver);
 
             return true;
@@ -2790,27 +2783,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //IWebDriver formContext;
                 // Initialize the quick create form context
                 // If this is not done -- element input will go to the main form due to new flyout design
-                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]), new TimeSpan(0,0, 1));
             }
             else if (formContextType == FormContextType.Entity)
             {
                 // Initialize the entity form context
-                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]));
+                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]), new TimeSpan(0, 0, 1));
             }
             else if (formContextType == FormContextType.BusinessProcessFlow)
             {
                 // Initialize the Business Process Flow context
-                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
+                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]), new TimeSpan(0, 0, 1));
             }
             else if (formContextType == FormContextType.Header)
             {
                 // Initialize the Header context
-                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderContext]));
+                formContext = container as IWebElement;
             }
             else if (formContextType == FormContextType.Dialog)
             {
                 // Initialize the Header context
-                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]), new TimeSpan(0, 0, 1));
             }
 
             var success = formContext.TryFindElement(timeFieldXPath, out var timeField);
@@ -2831,6 +2824,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 timeField.Click();
                 timeField.SendKeys(time);
                 timeField.SendKeys(Keys.Tab);
+                driver.WaitForTransaction();
             },
                 d => timeField.GetAttribute("value").IsValueEqualsTo(time),
                 TimeSpan.FromSeconds(9), 3,
