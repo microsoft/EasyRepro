@@ -1992,10 +1992,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else
                     {
                         //Is the button in More Commands Overflow?
-                        if (items.Any(x => x.GetAttribute("aria-label").Equals("More Commands", StringComparison.OrdinalIgnoreCase)))
+                        if (items.Any(x => x.GetAttribute("aria-label").Contains("More Commands", StringComparison.OrdinalIgnoreCase)))
                         {
                             //Click More Commands
-                            items.FirstOrDefault(x => x.GetAttribute("aria-label").Equals("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                            items.FirstOrDefault(x => x.GetAttribute("aria-label").Contains("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
                             driver.WaitForTransaction();
 
                             // Locate the overflow button (More Commands flyout)
