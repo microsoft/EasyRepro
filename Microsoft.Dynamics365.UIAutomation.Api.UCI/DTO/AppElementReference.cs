@@ -396,7 +396,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_TextFieldLookup", ".//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
             { "Entity_TextFieldLookupSearchButton", ".//button[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_search')]" },
             { "Entity_TextFieldLookupMenu", "//div[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]') and contains(@data-id,'tabContainer')]" },
-            { "Entity_LookupFieldExistingValue", ".//*[@data-id='[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag']" },
+            { "Entity_LookupFieldExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag')]" },
             { "Entity_LookupFieldDeleteExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]" },
             { "Entity_LookupFieldExpandCollapseButton", ".//button[contains(@data-id,'[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse')]/descendant::label[not(text()='+0')]" },
             { "Entity_LookupFieldNoRecordsText", ".//*[@data-id=\'[NAME].fieldControl-LookupResultsDropdown_[NAME]_No_Records_Text']" },
