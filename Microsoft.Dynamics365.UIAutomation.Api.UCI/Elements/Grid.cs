@@ -72,9 +72,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Sorts the grid by the column provided
         /// </summary>
         /// <param name="columnName">Label of the column name</param>
-        public void Sort(string columnName)
+        /// <param name="sortOptionButtonText">Sort option button text</param>
+        public void Sort(string columnName, string sortOptionButtonText)
         {
-            _client.Sort(columnName);
+            _client.Sort(columnName, sortOptionButtonText);
         }
     }
 }

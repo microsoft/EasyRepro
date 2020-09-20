@@ -23,7 +23,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.SwitchView("Active Accounts");
 
-                xrmApp.Grid.Sort("Main Phone");
+                xrmApp.Grid.Sort("Main Phone", "Sort A to Z");
             }
         }
     }
