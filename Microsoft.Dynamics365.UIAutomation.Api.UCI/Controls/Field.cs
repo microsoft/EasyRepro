@@ -94,6 +94,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (readOnlyInput.HasAttribute("disabled"))
                         return true;
                 }
+                else
+                {
+                    // Special Lookup Field condition (e.g. transactioncurrencyid)
+                    var lookupRecordList = containerElement.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.RecordList]));
+                    var lookupDescription = lookupRecordList.FindElement(By.TagName("div"));
+
+                    if (lookupDescription != null)
+                        return lookupDescription.GetAttribute("innerText").ToLowerInvariant().Contains("readonly", StringComparison.OrdinalIgnoreCase);                   
+                    else
+                        return false;                    
+                }
 
                 return false;
             }

@@ -5,6 +5,7 @@
         Entity,
         BusinessProcessFlow,
         QuickCreate,
-        Header
+        Header,
+        Dialog
     }
 }
