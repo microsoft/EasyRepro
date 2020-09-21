@@ -117,11 +117,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             get
             {
-                if (containerElement.HasElement(By.XPath(AppElements.Xpath[AppReference.Field.Required])))
+                if (containerElement.HasElement(By.XPath(AppElements.Xpath[AppReference.Field.RequiredIcon])))
                 {
-                    var required = containerElement.FindElement(By.XPath(AppElements.Xpath[AppReference.Field.Required]));
+                    var required = containerElement.FindElement(By.XPath(AppElements.Xpath[AppReference.Field.RequiredIcon]));
 
-                    if (required.GetAttribute("aria-required") == "true")
+                    if (required != null)
                         return true;
                 }
 

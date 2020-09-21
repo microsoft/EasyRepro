@@ -236,6 +236,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string BusinessProcessFlowFieldName = "BPF_FieldName_UCI";
             public static string BusinessProcessFlowFormContext = "BPF_FormContext";
             public static string TextFieldContainer = "BPF_TextFieldContainer";
+            public static string FieldSectionItemContainer = "BPF_FieldSectionItemContainer";
             public static string TextFieldLabel = "BPF_TextFieldLabel";
             public static string BooleanFieldContainer = "BPF_BooleanFieldContainer";
             public static string DateTimeFieldContainer = "BPF_DateTimeFieldContainer";
@@ -308,6 +309,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             public static string ReadOnly = "Field_ReadOnly";
             public static string Required = "Field_Required";
+            public static string RequiredIcon = "Field_RequiredIcon";
         }
         public static class PerformanceWidget
         {
@@ -526,6 +528,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_NextStageButton_UCI"     , "//button[contains(@data-id,'nextButtonContainer')]" },
             { "BPF_SetActiveButton", "//button[contains(@data-id,'setActiveButton')]" },
             { "BPF_FieldName_UCI"     , "//input[contains(@id,'[NAME]')]" },
+            { "BPF_FieldSectionItemContainer", ".//div[contains(@id, \'header_process_[NAME]-FieldSectionItemContainer\')]" },
             { "BPF_FormContext"     , "//div[contains(@id, \'ProcessStageControl-processHeaderStageFlyoutInnerContainer\')]" },
             { "BPF_TextFieldContainer", ".//div[contains(@data-lp-id, \'header_process_[NAME]\')]" },
             { "BPF_TextFieldLabel", "//label[contains(@id, \'header_process_[NAME]-field-label\')]" },
@@ -545,6 +548,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //Field
             {"Field_ReadOnly",".//*[@aria-readonly]" },
             {"Field_Required", ".//*[@aria-required]"},
+            {"Field_RequiredIcon", ".//div[contains(@data-id, 'required-icon') or contains(@id, 'required-icon')]"},
 
             //Dialogs
             { "AssignDialog_ToggleField" , "//label[contains(@data-id,'rdoMe_id.fieldControl-checkbox-inner-first')]" },
