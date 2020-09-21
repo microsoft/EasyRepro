@@ -2516,6 +2516,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 fieldContainer = ValidateFormContext(driver, formContextType, controlName, fieldContainer);
 
                 TrySetValue(fieldContainer, control);
+                driver.WaitForTransaction();
                 return true;
             });
         }
