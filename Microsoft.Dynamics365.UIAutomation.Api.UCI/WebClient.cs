@@ -2516,6 +2516,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 fieldContainer = ValidateFormContext(driver, formContextType, controlName, fieldContainer);
 
                 TrySetValue(fieldContainer, control);
+                driver.WaitForTransaction();
                 return true;
             });
         }
@@ -2526,6 +2527,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             bool success = fieldContainer.TryFindElement(By.TagName("select"), out IWebElement select);
             if (success)
             {
+                fieldContainer.WaitUntilAvailable(By.TagName("select"));
                 var options = select.FindElements(By.TagName("option"));
                 SelectOption(options, value);
                 return;
