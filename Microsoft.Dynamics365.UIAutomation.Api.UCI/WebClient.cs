@@ -2714,52 +2714,117 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // If this is not done -- element input will go to the main form due to new flyout design
                 var formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
                 fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+
+                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+
+                if (strExpanded == null)
+                {
+                    fieldContainer = formContext.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", controlName)));
+                }
             }
             else if (formContextType == FormContextType.Entity)
             {
                 // Initialize the entity form context
                 var formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]));
                 fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+
+                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+
+                if (strExpanded == null)
+                {
+                    fieldContainer = formContext.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", controlName)));
+                }
             }
             else if (formContextType == FormContextType.BusinessProcessFlow)
             {
                 // Initialize the Business Process Flow context
                 var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
                 fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+
+                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+
+                if (strExpanded == null)
+                {
+                    fieldContainer = formContext.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", controlName)));
+                }
             }
             else if (formContextType == FormContextType.Header)
             {
                 // Initialize the Header context
                 var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderContext]));
                 fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+
+                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+
+                if (strExpanded == null)
+                {
+                    fieldContainer = formContext.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", controlName)));
+                }
             }
             else if (formContextType == FormContextType.Dialog)
             {
                 // Initialize the Dialog context
                 var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
                 fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+
+                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+
+                if (strExpanded == null)
+                {
+                    fieldContainer = formContext.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", controlName)));
+                }
+
             }
 
-            TrySetDateValue(driver, fieldContainer, control.DateAsString);
+            TrySetDateValue(driver, fieldContainer, control.DateAsString, formContextType);
         }
 
-        private void TrySetDateValue(IWebDriver driver, IWebElement dateField, string date)
+        private void TrySetDateValue(IWebDriver driver, IWebElement dateField, string date, FormContextType formContextType)
         {
             var strExpanded = dateField.GetAttribute("aria-expanded");
-            bool success = bool.TryParse(strExpanded, out var isCalendarExpanded);
-            if (success && isCalendarExpanded)
-                dateField.Click(); // close calendar
 
-            driver.RepeatUntil(() =>
+            if (strExpanded != null)
             {
-                ClearFieldValue(dateField);
-                if (date != null)
-                    dateField.SendKeys(date);
-            },
-                d => dateField.GetAttribute("value").IsValueEqualsTo(date),
-                TimeSpan.FromSeconds(9), 3,
-                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
-            );
+                bool success = bool.TryParse(strExpanded, out var isCalendarExpanded);
+                if (success && isCalendarExpanded)
+                    dateField.Click(); // close calendar
+
+                driver.RepeatUntil(() =>
+                {
+                    ClearFieldValue(dateField);
+                    if (date != null)
+                        dateField.SendKeys(date);
+                },
+                    d => dateField.GetAttribute("value").IsValueEqualsTo(date),
+                    TimeSpan.FromSeconds(9), 3,
+                    failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
+                );
+            }
+            else
+            {
+                driver.RepeatUntil(() =>
+                {
+                    dateField.Click(true);
+                    if (date != null)
+                    {                        
+                        dateField = dateField.FindElement(By.TagName("input"));
+
+                        // Only send Keys.Escape to avoid element not interactable exceptions with calendar flyout on forms.
+                        // This can cause the Header or BPF flyouts to close unexpectedly
+                        if (formContextType == FormContextType.Entity || formContextType == FormContextType.QuickCreate )
+                        {
+                            dateField.SendKeys(Keys.Escape);
+                        }
+
+                        ClearFieldValue(dateField);
+                        dateField.SendKeys(date);
+                    }
+                },
+                    d => dateField.GetAttribute("value").IsValueEqualsTo(date),
+                    TimeSpan.FromSeconds(9), 3,
+                    failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
+                );
+            }
         }
 
         private void ClearFieldValue(IWebElement field)

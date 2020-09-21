@@ -415,7 +415,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_MoreTabsMenu", "//div[@id='__flyoutRootNode']" },
             { "Entity_SubTab", "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]" },
             { "Entity_FieldControlDateTimeContainer","//div[@data-id='[NAME]-FieldSectionItemContainer']" },
-            { "Entity_FieldControlDateTimeInputUCI",".//input[@data-id='[FIELD].fieldControl-date-time-input']" },
+            { "Entity_FieldControlDateTimeInputUCI",".//*[contains(@data-id, '[FIELD].fieldControl-date-time-input')]" },
             { "Entity_FieldControlDateTimeTimeInputUCI",".//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input" },
             { "Entity_LookupResultsDropdown", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
             { "Entity_Footer", "//div[contains(@id,'footerWrapper')]" },
