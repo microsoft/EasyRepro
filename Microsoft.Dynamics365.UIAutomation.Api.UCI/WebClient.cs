@@ -2526,6 +2526,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             bool success = fieldContainer.TryFindElement(By.TagName("select"), out IWebElement select);
             if (success)
             {
+                fieldContainer.WaitUntilAvailable(By.TagName("select"));
                 var options = select.FindElements(By.TagName("option"));
                 SelectOption(options, value);
                 return;
