@@ -4742,7 +4742,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Get Field"), driver =>
             {
-                var fieldElement = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.TextFieldContainer].Replace("[NAME]", field)));
+
+                // Initialize the Business Process Flow context
+                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
+                var fieldElement = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.FieldSectionItemContainer].Replace("[NAME]", field)));                
                 Field returnField = new Field(fieldElement);
                 returnField.Name = field;
 
