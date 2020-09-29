@@ -15,6 +15,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
         private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
@@ -23,13 +24,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Leads");
                 
-                xrmApp.Grid.Search("Linda");
+                xrmApp.Grid.SwitchView("Open Leads");
+
+                xrmApp.Grid.Search("Debra");
 
                 xrmApp.Grid.OpenRecord(0);
                 
@@ -38,16 +41,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
+        [TestCategory("Fail - Bug")]
         public void UCITestRetrieveBPFFields()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Leads");
+
+                xrmApp.Grid.SwitchView("Open Leads");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -56,6 +62,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.BusinessProcessFlow.SelectStage("Qualify");
 
+                // Bug: Lookups fail to resolve:  System.NullReferenceException: Object reference not set to an instance of an object.
                 string contactName = xrmApp.BusinessProcessFlow.GetValue(contact);
                 string acctName = xrmApp.BusinessProcessFlow.GetValue(account);
                 string budgetAmt = xrmApp.BusinessProcessFlow.GetValue("budgetamount");
@@ -72,11 +79,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Leads");
+
+                xrmApp.Grid.SwitchView("Open Leads");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -94,11 +103,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Leads");
+
+                xrmApp.Grid.SwitchView("Open Leads");
 
                 xrmApp.Grid.OpenRecord(0);
 

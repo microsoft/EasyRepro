@@ -35,6 +35,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenGroupSubArea(group, subarea);
         }
+        
+        /// <summary>
+        /// Opens a area in the unified client
+        /// </summary>
+        /// <param name="area">Name of the area</param>
+        public void OpenArea(string area)
+        {
+            _client.OpenArea(area);
+        }
+
+        /// <summary>
+        /// Opens a sub area in the unified client
+        /// </summary>
+        /// <param name="area">Name of the area</param>
+        public void OpenSubArea(string area)
+        {
+            _client.OpenSubArea(area);
+        }
 
         /// <summary>
         /// Opens a sub area in the unified client

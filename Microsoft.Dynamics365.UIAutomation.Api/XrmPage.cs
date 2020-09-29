@@ -212,36 +212,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="stay"></param>
         public BrowserCommandResult<bool> IsDialogFrameVisible(bool visible = false)
         {
-
             return this.Execute(GetOptions("Check If Dialog Frame Is Visible"), driver =>
             {
-                //try
-                //{
-                    SwitchToDefaultContent();
-                    //driver.FindElement(By.Id("InlineDialog"));
+                driver.WaitUntilVisible(By.Id("InlineDialog"),
+                    new TimeSpan(0, 0, 5),
+                    e => visible = true,
+                    () => visible = false);
 
-                    //Wait for CRM Page to load
-                    driver.WaitUntilVisible(By.Id("InlineDialog")
-                        , new TimeSpan(0, 0, 5),
-                    e =>
-                    {
-                        visible = true;
-                    },
-                        f => { visible = false; });
-
-                if (visible)
-                {
-                    return true;
-                }
-                else
-                    return false;
-
-                //    return true;
-                //}
-                //catch (NoSuchElementException)
-                //{
-                //    return false;
-                //}
+                return visible;
             });
         }
 
@@ -260,8 +238,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 if (nextIcon.GetAttribute("disabled") != null)
                     return false;
-                else
-                    nextIcon.Click();
+                
+                nextIcon.Click();
                 return true;
             });
         }
@@ -701,7 +679,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                             lookupMenuItem.Element.Click();
                         }
 
-                        driver.WaitUntilAvailable(By.Id("InlineDialog"),new TimeSpan(0,0,5));
+                        driver.WaitUntilAvailable(By.Id("InlineDialog"), new TimeSpan(0, 0, 5));
                         SwitchToDialog();
                         driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.LookUp.Remove]));
                         driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.LookUp.Remove]));
@@ -710,11 +688,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                         driver.WaitForPageToLoad();
                         driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
-                                                    new TimeSpan(0, 0, 30),
-                                                    null,
-                                                    d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
-                                                );
-
+                                                    TimeSpan.FromSeconds(30),
+                                                    "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
+                                                    );
                     }
                     else if (fieldContainer.Text != "" && !clearFieldValue)
                     {
@@ -979,7 +955,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     fieldElement.Click();
 
                     try
-                    { 
+                    {
                         //Check to see if focus is on field already
                         if (fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])) != null)
                             fieldElement.FindElement(By.ClassName(Elements.CssClass[Reference.SetValue.EditClass])).Click();
@@ -993,7 +969,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         fieldElement.FindElement(By.TagName("textarea")).Clear();
                         fieldElement.FindElement(By.TagName("textarea")).SendKeys(value);
                     }
-                    else if(fieldElement.TagName =="textarea")
+                    else if (fieldElement.TagName == "textarea")
                     {
                         fieldElement.Clear();
                         fieldElement.SendKeys(value);
@@ -1065,8 +1041,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (driver.HasElement(By.Id(option.Name)))
                 {
                     var container = driver.ClickWhenAvailable(By.Id(option.Name));
-                    
-                    if(removeExistingValues)
+
+                    if (removeExistingValues)
                     {
                         //Remove Existing Values
                         var values = container.FindElements(By.ClassName(Elements.CssClass[Reference.SetValue.MultiSelectPicklistDeleteClass]));
@@ -1213,7 +1189,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return this.Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
             {
-                 if (driver.HasElement(By.Id(control.Name)))
+                if (driver.HasElement(By.Id(control.Name)))
                 {
                     var fieldContainer = driver.WaitUntilAvailable(By.Id(control.Name));
 
@@ -1305,8 +1281,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     else
                         throw new InvalidOperationException($"Field: {control.Name} Does not exist");
                 }
-                    return true;
-                });
+                return true;
+            });
         }
 
         internal bool SwitchToContent()

@@ -185,7 +185,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.ThinkTime(2000);
 
-                xrmBrowser.BusinessProcessFlow.SetValue(new LookupItem { Name = "parentaccountid", Value = "Adventure Works (sample)" });
+                xrmBrowser.BusinessProcessFlow.SetValue(new LookupItem { Name = "parentaccountid", Value = "Adventure Works" });
 
                 xrmBrowser.ThinkTime(2000);
 

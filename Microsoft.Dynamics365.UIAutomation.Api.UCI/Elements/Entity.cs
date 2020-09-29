@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
+using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     {
         private readonly WebClient _client;
 
+        public SubGrid SubGrid => this.GetElement<SubGrid>(_client);
+        public RelatedGrid RelatedGrid => this.GetElement<RelatedGrid>(_client);
+
         public Entity(WebClient client) : base()
         {
             _client = client;
+        }
+
+        public T GetElement<T>(WebClient client)
+    where T : Element
+        {
+            return (T)Activator.CreateInstance(typeof(T), new object[] { client });
         }
 
         /// <summary>
@@ -30,7 +40,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="field"></param>
         public void ClearValue(string field)
         {
-            _client.ClearValue(field);
+            _client.ClearValue(field, FormContextType.Entity);
         }
 
         /// <summary>
@@ -42,7 +52,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.ClearValue(new LookupItem { Name = "to" });</example>
         public void ClearValue(LookupItem control)
         {
-            _client.ClearValue(control);
+            _client.ClearValue(control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -51,7 +61,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control"></param>
         public void ClearValue(OptionSet control)
         {
-            _client.ClearValue(control);
+            _client.ClearValue(control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -60,7 +70,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control"></param>
         public void ClearValue(MultiValueOptionSet control)
         {
-            _client.ClearValue(control);
+            _client.ClearValue(control, FormContextType.Entity);
+        }
+        
+
+        /// <summary>
+        /// Clears a value from the DateTimeControl provided
+        /// </summary>
+        /// <param name="control"></param>
+        public void ClearHeaderValue(DateTimeControl control)
+        {
+            _client.ClearHeaderValue(control);
+        }
+
+        /// <summary>
+        /// Clears a value from the DateTimeControl provided
+        /// </summary>
+        /// <param name="control"></param>
+        public void ClearValue(DateTimeControl control)
+        {
+            _client.ClearValue(control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -87,12 +116,38 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Gets test from a Business Process Error, if present
+        /// <paramref name="waitTimeInSeconds"/>Number of seconds to wait for the error dialog. Default value is 120 seconds</param>
+        /// </summary>
+        /// <example>var errorText = xrmApp.Entity.GetBusinessProcessError(int waitTimeInSeconds);</example>
+        public string GetBusinessProcessError(int waitTimeInSeconds = 120)
+        {
+            _client.Browser.Driver.WaitForTransaction();
+            return _client.GetBusinessProcessErrorText(waitTimeInSeconds);
+        }
+
+        /// <summary>
         /// Gets the value of the status from the footer
         /// </summary>
         /// <returns>Status of the entity record</returns>
         public string GetFooterStatusValue()
         {
             return _client.GetStatusFromFooter();
+        }
+
+        /// <summary>
+        /// Gets the value of the message, if present, from the footer
+        /// </summary>
+        /// <returns>Message from the footer of the entity record</returns>
+        /// <returns>String.empty if no message present</returns>
+        public string GetFooterMessageValue()
+        {
+            return _client.GetMessageFromFooter();
+        }
+
+        public IReadOnlyList<FormNotification> GetFormNotifications()
+        {
+            return _client.GetFormNotifications().Value;
         }
 
         /// <summary>
@@ -153,7 +208,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.GetHeaderValue(control);
         }
-
+        
+        /// <summary>
+        /// Gets the value of a DateTime Control from the header
+        /// </summary>
+        /// <param name="control">The date time field name of the lookup.</param>
+        /// <example>xrmApp.Entity.GetValue(new DateTimeControl { Name = "estimatedclosedate" });</example>
+        public DateTime? GetHeaderValue(DateTimeControl control)
+        {
+            return _client.GetHeaderValue(control);
+        }
+        
         /// <summary>
         /// Get the object id of the current entity
         /// </summary>
@@ -171,9 +236,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Get the Form Name of the current entity
+        /// </summary>
+        public string GetFormName()
+        {
+            return _client.GetFormName();
+        }
+        
+        /// <summary>
+        /// Get the Header Title of the current entity
+        /// </summary>
+        public string GetHeaderTitle()
+        {
+            return _client.GetHeaderTitle();
+        }
+
+        /// <summary>
         /// Retrieve the items from a subgrid
         /// </summary>
         /// <param name="subgridName">Label of the subgrid to retrieve items from</param>
+        [Obsolete("GetSubGridItems(string subgridName)is deprecated, please use the equivalent Entity.SubGrid.<Method> instead.")]
         public List<GridItem> GetSubGridItems(string subgridName)
         {
             return _client.GetSubGridItems(subgridName);
@@ -184,6 +266,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="subgridName">Label of the subgrid to retrieve items from</param>
         /// <returns></returns>
+        [Obsolete("GetSubGridItemsCount(string subgridName) is deprecated, please use the equivalent Entity.SubGrid.<Method> instead.")]
         public int GetSubGridItemsCount(string subgridName)
         {
             return _client.GetSubGridItemsCount(subgridName);
@@ -194,6 +277,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="control">The lookup field name of the lookup.</param>
         public string GetValue(LookupItem control)
+        {
+            return _client.GetValue(control);
+        }
+
+        
+        /// <summary>
+        /// Gets the value of a Lookup.
+        /// </summary>
+        /// <param name="control">The lookup field name of the lookup.</param>
+        public DateTime? GetValue(DateTimeControl control)
         {
             return _client.GetValue(control);
         }
@@ -270,9 +363,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="subgridName">Label of the subgrid</param>
         /// <param name="index">Index of the record to open</param>
+        [Obsolete("OpenSubGridRecord(string subgridName, int index = 0) is deprecated, please use the equivalent Entity.SubGrid.<Method> instead.")]
         public void OpenSubGridRecord(string subgridName, int index = 0)
         {
             _client.OpenSubGridRecord(subgridName, index);
+        }
+
+        [Obsolete("AddSubgridItem(string subgridName) is deprecated, please use the Entity.SubGrid.ClickCommand(string buttonName) instead.")]
+        public void AddSubgridItem(string subgridName)
+        {
+            _client.ClickSubgridAddButton(subgridName);
         }
 
         /// <summary>
@@ -359,11 +459,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="field">Date field name.</param>
         /// <param name="date">DateTime value.</param>
-        /// <param name="format">Datetime format matching Short Date & Time formatting personal options.</param>
+        /// <param name="formatDate">Datetime format matching Short Date formatting personal options.</param>
+        /// <param name="formatTime">Datetime format matching Short Time formatting personal options.</param>
         /// <example>xrmApp.Entity.SetHeaderValue("birthdate", DateTime.Parse("11/1/1980"));</example>
-        public void SetHeaderValue(string field, DateTime date, string format = "M/d/yyyy h:mm tt")
+        /// <example>xrmApp.Entity.SetHeaderValue("new_actualclosedatetime", DateTime.Now, "MM/dd/yyyy", "hh:mm tt");</example>
+        /// <example>xrmApp.Entity.SetHeaderValue("estimatedclosedate", DateTime.Now);</example>
+        public void SetHeaderValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
-            _client.SetHeaderValue(field, date, format);
+            _client.SetHeaderValue(field, date, formatDate, formatTime);
+        }
+
+        /// <summary>
+        /// Sets the value of a BooleanItem in the header
+        /// </summary>
+        /// <param name="control">The boolean field you want to set.</param>
+        public void SetHeaderValue(DateTimeControl control)
+        {
+            _client.SetHeaderValue(control);
         }
 
         /// <summary>
@@ -373,16 +485,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="value">The value</param>
         public void SetValue(string field, string value)
         {
-            _client.SetValue(field, value);
+            _client.SetValue(field, value, FormContextType.Entity);
         }
 
         /// <summary>
         /// Sets the value of a Lookup.
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
-        public void SetValue(LookupItem control, int index = 0)
+        public void SetValue(LookupItem control)
         {
-            _client.SetValue(control, index);
+            _client.SetValue(control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -390,9 +502,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="controls">The activityparty lookup field name, value or index of the lookup.</param>
         /// <example>xrmApp.Entity.SetValue(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
-        public void SetValue(LookupItem[] controls, int index = 0)
+        public void SetValue(LookupItem[] controls)
         {
-            _client.SetValue(controls, index);
+            _client.SetValue(controls, FormContextType.Entity);
         }
 
         /// <summary>
@@ -401,7 +513,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The option you want to set.</param>
         public void SetValue(OptionSet optionSet)
         {
-            _client.SetValue(optionSet);
+            _client.SetValue(optionSet, FormContextType.Entity);
         }
 
         /// <summary>
@@ -410,7 +522,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The boolean field name.</param>
         public void SetValue(BooleanItem option)
         {
-            _client.SetValue(option);
+            _client.SetValue(option, FormContextType.Entity);
         }
 
         /// <summary>
@@ -418,11 +530,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="field">Date field name.</param>
         /// <param name="date">DateTime value.</param>
-        /// <param name="format">Datetime format matching Short Date & Time formatting personal options.</param>
+        /// <param name="formatDate">Datetime format matching Short Date formatting personal options.</param>
+        /// <param name="formatTime">Datetime format matching Short Time formatting personal options.</param>
         /// <example>xrmApp.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
-        public void SetValue(string field, DateTime date, string format = "M/d/yyyy h:mm tt")
+        /// <example>xrmApp.Entity.SetValue("new_actualclosedatetime", DateTime.Now, "MM/dd/yyyy", "hh:mm tt");</example>
+        /// <example>xrmApp.Entity.SetValue("estimatedclosedate", DateTime.Now);</example>
+        public void SetValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
-            _client.SetValue(field, date, format);
+            _client.SetValue(field, date, FormContextType.Entity, formatDate, formatTime);
+        }
+
+        /// <summary>
+        /// Sets the value of a Date Field.
+        /// </summary>
+        /// <param name="control">Date field control.</param>
+        public void SetValue(DateTimeControl control)
+        {
+            _client.SetValue(control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -432,7 +556,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
         public void SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
-            _client.SetValue(option, removeExistingValues);
+            _client.SetValue(option, FormContextType.Entity, removeExistingValues);
         }
         
         /// <summary>
@@ -459,9 +583,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="controls">The activityparty lookup field name, value or index of the lookup.</param>
         /// <example>xrmApp.Entity.AddValues(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
-        public void AddValues(LookupItem[] controls, int index = 0)
+        public void AddValues(LookupItem[] controls)
         {
-            _client.AddValues(controls, index);
+            _client.AddValues(controls);
         }
 
         /// <summary>

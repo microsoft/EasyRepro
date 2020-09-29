@@ -94,9 +94,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 SwitchToContent();
                 driver.WaitForPageToLoad();
                 driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
-                    new TimeSpan(0, 0, 60),
-                    null,
-                    d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
+                    TimeSpan.FromSeconds(60),
+                    "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
                 );
 
                 return true;
@@ -115,15 +114,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions($"Global Search"), driver =>
             {
-                if (!driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.GlobalSearch.SearchText]), new TimeSpan(0, 0, 10)))
-                    throw new InvalidOperationException("Search Text Box is not available");
-
-                var searchText = driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.GlobalSearch.SearchText]));
-
+                var searchText = driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.GlobalSearch.SearchText]), 
+                                                                TimeSpan.FromSeconds(10), 
+                                                                "Search Text Box is not available");
                 searchText.SendKeys(criteria, true);
 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.GlobalSearch.SearchButton]));
-
                 return true;
             });
         }

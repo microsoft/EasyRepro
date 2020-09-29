@@ -14,6 +14,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     {
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
         private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
@@ -22,13 +23,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
                 xrmApp.Navigation.OpenSubArea("Service", "Cases");
 
-                xrmApp.Grid.Search("Contacted");
+                xrmApp.Grid.Search("Service Requested");
 
                 xrmApp.Grid.OpenRecord(0);
             }
@@ -40,47 +41,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
                 xrmApp.Navigation.OpenSubArea("Service", "Cases");
+
+                xrmApp.Grid.SwitchView("Active Cases");
 
                 xrmApp.Grid.OpenRecord(0);
-
-                Field ticketNumber = xrmApp.Entity.GetField("ticketnumber");
-                Field subject = xrmApp.Entity.GetField("subjectid");
-                Field description = xrmApp.Entity.GetField("description");
-                Field mobilePhone = xrmApp.Entity.GetField("mobilephone");
             }
         }
 
         [TestMethod]
-        public void UCITestOpenCaseById()
-        {
-            var client = new WebClient(TestSettings.Options);
-            using (var xrmApp = new XrmApp(client))
-            {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
-
-                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
-
-                xrmApp.Navigation.OpenSubArea("Service", "Cases");
-
-                // For proper test usage, please update the recordId below to a valid Case recordId
-                Guid recordId = new Guid("ba9a3931-675d-e911-a852-000d3a372393");
-
-                xrmApp.Entity.OpenEntity("incident", recordId);
-            }
-        }
-
-        [TestMethod]
+        [TestCategory("Fail - Bug")]
         public void UCITestOpenCaseRetrieveHeaderValues()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
@@ -90,11 +70,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.OpenRecord(0);
 
-                LookupItem ownerId = new LookupItem() { Name = "ownerid" };
-                string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
-
                 OptionSet priorityCode = new OptionSet() { Name = "prioritycode" };
                 string priorityCodeValue = xrmApp.Entity.GetHeaderValue(priorityCode);
+
+                // Bug: Fails to resolve ownerid
+                // OpenQA.Selenium.NoSuchElementException: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@data-id='header_ownerId.fieldControl-Lookup_ownerId']"}
+                LookupItem ownerId = new LookupItem() { Name = "ownerId" };
+                string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
 
                 xrmApp.ThinkTime(2000);
 

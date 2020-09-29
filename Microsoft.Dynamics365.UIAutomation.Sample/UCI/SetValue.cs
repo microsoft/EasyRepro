@@ -14,6 +14,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     {
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
         private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
@@ -22,15 +23,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
-
-                
                 
                 xrmApp.Grid.SwitchView("My Active Accounts");
+
                 xrmApp.Grid.OpenRecord(0);
                 //xrmApp.Entity.SetValue("name", "Margaret");
             }
@@ -42,11 +42,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
+
+                xrmApp.Grid.SwitchView("Active Contacts");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -56,13 +58,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Fail - Bug")]
         [TestMethod]
         public void UCITestOpenLookupSetValue()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -73,146 +76,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Grid.OpenRecord(0);
                 xrmApp.ThinkTime(500);
 
-                xrmApp.Entity.SetValue(new LookupItem { Name = "primarycontactid", Value = "Nancy Anderson (sample)" });
+                // Need to handle the Lookup Records window and select a record 
+                // Feature Request #854
+
+                // To work around the bug below, clearvalue first to initalize the field and then set it
+                xrmApp.Entity.ClearValue(new LookupItem { Name = "primarycontactid" });
+
+                // Bug - System.InvalidOperationException: No Results Matching Jim Were Found. #769
+                xrmApp.Entity.SetValue(new LookupItem { Name = "primarycontactid", Value = "Jim" });
                 xrmApp.ThinkTime(500);
-            }
-        }
-
-        [TestMethod]
-        public void UCITestActivityPartySetValue()
-        {
-            var client = new WebClient(TestSettings.Options);
-            using (var xrmApp = new XrmApp(client))
-            {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
-
-                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
-
-                xrmApp.Navigation.OpenSubArea("Sales", "Activities");
-
-                xrmApp.Grid.SwitchView("All Phone Calls");
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Grid.OpenRecord(0);
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Entity.SetValue(new LookupItem[] {
-                    new LookupItem { Name = "to", Value = "Adeventure Works (sample)", Index = 0 },
-                    new LookupItem { Name = "to", Value = "", Index = 0 } });
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Entity.SetValue(new LookupItem[] {
-                    new LookupItem { Name = "from", Value = "Rene Valdes (sample)", Index = 0 } });
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Entity.Save();
-            }
-        }
-
-        [TestMethod]
-        public void UCITestActivityPartyAddValues()
-        {
-            var client = new WebClient(TestSettings.Options);
-            using (var xrmApp = new XrmApp(client))
-            {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
-
-                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
-
-                xrmApp.Navigation.OpenSubArea("Sales", "Activities");
-
-                xrmApp.Grid.SwitchView("All Phone Calls");
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Grid.OpenRecord(0);
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Entity.AddValues(new LookupItem[] {
-                    new LookupItem { Name = "to", Value = "Adventure Works (sample)", Index = 0 },
-                    new LookupItem { Name = "to", Value = "", Index = 1 } });
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Entity.Save();
-            }
-        }
-
-        [TestMethod]
-        public void UCITestActivityPartyRemoveValues()
-        {
-            var client = new WebClient(TestSettings.Options);
-            using (var xrmApp = new XrmApp(client))
-            {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
-
-                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
-
-                xrmApp.Navigation.OpenSubArea("Sales", "Activities");
-
-                xrmApp.Grid.SwitchView("All Phone Calls");
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Grid.OpenRecord(0);
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Entity.RemoveValues(new LookupItem[] {
-                    new LookupItem { Name = "to", Value = "Adventure Works (sample)", Index = 0 },
-                    new LookupItem { Name = "to", Value = "", Index = 0 } });
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Entity.Save();
-            }
-        }
-
-        [TestMethod]
-        public void UCITestActivityClearValues()
-        {
-            var client = new WebClient(TestSettings.Options);
-            using (var xrmApp = new XrmApp(client))
-            {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
-
-                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
-
-                xrmApp.Navigation.OpenSubArea("Sales", "Activities");
-
-                xrmApp.Grid.SwitchView("All Phone Calls");
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Grid.OpenRecord(0);
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Entity.ClearValue(new LookupItem { Name = "to" });
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Entity.ClearValue(new LookupItem { Name = "from" });
-                xrmApp.ThinkTime(500);
-            }
-        }
-
-        [TestMethod]
-        public void UCITestDateTimeSetValue()
-        {
-            var client = new WebClient(TestSettings.Options);
-            using (var xrmApp = new XrmApp(client))
-            {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
-
-                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
-
-                xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
-                xrmApp.ThinkTime(500);
-
-                xrmApp.CommandBar.ClickCommand("New");
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Entity.SetValue("name", "Test EasyRepro Opportunity");
-
-                xrmApp.Entity.SetValue("estimatedclosedate", DateTime.Now, "M/d/yyyy h:mm tt");
-                xrmApp.ThinkTime(500);
-
-                xrmApp.Entity.Save();
-
-                xrmApp.ThinkTime(2000);
             }
         }
     }

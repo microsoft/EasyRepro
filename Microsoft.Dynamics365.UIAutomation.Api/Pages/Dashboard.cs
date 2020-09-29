@@ -76,35 +76,35 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 //Handle Firefox not clicking the viewpicker the first time
                 driver.WaitUntilVisible(By.ClassName(Elements.CssClass[Reference.DashBoard.ViewContainerClass]),
-                                        new TimeSpan(0, 0, 2),
-                                        null,
-                                        d => { dashboardSelectorContainer.FindElement(By.TagName("a")).Click(); });
+                                        TimeSpan.FromSeconds(2),
+                                        failureCallback: () => dashboardSelectorContainer.FindElement(By.TagName("a")).Click());
 
                 var viewContainer = driver.WaitUntilAvailable(By.ClassName(Elements.CssClass[Reference.DashBoard.ViewContainerClass]));
                 var viewItems = viewContainer.FindElements(By.TagName("li"));
 
                 foreach (var viewItem in viewItems)
                 {
-                    if (viewItem.GetAttribute("role") != null && viewItem.GetAttribute("role") == "menuitem")
-                    {
-                        var links = viewItem.FindElements(By.TagName("a"));
+                    var role = viewItem.GetAttribute("role");
+                    if (role != "menuitem")
+                        continue;
 
-                        if (links != null && links.Count > 1)
-                        {
-                            //var title = links[1].GetAttribute("title");
-                            var tag = links[1].FindElement(By.TagName("nobr"));
-                            var name = tag.Text;
-                            Guid guid;
+                    var links = viewItem.FindElements(By.TagName("a"));
+                    if (links == null || links.Count <= 1)
+                        continue;
 
-                            if (Guid.TryParse(viewItem.GetAttribute("id"), out guid))
-                            {
-                                //Handle Duplicate View Names
-                                //Temp Fix
-                                if (!dictionary.ContainsKey(name))
-                                    dictionary.Add(name, guid);
-                            }
-                        }
-                    }
+                    //var title = links[1].GetAttribute("title");
+                    var tag = links[1].FindElement(By.TagName("nobr"));
+                    var name = tag.Text;
+                    Guid guid;
+
+                    var parseSuccess = Guid.TryParse(viewItem.GetAttribute("id"), out guid);
+                    if (!parseSuccess)
+                        continue;
+
+                    //Handle Duplicate View Names
+                    //Temp Fix
+                    if (!dictionary.ContainsKey(name))
+                        dictionary.Add(name, guid);
                 }
 
                 return dictionary;
