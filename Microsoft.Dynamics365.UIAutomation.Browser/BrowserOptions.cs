@@ -20,7 +20,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.DownloadsPath = null;
             this.BrowserType = BrowserType.IE;
             this.PageLoadTimeout = new TimeSpan(0, 3, 0);
-            this.CommandTimeout = new TimeSpan(0, 10, 0);
+            this.CommandTimeout = TimeSpan.FromMinutes(20);
             this.StartMaximized = true;
             this.FireEvents = false;
             this.TraceSource = Constants.DefaultTraceSource;
