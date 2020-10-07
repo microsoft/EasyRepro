@@ -2699,7 +2699,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             TrySetDateValue(driver, container, control, formContext);
             TrySetTime(driver, container, control, formContext);
 
-            TryCloseHeaderFlyout(driver);
+            if (formContext == FormContextType.Header)
+            {
+                TryCloseHeaderFlyout(driver);
+            }
 
             return true;
         }
