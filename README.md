@@ -77,19 +77,18 @@ If the account you are using has MFA (Multi-Factor Authentication) enabled, you 
 You can obtain an MFA secret key for your account using these instructions - you will need Microsoft's Authenticator App to get this working:
 
 <ol >
-<li>Go to your Office365 'My account' page at: <a href="https://portal.office.com/account/" target="_blank">https://portal.office.com/account/</a></li>
-<li>Click on 'Manage security & privacy'</li>
-<li>Click on 'Additional security verification'</li>
-<li>Click on 'Create and manage app passwords'</li>
-<li>On the page which opens, there are two tabs which don't look like tabs. Click on the first of these: 'Additional security verification'</li>
-<li>Click on 'Set up Authenticator app'</li>
-<li>Click on 'Configure app without notifications'</li>
-<li>Make a note of the 'Secret Key' which is displayed</li>
-<li>In the authenticator app, Click the '+' to add an account and select 'work or school account'</li>
+<li>Go to your Office365 'Security info' page at: <a href="https://mysignins.microsoft.com/security-info" target="_blank">https://mysignins.microsoft.com/security-info</a></li> 
+<li>Enter your O365 login and password</li>
+<li>Click 'Add method' and select "Authenticator app" in Combobox, click Add</li>
+<li>Click on "I want to use a different authenticator app" link if you want to use
+not 'Microsoft Authenticator' authenticator app</li>
+<li>Click on the 'Next' button, click on the 'Next' button</li>
+<li>Click on 'Can't scan image?'</li>
+<li>Make a note of the 'Code' which is displayed</li>
+<li>Click the '+' to add an account and select 'work or school account'</li>
 <li>Scan the QR code displayed on the web page</li>
 <li>If the App displays a six-digit code, click 'Next' on the web page</li>
-<li>Click Verify Now on the web page</li>
-<li>Enter the six-digit verification code from the app into the web page</li>
+<li>Enter the six-digit verification code from the app into the web page and Click the 'Next' button</li>
 <li>Add your MFA Secret key from step 8 <i>with the spaces removed</i> to your app.config as shown below, in the same section that you add your username and password</li>
 </ol>
 
