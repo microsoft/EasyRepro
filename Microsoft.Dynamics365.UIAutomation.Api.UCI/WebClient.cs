@@ -1194,7 +1194,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var xpathToItems = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", name));
 
             //wait for complete the search
-            container.WaitUntil(d => d.FindVisible(By.XPath(".//li/div/label/span"))?.Text?.Contains(control.Value, StringComparison.OrdinalIgnoreCase) == true);
+            container.WaitUntil(d => d.FindVisible(xpathToItems)?.Text?.Contains(control.Value, StringComparison.OrdinalIgnoreCase) == true);
 
             ICollection<IWebElement> result = container.WaitUntil(
                 d => d.FindElements(xpathToItems),
@@ -2386,7 +2386,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (found)
                 SetInputValue(driver, input, value);
 
-            TrySetValue(fieldContainer, control);
+            TrySetValue(driver, control);
         }
 
         /// <summary>
