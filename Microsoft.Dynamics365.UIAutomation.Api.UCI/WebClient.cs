@@ -382,7 +382,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         appMenu =>
                         {
                             appMenu.Click(true);
-                            found = OpenAppFromMenu(driver, appName);
+                            found = TryToClickInAppTile(appName, driver) || OpenAppFromMenu(driver, appName);
                         });
             return found;
         }
@@ -1443,7 +1443,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     viewPicker.Click(true);
 
                     // Locate the ViewSelector flyout
-                    var viewPickerFlyout = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridViewPickerFlyout]), new TimeSpan(0,0,2));
+                    var viewPickerFlyout = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridViewPickerFlyout]), new TimeSpan(0, 0, 2));
 
                     var viewItems = viewPickerFlyout.FindElements(By.TagName("li"));
 
@@ -2448,7 +2448,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             string value = control.Value;
             if (value == null)
                 control.Value = string.Empty;
-                // throw new InvalidOperationException($"No value has been provided for the LookupItem {control.Name}. Please provide a value or an empty string and try again.");
+            // throw new InvalidOperationException($"No value has been provided for the LookupItem {control.Name}. Please provide a value or an empty string and try again.");
 
             if (control.Value == string.Empty)
                 SetLookupByIndex(container, control);
@@ -2808,12 +2808,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     dateField.Click(true);
                     if (date != null)
-                    {                        
+                    {
                         dateField = dateField.FindElement(By.TagName("input"));
 
                         // Only send Keys.Escape to avoid element not interactable exceptions with calendar flyout on forms.
                         // This can cause the Header or BPF flyouts to close unexpectedly
-                        if (formContextType == FormContextType.Entity || formContextType == FormContextType.QuickCreate )
+                        if (formContextType == FormContextType.Entity || formContextType == FormContextType.QuickCreate)
                         {
                             dateField.SendKeys(Keys.Escape);
                         }
@@ -2851,7 +2851,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //IWebDriver formContext;
                 // Initialize the quick create form context
                 // If this is not done -- element input will go to the main form due to new flyout design
-                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]), new TimeSpan(0,0, 1));
+                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]), new TimeSpan(0, 0, 1));
             }
             else if (formContextType == FormContextType.Entity)
             {
@@ -2916,7 +2916,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     RemoveMultiOptions(option, formContextType);
                 }
 
-                
+
                 AddMultiOptions(option, formContextType);
 
                 return true;
@@ -2979,7 +2979,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     // Hover the field to expose the Select Record buttons
                     fieldContainer.Hover(driver, true);
                 }
-                    
+
 
                 xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.SelectedRecordButton].Replace("[NAME]", option.Name));
                 var listItemObjects = fieldContainer.FindElements(By.XPath(xpath));
@@ -3069,17 +3069,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         input.SendKeys(optionValue);
                         ThinkTime(2000);
                         var searchFlyout = fieldContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.Flyout].Replace("[NAME]", option.Name)));
-                        ThinkTime(2000);  
+                        ThinkTime(2000);
                         var searchResultList = searchFlyout.FindElements(By.TagName("li"));
 
-                        
+
                         // Is the item in search results?
                         if (searchResultList.Any(x => x.GetAttribute("aria-label").Contains(optionValue, StringComparison.OrdinalIgnoreCase)))
                         {
                             searchResultList.FirstOrDefault(x => x.GetAttribute("aria-label").Contains(optionValue, StringComparison.OrdinalIgnoreCase)).Click(true);
                             driver.WaitForTransaction();
                         }
-                    }    
+                    }
                 }
 
                 // Click on the div containing textbox so that the floyout collapses or else the flyout
@@ -3482,7 +3482,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Get Header Title"), driver =>
             {
                 // Wait for form selector visible
-                var headerTitle = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderTitle]), new TimeSpan(0,0,5));
+                var headerTitle = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderTitle]), new TimeSpan(0, 0, 5));
 
                 var headerTitleName = headerTitle?.Text;
 
@@ -3529,7 +3529,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         {
                             var recordLabels = recordRow.FindElements(By.TagName("label"));
 
-                            foreach(IWebElement label in recordLabels)
+                            foreach (IWebElement label in recordLabels)
                             {
                                 if (label.GetAttribute("id") != null)
                                 {
@@ -3565,7 +3565,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                     else
                         throw new NotFoundException($"Unable to locate record list for subgrid {subgridName}");
-                  
+
                 }
                 // Attempt to locate the editable grid list
                 else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList))
@@ -3706,10 +3706,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     return true;
                 }
-                else if(!foundGrid)
+                else if (!foundGrid)
                 {
                     // Read Only Grid Not Found
-                   var foundEditableGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+                    var foundEditableGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
 
                     if (foundEditableGrid)
                     {
@@ -4355,7 +4355,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         icon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormMessageBarTypeIcon]));
                     }
-                    catch(NoSuchElementException)
+                    catch (NoSuchElementException)
                     {
                         // Swallow the exception
                     }
@@ -4708,7 +4708,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var inputbox = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[fieldName]));
                 if (expectedTagName.Equals(inputbox.TagName, StringComparison.InvariantCultureIgnoreCase))
-                {                    
+                {
                     if (!inputbox.TagName.Contains("iframe", StringComparison.InvariantCultureIgnoreCase))
                     {
                         inputbox.Click(true);
@@ -4747,7 +4747,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 // Initialize the Business Process Flow context
                 var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
-                var fieldElement = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.FieldSectionItemContainer].Replace("[NAME]", field)));                
+                var fieldElement = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.FieldSectionItemContainer].Replace("[NAME]", field)));
                 Field returnField = new Field(fieldElement);
                 returnField.Name = field;
 
