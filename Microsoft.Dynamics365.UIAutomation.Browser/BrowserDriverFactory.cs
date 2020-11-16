@@ -23,12 +23,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 case BrowserType.Chrome:
                     var chromeService = ChromeDriverService.CreateDefaultService(options.DriversPath);
                     chromeService.HideCommandPromptWindow = options.HideDiagnosticWindow;
-                    driver = new ChromeDriver(chromeService, options.ToChrome());
+                    driver = new ChromeDriver(chromeService, options.ToChrome(), options.CommandTimeout);
                     break;
                 case BrowserType.IE:
                     var ieService = InternetExplorerDriverService.CreateDefaultService(options.DriversPath);
                     ieService.SuppressInitialDiagnosticInformation = options.HideDiagnosticWindow;
-                    driver = new InternetExplorerDriver(ieService, options.ToInternetExplorer(), TimeSpan.FromMinutes(20));
+                    driver = new InternetExplorerDriver(ieService, options.ToInternetExplorer(), options.CommandTimeout);
                     break;
                 case BrowserType.Firefox:
                     var ffService = FirefoxDriverService.CreateDefaultService(options.DriversPath);
@@ -39,7 +39,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 case BrowserType.Edge:
                     var edgeService = EdgeDriverService.CreateDefaultService(options.DriversPath);
                     edgeService.HideCommandPromptWindow = options.HideDiagnosticWindow;
-                    driver = new EdgeDriver(edgeService,options.ToEdge(), TimeSpan.FromMinutes(20));
+                    driver = new EdgeDriver(edgeService, options.ToEdge(), options.CommandTimeout);
                     break;
                 case BrowserType.Remote:
                     ICapabilities capabilities = null;
@@ -52,7 +52,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                             capabilities = options.ToFireFox().ToCapabilities();
                             break;
                     }
-                    driver = new RemoteWebDriver(options.RemoteHubServer, capabilities, TimeSpan.FromMinutes(20));
+                    driver = new RemoteWebDriver(options.RemoteHubServer, capabilities, options.CommandTimeout);
                     break;
                 default:
                     throw new InvalidOperationException(
