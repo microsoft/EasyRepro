@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using System.Collections.Generic;
@@ -331,7 +331,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_AreaMoreMenu"       , "//ul[@role=\"menubar\"]"},
             { "Nav_SubAreaContainer"       , "//*[@data-id=\"navbar-container\"]/div/ul"},
             { "Nav_WebAppMenuButton"       , "//*[@id=\"TabArrowDivider\"]/a"},
-            { "Nav_UCIAppMenuButton"       , "//button[@data-id=\"navbar-switch-app\"]"},
+            { "Nav_UCIAppMenuButton"       , "//a[@data-id=\"appBreadCrumb\"]"},
             { "Nav_SiteMapLauncherButton", "//button[@data-lp-id=\"sitemap-launcher\"]" },
             { "Nav_SiteMapLauncherCloseButton", "//button[@data-id='navbutton']" },
             { "Nav_SiteMapAreaMoreButton", "//button[@data-lp-id=\"sitemap-areaBar-more-btn\"]" },
@@ -470,7 +470,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_FormMessageBar", "//*[@id=\"notificationMessageAndButtons\"]/div/div/span" },
             { "Entity_FormMessageBarTypeIcon", ".//span[contains(@data-id,'formReadOnlyIcon')]" },
             { "Entity_FormNotifcationBar", "//div[contains(@data-id, 'notificationWrapper')]" },
-            { "Entity_FormNotifcationTypeIcon", ".//span[contains(@id,'notification_icon_')]" },            
+            { "Entity_FormNotifcationTypeIcon", ".//span[contains(@id,'notification_icon_')]" },
             { "Entity_FormNotifcationExpandButton", ".//span[@id='notificationExpandIcon']" },
             { "Entity_FormNotifcationFlyoutRoot", "//div[@id='__flyoutRootNode']" },
             { "Entity_FormNotifcationList", ".//ul[@data-id='notificationList']" },

@@ -20,7 +20,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.DownloadsPath = null;
             this.BrowserType = BrowserType.IE;
             this.PageLoadTimeout = new TimeSpan(0, 3, 0);
-            this.CommandTimeout = new TimeSpan(0, 10, 0);
+            this.CommandTimeout = TimeSpan.FromMinutes(20);
             this.StartMaximized = true;
             this.FireEvents = false;
             this.TraceSource = Constants.DefaultTraceSource;
@@ -58,7 +58,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool PrivateMode { get; set; }
         public bool CleanSession { get; set; }
         public TimeSpan PageLoadTimeout { get; set; }
-        public TimeSpan CommandTimeout { get; set; }
+        public TimeSpan CommandTimeout { get; set; } = TimeSpan.FromMinutes(20);
         /// <summary>
         /// When <see langword="true" /> the browser will open maximized at the highest supported resolution.
         /// </summary>
