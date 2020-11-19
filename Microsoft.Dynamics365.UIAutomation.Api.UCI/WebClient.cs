@@ -4400,7 +4400,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         var notification = new FormNotification
                         {
-                            Message = item.GetAttribute("aria-label")
+                            Message = item.Text
                         };
                         string classes = icon.GetAttribute("class");
                         notification.SetTypeFromClass(classes);
