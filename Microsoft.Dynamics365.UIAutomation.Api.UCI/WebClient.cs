@@ -1194,7 +1194,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var xpathToItems = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", name));
 
             //wait for complete the search
-            container.WaitUntil(d => d.FindVisible(By.XPath(".//li/div/label/span"))?.Text?.Contains(control.Value, StringComparison.OrdinalIgnoreCase) == true);
+            container.WaitUntil(d => d.FindVisible(xpathToItems)?.Text?.Contains(control.Value, StringComparison.OrdinalIgnoreCase) == true);
 
             ICollection<IWebElement> result = container.WaitUntil(
                 d => d.FindElements(xpathToItems),
@@ -2386,7 +2386,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (found)
                 SetInputValue(driver, input, value);
 
-            TrySetValue(fieldContainer, control);
+            TrySetValue(driver, control);
         }
 
         /// <summary>
@@ -2699,7 +2699,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             TrySetDateValue(driver, container, control, formContext);
             TrySetTime(driver, container, control, formContext);
 
-            TryCloseHeaderFlyout(driver);
+            if (formContext == FormContextType.Header)
+            {
+                TryCloseHeaderFlyout(driver);
+            }
 
             return true;
         }
@@ -4397,7 +4400,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         var notification = new FormNotification
                         {
-                            Message = item.GetAttribute("aria-label")
+                            Message = item.Text
                         };
                         string classes = icon.GetAttribute("class");
                         notification.SetTypeFromClass(classes);
