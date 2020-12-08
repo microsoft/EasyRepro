@@ -3635,14 +3635,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRowsHighDensity]));
 
                     //Process each row
+                    var jsExecutor = (IJavaScriptExecutor)driver;
                     foreach (IWebElement row in rows)
                     {
                         //Get the entityId and entity Type
                         if (row.GetAttribute("data-lp-id") != null)
                         {
                             var rowAttributes = row.GetAttribute("data-lp-id").Split('|');
-                            item.Id = Guid.Parse(rowAttributes[3]);
                             item.EntityName = rowAttributes[4];
+                            //The row record IDs are not in the DOM. Must be retrieved via JavaScript
+                            var getId = $"return Xrm.Page.getControl(\"{subgridName}\").getGrid().getRows().get({rows.IndexOf(row)}).getData().entity.getId()";
+                            item.Id = new Guid((string)jsExecutor.ExecuteScript(getId));
                         }
 
                         var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
