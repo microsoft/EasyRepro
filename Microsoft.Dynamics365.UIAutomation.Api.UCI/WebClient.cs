@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using OpenQA.Selenium;
@@ -3635,7 +3635,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRowsHighDensity]));
 
                     //Process each row
-                    var jsExecutor = (IJavaScriptExecutor)driver;
                     foreach (IWebElement row in rows)
                     {
                         //Get the entityId and entity Type
@@ -3645,7 +3644,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             item.EntityName = rowAttributes[4];
                             //The row record IDs are not in the DOM. Must be retrieved via JavaScript
                             var getId = $"return Xrm.Page.getControl(\"{subgridName}\").getGrid().getRows().get({rows.IndexOf(row)}).getData().entity.getId()";
-                            item.Id = new Guid((string)jsExecutor.ExecuteScript(getId));
+                            item.Id = new Guid((string)driver.ExecuteScript(getId));
                         }
 
                         var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
