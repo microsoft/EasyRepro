@@ -33,7 +33,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Retrieves the value of a Lookup field
         /// </summary>
-        /// <param name="field">LookupItem with the schema name of the field to retrieve
+        /// <param name="field">LookupItem with the schema name of the field to retrieve</param>
         public string GetValue(LookupItem field)
         {
             return _client.GetValue(field);
@@ -42,8 +42,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Retrieves the value of a OptionSet field
         /// </summary>
-        /// <param name="field">OptionSet with the schema name of the field to retrieve
+        /// <param name="field">OptionSet with the schema name of the field to retrieve</param
         public string GetValue(OptionSet field)
+        {
+            return _client.GetValue(field);
+        }
+
+        /// <summary>
+        /// Retrieves the value of a BooleanItem field.
+        /// </summary>
+        /// <param name="field">BooleanItem with the schema name of the field to retrieve.</param>
+        public bool GetValue(BooleanItem field)
         {
             return _client.GetValue(field);
         }
