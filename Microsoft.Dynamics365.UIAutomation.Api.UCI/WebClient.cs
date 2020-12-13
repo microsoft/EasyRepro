@@ -4066,13 +4066,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var count = existingValues.Count;
                 fieldContainer.WaitUntil(x => x.FindElements(xpathDeleteExistingValues).Count > count);
             }
-            else if (!isHeader && !success)
-            {
-                var xpathToHoveExistingValue = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", controlName));
-                var found = fieldContainer.TryFindElement(xpathToHoveExistingValue, out var existingList);
-                if (found)
-                    existingList.Click(true);
-            }
 
             fieldContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupSearchButton].Replace("[NAME]", controlName)));
 
