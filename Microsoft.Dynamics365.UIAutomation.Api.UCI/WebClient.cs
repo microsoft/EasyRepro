@@ -4163,11 +4163,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.ClickWhenAvailable(By.Id(form.GetAttribute("id")));
 
                 driver.WaitForPageToLoad();
+                driver.WaitForTransaction();
 
-                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
-                    TimeSpan.FromSeconds(30),
-                    "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
-                );
                 return true;
             });
         }
