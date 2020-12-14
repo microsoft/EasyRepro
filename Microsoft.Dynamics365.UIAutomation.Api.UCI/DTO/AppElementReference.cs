@@ -26,6 +26,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string AppMenuContainer = "Nav_AppMenuContainer";
             public static string SettingsLauncherBar = "Nav_SettingsLauncherBar";
             public static string SettingsLauncher = "Nav_SettingsLauncher";
+            public static string AccountManagerButton = "Nav_AccountManagerButton";
+            public static string AccountManagerSignOutButton = "Nav_AccountManagerSignOutButton";
             public static string GuidedHelp = "Nav_GuidedHelp";
             public static string AdminPortal = "Nav_AdminPortal";
             public static string AdminPortalButton = "Nav_AdminPortalButton";
@@ -339,6 +341,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_AppMenuContainer"       , "//*[@id=\"taskpane-scroll-container\"]"},
             { "Nav_SettingsLauncherBar"       , "//button[@data-id='[NAME]Launcher']"},
             { "Nav_SettingsLauncher"       , "//div[@id='[NAME]Launcher']"},
+            { "Nav_AccountManagerButton", "//*[@id=\"mectrl_main_trigger\"]" },
+            { "Nav_AccountManagerSignOutButton", "//*[@id=\"mectrl_body_signOut\"]" },
             { "Nav_GuidedHelp"       , "//*[@id=\"helpLauncher\"]/button"},
             //{ "Nav_AdminPortal"       , "//*[@id=(\"id-5\")]"},
             { "Nav_AdminPortal"       , "//*[contains(@data-id,'officewaffle')]"},
