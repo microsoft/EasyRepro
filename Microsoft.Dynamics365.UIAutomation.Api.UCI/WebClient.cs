@@ -4684,9 +4684,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (tabList.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabs]), out moreTabsButton))
             {
                 moreTabsButton.Click();
-                searchScope = Browser.Driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabsMenu]));
-            }
 
+                // No tab to click - subtabs under 'Related' are automatically expanded in overflow menu
+                if (name == "Related")
+                {
+                    return;
+                }
+                else
+                {
+                    searchScope = Browser.Driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabsMenu]));
+                }
+            }
 
             if (searchScope.TryFindElement(By.XPath(string.Format(xpath, name)), out listItem))
             {
