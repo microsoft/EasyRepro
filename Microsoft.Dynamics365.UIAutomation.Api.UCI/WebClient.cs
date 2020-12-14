@@ -4857,27 +4857,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Set BPF Value: {option.Name}"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BooleanFieldContainer].Replace("[NAME]", option.Name)));
-                if (!option.Value)
+                var selectedOption = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BooleanFieldSelectedOption].Replace("[NAME]", option.Name)));
+
+                var existingValue = selectedOption.GetAttribute<string>("Title") == "Yes";
+                if (option.Value != existingValue)
                 {
-                    if (!fieldContainer.Selected)
-                    {
-                        fieldContainer.Click(true);
-                    }
-                    else
-                    {
-                        fieldContainer.Click(true);
-                    }
-                }
-                else
-                {
-                    if (fieldContainer.Selected)
-                    {
-                        fieldContainer.Click(true);
-                    }
-                    else
-                    {
-                        fieldContainer.Click(true);
-                    }
+                    fieldContainer.Click();
                 }
 
                 return true;
