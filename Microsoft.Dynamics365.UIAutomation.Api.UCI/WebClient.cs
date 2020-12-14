@@ -340,6 +340,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         #region Navigation
 
+        internal BrowserCommandResult<bool> SignOut()
+        {
+            return Execute(GetOptions("Sign out"), driver =>
+            {
+                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Navigation.AccountManagerButton])).Click();
+                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Navigation.AccountManagerSignOutButton])).Click();
+
+                return driver.WaitForPageToLoad();
+            });
+        }
+
+
         internal BrowserCommandResult<bool> OpenApp(string appName, int thinkTime = Constants.DefaultThinkTime)
         {
             ThinkTime(thinkTime);
