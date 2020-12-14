@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using OpenQA.Selenium;
@@ -3641,8 +3641,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         if (row.GetAttribute("data-lp-id") != null)
                         {
                             var rowAttributes = row.GetAttribute("data-lp-id").Split('|');
-                            item.Id = Guid.Parse(rowAttributes[3]);
                             item.EntityName = rowAttributes[4];
+                            //The row record IDs are not in the DOM. Must be retrieved via JavaScript
+                            var getId = $"return Xrm.Page.getControl(\"{subgridName}\").getGrid().getRows().get({rows.IndexOf(row)}).getData().entity.getId()";
+                            item.Id = new Guid((string)driver.ExecuteScript(getId));
                         }
 
                         var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
