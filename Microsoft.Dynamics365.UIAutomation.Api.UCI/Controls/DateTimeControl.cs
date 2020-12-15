@@ -19,16 +19,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public string DateFormat { get; set; }
         public string TimeFormat { get; set; }
-        
+
         private string _dateAsString;
-        public string DateAsString { 
-            get =>  _dateAsString ?? (_dateAsString = string.IsNullOrWhiteSpace(DateFormat) ? Value?.ToShortDateString() : Value?.ToString(DateFormat));
+        public string DateAsString
+        {
+            get => _dateAsString ?? (_dateAsString = string.IsNullOrWhiteSpace(DateFormat) ? Value?.ToShortDateString() : Value?.ToString(DateFormat));
             set => _dateAsString = value;
         }
 
         private string _timeAsString;
-        public string TimeAsString { 
-            get =>  _timeAsString ?? (_timeAsString = string.IsNullOrWhiteSpace(TimeFormat) ? Value?.ToShortTimeString().ToUpper() : Value?.ToString(TimeFormat)).ToUpper();
+        public string TimeAsString
+        {
+            get => _timeAsString ?? (_timeAsString = string.IsNullOrWhiteSpace(TimeFormat) ? Value?.ToShortTimeString()?.ToUpper() : Value?.ToString(TimeFormat))?.ToUpper();
             set => _timeAsString = value;
         }
     }
