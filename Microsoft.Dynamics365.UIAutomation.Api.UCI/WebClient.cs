@@ -2981,33 +2981,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
 
-                // If there are large number of options selected then a small expand collapse 
-                // button needs to be clicked to expose all the list elements.
-                var xpath = AppElements.Xpath[AppReference.MultiSelect.ExpandCollapseButton].Replace("[NAME]", option.Name);
-                var expandCollapseButtons = fieldContainer.FindElements(By.XPath(xpath));
-                if (expandCollapseButtons.Any())
-                {
-                    expandCollapseButtons.First().Click(true);
-                }
-                else
-                {
-                    // Hover the field to expose the Select Record buttons
-                    fieldContainer.Hover(driver, true);
-                }
+                fieldContainer.Hover(driver, true);
 
+                var selectedRecordXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord]);
+                var selectedRecords = fieldContainer.FindElements(selectedRecordXPath);
 
-                xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.SelectedRecordButton].Replace("[NAME]", option.Name));
-                var listItemObjects = fieldContainer.FindElements(By.XPath(xpath));
-                var loopCounts = listItemObjects.Any() ? listItemObjects.Count : 0;
-
-                for (int i = 0; i < loopCounts; i++)
+                var initialCountOfSelectedOptions = selectedRecords.Count;
+                var deleteButtonXpath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedOptionDeleteButton]);
+                for (int i = 0; i < initialCountOfSelectedOptions; i++)
                 {
                     // With every click of the button, the underlying DOM changes and the
                     // entire collection becomes stale, hence we only click the first occurance of
                     // the button and loop back to again find the elements and anyother occurance
-                    listItemObjects[0].FindElement(By.TagName("button")).Click(true);
+                    selectedRecords[0].FindElement(deleteButtonXpath).Click(true);
                     driver.WaitForTransaction();
-                    listItemObjects = fieldContainer.FindElements(By.XPath(xpath));
+                    selectedRecords = fieldContainer.FindElements(selectedRecordXPath);
                 }
 
                 return true;
@@ -3057,58 +3045,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
 
+                var inputXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch]);
+                fieldContainer.FindElement(inputXPath).SendKeys(string.Empty);
 
+                var flyoutCaretXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.FlyoutCaret]);
+                fieldContainer.FindElement(flyoutCaretXPath).Click();
 
-                string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", option.Name);
-                // If there is already some pre-selected items in the div then we must determine if it
-                // actually exists and simulate a set focus event on that div so that the input textbox
-                // becomes visible.
-                var listItems = fieldContainer.FindElements(By.XPath(xpath));
-                if (listItems.Any())
-                {
-                    listItems.First().SendKeys("");
-                }
-
-                fieldContainer.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch].Replace("[NAME]", option.Name)));
                 foreach (var optionValue in option.Values)
                 {
-                    xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.FlyoutList].Replace("[NAME]", option.Name), optionValue);
-                    var flyout = fieldContainer.FindElements(By.XPath(xpath));
-                    if (flyout.Any())
+                    var flyoutOptionXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.FlyoutOption].Replace("[NAME]", optionValue));
+                    if (fieldContainer.TryFindElement(flyoutOptionXPath, out var flyoutOption))
                     {
-                        flyout.First().Click(true);
-                    }
-                    else
-                    {
-                        var input = fieldContainer.FindElement(By.TagName("input"));
-                        input.SendKeys(optionValue);
-                        ThinkTime(2000);
-                        var searchFlyout = fieldContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.Flyout].Replace("[NAME]", option.Name)));
-                        ThinkTime(2000);
-                        var searchResultList = searchFlyout.FindElements(By.TagName("li"));
+                        var ariaSelected = flyoutOption.GetAttribute<string>("aria-selected");
+                        var selected = !string.IsNullOrEmpty(ariaSelected) && bool.Parse(ariaSelected);
 
-
-                        // Is the item in search results?
-                        if (searchResultList.Any(x => x.GetAttribute("aria-label").Contains(optionValue, StringComparison.OrdinalIgnoreCase)))
+                        if (!selected)
                         {
-                            searchResultList.FirstOrDefault(x => x.GetAttribute("aria-label").Contains(optionValue, StringComparison.OrdinalIgnoreCase)).Click(true);
-                            driver.WaitForTransaction();
+                            flyoutOption.Click();
                         }
                     }
                 }
-
-                // Click on the div containing textbox so that the floyout collapses or else the flyout
-                // will interfere in finding the next multiselect control which by chance will be lying
-                // behind the flyout control.
-                //driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", Elements.ElementId[option.Name])));
-                xpath = AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name);
-                var divElements = fieldContainer.FindElements(By.XPath(xpath));
-                if (divElements.Any())
-                {
-                    divElements.First().Click(true);
-                }
-
-                fieldContainer.Click(true);
 
                 return true;
             });
@@ -3367,25 +3323,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Get Multi Select Value: {option.Name}"), driver =>
             {
-                // If there are large number of options selected then a small expand collapse 
-                // button needs to be clicked to expose all the list elements.
-                string xpath = AppElements.Xpath[AppReference.MultiSelect.ExpandCollapseButton].Replace("[NAME]", Elements.ElementId[option.Name]);
-                var expandCollapseButtons = driver.FindElements(By.XPath(xpath));
-                if (expandCollapseButtons.Any())
+                var containerXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name));
+                var container = driver.WaitUntilAvailable(containerXPath, $"Multi-select option set {option.Name} not found.");
+
+                container.Hover(driver, true);
+                var expandButtonXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.ExpandCollapseButton]);
+                if (container.TryFindElement(expandButtonXPath, out var expandButton) && expandButton.IsClickable())
                 {
-                    expandCollapseButtons.First().Click(true);
+                    expandButton.Click();
                 }
 
-                var returnValue = new MultiValueOptionSet { Name = option.Name };
+                var selectedOptionsXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecordLabel]);
+                var selectedOptions = container.FindElements(selectedOptionsXPath);
 
-                xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecordLabel].Replace("[NAME]", Elements.ElementId[option.Name]);
-                var labelItems = driver.FindElements(By.XPath(xpath));
-                if (labelItems.Any())
+                return new MultiValueOptionSet
                 {
-                    returnValue.Values = labelItems.Select(x => x.Text).ToArray();
-                }
-
-                return returnValue;
+                    Name = option.Name,
+                    Values = selectedOptions.Select(o => o.Text).ToArray()
+                };
             });
         }
 
