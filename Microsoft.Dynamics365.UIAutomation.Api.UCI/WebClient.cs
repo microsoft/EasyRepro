@@ -4171,9 +4171,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal void TryExpandHeaderFlyout(IWebDriver driver)
         {
-            bool hasHeader = driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.Header.Container]));
-            if (!hasHeader)
-                throw new NotFoundException("Unable to find header on the form");
+            driver.WaitUntilAvailable(
+                By.XPath(AppElements.Xpath[AppReference.Entity.Header.Container]),
+                "Unable to find header on the form");
 
             var xPath = By.XPath(AppElements.Xpath[AppReference.Entity.Header.FlyoutButton]);
             var headerFlyoutButton = driver.FindElement(xPath);
