@@ -205,9 +205,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string InputSearch = "MultiSelect_InputSearch";
             public static string SelectedRecord = "MultiSelect_SelectedRecord";
             public static string SelectedRecordButton = "MultiSelect_SelectedRecord_Button";
+            public static string SelectedOptionDeleteButton = "MultiSelect_SelectedRecord_DeleteButton";
             public static string SelectedRecordLabel = "MultiSelect_SelectedRecord_Label";
-            public static string Flyout = "MultiSelect_Flyout";
-            public static string FlyoutList = "MultiSelect_FlyoutList";
+            public static string FlyoutCaret = "MultiSelect_FlyoutCaret";
+            public static string FlyoutOption = "MultiSelect_FlyoutOption";
+            public static string FlyoutOptionCheckbox = "MultiSelect_FlyoutOptionCheckbox";
             public static string ExpandCollapseButton = "MultiSelect_ExpandCollapseButton";
         }
 
@@ -514,13 +516,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             //MultiSelect
             { "MultiSelect_DivContainer",     ".//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]" },
-            { "MultiSelect_InputSearch",     ".//div[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_InputSearch\")]" },
-            { "MultiSelect_SelectedRecord",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li" },
-            { "MultiSelect_SelectedRecord_Button",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]\") and contains(@data-id, 'SelectedRecordList')]//li" },
-            { "MultiSelect_SelectedRecord_Label",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]/descendant::label" },
-            { "MultiSelect_Flyout",      "//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//ul" },
-            { "MultiSelect_FlyoutList",      "//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//li[descendant::label[contains(text(), \"{0}\")]]" },
-            { "MultiSelect_ExpandCollapseButton", ".//button[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse\")]/descendant::label[not(text()=\"+0\")]" },
+            { "MultiSelect_InputSearch",     ".//input[contains(@class,\"msos-input\")]" },
+            { "MultiSelect_SelectedRecord",  ".//li[contains(@class, \"msos-selected-display-item\")]" },
+            { "MultiSelect_SelectedRecord_DeleteButton", ".//button[contains(@class, \"msos-quick-delete\")]" },
+            { "MultiSelect_SelectedRecord_Label",  ".//span[contains(@class, \"msos-selected-display-item-text\")]" },
+            { "MultiSelect_FlyoutOption",      "//li[label[contains(@title, \"[NAME]\")] and contains(@class,\"msos-option\")]" },
+            { "MultiSelect_FlyoutOptionCheckbox", "//input[contains(@class, \"msos-checkbox\")]" },
+            { "MultiSelect_FlyoutCaret", "//button[contains(@class, \"msos-caret-button\")]" },
+            { "MultiSelect_ExpandCollapseButton", ".//button[contains(@class,\"msos-selecteditems-toggle\")]" },
 
             //Dashboard
             { "Dashboard_Selector"       , "//span[contains(@id, 'Dashboard_Selector')]"},
