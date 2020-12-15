@@ -4205,16 +4205,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions("Select Lookup Record"), driver =>
             {
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows])))
+                driver.WaitForTransaction();
+
+                var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows]));
+                if (!rows.Any())
                 {
-                    var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows]));
-
-                    if (rows.Count > 0)
-                        rows.FirstOrDefault().Click(true);
-                }
-                else
                     throw new NotFoundException("No rows found");
+                }
 
+                rows.ElementAt(index).Click();
                 driver.WaitForTransaction();
 
                 return true;
