@@ -73,6 +73,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Gets the value of a DateTime field in the quick create form.
+        /// </summary>
+        /// <param name="control">The control.</param>
+        /// <returns>The value.</returns>
+        public DateTime? GetValue(DateTimeControl control)
+        {
+            return _client.GetValue(control);
+        }
+
+        /// <summary>
         /// Gets the value of a LookupItem field in the quick create form
         /// </summary>
         /// <param name="control">LookupItem of the field to set</param>
