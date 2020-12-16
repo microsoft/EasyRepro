@@ -592,7 +592,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "QuickCreate_CancelButton", "//button[contains(@id,'quickCreateCancelBtn')]"},
 
             //Lookup
-            { "Lookup_RelatedEntityLabel", "//li[contains(@title,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]" },
+            { "Lookup_RelatedEntityLabel", "//li[contains(@aria-label,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]" },
             { "Lookup_ChangeViewButton", "//button[contains(@data-id,'changeViewBtn')]"},
             { "Lookup_ViewRows", "//li[contains(@data-id,'viewLineContainer')]"},
             { "Lookup_ResultRows", "//li[contains(@data-id,'LookupResultsDropdown') and contains(@data-id,'resultsContainer')]"},
