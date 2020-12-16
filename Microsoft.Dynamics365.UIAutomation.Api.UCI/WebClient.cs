@@ -1064,6 +1064,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (toggleButton.Text == "Me")
                         toggleButton.Click();
 
+                    driver.WaitForTransaction();
+
                     //Set the User Or Team
                     var userOrTeamField = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookup]), "User field unavailable");
                     var input = userOrTeamField.ClickWhenAvailable(By.TagName("input"), "User field unavailable");
@@ -1224,7 +1226,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 //Find the button in the CommandBar
                 var ribbon = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]),
-                    TimeSpan.FromSeconds(5));
+            TimeSpan.FromSeconds(5));
 
                 if (ribbon == null)
                 {
@@ -4522,9 +4524,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
 
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]),
-                    TimeSpan.FromSeconds(5),
-                    "The Close Opportunity dialog is not available."
-                );
+            TimeSpan.FromSeconds(5),
+            "The Close Opportunity dialog is not available."
+        );
 
                 return true;
             });
