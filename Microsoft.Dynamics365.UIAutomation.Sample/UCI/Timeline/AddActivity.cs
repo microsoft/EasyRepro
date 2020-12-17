@@ -60,8 +60,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
 
-                xrmApp.Timeline.AddEmailContacts(CreateBccLookupItems("Jim Glynn (sample)", "Nancy Anderson (sample)"));
-                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItems("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+                xrmApp.Timeline.AddEmailContacts(CreateBccLookupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
 
 
                 // This fails as it already has a value.
@@ -97,8 +97,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(4000);
 
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
-                xrmApp.Timeline.AddEmailContacts(CreateBccLookupItems("Jim Glynn (sample)", "Nancy Anderson (sample)"));
-                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItems("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+                xrmApp.Timeline.AddEmailContacts(CreateBccLookupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
 
                 // This fails as it already has a value.
                 //xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
@@ -139,7 +139,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
 
-                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItems("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
 
                 // This fails with the exception of OpenQA.Selenium.ElementNotInteractableException: element not interactable
                 var success = xrmApp.Timeline.RemoveEmail(
@@ -202,7 +202,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
-        private LookupItem[] CreateBccLookupItems(params string[] lookupNames)
+        private LookupItem[] CreateBccLookupItemsFor(params string[] lookupNames)
         {
             var lookupItemList = new List<LookupItem>();
             foreach (var lookupName in lookupNames)
@@ -212,7 +212,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             return lookupItemList.ToArray();
         }
 
-        private LookupItem[] CreateCcLooupItems(params string[] v1)
+        private LookupItem[] CreateCcLooupItemsFor(params string[] v1)
         {
             var lookupItemList = new List<LookupItem>();
             foreach (var item in v1)
