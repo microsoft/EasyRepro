@@ -1580,7 +1580,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                             foreach (var header in rowHeaders)
                             {
-                                var id = header.GetAttribute("id");
+                                var id = header.GetAttribute("data-id") ?? header.GetAttribute("id");
                                 var className = header.GetAttribute("class");
                                 var cellData = cells[currentindex + 1].GetAttribute("title");
 
