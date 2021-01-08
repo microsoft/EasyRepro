@@ -68,7 +68,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="subject">Subject of the email</param>
         public void AddEmailSubject(string subject)
         {
-           _client.SetValue(Elements.ElementId[Reference.Timeline.EmailSubject], subject);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.EmailSubject], subject);
         }
 
         /// <summary>
@@ -76,9 +76,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="toOptions">Object of type MultiValueOptionSet containing name of the Field and the values to be set</param>
         /// <param name="removeExistingValues">Remove any existing values in the To, CC, or BCC lines, if present</param>         
-        public void AddEmailContacts(MultiValueOptionSet toOptions, bool removeExistingValues = false)
+        public void AddEmailContacts(LookupItem[] toOptions, bool removeExistingValues = false)
         {
-           _client.SetValue(toOptions,FormContextType.Entity, removeExistingValues);
+            _client.SetValue(toOptions, FormContextType.Entity, removeExistingValues);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="duration">The duration as text</param>
         public void AddEmailDuration(string duration)
         {
-           _client.SetValue(Elements.ElementId[Reference.Timeline.EmailDuration], duration);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.EmailDuration], duration);
         }
 
         /// <summary>

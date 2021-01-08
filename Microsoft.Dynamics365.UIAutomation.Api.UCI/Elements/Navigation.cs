@@ -35,7 +35,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenGroupSubArea(group, subarea);
         }
-        
+
         /// <summary>
         /// Opens a area in the unified client
         /// </summary>
@@ -117,7 +117,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         public void SignOut()
         {
-            _client.OpenSettingsOption("userInformation", "UserInformationMenu.SignOut");
+            _client.SignOut();
         }
 
         /// <summary>
@@ -153,12 +153,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenAndClickPopoutMenu(menuName, menuItemName);
         }
-		
+
         /// <summary>
         /// Clicks the quick create button (+ icon)
         /// </summary>
         /// <param name="entityName"></param>
-		public void QuickCreate(string entityName)
+        public void QuickCreate(string entityName)
         {
             _client.QuickCreate(entityName);
         }

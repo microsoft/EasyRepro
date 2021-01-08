@@ -72,7 +72,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.ClearValue(control, FormContextType.Entity);
         }
-        
+
 
         /// <summary>
         /// Clears a value from the DateTimeControl provided
@@ -179,7 +179,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.GetHeaderValue(control);
         }
-        
+
         /// <summary>
         /// Gets the value of a Boolean Item from the header
         /// </summary>
@@ -208,7 +208,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.GetHeaderValue(control);
         }
-        
+
         /// <summary>
         /// Gets the value of a DateTime Control from the header
         /// </summary>
@@ -218,7 +218,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.GetHeaderValue(control);
         }
-        
+
         /// <summary>
         /// Get the object id of the current entity
         /// </summary>
@@ -242,7 +242,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.GetFormName();
         }
-        
+
         /// <summary>
         /// Get the Header Title of the current entity
         /// </summary>
@@ -281,7 +281,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.GetValue(control);
         }
 
-        
+
         /// <summary>
         /// Gets the value of a Lookup.
         /// </summary>
@@ -333,9 +333,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Gets the value of a MultiValueOptionSet.
         /// </summary>
         /// <param name="option">The option you want to set.</param>
-        public void GetValue(MultiValueOptionSet option)
+        public MultiValueOptionSet GetValue(MultiValueOptionSet option)
         {
-            _client.GetValue(option);
+            return _client.GetValue(option);
         }
 
         /// <summary>
@@ -558,7 +558,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.SetValue(option, FormContextType.Entity, removeExistingValues);
         }
-        
+
         /// <summary>
         /// Click Process>Switch Process
         /// </summary>
@@ -597,5 +597,5 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.RemoveValues(controls);
         }
-    }   
+    }
 }

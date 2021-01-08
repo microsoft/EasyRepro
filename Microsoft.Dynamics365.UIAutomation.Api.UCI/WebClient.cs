@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using OpenQA.Selenium;
@@ -339,6 +339,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #endregion
 
         #region Navigation
+
+        internal BrowserCommandResult<bool> SignOut()
+        {
+            return Execute(GetOptions("Sign out"), driver =>
+            {
+                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Navigation.AccountManagerButton])).Click();
+                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Navigation.AccountManagerSignOutButton])).Click();
+
+                return driver.WaitForPageToLoad();
+            });
+        }
+
 
         internal BrowserCommandResult<bool> OpenApp(string appName, int thinkTime = Constants.DefaultThinkTime)
         {
@@ -1052,6 +1064,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (toggleButton.Text == "Me")
                         toggleButton.Click();
 
+                    driver.WaitForTransaction();
+
                     //Set the User Or Team
                     var userOrTeamField = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookup]), "User field unavailable");
                     var input = userOrTeamField.ClickWhenAvailable(By.TagName("input"), "User field unavailable");
@@ -1212,7 +1226,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 //Find the button in the CommandBar
                 var ribbon = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]),
-                    TimeSpan.FromSeconds(5));
+            TimeSpan.FromSeconds(5));
 
                 if (ribbon == null)
                 {
@@ -2969,33 +2983,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
 
-                // If there are large number of options selected then a small expand collapse 
-                // button needs to be clicked to expose all the list elements.
-                var xpath = AppElements.Xpath[AppReference.MultiSelect.ExpandCollapseButton].Replace("[NAME]", option.Name);
-                var expandCollapseButtons = fieldContainer.FindElements(By.XPath(xpath));
-                if (expandCollapseButtons.Any())
-                {
-                    expandCollapseButtons.First().Click(true);
-                }
-                else
-                {
-                    // Hover the field to expose the Select Record buttons
-                    fieldContainer.Hover(driver, true);
-                }
+                fieldContainer.Hover(driver, true);
 
+                var selectedRecordXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord]);
+                var selectedRecords = fieldContainer.FindElements(selectedRecordXPath);
 
-                xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.SelectedRecordButton].Replace("[NAME]", option.Name));
-                var listItemObjects = fieldContainer.FindElements(By.XPath(xpath));
-                var loopCounts = listItemObjects.Any() ? listItemObjects.Count : 0;
-
-                for (int i = 0; i < loopCounts; i++)
+                var initialCountOfSelectedOptions = selectedRecords.Count;
+                var deleteButtonXpath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedOptionDeleteButton]);
+                for (int i = 0; i < initialCountOfSelectedOptions; i++)
                 {
                     // With every click of the button, the underlying DOM changes and the
                     // entire collection becomes stale, hence we only click the first occurance of
                     // the button and loop back to again find the elements and anyother occurance
-                    listItemObjects[0].FindElement(By.TagName("button")).Click(true);
+                    selectedRecords[0].FindElement(deleteButtonXpath).Click(true);
                     driver.WaitForTransaction();
-                    listItemObjects = fieldContainer.FindElements(By.XPath(xpath));
+                    selectedRecords = fieldContainer.FindElements(selectedRecordXPath);
                 }
 
                 return true;
@@ -3045,58 +3047,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
 
+                var inputXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch]);
+                fieldContainer.FindElement(inputXPath).SendKeys(string.Empty);
 
+                var flyoutCaretXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.FlyoutCaret]);
+                fieldContainer.FindElement(flyoutCaretXPath).Click();
 
-                string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", option.Name);
-                // If there is already some pre-selected items in the div then we must determine if it
-                // actually exists and simulate a set focus event on that div so that the input textbox
-                // becomes visible.
-                var listItems = fieldContainer.FindElements(By.XPath(xpath));
-                if (listItems.Any())
-                {
-                    listItems.First().SendKeys("");
-                }
-
-                fieldContainer.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch].Replace("[NAME]", option.Name)));
                 foreach (var optionValue in option.Values)
                 {
-                    xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.FlyoutList].Replace("[NAME]", option.Name), optionValue);
-                    var flyout = fieldContainer.FindElements(By.XPath(xpath));
-                    if (flyout.Any())
+                    var flyoutOptionXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.FlyoutOption].Replace("[NAME]", optionValue));
+                    if (fieldContainer.TryFindElement(flyoutOptionXPath, out var flyoutOption))
                     {
-                        flyout.First().Click(true);
-                    }
-                    else
-                    {
-                        var input = fieldContainer.FindElement(By.TagName("input"));
-                        input.SendKeys(optionValue);
-                        ThinkTime(2000);
-                        var searchFlyout = fieldContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.Flyout].Replace("[NAME]", option.Name)));
-                        ThinkTime(2000);
-                        var searchResultList = searchFlyout.FindElements(By.TagName("li"));
+                        var ariaSelected = flyoutOption.GetAttribute<string>("aria-selected");
+                        var selected = !string.IsNullOrEmpty(ariaSelected) && bool.Parse(ariaSelected);
 
-
-                        // Is the item in search results?
-                        if (searchResultList.Any(x => x.GetAttribute("aria-label").Contains(optionValue, StringComparison.OrdinalIgnoreCase)))
+                        if (!selected)
                         {
-                            searchResultList.FirstOrDefault(x => x.GetAttribute("aria-label").Contains(optionValue, StringComparison.OrdinalIgnoreCase)).Click(true);
-                            driver.WaitForTransaction();
+                            flyoutOption.Click();
                         }
                     }
                 }
-
-                // Click on the div containing textbox so that the floyout collapses or else the flyout
-                // will interfere in finding the next multiselect control which by chance will be lying
-                // behind the flyout control.
-                //driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", Elements.ElementId[option.Name])));
-                xpath = AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name);
-                var divElements = fieldContainer.FindElements(By.XPath(xpath));
-                if (divElements.Any())
-                {
-                    divElements.First().Click(true);
-                }
-
-                fieldContainer.Click(true);
 
                 return true;
             });
@@ -3355,25 +3325,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Get Multi Select Value: {option.Name}"), driver =>
             {
-                // If there are large number of options selected then a small expand collapse 
-                // button needs to be clicked to expose all the list elements.
-                string xpath = AppElements.Xpath[AppReference.MultiSelect.ExpandCollapseButton].Replace("[NAME]", Elements.ElementId[option.Name]);
-                var expandCollapseButtons = driver.FindElements(By.XPath(xpath));
-                if (expandCollapseButtons.Any())
+                var containerXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name));
+                var container = driver.WaitUntilAvailable(containerXPath, $"Multi-select option set {option.Name} not found.");
+
+                container.Hover(driver, true);
+                var expandButtonXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.ExpandCollapseButton]);
+                if (container.TryFindElement(expandButtonXPath, out var expandButton) && expandButton.IsClickable())
                 {
-                    expandCollapseButtons.First().Click(true);
+                    expandButton.Click();
                 }
 
-                var returnValue = new MultiValueOptionSet { Name = option.Name };
+                var selectedOptionsXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecordLabel]);
+                var selectedOptions = container.FindElements(selectedOptionsXPath);
 
-                xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecordLabel].Replace("[NAME]", Elements.ElementId[option.Name]);
-                var labelItems = driver.FindElements(By.XPath(xpath));
-                if (labelItems.Any())
+                return new MultiValueOptionSet
                 {
-                    returnValue.Values = labelItems.Select(x => x.Text).ToArray();
-                }
-
-                return returnValue;
+                    Name = option.Name,
+                    Values = selectedOptions.Select(o => o.Text).ToArray()
+                };
             });
         }
 
@@ -3641,8 +3610,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         if (row.GetAttribute("data-lp-id") != null)
                         {
                             var rowAttributes = row.GetAttribute("data-lp-id").Split('|');
-                            item.Id = Guid.Parse(rowAttributes[3]);
                             item.EntityName = rowAttributes[4];
+                            //The row record IDs are not in the DOM. Must be retrieved via JavaScript
+                            var getId = $"return Xrm.Page.getControl(\"{subgridName}\").getGrid().getRows().get({rows.IndexOf(row)}).getData().entity.getId()";
+                            item.Id = new Guid((string)driver.ExecuteScript(getId));
                         }
 
                         var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
@@ -4066,13 +4037,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var count = existingValues.Count;
                 fieldContainer.WaitUntil(x => x.FindElements(xpathDeleteExistingValues).Count > count);
             }
-            else if (!isHeader && !success)
-            {
-                var xpathToHoveExistingValue = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", controlName));
-                var found = fieldContainer.TryFindElement(xpathToHoveExistingValue, out var existingList);
-                if (found)
-                    existingList.Click(true);
-            }
 
             fieldContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupSearchButton].Replace("[NAME]", controlName)));
 
@@ -4163,11 +4127,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.ClickWhenAvailable(By.Id(form.GetAttribute("id")));
 
                 driver.WaitForPageToLoad();
+                driver.WaitForTransaction();
 
-                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
-                    TimeSpan.FromSeconds(30),
-                    "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
-                );
                 return true;
             });
         }
@@ -4212,9 +4173,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal void TryExpandHeaderFlyout(IWebDriver driver)
         {
-            bool hasHeader = driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.Header.Container]));
-            if (!hasHeader)
-                throw new NotFoundException("Unable to find header on the form");
+            driver.WaitUntilAvailable(
+                By.XPath(AppElements.Xpath[AppReference.Entity.Header.Container]),
+                "Unable to find header on the form");
 
             var xPath = By.XPath(AppElements.Xpath[AppReference.Entity.Header.FlyoutButton]);
             var headerFlyoutButton = driver.FindElement(xPath);
@@ -4246,16 +4207,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions("Select Lookup Record"), driver =>
             {
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows])))
+                driver.WaitForTransaction();
+
+                var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows]));
+                if (!rows.Any())
                 {
-                    var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows]));
-
-                    if (rows.Count > 0)
-                        rows.FirstOrDefault().Click(true);
-                }
-                else
                     throw new NotFoundException("No rows found");
+                }
 
+                rows.ElementAt(index).Click();
                 driver.WaitForTransaction();
 
                 return true;
@@ -4400,7 +4360,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         var notification = new FormNotification
                         {
-                            Message = item.GetAttribute("aria-label")
+                            Message = item.Text
                         };
                         string classes = icon.GetAttribute("class");
                         notification.SetTypeFromClass(classes);
@@ -4563,9 +4523,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
 
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]),
-                    TimeSpan.FromSeconds(5),
-                    "The Close Opportunity dialog is not available."
-                );
+            TimeSpan.FromSeconds(5),
+            "The Close Opportunity dialog is not available."
+        );
 
                 return true;
             });
@@ -4682,9 +4642,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (tabList.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabs]), out moreTabsButton))
             {
                 moreTabsButton.Click();
-                searchScope = Browser.Driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabsMenu]));
-            }
 
+                // No tab to click - subtabs under 'Related' are automatically expanded in overflow menu
+                if (name == "Related")
+                {
+                    return;
+                }
+                else
+                {
+                    searchScope = Browser.Driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabsMenu]));
+                }
+            }
 
             if (searchScope.TryFindElement(By.XPath(string.Format(xpath, name)), out listItem))
             {
@@ -4854,27 +4822,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Set BPF Value: {option.Name}"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BooleanFieldContainer].Replace("[NAME]", option.Name)));
-                if (!option.Value)
+                var selectedOption = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BooleanFieldSelectedOption].Replace("[NAME]", option.Name)));
+
+                var existingValue = selectedOption.GetAttribute<string>("Title") == "Yes";
+                if (option.Value != existingValue)
                 {
-                    if (!fieldContainer.Selected)
-                    {
-                        fieldContainer.Click(true);
-                    }
-                    else
-                    {
-                        fieldContainer.Click(true);
-                    }
-                }
-                else
-                {
-                    if (fieldContainer.Selected)
-                    {
-                        fieldContainer.Click(true);
-                    }
-                    else
-                    {
-                        fieldContainer.Click(true);
-                    }
+                    fieldContainer.Click();
                 }
 
                 return true;
