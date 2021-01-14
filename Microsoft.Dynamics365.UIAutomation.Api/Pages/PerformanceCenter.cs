@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web.Script.Serialization;
+using Nancy.Json;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
@@ -110,7 +110,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 jsSerializer.RegisterConverters(new[] { new DynamicJsonConverter() });
 
-                var jsonObj = (Dictionary<string, object>)jsSerializer.Deserialize(jsonResults, typeof(Dictionary<string, object>));
+                var jsonObj = (Dictionary<string, object>)jsSerializer.Deserialize<Dictionary<string, object>>(jsonResults);
 
                 return jsonObj;
             });

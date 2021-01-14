@@ -5,15 +5,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using OpenQA.Selenium;
+using System.Configuration;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.Web.Navigation
 {
     [TestClass]
     public class AreasAndSubAreas
     {
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"]);
+        private readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
+        private readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly Uri _xrmUri = new Uri(ConfigurationManager.AppSettings["OnlineCrmUrl"]);
 
         [TestMethod]
         public void CheckSubAreasAvailableWithinSalesArea()

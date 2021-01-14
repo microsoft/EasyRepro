@@ -2,11 +2,11 @@
 // Licensed under the MIT license.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Security;
 using System.Collections.Generic;
+using Microsoft.Dynamics365.UIAutomation.Api;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 {

@@ -2,13 +2,11 @@
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.Dynamics365.UIAutomation.Browser.Extensions;
+using Newtonsoft.Json;
 using OpenQA.Selenium;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Web.Script.Serialization;
-using Newtonsoft.Json;
+using System.Linq;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -45,6 +43,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="additionalProperties">The additional properties you want to track in telemetry. These values will show up in the customDimensions of the customEvents</param>
         /// <param name="additionalMetrics">The additional metricsyou want to track in telemetry. These values will show up in the customMeasurements of the customEvents</param>
+        [Obsolete]
         public void TrackCommandEvents(Dictionary<string, string> additionalProperties = null, Dictionary<string, double> additionalMetrics = null)
         {
             _client.CommandResults.ForEach(x =>
@@ -69,12 +68,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 TrackEvents(x.CommandName, properties, metrics);
             });
         }
+
         /// <summary>
         /// Tracks the performance center telemetry events.
         /// </summary>
         /// <param name="additionalProperties">The additional properties you want to track in telemetry. These values will show up in the customDimensions of the customEvents</param>
         /// <param name="additionalMetrics">The additional metricsyou want to track in telemetry. These values will show up in the customMeasurements of the customEvents</param>
         /// <exception cref="System.InvalidOperationException">UCI Performance Mode is not enabled.  Please enable performance mode in the Options before tracking performance telemetry.</exception>
+        [Obsolete]
         public void TrackPerformanceEvents(Dictionary<string, string> additionalProperties = null, Dictionary<string, double> additionalMetrics = null)
         {
             if (!_client.Browser.Options.UCIPerformanceMode) throw new InvalidOperationException("UCI Performance Mode is not enabled.  Please enable performance mode in the Options before tracking performance telemetry.");
@@ -111,12 +112,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if(properties.Count>0) TrackEvents(type.ToString(), properties, null);
         }
 
+        [Obsolete]
         internal void TrackEvents(string eventName, Dictionary<string, string> properties, Dictionary<string, double> metrics)
         {
             if (string.IsNullOrEmpty(_client.Browser.Options.AppInsightsKey)) throw new InvalidOperationException("The Application Insights key was not specified.  Please specify an Instrumentation key in the Browser Options.");
             properties.Add("ClientSessionId", _client.ClientSessionId.ToString());
 
-            var telemetry = new Microsoft.ApplicationInsights.TelemetryClient { InstrumentationKey = _client.Browser.Options.AppInsightsKey };
+            var telemetry = new ApplicationInsights.TelemetryClient { InstrumentationKey = _client.Browser.Options.AppInsightsKey };
             telemetry.TrackEvent(eventName, properties, metrics);
             telemetry.Flush();
 
