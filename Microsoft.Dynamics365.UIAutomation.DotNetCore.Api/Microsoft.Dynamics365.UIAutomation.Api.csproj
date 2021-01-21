@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DFE2C141-F1AA-4D4B-8DF8-0FB93023CF45}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Microsoft.Dynamics365.UIAutomation.Api</RootNamespace>
+    <AssemblyName>Microsoft.Dynamics365.UIAutomation.Api</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WebDriver, Version=3.11.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selenium.WebDriver.3.11.2\lib\net45\WebDriver.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WebDriver.Support, Version=3.11.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selenium.Support.3.11.2\lib\net45\WebDriver.Support.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls\CompositeControl.cs" />
+    <Compile Include="Controls\Field.cs" />
+    <Compile Include="Controls\LookupItem.cs" />
+    <Compile Include="Controls\MultiValueOptionSet.cs" />
+    <Compile Include="Controls\DateTimeControl.cs" />
+    <Compile Include="Controls\TwoOption.cs" />
+    <Compile Include="Controls\OptionSet.cs" />
+    <Compile Include="DTOs\PerformanceNavigationTiming.cs" />
+    <Compile Include="DTOs\PerformanceResource.cs" />
+    <Compile Include="DTOs\AppNotification.cs" />
+    <Compile Include="DTOs\ElementReference.cs" />
+    <Compile Include="DTOs\GridItem.cs" />
+    <Compile Include="DTOs\InstanceInfo.cs" />
+    <Compile Include="DTOs\Link.cs" />
+    <Compile Include="DTOs\ListItem.cs" />
+    <Compile Include="DTOs\PerformanceMarker.cs" />
+    <Compile Include="LoginRedirectEventArgs.cs" />
+    <Compile Include="Office365Browser.cs" />
+    <Compile Include="Pages\Office365.cs" />
+    <Compile Include="Pages\WindowPerformanceNavigation.cs" />
+    <Compile Include="Pages\Administration.cs" />
+    <Compile Include="Pages\Dashboard.cs" />
+    <Compile Include="Pages\GlobalSearch.cs" />
+    <Compile Include="Pages\LoginDialog.cs" />
+    <Compile Include="Pages\Office365Navigation.cs" />
+    <Compile Include="Pages\Office365XrmInstancePicker.cs" />
+    <Compile Include="Pages\CommandBar.cs" />
+    <Compile Include="Pages\Dialog.cs" />
+    <Compile Include="Pages\Entity.cs" />
+    <Compile Include="Pages\Grid.cs" />
+    <Compile Include="Pages\GuidedHelp.cs" />
+    <Compile Include="Pages\Lookup.cs" />
+    <Compile Include="Pages\Mobile.cs" />
+    <Compile Include="Pages\Navigation.cs" />
+    <Compile Include="Pages\BusinessProcessFlow.cs" />
+    <Compile Include="Pages\Notfication.cs" />
+    <Compile Include="Pages\PerformanceCenter.cs" />
+    <Compile Include="Pages\Processes.cs" />
+    <Compile Include="Pages\QuickCreate.cs" />
+    <Compile Include="Pages\Document.cs" />
+    <Compile Include="Pages\ActivityFeed.cs" />
+    <Compile Include="Pages\RelatedGrid.cs" />
+    <Compile Include="Pages\Report.cs" />
+    <Compile Include="Pages\WindowPerformanceResource.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReportEventArgs.cs" />
+    <Compile Include="Browser.cs" />
+    <Compile Include="XrmPage.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Browser\Microsoft.Dynamics365.UIAutomation.Browser.csproj">
+      <Project>{c9748803-f3cb-4531-b313-bc24d4d0bf0c}</Project>
+      <Name>Microsoft.Dynamics365.UIAutomation.Browser</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Selenium.Chrome.WebDriver.2.38\build\Selenium.Chrome.WebDriver.targets" Condition="Exists('..\packages\Selenium.Chrome.WebDriver.2.38\build\Selenium.Chrome.WebDriver.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Selenium.Chrome.WebDriver.2.38\build\Selenium.Chrome.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.Chrome.WebDriver.2.38\build\Selenium.Chrome.WebDriver.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
