@@ -91,7 +91,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     // DateTime condition
                     var readOnlyInput = containerElement.FindElement(By.TagName("input"));
 
-                    if (readOnlyInput.HasAttribute("disabled"))
+                    if (readOnlyInput.HasAttribute("disabled") || readOnlyInput.HasAttribute("readonly"))
                         return true;
                 }
                 else
