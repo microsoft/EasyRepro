@@ -600,7 +600,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Lookup_RecordList", ".//div[contains(@id,'RecordList') and contains(@role,'presentation')]" },
 
             //Performance Width
-            { "Performance_Widget","//div[@data-id='performance-widget']/div"},
+            { "Performance_Widget","//div[@data-id='performance-widget']//*[text()='Page load']"},
             { "Performance_WidgetPage", "//div[@data-id='performance-widget']//span[contains(text(), '[NAME]')]" }
         };
     }
