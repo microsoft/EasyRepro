@@ -367,17 +367,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     success = TryToClickInAppTile(appName, driver);
                 }
 
+                else if (driver.Url.Contains("forceUCI=1"))
+                {
+                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton);
+                }
                 else
                 {
-                    if (driver.Url.Contains("forceUCI=1"))
-                    {
-                        success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton);
-                    }
-                    else
-                    {
-                        success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton);
-                    }
+                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton);
                 }
+
 
                 if (!success)
                     throw new InvalidOperationException($"App Name {appName} not found.");
