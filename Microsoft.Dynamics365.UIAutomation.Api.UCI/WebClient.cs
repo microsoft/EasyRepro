@@ -160,14 +160,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             }
 
             int attempts = 0;
-            bool entered;
-            do
+            bool entered=false;
+            if (mfaSecretKey != null)
             {
-                entered = EnterOneTimeCode(driver, mfaSecretKey);
-                success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
-                attempts++;
+                do
+                {
+                    entered = EnterOneTimeCode(driver, mfaSecretKey);
+                    success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
+                    attempts++;
+                }
+                while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
             }
-            while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
 
             if (entered && !success)
                 throw new InvalidOperationException("Something went wrong entering the OTC. Please check the MFA-SecretKey in configuration.");
