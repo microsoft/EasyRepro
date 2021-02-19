@@ -1236,7 +1236,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 //Get the CommandBar buttons
-                var items = ribbon.FindElements(By.TagName("li"));
+                var items = ribbon.FindElements(By.TagName("button"));
 
                 //Is the button in the ribbon?
                 if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
