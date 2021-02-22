@@ -1995,7 +1995,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     // Locate subGrid command list
                     //var foundCommands = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
 
-                    var items = subGridCommandBar.FindElements(By.TagName("li"));
+                    var items = subGridCommandBar.FindElements(By.TagName("button"));
 
                     //Is the button in the ribbon?
                     if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
