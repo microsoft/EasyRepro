@@ -202,5 +202,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.ClickCommand(buttonName, subButtonName, secondSubButtonName);
         }
+
+        /// <summary>
+        /// Clicks on entity dialog ribbon button
+        /// </summary>
+        /// <param name="tabName"></param>
+        /// <param name="subtabName"></param>
+        /// <returns></returns>
+        public bool SelectTab(string tabName, string subtabName = null)
+        {
+            return _client.SelectTab(tabName, subtabName);
+        }
     }
 }
