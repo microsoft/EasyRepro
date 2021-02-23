@@ -190,5 +190,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.SetStateDialog(clickOkButton);
         }
+
+        /// <summary>
+        /// Clicks on entity dialog ribbon button
+        /// </summary>
+        /// <param name="buttonname"></param>
+        /// <param name="subButtonName"></param>
+        /// <param name="secondSubButtonName"></param>
+        /// <returns></returns>
+        public bool ClickCommand(string buttonName, string subButtonName = null, string secondSubButtonName = null)
+        {
+            return _client.ClickCommand(buttonName, subButtonName, secondSubButtonName);
+        }
     }
 }

@@ -182,6 +182,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public static class CommandBar
         {
             public static string Container = "Cmd_Container";
+            public static string DialogContainer = "Cmd_DialogContainer";
             public static string ContainerGrid = "Cmd_ContainerGrid";
             public static string MoreCommandsMenu = "Cmd_MoreCommandsMenu";
             public static string Button = "Cmd_Button";
@@ -418,7 +419,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_RecordSetNavList", "//ul[contains(@data-id, 'recordSetNavList')]" },
             { "Entity_RecordSetNavCollapseIcon", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
             { "Entity_RecordSetNavCollapseIconParent", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
-            { "Entity_TabList", "//ul[contains(@id, \"tablist\")]" },
+            { "Entity_TabList", ".//ul[contains(@id, \"tablist\")]" },
             { "Entity_Tab", ".//li[@title='{0}']" },
             { "Entity_MoreTabs", ".//button[@data-id='more_button']" },
             { "Entity_MoreTabsMenu", "//div[@id='__flyoutRootNode']" },
@@ -492,7 +493,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Header_DateTimeFieldContainer","//div[@data-id='header_[NAME]-FieldSectionItemContainer']" },
                         
             //CommandBar
-            { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
+            { "Cmd_Container"       , ".//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
             { "Cmd_ContainerGrid"       , "//ul[contains(@data-lp-id,\"commandbar-HomePageGrid\")]"},
             { "Cmd_MoreCommandsMenu"       , "//*[@id=\"__flyoutRootNode\"]"},
             { "Cmd_Button", "//*[contains(text(),'[NAME]')]"},
@@ -548,7 +549,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_CloseStageButton","//button[contains(@id,'stageContentClose')]"},
 
             //Related Grid
-            { "Related_CommandBarButton", ".//li[contains(@aria-label, '[NAME]') and contains(@id,'SubGrid')]//button"},
+            { "Related_CommandBarButton", ".//button[contains(@aria-label, '[NAME]') and contains(@id,'SubGrid')]"},
             { "Related_CommandBarOverflowContainer", "//div[contains(@data-id, 'flyoutRootNode')]"},
             { "Related_CommandBarOverflowButton", ".//button[contains(@data-id, 'OverflowButton') and contains(@data-lp-id, 'SubGridAssociated')]"},
             { "Related_CommandBarSubButton" ,".//button[contains(., '[NAME]')]"},
@@ -567,7 +568,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "CloseOpportunityDialog_CancelButton" , "//button[contains(@data-id, 'cancel_id')]" },
             { "CloseActivityDialog_CloseButton" , ".//button[contains(@data-id, 'ok_id')]" },
             { "CloseActivityDialog_CancelButton" , ".//button[contains(@data-id, 'cancel_id')]" },
-            { "Dialog_DialogContext", "//div[contains(@id,'dialogView') and contains(@role, 'dialog')]" },
+            { "Dialog_DialogContext", "//div[contains(@role, 'dialog')]" },
             { "Dialog_ActualRevenue", "//input[contains(@data-id,'actualrevenue_id')]" },
             { "Dialog_CloseDate", "//input[contains(@data-id,'closedate_id')]" },
             { "Dialog_DescriptionId", "//input[contains(@data-id,'description_id')]" },
