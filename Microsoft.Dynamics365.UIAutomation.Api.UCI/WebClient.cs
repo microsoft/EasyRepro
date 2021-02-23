@@ -1224,9 +1224,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return Execute(GetOptions($"Click Command"), driver =>
             {
-                //Find the button in the CommandBar
-                var ribbon = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]),
-            TimeSpan.FromSeconds(5));
+                // Find the button in the CommandBar
+                IWebElement ribbon;
+                // Checking if any dialog is active
+                if (driver.HasElement(By.XPath(string.Format(AppElements.Xpath[AppReference.Dialogs.DialogContext]))))
+                {
+                    var dialogContainer = driver.FindElement(By.XPath(string.Format(AppElements.Xpath[AppReference.Dialogs.DialogContext])));
+                    ribbon = dialogContainer.WaitUntilAvailable(By.XPath(string.Format(AppElements.Xpath[AppReference.CommandBar.Container])));
+                }
+                else
+                {
+                    ribbon = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]));
+                }
+                TimeSpan.FromSeconds(5);
 
                 if (ribbon == null)
                 {
@@ -1236,7 +1246,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 //Get the CommandBar buttons
-                var items = ribbon.FindElements(By.TagName("li"));
+                var items = ribbon.FindElements(By.TagName("button"));
 
                 //Is the button in the ribbon?
                 if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
@@ -4523,8 +4533,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
 
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]),
-            TimeSpan.FromSeconds(5),
-            "The Close Opportunity dialog is not available."
+        TimeSpan.FromSeconds(5),
+        "The Close Opportunity dialog is not available."
         );
 
                 return true;
@@ -4614,7 +4624,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute($"Select Tab", driver =>
             {
-                IWebElement tabList = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
+                IWebElement tabList;
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext])))
+                {
+                    var dialogContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+                    tabList = dialogContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
+                }
+                else
+                {
+                    tabList = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
+                }
 
                 ClickTab(tabList, AppElements.Xpath[AppReference.Entity.Tab], tabName);
 
