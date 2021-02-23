@@ -182,7 +182,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public static class CommandBar
         {
             public static string Container = "Cmd_Container";
-            public static string DialogContainer = "Cmd_DialogContainer";
             public static string ContainerGrid = "Cmd_ContainerGrid";
             public static string MoreCommandsMenu = "Cmd_MoreCommandsMenu";
             public static string Button = "Cmd_Button";
