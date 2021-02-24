@@ -1,7 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
+using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
+using OtpNet;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,10 +14,6 @@ using System.Linq;
 using System.Security;
 using System.Threading;
 using System.Web;
-using OpenQA.Selenium.Interactions;
-using OtpNet;
-using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
-using Microsoft.Dynamics365.UIAutomation.Browser;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -360,11 +360,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForPageToLoad();
                 driver.SwitchTo().DefaultContent();
-
+                var success = false;
                 //Handle left hand Nav in Web Client
-                var success = TryToClickInAppTile(appName, driver) ||
-                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton) ||
-                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton);
+                if (!driver.Url.Contains("appid"))
+                {
+                    success = TryToClickInAppTile(appName, driver);
+                }
+
+                else if (driver.Url.Contains("forceUCI=1"))
+                {
+                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton);
+                }
+                else
+                {
+                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton);
+                }
+
 
                 if (!success)
                     throw new InvalidOperationException($"App Name {appName} not found.");
