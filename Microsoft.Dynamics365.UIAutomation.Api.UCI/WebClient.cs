@@ -2175,6 +2175,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     link += "&flags=testmode=true";
                 }
+                if (Browser.Options.UCIPerformanceMode)
+                {
+                    link += "&perf=true";
+                }
 
                 driver.Navigate().GoToUrl(link);
 
