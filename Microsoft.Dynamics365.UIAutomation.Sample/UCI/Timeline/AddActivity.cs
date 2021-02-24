@@ -2,6 +2,7 @@
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Security;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
@@ -58,16 +59,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(4000);
 
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Elements.ElementId[Reference.Timeline.EmailBcc],
-                    Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
-                });
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Elements.ElementId[Reference.Timeline.EmailCC],
-                    Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
-                });
+
+                xrmApp.Timeline.AddEmailContacts(CreateBccLookupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+
+
                 // This fails as it already has a value.
                 //xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
                 //{
@@ -101,16 +97,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(4000);
 
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Elements.ElementId[Reference.Timeline.EmailBcc],
-                    Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
-                });
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Elements.ElementId[Reference.Timeline.EmailCC],
-                    Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
-                });
+                xrmApp.Timeline.AddEmailContacts(CreateBccLookupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+
                 // This fails as it already has a value.
                 //xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
                 //{
@@ -149,11 +138,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(4000);
 
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Elements.ElementId[Reference.Timeline.EmailCC],
-                    Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
-                });
+
+                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
 
                 // This fails with the exception of OpenQA.Selenium.ElementNotInteractableException: element not interactable
                 var success = xrmApp.Timeline.RemoveEmail(
@@ -214,6 +200,35 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.ThinkTime(3000);
             }
+        }
+
+        private LookupItem[] CreateBccLookupItemsFor(params string[] lookupNames)
+        {
+            var lookupItemList = new List<LookupItem>();
+            foreach (var lookupName in lookupNames)
+            {
+                lookupItemList.Add(CreateLookupItem(Reference.Timeline.EmailBcc, lookupName));
+            }
+            return lookupItemList.ToArray();
+        }
+
+        private LookupItem[] CreateCcLooupItemsFor(params string[] v1)
+        {
+            var lookupItemList = new List<LookupItem>();
+            foreach (var item in v1)
+            {
+                lookupItemList.Add(CreateLookupItem(Reference.Timeline.EmailCC, item));
+            }
+            return lookupItemList.ToArray();
+        }
+
+        private LookupItem CreateLookupItem(string name, string value)
+        {
+            return new LookupItem
+            {
+                Name = Elements.ElementId[name],
+                Value = value
+            };
         }
     }
 }

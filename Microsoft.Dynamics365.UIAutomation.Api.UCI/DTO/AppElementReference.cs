@@ -26,6 +26,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string AppMenuContainer = "Nav_AppMenuContainer";
             public static string SettingsLauncherBar = "Nav_SettingsLauncherBar";
             public static string SettingsLauncher = "Nav_SettingsLauncher";
+            public static string AccountManagerButton = "Nav_AccountManagerButton";
+            public static string AccountManagerSignOutButton = "Nav_AccountManagerSignOutButton";
             public static string GuidedHelp = "Nav_GuidedHelp";
             public static string AdminPortal = "Nav_AdminPortal";
             public static string AdminPortalButton = "Nav_AdminPortalButton";
@@ -203,9 +205,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string InputSearch = "MultiSelect_InputSearch";
             public static string SelectedRecord = "MultiSelect_SelectedRecord";
             public static string SelectedRecordButton = "MultiSelect_SelectedRecord_Button";
+            public static string SelectedOptionDeleteButton = "MultiSelect_SelectedRecord_DeleteButton";
             public static string SelectedRecordLabel = "MultiSelect_SelectedRecord_Label";
-            public static string Flyout = "MultiSelect_Flyout";
-            public static string FlyoutList = "MultiSelect_FlyoutList";
+            public static string FlyoutCaret = "MultiSelect_FlyoutCaret";
+            public static string FlyoutOption = "MultiSelect_FlyoutOption";
+            public static string FlyoutOptionCheckbox = "MultiSelect_FlyoutOptionCheckbox";
             public static string ExpandCollapseButton = "MultiSelect_ExpandCollapseButton";
         }
 
@@ -239,6 +243,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string FieldSectionItemContainer = "BPF_FieldSectionItemContainer";
             public static string TextFieldLabel = "BPF_TextFieldLabel";
             public static string BooleanFieldContainer = "BPF_BooleanFieldContainer";
+            public static string BooleanFieldSelectedOption = "BPF_BooleanFieldSelectedOption";
             public static string DateTimeFieldContainer = "BPF_DateTimeFieldContainer";
             public static string FieldControlDateTimeInputUCI = "BPF_FieldControlDateTimeInputUCI";
             public static string PinStageButton = "BPF_PinStageButton";
@@ -339,6 +344,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_AppMenuContainer"       , "//*[@id=\"taskpane-scroll-container\"]"},
             { "Nav_SettingsLauncherBar"       , "//button[@data-id='[NAME]Launcher']"},
             { "Nav_SettingsLauncher"       , "//div[@id='[NAME]Launcher']"},
+            { "Nav_AccountManagerButton", "//*[@id=\"mectrl_main_trigger\"]" },
+            { "Nav_AccountManagerSignOutButton", "//*[@id=\"mectrl_body_signOut\"]" },
             { "Nav_GuidedHelp"       , "//*[@id=\"helpLauncher\"]/button"},
             //{ "Nav_AdminPortal"       , "//*[@id=(\"id-5\")]"},
             { "Nav_AdminPortal"       , "//*[contains(@data-id,'officewaffle')]"},
@@ -398,7 +405,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_TextFieldLookup", ".//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
             { "Entity_TextFieldLookupSearchButton", ".//button[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_search')]" },
             { "Entity_TextFieldLookupMenu", "//div[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]') and contains(@data-id,'tabContainer')]" },
-            { "Entity_LookupFieldExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag')]" },
+            { "Entity_LookupFieldExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag') and @role='link']" },
             { "Entity_LookupFieldDeleteExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]" },
             { "Entity_LookupFieldExpandCollapseButton", ".//button[contains(@data-id,'[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse')]/descendant::label[not(text()='+0')]" },
             { "Entity_LookupFieldNoRecordsText", ".//*[@data-id=\'[NAME].fieldControl-LookupResultsDropdown_[NAME]_No_Records_Text']" },
@@ -509,13 +516,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             //MultiSelect
             { "MultiSelect_DivContainer",     ".//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]" },
-            { "MultiSelect_InputSearch",     ".//div[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_InputSearch\")]" },
-            { "MultiSelect_SelectedRecord",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]//li" },
-            { "MultiSelect_SelectedRecord_Button",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]\") and contains(@data-id, 'SelectedRecordList')]//li" },
-            { "MultiSelect_SelectedRecord_Label",  ".//ul[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList\")]/descendant::label" },
-            { "MultiSelect_Flyout",      "//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//ul" },
-            { "MultiSelect_FlyoutList",      "//div[contains(@id,\"[NAME].fieldControl|__flyoutRootNode_SimpleLookupControlFlyout\")]//li[descendant::label[contains(text(), \"{0}\")]]" },
-            { "MultiSelect_ExpandCollapseButton", ".//button[contains(@data-id,\"[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse\")]/descendant::label[not(text()=\"+0\")]" },
+            { "MultiSelect_InputSearch",     ".//input[contains(@class,\"msos-input\")]" },
+            { "MultiSelect_SelectedRecord",  ".//li[contains(@class, \"msos-selected-display-item\")]" },
+            { "MultiSelect_SelectedRecord_DeleteButton", ".//button[contains(@class, \"msos-quick-delete\")]" },
+            { "MultiSelect_SelectedRecord_Label",  ".//span[contains(@class, \"msos-selected-display-item-text\")]" },
+            { "MultiSelect_FlyoutOption",      "//li[label[contains(@title, \"[NAME]\")] and contains(@class,\"msos-option\")]" },
+            { "MultiSelect_FlyoutOptionCheckbox", "//input[contains(@class, \"msos-checkbox\")]" },
+            { "MultiSelect_FlyoutCaret", "//button[contains(@class, \"msos-caret-button\")]" },
+            { "MultiSelect_ExpandCollapseButton", ".//button[contains(@class,\"msos-selecteditems-toggle\")]" },
 
             //Dashboard
             { "Dashboard_Selector"       , "//span[contains(@id, 'Dashboard_Selector')]"},
@@ -532,7 +540,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_FormContext"     , "//div[contains(@id, \'ProcessStageControl-processHeaderStageFlyoutInnerContainer\')]" },
             { "BPF_TextFieldContainer", ".//div[contains(@data-lp-id, \'header_process_[NAME]\')]" },
             { "BPF_TextFieldLabel", "//label[contains(@id, \'header_process_[NAME]-field-label\')]" },
-            { "BPF_BooleanFieldContainer", ".//input[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-toggle\')]" },
+            { "BPF_BooleanFieldContainer", ".//div[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-container\')]" },
+            { "BPF_BooleanFieldSelectedOption", ".//div[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-container\') and contains(@aria-checked, \'true\')]" },
             { "BPF_DateTimeFieldContainer", ".//input[contains(@data-id, \'[NAME].fieldControl-date-time-input\')]" },
             { "BPF_FieldControlDateTimeInputUCI",".//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
             { "BPF_PinStageButton","//button[contains(@id,'stageDockModeButton')]"},
@@ -583,7 +592,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "QuickCreate_CancelButton", "//button[contains(@id,'quickCreateCancelBtn')]"},
 
             //Lookup
-            { "Lookup_RelatedEntityLabel", "//li[contains(@title,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]" },
+            { "Lookup_RelatedEntityLabel", "//li[contains(@aria-label,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]" },
             { "Lookup_ChangeViewButton", "//button[contains(@data-id,'changeViewBtn')]"},
             { "Lookup_ViewRows", "//li[contains(@data-id,'viewLineContainer')]"},
             { "Lookup_ResultRows", "//li[contains(@data-id,'LookupResultsDropdown') and contains(@data-id,'resultsContainer')]"},
