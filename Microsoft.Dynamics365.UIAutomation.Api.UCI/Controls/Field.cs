@@ -94,6 +94,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (readOnlyInput.HasAttribute("disabled") || readOnlyInput.HasAttribute("readonly"))
                         return true;
                 }
+                else if (containerElement.HasElement(By.TagName("textarea")))
+                {
+                    var readOnlyTextArea = containerElement.FindElement(By.TagName("textarea"));
+                    return readOnlyTextArea.HasAttribute("readonly"))
+                }
                 else
                 {
                     // Special Lookup Field condition (e.g. transactioncurrencyid)
