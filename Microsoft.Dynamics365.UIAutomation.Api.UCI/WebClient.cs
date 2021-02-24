@@ -4083,6 +4083,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 throw new InvalidOperationException($"Field '{controlName}' does not contain a record with the name:  {value}");
 
             existingValue.Click(true);
+            driver.WaitForTransaction();
         }
 
         internal BrowserCommandResult<bool> ClearValue(OptionSet control, FormContextType formContextType)
