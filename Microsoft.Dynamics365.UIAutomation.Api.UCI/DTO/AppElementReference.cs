@@ -356,7 +356,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_QuickLaunchButton",                "//li[contains(@title, '[NAME]')]"},
             { "Nav_QuickCreateButton", "//button[contains(@data-id,'quickCreateLauncher')]" },
             { "Nav_QuickCreateMenuList", "//ul[contains(@id,'MenuSectionItemsquickCreate')]" },
-            { "Nav_QuickCreateMenuItems", "//li[@role='menuitem']" },
+            { "Nav_QuickCreateMenuItems", "//button[@role='menuitem']" },
             { "Nav_PinnedSitemapEntity","//li[contains(@data-id,'sitemap-entity-Pinned') and contains(@role,'treeitem')]"},
             { "Nav_SitemapMenuGroup", "//ul[@role=\"group\"]"},
             { "Nav_SitemapMenuItems", "//li[contains(@data-id,'sitemap-entity')]"},
@@ -548,7 +548,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_CloseStageButton","//button[contains(@id,'stageContentClose')]"},
 
             //Related Grid
-            { "Related_CommandBarButton", ".//li[contains(@aria-label, '[NAME]') and contains(@id,'SubGrid')]//button"},
+            { "Related_CommandBarButton", ".//button[contains(@aria-label, '[NAME]') and contains(@id,'SubGrid')]"},
             { "Related_CommandBarOverflowContainer", "//div[contains(@data-id, 'flyoutRootNode')]"},
             { "Related_CommandBarOverflowButton", ".//button[contains(@data-id, 'OverflowButton') and contains(@data-lp-id, 'SubGridAssociated')]"},
             { "Related_CommandBarSubButton" ,".//button[contains(., '[NAME]')]"},
