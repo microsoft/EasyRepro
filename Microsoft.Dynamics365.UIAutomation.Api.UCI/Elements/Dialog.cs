@@ -194,10 +194,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Clicks on entity dialog ribbon button
         /// </summary>
-        /// <param name="buttonname"></param>
-        /// <param name="subButtonName"></param>
         /// <param name="secondSubButtonName"></param>
-        /// <returns></returns>
+        /// <param name="buttonName">Name of button to click</param>
+        /// <param name="subButtonName">Name of button on submenu to click</param>
+        /// <param name="secondSubButtonName">Name of button on submenu (3rd level) to click</param>
         public bool ClickCommand(string buttonName, string subButtonName = null, string secondSubButtonName = null)
         {
             return _client.ClickCommand(buttonName, subButtonName, secondSubButtonName);
@@ -206,9 +206,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Clicks on entity dialog ribbon button
         /// </summary>
-        /// <param name="tabName"></param>
-        /// <param name="subtabName"></param>
-        /// <returns></returns>
+        /// <param name="tabName">The name of the tab based on the References class</param>
+        /// <param name="subtabName">The name of the subtab based on the References class</param>
         public bool SelectTab(string tabName, string subtabName = null)
         {
             return _client.SelectTab(tabName, subtabName);
