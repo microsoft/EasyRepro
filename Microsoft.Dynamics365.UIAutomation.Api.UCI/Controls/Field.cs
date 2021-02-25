@@ -97,7 +97,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else if (containerElement.HasElement(By.TagName("textarea")))
                 {
                     var readOnlyTextArea = containerElement.FindElement(By.TagName("textarea"));
-                    return readOnlyTextArea.HasAttribute("readonly"))
+                    return readOnlyTextArea.HasAttribute("readonly");
                 }
                 else
                 {
