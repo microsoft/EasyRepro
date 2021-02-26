@@ -1601,13 +1601,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                                 if (!string.IsNullOrEmpty(id)
                                     && className.Contains("wj-cell")
                                     && !string.IsNullOrEmpty(cellData)
+                                    && !id.Contains("btnheaderselectcolumn")
                                     && cells.Count > currentindex
                                 )
                                 {
                                     item[id] = cellData.Replace("-", "");
+                                    currentindex++;
                                 }
 
-                                currentindex++;
                             }
 
                             returnList.Add(item);
