@@ -80,8 +80,7 @@ You can obtain an MFA secret key for your account using these instructions - you
 <li>Go to your Office365 'Security info' page at: <a href="https://mysignins.microsoft.com/security-info" target="_blank">https://mysignins.microsoft.com/security-info</a></li> 
 <li>Enter your O365 login and password</li>
 <li>Click 'Add method' and select "Authenticator app" in Combobox, click Add</li>
-<li>Click on "I want to use a different authenticator app" link if you want to use
-not 'Microsoft Authenticator' authenticator app</li>
+<li>Click on "I want to use a different authenticator app" link</li>
 <li>Click on the 'Next' button, click on the 'Next' button</li>
 <li>Click on 'Can't scan image?'</li>
 <li>Make a note of the 'Code' which is displayed</li>
