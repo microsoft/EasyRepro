@@ -398,6 +398,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Opens any tab on the web page.
         /// </summary>
         /// <param name="tabName">The name of the tab based on the References class</param>
+        /// <param name="subtabName">The name of the subtab based on the References class</param>
         public void SelectTab(string tabName, string subTabName = "")
         {
             _client.SelectTab(tabName, subTabName);
