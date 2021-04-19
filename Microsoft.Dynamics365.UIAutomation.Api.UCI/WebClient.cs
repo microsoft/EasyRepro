@@ -1055,7 +1055,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
 
-        internal BrowserCommandResult<bool> AssignDialog(Dialogs.AssignTo to, string userOrTeamName)
+        internal BrowserCommandResult<bool> AssignDialog(Dialogs.AssignTo to, string userOrTeamName = null)
         {
             return this.Execute(GetOptions($"Assign to User or Team Dialog"), driver =>
             {
