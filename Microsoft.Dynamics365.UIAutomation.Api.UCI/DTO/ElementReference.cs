@@ -256,6 +256,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Dialog_CloseDate"       , "closedate_id"},
             { "Dialog_Description"       , "description_id"},
             { "Dialog_UserOrTeamLookupId"       , "systemuserview_id"},
+            { "Dialog_AssignToId"       , "rdoMe_id"},
 
             //Add Connection
             { "Dialog_ConnectionDescription"  , "description"},
@@ -417,6 +418,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 public static string Ok = "Dialog_AssignOk";
                 public static string UserOrTeamLookupId = "Dialog_UserOrTeamLookupId";
+                public static string AssignToId = "Dialog_AssignToId";
             }
             public static class Delete
             {

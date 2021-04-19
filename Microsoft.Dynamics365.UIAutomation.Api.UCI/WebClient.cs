@@ -160,7 +160,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             }
 
             int attempts = 0;
-            bool entered=false;
+            bool entered = false;
             if (mfaSecretKey != null)
             {
                 do
@@ -1055,30 +1055,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
 
-        internal BrowserCommandResult<bool> AssignDialog(Dialogs.AssignTo to, string userOrTeamName = null)
+        internal BrowserCommandResult<bool> AssignDialog(Dialogs.AssignTo to, string userOrTeamName)
         {
-            userOrTeamName = userOrTeamName?.Trim() ?? string.Empty;
             return this.Execute(GetOptions($"Assign to User or Team Dialog"), driver =>
             {
                 var inlineDialog = this.SwitchToDialog();
                 if (!inlineDialog)
                     return false;
 
-                //Click the Option to Assign to User Or Team
-                var xpathToToggleButton = By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogToggle]);
-                var toggleButton = driver.WaitUntilClickable(xpathToToggleButton, "Me/UserTeam toggle button unavailable");
-
                 if (to == Dialogs.AssignTo.Me)
                 {
-                    if (toggleButton.Text != "Me")
-                        toggleButton.Click();
+                    SetValue(new OptionSet { Name = Elements.ElementId[Reference.Dialogs.Assign.AssignToId], Value = "Me" }, FormContextType.Dialog);
                 }
                 else
                 {
-                    if (toggleButton.Text == "Me")
-                        toggleButton.Click();
-
-                    driver.WaitForTransaction();
+                    SetValue(new OptionSet { Name = Elements.ElementId[Reference.Dialogs.Assign.AssignToId], Value = "User or team" }, FormContextType.Dialog);
 
                     //Set the User Or Team
                     var userOrTeamField = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookup]), "User field unavailable");
