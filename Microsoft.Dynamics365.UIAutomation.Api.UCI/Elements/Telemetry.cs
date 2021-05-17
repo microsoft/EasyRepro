@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Web.Script.Serialization;
 using Newtonsoft.Json;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -94,6 +95,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             TrackEvents("Performance Markers",metadata, markers);
 
 
+        }
+        /// <summary>
+        /// Send Exception to Application Insights
+        /// </summary>
+        /// <param name="exception">System.Exception object containing message and stack that you want to track.</param>
+        /// <param name="additionalProperties"></param>
+        /// <param name="additionalMetrics"></param>
+        public void TrackException(Exception exception, Dictionary<string, string> additionalProperties = null, Dictionary<string, double> additionalMetrics = null) {
+
+            if (string.IsNullOrEmpty(_client.Browser.Options.AppInsightsKey)) throw new InvalidOperationException("The Application Insights key was not specified.  Please specify an Instrumentation key in the Browser Options.");
+
+            var telemetry = new Microsoft.ApplicationInsights.TelemetryClient { InstrumentationKey = _client.Browser.Options.AppInsightsKey };
+
+            ExceptionTelemetry exceptionTelemetry = new ExceptionTelemetry();
+            exceptionTelemetry.Exception = exception;
+
+            telemetry.TrackException(exception, additionalProperties, additionalMetrics);
+            telemetry.Flush();
+
+            telemetry = null;
         }
 
         /// <summary>
