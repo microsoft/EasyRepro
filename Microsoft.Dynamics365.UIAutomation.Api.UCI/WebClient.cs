@@ -157,6 +157,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 EnterPassword(driver, password);
                 ThinkTime(1000);
+                success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
             }
 
             int attempts = 0;
