@@ -120,7 +120,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (!online)
                 return LoginResult.Success;
 
-            driver.ClickIfVisible(By.Id("use_another_account_link"));
+            driver.ClickIfVisible(By.Id(Elements.ElementId[Reference.Login.UseAnotherAccount]));
 
             bool waitingForOtc = false;
             bool success = EnterUserName(driver, username);

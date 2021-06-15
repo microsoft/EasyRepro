@@ -316,6 +316,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Process_Category", "WorkflowCategory"},
             { "Process_Entity", "PrimaryEntity"},
 
+            //Login
+            { "Login_UseAnotherAccount", "otherTile" }
     };
 
         public static Dictionary<string, string> CssClass = new Dictionary<string, string>()
@@ -733,6 +735,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string CrmUCIMainPage = "Login_CrmUCIMainPage";
             public static string StaySignedIn = "Login_StaySignedIn";
             public static string OneTimeCode = "Login_OneTimeCode";
+            public static string UseAnotherAccount = "Login_UseAnotherAccount";
         }
         public static class Report
         {
