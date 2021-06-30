@@ -46,6 +46,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.DisableDevShmUsage = false;
             this.DisableInfoBars = false;
             this.Headless = false;
+            this.Kiosk = false;
             this.TestTypeBrowser = false;
         }
 
@@ -69,6 +70,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public string TraceSource { get; set; }
         public bool HideDiagnosticWindow { get; set; }
         public bool Headless { get; set; }
+        public bool Kiosk { get; set; }
         public bool DisableExtensions { get; set; }
         public bool DisableFeatures { get; set; }
         public bool DisablePopupBlocking { get; set; }
@@ -128,6 +130,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             if (this.Headless)
             {
                 options.AddArgument("--headless");
+            }
+
+            if (this.Kiosk)
+            {
+                options.AddArgument("--kiosk");
             }
 
             if (UserAgent && !string.IsNullOrEmpty(UserAgentValue))
