@@ -1,7 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
+using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
+using OtpNet;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,10 +14,6 @@ using System.Linq;
 using System.Security;
 using System.Threading;
 using System.Web;
-using OpenQA.Selenium.Interactions;
-using OtpNet;
-using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
-using Microsoft.Dynamics365.UIAutomation.Browser;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -157,17 +157,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 EnterPassword(driver, password);
                 ThinkTime(1000);
+                success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
             }
 
             int attempts = 0;
-            bool entered;
-            do
+            bool entered = false;
+            if (mfaSecretKey != null)
             {
-                entered = EnterOneTimeCode(driver, mfaSecretKey);
-                success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
-                attempts++;
+                do
+                {
+                    entered = EnterOneTimeCode(driver, mfaSecretKey);
+                    success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
+                    attempts++;
+                }
+                while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
             }
-            while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
 
             if (entered && !success)
                 throw new InvalidOperationException("Something went wrong entering the OTC. Please check the MFA-SecretKey in configuration.");
@@ -360,11 +364,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForPageToLoad();
                 driver.SwitchTo().DefaultContent();
-
+                var success = false;
                 //Handle left hand Nav in Web Client
-                var success = TryToClickInAppTile(appName, driver) ||
-                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton) ||
-                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton);
+                if (!driver.Url.Contains("appid"))
+                {
+                    success = TryToClickInAppTile(appName, driver);
+                }
+
+                else if (driver.Url.Contains("forceUCI=1"))
+                {
+                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton);
+                }
+                else
+                {
+                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton);
+                }
+
 
                 if (!success)
                     throw new InvalidOperationException($"App Name {appName} not found.");
@@ -1043,28 +1058,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> AssignDialog(Dialogs.AssignTo to, string userOrTeamName = null)
         {
-            userOrTeamName = userOrTeamName?.Trim() ?? string.Empty;
             return this.Execute(GetOptions($"Assign to User or Team Dialog"), driver =>
             {
                 var inlineDialog = this.SwitchToDialog();
                 if (!inlineDialog)
                     return false;
 
-                //Click the Option to Assign to User Or Team
-                var xpathToToggleButton = By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogToggle]);
-                var toggleButton = driver.WaitUntilClickable(xpathToToggleButton, "Me/UserTeam toggle button unavailable");
-
                 if (to == Dialogs.AssignTo.Me)
                 {
-                    if (toggleButton.Text != "Me")
-                        toggleButton.Click();
+                    SetValue(new OptionSet { Name = Elements.ElementId[Reference.Dialogs.Assign.AssignToId], Value = "Me" }, FormContextType.Dialog);
                 }
                 else
                 {
-                    if (toggleButton.Text == "Me")
-                        toggleButton.Click();
-
-                    driver.WaitForTransaction();
+                    SetValue(new OptionSet { Name = Elements.ElementId[Reference.Dialogs.Assign.AssignToId], Value = "User or team" }, FormContextType.Dialog);
 
                     //Set the User Or Team
                     var userOrTeamField = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookup]), "User field unavailable");
@@ -1224,9 +1230,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return Execute(GetOptions($"Click Command"), driver =>
             {
-                //Find the button in the CommandBar
-                var ribbon = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]),
-            TimeSpan.FromSeconds(5));
+                // Find the button in the CommandBar
+                IWebElement ribbon;
+                // Checking if any dialog is active
+                if (driver.HasElement(By.XPath(string.Format(AppElements.Xpath[AppReference.Dialogs.DialogContext]))))
+                {
+                    var dialogContainer = driver.FindElement(By.XPath(string.Format(AppElements.Xpath[AppReference.Dialogs.DialogContext])));
+                    ribbon = dialogContainer.WaitUntilAvailable(By.XPath(string.Format(AppElements.Xpath[AppReference.CommandBar.Container])));
+                }
+                else
+                {
+                    ribbon = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]));
+                }
+                TimeSpan.FromSeconds(5);
 
                 if (ribbon == null)
                 {
@@ -1236,7 +1252,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 //Get the CommandBar buttons
-                var items = ribbon.FindElements(By.TagName("li"));
+                var items = ribbon.FindElements(By.TagName("button"));
 
                 //Is the button in the ribbon?
                 if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
@@ -1580,20 +1596,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                             foreach (var header in rowHeaders)
                             {
-                                var id = header.GetAttribute("id");
+                                var id = header.GetAttribute("data-id") ?? header.GetAttribute("id");
                                 var className = header.GetAttribute("class");
                                 var cellData = cells[currentindex + 1].GetAttribute("title");
 
                                 if (!string.IsNullOrEmpty(id)
                                     && className.Contains("wj-cell")
                                     && !string.IsNullOrEmpty(cellData)
+                                    && !id.Contains("btnheaderselectcolumn")
                                     && cells.Count > currentindex
                                 )
                                 {
                                     item[id] = cellData.Replace("-", "");
+                                    currentindex++;
                                 }
 
-                                currentindex++;
                             }
 
                             returnList.Add(item);
@@ -1995,7 +2012,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     // Locate subGrid command list
                     //var foundCommands = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
 
-                    var items = subGridCommandBar.FindElements(By.TagName("li"));
+                    var items = subGridCommandBar.FindElements(By.TagName("button"));
 
                     //Is the button in the ribbon?
                     if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
@@ -2174,6 +2191,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (Browser.Options.UCITestMode)
                 {
                     link += "&flags=testmode=true";
+                }
+                if (Browser.Options.UCIPerformanceMode)
+                {
+                    link += "&perf=true";
                 }
 
                 driver.Navigate().GoToUrl(link);
@@ -4079,6 +4100,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 throw new InvalidOperationException($"Field '{controlName}' does not contain a record with the name:  {value}");
 
             existingValue.Click(true);
+            driver.WaitForTransaction();
         }
 
         internal BrowserCommandResult<bool> ClearValue(OptionSet control, FormContextType formContextType)
@@ -4523,8 +4545,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
 
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]),
-            TimeSpan.FromSeconds(5),
-            "The Close Opportunity dialog is not available."
+        TimeSpan.FromSeconds(5),
+        "The Close Opportunity dialog is not available."
         );
 
                 return true;
@@ -4614,7 +4636,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute($"Select Tab", driver =>
             {
-                IWebElement tabList = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
+                IWebElement tabList;
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext])))
+                {
+                    var dialogContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+                    tabList = dialogContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
+                }
+                else
+                {
+                    tabList = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
+                }
 
                 ClickTab(tabList, AppElements.Xpath[AppReference.Entity.Tab], tabName);
 
