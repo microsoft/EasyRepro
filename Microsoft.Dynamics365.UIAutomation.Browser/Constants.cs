@@ -97,7 +97,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 ".crm.dynamics.com", ".crm2.dynamics.com", ".crm3.dynamics.com",
                 ".crm4.dynamics.com", "crm5.dynamics.com", "crm6.dynamics.com", "crm7.dynamics.com",
                 ".crm8.dynamics.com", ".crm9.dynamics.com", ".crm10.dynamics.com", ".crm11.dynamics.com",
-                ".crm12.dynamics.com", ".crm15.dynamics.com", "portal.office.com", "crm2.crmlivetie.com", ".crm.microsoftdynamics.us", "portal.office365.us"
+                ".crm12.dynamics.com", ".crm14.dynamics.com", ".crm15.dynamics.com", ".crm16.dynamics.com", ".crm17.dynamics.com", "portal.office.com", "crm2.crmlivetie.com", ".crm.microsoftdynamics.us", "portal.office365.us"
             };
         }
 
