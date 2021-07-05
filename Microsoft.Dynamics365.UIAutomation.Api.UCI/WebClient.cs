@@ -157,21 +157,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 EnterPassword(driver, password);
                 ThinkTime(1000);
-                success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
             }
 
             int attempts = 0;
-            bool entered = false;
-            if (mfaSecretKey != null)
+            bool entered;
+            do
             {
-                do
-                {
-                    entered = EnterOneTimeCode(driver, mfaSecretKey);
-                    success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
-                    attempts++;
-                }
-                while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
+                entered = EnterOneTimeCode(driver, mfaSecretKey);
+                success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
+                attempts++;
             }
+            while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
 
             if (entered && !success)
                 throw new InvalidOperationException("Something went wrong entering the OTC. Please check the MFA-SecretKey in configuration.");
@@ -181,17 +177,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         private bool IsUserAlreadyLogged() => WaitForMainPage(10.Seconds());
 
-        private static string GenerateOneTimeCode(SecureString mfaSecretKey)
+        private static string GenerateOneTimeCode(string key)
         {
             // credits:
             // https://dev.to/j_sakamoto/selenium-testing---how-to-sign-in-to-two-factor-authentication-2joi
             // https://www.nuget.org/packages/Otp.NET/
-            string key = mfaSecretKey?.ToUnsecureString(); // <- this 2FA secret key.
-
             byte[] base32Bytes = Base32Encoding.ToBytes(key);
 
             var totp = new Totp(base32Bytes);
-            var result = totp.ComputeTotp(); // <- got 2FA coed at this time!
+            var result = totp.ComputeTotp(); // <- got 2FA code at this time!
             return result;
         }
 
@@ -221,10 +215,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (input == null)
                     return true;
 
-                if (mfaSecretKey == null)
+                string key = mfaSecretKey?.ToUnsecureString(); // <- this 2FA secret key.
+                if (string.IsNullOrWhiteSpace(key))
                     throw new InvalidOperationException("The application is wait for the OTC but your MFA-SecretKey is not set. Please check your configuration.");
 
-                var oneTimeCode = GenerateOneTimeCode(mfaSecretKey);
+                var oneTimeCode = GenerateOneTimeCode(key);
                 SetInputValue(driver, input, oneTimeCode, 1.Seconds());
                 input.Submit();
                 return true; // input found & code was entered

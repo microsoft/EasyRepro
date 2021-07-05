@@ -17,11 +17,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         public void MultiFactorLogin()
         {
             _xrmApp.Grid.SwitchView("All Accounts");
-
-            _xrmApp.CommandBar.ClickCommand("New");
-
-            _xrmApp.Entity.SetValue("name", "Test API Account" + TestSettings.GetRandomString(5,5) );
-            _xrmApp.Entity.SetValue("telephone1", "555-555-5555");
         }
     }
 }
