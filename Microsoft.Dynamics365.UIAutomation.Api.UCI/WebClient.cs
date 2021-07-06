@@ -49,24 +49,37 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Wait for main page to load before attempting this. If you don't do this it might still be authenticating and the URL will be wrong
                 WaitForMainPage();
 
-                var uri = driver.Url;
+                string uri = driver.Url;
+                if (string.IsNullOrEmpty(uri))
+                    return false;
+                
+                var prevQuery = GetUrlQueryParams(uri);
                 var queryParams = "&flags=easyreproautomation=true";
 
-                if (Browser.Options.UCITestMode) queryParams += ",testmode=true";
-                if (Browser.Options.UCIPerformanceMode) queryParams += "&perf=true";
+                var options = Browser.Options;
+                if (options.UCITestMode) queryParams += ",testmode=true";
+                if (options.UCIPerformanceMode) queryParams += "&perf=true";
 
-                if (!uri.Contains(queryParams) && !uri.Contains(HttpUtility.UrlEncode(queryParams)))
-                {
-                    var testModeUri = uri + queryParams;
-
-                    driver.Navigate().GoToUrl(testModeUri);
-                }
+                if (prevQuery.Contains(queryParams)) 
+                    return true;
+                
+                var testModeUri = uri + queryParams;
+                driver.Navigate().GoToUrl(testModeUri);
 
                 // Again wait for loading
                 WaitForMainPage();
-
                 return true;
             });
+        }
+
+        private static string GetUrlQueryParams(string uri)
+        {
+            if (string.IsNullOrEmpty(uri))
+                return string.Empty;
+
+            var decoded = HttpUtility.UrlDecode(uri);
+            var result = new Uri(decoded).Query.ToLower();
+            return result;
         }
 
 
@@ -283,7 +296,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             //else we landed on the Web Client main page or app picker page
                             SwitchToDefaultContent(driver);
                     },
-                    () => new InvalidOperationException("Load Main Page Fail.")
+                    () => throw new InvalidOperationException("Load Main Page Fail.")
                 );
 
                 return LoginResult.Success;
@@ -364,28 +377,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForPageToLoad();
                 driver.SwitchTo().DefaultContent();
-                var success = false;
-                //Handle left hand Nav in Web Client
-                if (!driver.Url.Contains("appid"))
-                {
-                    success = TryToClickInAppTile(appName, driver);
-                }
 
-                else if (driver.Url.Contains("forceUCI=1"))
-                {
-                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton);
-                }
-                else
-                {
-                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton);
-                }
-
+                string url = GetUrlQueryParams(driver.Url);   
+                var success = url.Contains("appid=") || url.Contains("app=") || // already in some app
+                              TryToClickInAppTile(appName, driver) ||
+                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton) ||
+                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton); //Handle left hand Nav in Web Client
 
                 if (!success)
                     throw new InvalidOperationException($"App Name {appName} not found.");
-
-                Thread.Sleep(1000);
-                WaitForMainPage();
+                
                 InitializeModes();
 
                 // Wait for app page elements to be visible (shell and sitemapLauncherButton)
@@ -397,7 +398,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!success)
                     throw new InvalidOperationException($"App '{appName}' was found but app page was not loaded.");
 
-                return success;
+                return true;
             });
         }
 
