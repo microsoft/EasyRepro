@@ -428,8 +428,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public static bool TryFindElement(this ISearchContext context, By by, out IWebElement element)
         {
-            var elements = context.FindElements(by);
-            var success = elements.Count > 0;
+            ReadOnlyCollection<IWebElement> elements = null;
+
+            try
+            {
+               elements = context.FindElements(by);
+            }
+            catch (NullReferenceException)
+            {
+                // Do nothing
+            }
+
+            var success = elements?.Count > 0;
             element = success ? elements[0] : null;
             return success;
         }

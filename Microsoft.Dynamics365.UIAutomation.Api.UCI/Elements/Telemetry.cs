@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Web.Script.Serialization;
 using Newtonsoft.Json;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -52,8 +53,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var properties = new Dictionary<string, string>();
                 var metrics = new Dictionary<string, double>();
 
-                if (additionalProperties != null) properties = additionalProperties;
-                if (additionalMetrics != null) metrics = additionalMetrics;
+                if (additionalMetrics != null && additionalMetrics.Count > 0)
+                    metrics = metrics.Merge(additionalMetrics);
+
+                if (additionalProperties != null && additionalProperties.Count > 0)
+                    properties = properties.Merge(additionalProperties);
 
                 properties.Add("StartTime", x.StartTime.Value.ToLongDateString());
                 properties.Add("EndTime", x.StopTime.Value.ToLongDateString());
@@ -78,7 +82,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             ShowHidePerformanceWidget();
 
             Dictionary<string, string> metadata = GetMetadataMarkers();
-            Dictionary<string, double> markers = GetPerformanceMarkers(metadata["PageName"]);
+            Dictionary<string, double> markers = GetPerformanceMarkers(GetRecentPageName());
 
             ShowHidePerformanceWidget();
 
@@ -91,6 +95,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             TrackEvents("Performance Markers",metadata, markers);
 
 
+        }
+        /// <summary>
+        /// Send Exception to Application Insights
+        /// </summary>
+        /// <param name="exception">System.Exception object containing message and stack that you want to track.</param>
+        /// <param name="additionalProperties"></param>
+        /// <param name="additionalMetrics"></param>
+        public void TrackException(Exception exception, Dictionary<string, string> additionalProperties = null, Dictionary<string, double> additionalMetrics = null) {
+
+            if (string.IsNullOrEmpty(_client.Browser.Options.AppInsightsKey)) throw new InvalidOperationException("The Application Insights key was not specified.  Please specify an Instrumentation key in the Browser Options.");
+
+            var telemetry = new Microsoft.ApplicationInsights.TelemetryClient { InstrumentationKey = _client.Browser.Options.AppInsightsKey };
+
+            ExceptionTelemetry exceptionTelemetry = new ExceptionTelemetry();
+            exceptionTelemetry.Exception = exception;
+
+            telemetry.TrackException(exception, additionalProperties, additionalMetrics);
+            telemetry.Flush();
+
+            telemetry = null;
         }
 
         /// <summary>
@@ -120,6 +144,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             telemetry = null;
         }
 
+        internal string GetRecentPageName()
+        {
+            return _client.Browser.Driver.FindElement(By.XPath("//div[@data-id='performance-widget']//div[contains(@style, '253, 253, 253')]/span[1]")).Text;
+        }
         internal Dictionary<string, double> GetPerformanceMarkers(string page)
         {
             SelectPerformanceWidgetPage(page);

@@ -28,6 +28,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,6 +37,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.ApplicationInsights, Version=2.11.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -96,6 +98,7 @@
     <Compile Include="UCI\CommandBar\CloseOpportunity.cs" />
     <Compile Include="UCI\CommandBar\DuplicateDetection.cs" />
     <Compile Include="UCI\CommandBar\SelectDashboard.cs" />
+    <Compile Include="ConsoleTraceListener.cs" />
     <Compile Include="UCI\Controls\Grid.cs" />
     <Compile Include="UCI\Create\CreateAccount.cs" />
     <Compile Include="UCI\Create\CreateCase.cs" />
@@ -103,15 +106,17 @@
     <Compile Include="UCI\Create\CreateLead.cs" />
     <Compile Include="UCI\Create\CreateActivity.cs" />
     <Compile Include="UCI\Create\CreateOpportunity.cs" />
-    <Compile Include="UCI\QuickStart\1_Demo_TestsClass.cs" />
-    <Compile Include="UCI\QuickStart\3_Demo_Let_TestsBase_WorkForYou_CreateApp.cs" />
-    <Compile Include="UCI\QuickStart\2_Demo_Let_TestsBase_WorkForYou_ReadConfigParameters.cs" />
-    <Compile Include="UCI\QuickStart\4_Demo_Let_TestsBase_WorkForYou_CreateApp_AllTestsUsesDefaultOptions.cs" />
-    <Compile Include="UCI\QuickStart\5_Demo_Let_TestsBase_WorkForYou_CreateApp_AllTestsUsesMyCustomOptions.cs" />
-    <Compile Include="UCI\QuickStart\6_Demo_Let_TestsBase_WorkForYou_CreateApp_NavigateToSameApp_InAllTests.cs" />
-    <Compile Include="UCI\QuickStart\7_Demo_Let_TestsBase_WorkForYou_CreateApp_NavigateToSameArea_InAllTests.cs" />
-    <Compile Include="UCI\QuickStart\QuickStart.cs" />
-    <Compile Include="UCI\TestsBase.cs" />
+    <Compile Include="UCI\Navigation\AreasAndSubAreas.cs" />
+    <Compile Include="UCI\FormNotifications\ReadFormNotifications.cs" />
+    <Compile Include="UCI\Labs\TestsBase\1_Lab_TestsClass.cs" />
+    <Compile Include="UCI\Labs\TestsBase\3_Lab_TestsBase_CreateApp.cs" />
+    <Compile Include="UCI\Labs\TestsBase\2_Lab_TestsBase_ReadConfigParameters.cs" />
+    <Compile Include="UCI\Labs\TestsBase\4_Lab_TestsBase_CreateApp_AllTestsUsesDefaultOptions.cs" />
+    <Compile Include="UCI\Labs\TestsBase\5_Lab_TestsBase_CreateApp_AllTestsUsesMyCustomOptions.cs" />
+    <Compile Include="UCI\Labs\TestsBase\6_Lab_TestsBase_CreateApp_NavigateToSameApp_InAllTests.cs" />
+    <Compile Include="UCI\Labs\TestsBase\7_Lab_TestsBase_CreateApp_NavigateToSameArea_InAllTests.cs" />
+    <Compile Include="UCI\Labs\TestsBase\0_Lab_TestsBase_QuickStart.cs" />
+    <Compile Include="UCI\Labs\TestsBase\TestsBase.cs" />
     <Compile Include="UCI\Delete\DeleteAccount.cs" />
     <Compile Include="UCI\Delete\DeleteCase.cs" />
     <Compile Include="UCI\Delete\DeleteContact.cs" />
@@ -286,10 +291,10 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Selenium.Firefox.WebDriver.0.26.0\build\Selenium.Firefox.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.Firefox.WebDriver.0.26.0\build\Selenium.Firefox.WebDriver.targets'))" />
-    <Error Condition="!Exists('..\packages\Selenium.Chrome.WebDriver.79.0.0\build\Selenium.Chrome.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.Chrome.WebDriver.79.0.0\build\Selenium.Chrome.WebDriver.targets'))" />
+    <Error Condition="!Exists('..\packages\Selenium.WebDriver.ChromeDriver.91.0.4472.1900\build\Selenium.WebDriver.ChromeDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.WebDriver.ChromeDriver.91.0.4472.1900\build\Selenium.WebDriver.ChromeDriver.targets'))" />
   </Target>
   <Import Project="..\packages\Selenium.Firefox.WebDriver.0.26.0\build\Selenium.Firefox.WebDriver.targets" Condition="Exists('..\packages\Selenium.Firefox.WebDriver.0.26.0\build\Selenium.Firefox.WebDriver.targets')" />
-  <Import Project="..\packages\Selenium.Chrome.WebDriver.79.0.0\build\Selenium.Chrome.WebDriver.targets" Condition="Exists('..\packages\Selenium.Chrome.WebDriver.79.0.0\build\Selenium.Chrome.WebDriver.targets')" />
+  <Import Project="..\packages\Selenium.WebDriver.ChromeDriver.91.0.4472.1900\build\Selenium.WebDriver.ChromeDriver.targets" Condition="Exists('..\packages\Selenium.WebDriver.ChromeDriver.91.0.4472.1900\build\Selenium.WebDriver.ChromeDriver.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

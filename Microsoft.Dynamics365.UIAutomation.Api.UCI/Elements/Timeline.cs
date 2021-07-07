@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
@@ -30,10 +31,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenAndClickPopoutMenu(Reference.Timeline.Popout, Reference.Timeline.PopoutAppointment, 4000);
             _client.ThinkTime(4000);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentSubject], subject);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentLocation], location);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentDescription], description);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentDuration], duration);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentSubject], subject, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentLocation], location, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentDescription], description, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.AppointmentDuration], duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -74,9 +75,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Opens the multiselect control and adds the contacts to the To, CC or BCC line.
         /// </summary>
         /// <param name="toOptions">Object of type MultiValueOptionSet containing name of the Field and the values to be set</param>
-        public void AddEmailContacts(MultiValueOptionSet toOptions)
+        /// <param name="removeExistingValues">Remove any existing values in the To, CC, or BCC lines, if present</param>         
+        public void AddEmailContacts(LookupItem[] toOptions, bool removeExistingValues = false)
         {
-            _client.SetValue(toOptions);
+            _client.SetValue(toOptions, FormContextType.Entity, removeExistingValues);
         }
 
         /// <summary>
@@ -106,7 +108,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <returns></returns>
         public bool RemoveEmail(MultiValueOptionSet emailOptions)
         {
-            return _client.SetValue(emailOptions, true);
+            return _client.SetValue(emailOptions, FormContextType.Entity, true);
         }
 
         /// <summary>
@@ -130,10 +132,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenAndClickPopoutMenu(Reference.Timeline.Popout, Reference.Timeline.PopoutPhoneCall, 4000);
             _client.ThinkTime(4000);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallSubject], subject);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallNumber], phoneNumber);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallDescription], description);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallDuration], duration);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallSubject], subject, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallNumber], phoneNumber, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallDescription], description, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.PhoneCallDuration], duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -154,9 +156,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenAndClickPopoutMenu(Reference.Timeline.Popout, Reference.Timeline.PopoutTask, 4000);
             _client.ThinkTime(4000);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.TaskSubject], subject);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.TaskDescription], description);
-            _client.SetValue(Elements.ElementId[Reference.Timeline.TaskDuration], duration);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.TaskSubject], subject, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.TaskDescription], description, FormContextType.QuickCreate);
+            _client.SetValue(Elements.ElementId[Reference.Timeline.TaskDuration], duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -187,7 +189,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.OpenAndClickPopoutMenu(Reference.Timeline.Popout, Reference.Timeline.PopoutNote, 4000);
             _client.SetValue(Reference.Timeline.NoteTitle, title, "input");
-            _client.SetValue(Reference.Timeline.NoteText, note, "textarea");
+            _client.SetValue(Reference.Timeline.NoteText, note, "iframe");
             _client.ClickButton(Elements.Xpath[Reference.Timeline.NoteAdd]);
         }
     }

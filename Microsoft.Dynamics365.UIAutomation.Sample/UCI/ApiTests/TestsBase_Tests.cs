@@ -1,7 +1,5 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT license.
-
-using System;
+﻿using System;
+using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI.ApiTests
@@ -46,6 +44,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI.ApiTests
                 Assert.IsNull(_xrmApp, "Browser still open");
                 Assert.IsNull(_client, "Browser still open");
             }
+        }
+
+        [TestMethod]
+        public void WriteTraces_in_AzurePipeline()
+        {
+            trace.Log("Start");
+            Console.WriteLine("Console.WriteLine");
+            Trace.WriteLine("Trace.WriteLine");
+            trace.Log("End");
+            Assert.Inconclusive("Check that this test is printing the traces properly");
+        }
+        
+        [TestMethod]
+        public void WriteTraces_SecoundTest_DontWrite_ToTraceSource()
+        {
+            trace.Log("Start");
+            Console.WriteLine("Console.WriteLine");
+            Trace.WriteLine("Trace.WriteLine");
+            trace.Log("End");
+            Assert.Inconclusive("Check that this test is printing the traces properly");
         }
     }
 }

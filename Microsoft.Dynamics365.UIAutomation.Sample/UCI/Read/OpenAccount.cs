@@ -3,78 +3,135 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
+using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
+using System.Security;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class OpenAccountUCI : TestsBase
+    public class OpenAccountUCI
     {
-        [TestInitialize]
-        public override void InitTest() => base.InitTest();
 
-        [TestCleanup]
-        public override void FinishTest() => base.FinishTest();
-
-        public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Accounts");
+        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
+        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
+        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
         public void UCITestOpenActiveAccount()
         {
-            _xrmApp.Grid.Search("Adventure");
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-            _xrmApp.Grid.OpenRecord(0);
-            
-            _xrmApp.ThinkTime(1000);
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-            string value = _xrmApp.Entity.GetValue("name");
-            Assert.IsTrue(value.StartsWith("Adventure"));
+                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.SwitchView("Active Accounts");
+
+                xrmApp.Grid.Search("A. Datum");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                xrmApp.ThinkTime(3000);
+
+            }
         }
 
         [TestMethod]
         public void UCITestGetActiveGridItems()
         {
-            _xrmApp.Grid.GetGridItems();
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-            _xrmApp.Grid.Sort("Account Name");
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-            _xrmApp.ThinkTime(3000);
+                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.SwitchView("Active Accounts");
+
+                xrmApp.Grid.GetGridItems();
+
+                xrmApp.Grid.Sort("Account Name", "Sort Z to A");
+
+                xrmApp.ThinkTime(3000);
+            }
         }
 
         [TestMethod]
         public void UCITestOpenTabDetails()
         {
-            _xrmApp.Grid.SwitchView("All Accounts");
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-            _xrmApp.Grid.OpenRecord(0);
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-            _xrmApp.ThinkTime(3000);
+                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
-            _xrmApp.Entity.SelectTab("Details");
+                xrmApp.Grid.SwitchView("All Accounts");
 
-            _xrmApp.Entity.SelectTab("Related", "Contacts");
-            
-            _xrmApp.ThinkTime(3000);
+                xrmApp.Grid.OpenRecord(0);
+
+                xrmApp.ThinkTime(3000);
+
+                xrmApp.Entity.SelectTab("Details");
+
+                xrmApp.Entity.SelectTab("Related","Contacts");
+
+                xrmApp.ThinkTime(3000);
+            }
         }
 
         [TestMethod]
         public void UCITestGetObjectId()
         {
-            _xrmApp.Grid.OpenRecord(0);
+            var client = new WebClient(TestSettings.Options);
 
-            Guid objectId = _xrmApp.Entity.GetObjectId();
-            Assert.AreNotEqual(Guid.Empty, objectId);
-            _xrmApp.ThinkTime(3000);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
+
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.SwitchView("Active Accounts");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                Guid objectId = xrmApp.Entity.GetObjectId();
+
+                xrmApp.ThinkTime(3000);
+            }
         }
 
         [TestMethod]
         public void UCITestOpenSubGridRecord()
         {
-            _xrmApp.Grid.OpenRecord(0);
+            var client = new WebClient(TestSettings.Options);
 
-            _xrmApp.Entity.GetSubGridItems("CONTACTS");
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-            _xrmApp.ThinkTime(3000);
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                // Reference schema name of the SubGrid
+                xrmApp.Entity.SubGrid.GetSubGridItems("Contacts");
+
+                xrmApp.ThinkTime(3000);
+            }
         }
     }
 }

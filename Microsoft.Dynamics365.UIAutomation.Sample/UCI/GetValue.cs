@@ -3,105 +3,145 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
+using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
+using System.Security;
 using System.Diagnostics;
 using System.Linq;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
-   [TestClass]
-    public class GetValueUci : TestsBase
+    [TestClass]
+    public class GetValueUci
     {
-        [TestInitialize]
-        public override void InitTest() => base.InitTest();
-
-        [TestCleanup]
-        public override void FinishTest() => base.FinishTest();
-
-        public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales);
+        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
+        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
+        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
         public void UCITestGetValueFromOptionSet()
         {
-            _xrmApp.Navigation.OpenSubArea("Contacts");
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-            _xrmApp.Grid.SwitchView("Active Contacts");
-            _xrmApp.Grid.OpenRecord(0);
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-            string option = _xrmApp.Entity.GetValue(new OptionSet {Name = "preferredcontactmethodcode"});
-            Assert.IsNotNull(option);
+                xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
+
+                xrmApp.Grid.SwitchView("Active Contacts");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                var options = xrmApp.Entity.GetValue(new OptionSet { Name = "preferredcontactmethodcode" });
+            }
+
         }
 
         [TestMethod]
-        public void UCITestGetSingleValueFromLookup()
+        public void UCITestGetValueFromLookup()
         {
-            _xrmApp.Navigation.OpenSubArea("Accounts");
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-            _xrmApp.Grid.SwitchView("Active Accounts");
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-            _xrmApp.Grid.OpenRecord(0);
+                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
-            _xrmApp.ThinkTime(2000);
-            string lookupValue = _xrmApp.Entity.GetValue(new LookupItem {Name = "primarycontactid"});
-            Assert.IsNotNull(lookupValue);
+                xrmApp.Grid.SwitchView("Active Accounts");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                xrmApp.ThinkTime(2000);
+                string lookupValue = xrmApp.Entity.GetValue(new LookupItem { Name = "primarycontactid" });
+            }
         }
 
         [TestMethod]
         public void UCITestGetValueFromLookup_MultiAndSingle_ReturnsTheSameResult()
         {
-            _xrmApp.Navigation.OpenSubArea("Accounts");
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-            _xrmApp.Grid.SwitchView("Active Accounts");
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-            _xrmApp.Grid.OpenRecord(0);
+                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
-            _xrmApp.ThinkTime(2000);
-            
-            var primaryContactLookupItem = new LookupItem {Name = "primarycontactid"};
-            
-            string lookupValue = _xrmApp.Entity.GetValue(primaryContactLookupItem);
-            Debug.WriteLine($"Single-Value: {lookupValue ?? "null"}");
-           
-            string[] lookupValues = _xrmApp.Entity.GetValue(new[]{ primaryContactLookupItem });
-            Assert.IsNotNull(lookupValues);
-            Assert.IsTrue(lookupValues.Length == 0 && lookupValue == string.Empty || string.Equals(lookupValue, lookupValues[0]));
-            
-            Debug.WriteLine($"Multi-Value: {lookupValues.FirstOrDefault() ?? "null"}");
+                xrmApp.Grid.SwitchView("Active Accounts");
+
+                xrmApp.Grid.OpenRecord(0);
+
+                xrmApp.ThinkTime(2000);
+
+                var primaryContactLookupItem = new LookupItem { Name = "primarycontactid" };
+
+                string lookupValue = xrmApp.Entity.GetValue(primaryContactLookupItem);
+                Debug.WriteLine($"Single-Value: {lookupValue ?? "null"}");
+
+                string[] lookupValues = xrmApp.Entity.GetValue(new[] { primaryContactLookupItem });
+                Assert.IsNotNull(lookupValues);
+                Assert.IsTrue(lookupValues.Length == 0 && lookupValue == string.Empty || string.Equals(lookupValue, lookupValues[0]));
+
+                Debug.WriteLine($"Multi-Value: {lookupValues.FirstOrDefault() ?? "null"}");
+            }
         }
-        
+
         [TestMethod]
         public void UCITestActivityPartyGetValue()
         {
-            _xrmApp.Navigation.OpenSubArea("Activities");
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-            _xrmApp.Grid.SwitchView("All Phone Calls");
-            _xrmApp.ThinkTime(500);
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-            _xrmApp.Grid.OpenRecord(0);
-            _xrmApp.ThinkTime(500);
+                xrmApp.Navigation.OpenSubArea("My Work", "Activities");
 
-            var to = _xrmApp.Entity.GetValue(new [] {new LookupItem {Name = "to"}});
-            Assert.IsNotNull(to);
-            _xrmApp.ThinkTime(500);
+                xrmApp.Grid.SwitchView("All Phone Calls");
+                xrmApp.ThinkTime(500);
+
+                xrmApp.Grid.OpenRecord(0);
+                xrmApp.ThinkTime(500);
+
+                var to = xrmApp.Entity.GetValue(new[] { new LookupItem { Name = "to" } });
+                Assert.IsNotNull(to);
+                xrmApp.ThinkTime(500);
+            }
         }
 
         [TestMethod]
         public void UCITestGetValueFromDateTime()
         {
-            _xrmApp.Navigation.OpenSubArea("Opportunities");
-            _xrmApp.ThinkTime(500);
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-            _xrmApp.CommandBar.ClickCommand("New");
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-            _xrmApp.Entity.SetValue("name", "Test EasyRepro Opportunity");
+                xrmApp.Navigation.OpenSubArea("Sales", "Opportunities");
+                
+                xrmApp.ThinkTime(500);
 
-            var dateTime = DateTime.Today.AddHours(10).AddMinutes(15);
-            _xrmApp.Entity.SetHeaderValue("estimatedclosedate", dateTime);
-            _xrmApp.ThinkTime(500);
+                xrmApp.CommandBar.ClickCommand("New");
 
-            var estimatedclosedate = _xrmApp.Entity.GetHeaderValue(new DateTimeControl("estimatedclosedate"));
-            Assert.AreEqual(dateTime, estimatedclosedate);
-            _xrmApp.ThinkTime(500);
+                xrmApp.Entity.SetValue("name", TestSettings.GetRandomString(5, 10));
+
+                var dateTime = DateTime.Today;
+                xrmApp.Entity.SetHeaderValue("estimatedclosedate", dateTime);
+                xrmApp.ThinkTime(500);
+
+                var estimatedclosedate = xrmApp.Entity.GetHeaderValue(new DateTimeControl("estimatedclosedate"));
+                Assert.AreEqual(dateTime, estimatedclosedate);
+                xrmApp.ThinkTime(500);
+            }
         }
     }
 }

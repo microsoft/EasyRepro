@@ -34,10 +34,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="orgUrl">URL of the organization</param>
         /// <param name="username">User name</param>
         /// <param name="password">Password</param>
-        /// <param name="mfaSecrectKey">SecrectKey for multi-factor authentication</param>
-        public void Login(Uri orgUrl, SecureString username, SecureString password, SecureString mfaSecrectKey = null)
+        /// <param name="mfaSecretKey">SecretKey for multi-factor authentication</param>
+        public void Login(Uri orgUrl, SecureString username, SecureString password, SecureString mfaSecretKey = null)
         {
-            LoginResult result = _client.Login(orgUrl, username, password, mfaSecrectKey);
+            LoginResult result = _client.Login(orgUrl, username, password, mfaSecretKey);
             if(result == LoginResult.Failure) 
                 throw new InvalidOperationException("Login Failure, please check your configuration");
             
@@ -50,11 +50,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="orgUrl">URL of the organization</param>
         /// <param name="username">User name</param>
         /// <param name="password">Password</param>
-        /// <param name="mfaSecrectKey">SecrectKey for multi-factor authentication</param>
+        /// <param name="mfaSecretKey">SecretKey for multi-factor authentication</param>
         /// <param name="redirectAction">Actions required during redirect</param>
-        public void Login(Uri orgUrl, SecureString username, SecureString password, SecureString mfaSecrectKey, Action<LoginRedirectEventArgs> redirectAction)
+        public void Login(Uri orgUrl, SecureString username, SecureString password, SecureString mfaSecretKey, Action<LoginRedirectEventArgs> redirectAction)
         {
-            LoginResult result = _client.Login(orgUrl, username, password, mfaSecrectKey, redirectAction);
+            LoginResult result = _client.Login(orgUrl, username, password, mfaSecretKey, redirectAction);
             if(result == LoginResult.Failure) 
                 throw new InvalidOperationException("Login Failure, please check your configuration");
             

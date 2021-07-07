@@ -3,28 +3,38 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
+using Microsoft.Dynamics365.UIAutomation.Browser;
+using System;
+using System.Security;
 using System.Collections.Generic;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class OpenContactUCI: TestsBase
+    public class OpenContactUCI
     {
+
+        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
+        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
+        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
+
         [TestMethod]
         public void UCITestOpenActiveContact()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
-                
-                xrmApp.Grid.Search("David");
+
+                xrmApp.Grid.Search("Patrick");
 
                 xrmApp.Grid.OpenRecord(0);
+                
             }
             
         }
@@ -35,12 +45,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
-                
+
                 xrmApp.Grid.SwitchView("Active Contacts");
 
                 xrmApp.Grid.OpenRecord(0);
@@ -61,41 +71,40 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
+        [TestCategory("Fail - Bug")]
         public void UCITestOpenSubGridRecord()
         {
             var client = new WebClient(TestSettings.Options);
 
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
-                
-                xrmApp.Grid.SwitchView("Active Contacts");
 
                 xrmApp.Grid.OpenRecord(0);
 
-                List<GridItem> rows = xrmApp.Entity.GetSubGridItems("Opportunities");
+                List<GridItem> rows = xrmApp.Entity.SubGrid.GetSubGridItems("contactopportunitiesgrid");
 
-                int rowCount = xrmApp.Entity.GetSubGridItemsCount("Cases");
+                int rowCount = xrmApp.Entity.SubGrid.GetSubGridItemsCount("contactcasessgrid");
 
-                if (rows.Count > 0)
-                    xrmApp.Entity.OpenSubGridRecord("Opportunities", 0);
+                xrmApp.Entity.SubGrid.OpenSubGridRecord("contactopportunitiesgrid", 0);
 
                 xrmApp.ThinkTime(500);
             }
         }
 
         [TestMethod]
+        [TestCategory("Fail - Bug")]
         public void UCITestLookupSearch()
         {
             var client = new WebClient(TestSettings.Options);
 
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -106,6 +115,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 LookupItem parentCustomerId = new LookupItem { Name = "parentcustomerid" };
                 xrmApp.Entity.SelectLookup(parentCustomerId);
 
+                // Bug: OpenQA.Selenium.NotFoundException: Lookup Entity Accounts not found
                 xrmApp.Lookup.SelectRelatedEntity("Accounts");
 
                 xrmApp.Lookup.SwitchView("My Active Accounts");
@@ -117,13 +127,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
+        [TestCategory("Fail - Bug")]
         public void UCITestLookupNew()
         {
             var client = new WebClient(TestSettings.Options);
 
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
@@ -134,6 +145,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 LookupItem parentCustomerId = new LookupItem { Name = "parentcustomerid" };
                 xrmApp.Entity.SelectLookup(parentCustomerId);
 
+                // Bug: OpenQA.Selenium.NotFoundException: Lookup Entity Accounts not found
                 xrmApp.Lookup.SelectRelatedEntity("Accounts");
 
                 xrmApp.Lookup.New();
@@ -145,13 +157,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Fail - Bug")]
         [TestMethod]
         public void UCITestOpenContactRetrieveHeaderValues()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
@@ -159,6 +172,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.RelatedGrid.OpenGridRow(0);
 
+                // Bug: Fails to resolve ownerid
+                // OpenQA.Selenium.NoSuchElementException: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@data-id='header_ownerId.fieldControl-Lookup_ownerId']"}
                 LookupItem ownerId = new LookupItem() { Name = "ownerid" };
                 string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
 
@@ -169,13 +184,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Fail - Bug")]
         [TestMethod]
         public void UCITestOpenContactRelatedEntity()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
@@ -185,36 +201,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Entity.SelectTab("Related", "Leads");
 
+                // Bug: OpenQA.Selenium.NotFoundException: Excel Templates button not found. Button names are case sensitive. Please check for proper casing of button name.
                 xrmApp.RelatedGrid.ClickCommand("Excel Templates", "View All My Templates");
 
                 xrmApp.ThinkTime(2000);
 
-            }
-        }
-        
-        [TestMethod]
-        public void UCITestOpenContactRelatedEntity_SwitchView()
-        {
-            var client = new WebClient(TestSettings.Options);
-            using (var xrmApp = new XrmApp(client))
-            {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecrectKey);
-
-                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
-
-                xrmApp.Navigation.OpenSubArea("Service", "Contacts");
-
-                xrmApp.ThinkTime(2000);
-
-                xrmApp.Grid.SwitchView("Active Contacts");
-
-                xrmApp.ThinkTime(2000);
-
-                xrmApp.Grid.SwitchView("My Active Contacts");
-                
-                xrmApp.ThinkTime(2000);
-
-                xrmApp.Grid.OpenRecord(1);
             }
         }
     }

@@ -4,44 +4,43 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using System;
+using System.Security;
 
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class AssignAccount : TestsBase
+    public class AssignAccountUCI
     {
-        [TestInitialize]
-        public override void InitTest() => base.InitTest();
+        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
+        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
+        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
-        [TestCleanup]
-        public override void FinishTest() => base.FinishTest();
-
-        public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Accounts");
-
+        [TestCategory("Fail - DynamicData")]
         [TestMethod]
         public void UCITestAssignAccount()
         {
-            _xrmApp.Grid.OpenRecord(0);
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-            _xrmApp.ThinkTime(2000);
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-             string name = _xrmApp.Entity.GetHeaderValue(new LookupItem{ Name = "ownerid" });
-            Assert.IsNotNull(name);
-            
-            _xrmApp.CommandBar.ClickCommand("Assign");
-            _xrmApp.Dialogs.Assign(Dialogs.AssignTo.User, name);
-        }
+                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
-        [TestMethod]
-        public void UCITestAssignAccount_ToMe()
-        {
-            _xrmApp.Grid.OpenRecord(0);
+                xrmApp.Grid.OpenRecord(0);
 
-            _xrmApp.ThinkTime(2000);
-            
-            _xrmApp.CommandBar.ClickCommand("Assign");
-            _xrmApp.Dialogs.Assign(Dialogs.AssignTo.Me);
+                xrmApp.ThinkTime(2000);
+
+                xrmApp.CommandBar.ClickCommand("Assign");
+
+                // Fail - DynamicData: Need to set an actual user here
+                xrmApp.Dialogs.Assign(Dialogs.AssignTo.User, "Grant");
+
+            }
         }
     }
 }
