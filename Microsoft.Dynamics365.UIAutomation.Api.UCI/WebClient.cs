@@ -9,8 +9,10 @@ using OtpNet;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using System.Resources;
 using System.Security;
 using System.Threading;
 using System.Web;
@@ -54,13 +56,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     return false;
                 
                 var prevQuery = GetUrlQueryParams(uri);
-                var queryParams = "&flags=easyreproautomation=true";
+                bool requiereRedirect = false;
+                string queryParams = "";
+                if (prevQuery.Get("flags") == null)
+                {
+                    queryParams+= "&flags=easyreproautomation=true";
+                    if (Browser.Options.UCITestMode)
+                        queryParams += ",testmode=true";
+                    requiereRedirect = true;
+                }
 
-                var options = Browser.Options;
-                if (options.UCITestMode) queryParams += ",testmode=true";
-                if (options.UCIPerformanceMode) queryParams += "&perf=true";
+                if (Browser.Options.UCIPerformanceMode && prevQuery.Get("perf") == null)
+                {
+                    queryParams += "&perf=true";
+                    requiereRedirect = true;
+                }
 
-                if (prevQuery.Contains(queryParams)) 
+                if (!requiereRedirect) 
                     return true;
                 
                 var testModeUri = uri + queryParams;
@@ -72,13 +84,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        private static string GetUrlQueryParams(string uri)
+        private NameValueCollection GetUrlQueryParams(string url)
         {
-            if (string.IsNullOrEmpty(uri))
-                return string.Empty;
+            if (string.IsNullOrEmpty(url))
+                return null;
 
-            var decoded = HttpUtility.UrlDecode(uri);
-            var result = new Uri(decoded).Query.ToLower();
+            Uri uri = new Uri(url);
+            var query = uri.Query.ToLower();
+            NameValueCollection result = HttpUtility.ParseQueryString(query);
             return result;
         }
 
@@ -192,7 +205,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return success ? LoginResult.Success : LoginResult.Failure;
         }
 
-        private bool IsUserAlreadyLogged() => WaitForMainPage(10.Seconds());
+        private bool IsUserAlreadyLogged() => WaitForMainPage(2.Seconds());
 
         private static string GenerateOneTimeCode(SecureString mfaSecretKey)
         {
@@ -257,7 +270,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         private static bool ClickStaySignedIn(IWebDriver driver)
         {
             var xpath = By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]);
-            var element = driver.ClickIfVisible(xpath, 5.Seconds());
+            var element = driver.ClickIfVisible(xpath, 2.Seconds());
             return element != null;
         }
 
@@ -377,12 +390,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForPageToLoad();
                 driver.SwitchTo().DefaultContent();
-
-                string url = GetUrlQueryParams(driver.Url);   
-                var success = url.Contains("appid=") || url.Contains("app=") || // already in some app
-                              TryToClickInAppTile(appName, driver) ||
-                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton) ||
-                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton); //Handle left hand Nav in Web Client
+                
+                var query = GetUrlQueryParams(driver.Url);
+                bool isSomeAppOpen = query.Get("appid") != null || query.Get("app") != null;
+                
+                bool success = false;
+                if (!isSomeAppOpen)
+                    success = TryToClickInAppTile(appName, driver);
+                else
+                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton) ||
+                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton);
 
                 if (!success)
                     throw new InvalidOperationException($"App Name {appName} not found.");
@@ -406,7 +423,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             bool found = false;
             var xpathToAppMenu = By.XPath(AppElements.Xpath[appMenuButton]);
-            driver.WaitUntilClickable(xpathToAppMenu, TimeSpan.FromSeconds(5),
+            driver.WaitUntilClickable(xpathToAppMenu, 5.Seconds(),
                         appMenu =>
                         {
                             appMenu.Click(true);
@@ -448,7 +465,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                     return true;
                 },
-                TimeSpan.FromSeconds(30)
+                5.Seconds()
                 );
 
             var xpathToAppContainer = By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]);

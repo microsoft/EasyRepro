@@ -21,7 +21,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         public void MultiFactorLogin_NavigateToApp()
         {
             trace.Log("Login success");
-            NavigateTo(UCIAppName.Sales, "Sales", "Accounts");
+            NavigateTo(UCIAppName.Sales);
         }
-	}
+        
+        [TestMethod]
+        public void MultiFactorLogin_NavigateToApp_CustomerService()
+        {
+            trace.Log("Login success");
+
+            NavigateTo(UCIAppName.CustomerService);
+            trace.Log("Open Customer Service Success");
+        }
+
+        [TestMethod]
+        public void MultiFactorLogin_NavigateToApp_ChangeApp()
+        {
+            trace.Log("Login success");
+            NavigateTo(UCIAppName.Sales);
+
+            trace.Log("Open Sales Success");
+            
+            NavigateTo(UCIAppName.CustomerService);
+            trace.Log("Open Customer Service Success");
+        }
+    }
 }
