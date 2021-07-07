@@ -88,7 +88,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             int retries = 1;
             int maxRetryAttempts = Options.RetryAttempts;
-            int maxRetryAttemptsNotIgnoredExceptions = maxRetryAttempts / 2 + maxRetryAttempts % 2;
+            int maxRetryAttemptsNotIgnoredExceptions = Options.RetryAttemptsNotIgnoredExceptions;
 
             var result = new BrowserCommandResult<TReturn> { CommandName = Options.CommandName };
 
