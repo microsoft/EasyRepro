@@ -1266,7 +1266,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (items.Any(x => x.GetAttribute("aria-label").Contains("More Commands", StringComparison.OrdinalIgnoreCase)))
                     {
                         //Click More Commands
-                        items.FirstOrDefault(x => x.GetAttribute("aria-label").Contains("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                        items.LastOrDefault(x => x.GetAttribute("aria-label").Contains("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
                         driver.WaitForTransaction();
 
                         //Click the button
