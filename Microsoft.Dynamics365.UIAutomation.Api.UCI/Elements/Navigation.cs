@@ -171,5 +171,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.ClickQuickLaunchButton(toolTip);
         }
+
+        // <summary>
+        /// Go back
+        /// </summary>
+        /// <example>xrmApp.Navigation.GoBack();</example>
+        public void GoBack()
+        {
+            _client.GoBack();
+        }
     }
 }
