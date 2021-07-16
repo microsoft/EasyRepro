@@ -47,6 +47,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.DisableInfoBars = false;
             this.Headless = false;
             this.TestTypeBrowser = false;
+            this.CookieСontrolsMode = 1;
         }
 
         public BrowserType RemoteBrowserType { get; set; }
@@ -84,8 +85,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool TestTypeBrowser { get; set; }
         public bool UserAgent { get; set; }
         public string UserAgentValue { get; set; }
-        public string UserDataDirectory { get; set; }
         public int DefaultThinkTime { get; set; }
+        /// <summary>
+        /// 0 - allow all cookies.
+        /// 1 - block third-party cookies
+        /// 2 - block all cookies
+        /// </summary>
+        public int CookieСontrolsMode { get; set; }
 
         /// <summary>
         /// Gets or sets the browser height when <see cref="StartMaximized"/> is <see langword="false" />. Both <see cref="Height"/> and <see cref="Width"/> must be set.
@@ -191,6 +197,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 options.AddArgument("--disable-dev-shm-usage");
             }
 
+
             if (this.DisableInfoBars)
             {
                 options.AddArgument("disable-infobars");
@@ -207,10 +214,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 options.AddUserProfilePreference("download.default_directory", DownloadsPath);
             }
 
-            if (!string.IsNullOrEmpty(UserDataDirectory))
-            {
-                options.AddArgument("user-data-dir=" + UserDataDirectory);
-            }
+            options.AddUserProfilePreference("profile.cookie_controls_mode", this.CookieСontrolsMode);
             return options;
         }
 
@@ -256,6 +260,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 options.SetPreference("browser.download.folderList", 2);
                 options.SetPreference("browser.download.dir", DownloadsPath);
                 options.SetPreference("browser.helperApps.neverAsk.saveToDisk", "text/csv,application/java-archive, application/x-msexcel,application/excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml,application/vnd.microsoft.portable-executable");
+                options.SetPreference("network.cookie.cookieBehavior", CookieСontrolsMode);
             }
 
             return options;
