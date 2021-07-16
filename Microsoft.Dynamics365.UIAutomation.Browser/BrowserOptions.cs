@@ -84,6 +84,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool TestTypeBrowser { get; set; }
         public bool UserAgent { get; set; }
         public string UserAgentValue { get; set; }
+        public string UserDataDirectory { get; set; }
         public int DefaultThinkTime { get; set; }
 
         /// <summary>
@@ -206,6 +207,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 options.AddUserProfilePreference("download.default_directory", DownloadsPath);
             }
 
+            if (!string.IsNullOrEmpty(UserDataDirectory))
+            {
+                options.AddArgument("user-data-dir=" + UserDataDirectory);
+            }
             return options;
         }
 
