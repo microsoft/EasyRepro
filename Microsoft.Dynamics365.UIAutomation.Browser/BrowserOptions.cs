@@ -86,11 +86,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool UserAgent { get; set; }
         public string UserAgentValue { get; set; }
         public int DefaultThinkTime { get; set; }
-        /// <summary>
-        /// 0 - allow all cookies.
-        /// 1 - block third-party cookies
-        /// 2 - block all cookies
-        /// </summary>
         public int CookieСontrolsMode { get; set; }
 
         /// <summary>
