@@ -48,6 +48,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.Headless = false;
             this.Kiosk = false;
             this.TestTypeBrowser = false;
+            this.CookieСontrolsMode = 1;
         }
 
         public BrowserType RemoteBrowserType { get; set; }
@@ -87,6 +88,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool UserAgent { get; set; }
         public string UserAgentValue { get; set; }
         public int DefaultThinkTime { get; set; }
+        public int CookieСontrolsMode { get; set; }
 
         /// <summary>
         /// Gets or sets the browser height when <see cref="StartMaximized"/> is <see langword="false" />. Both <see cref="Height"/> and <see cref="Width"/> must be set.
@@ -197,6 +199,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 options.AddArgument("--disable-dev-shm-usage");
             }
 
+
             if (this.DisableInfoBars)
             {
                 options.AddArgument("disable-infobars");
@@ -213,6 +216,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 options.AddUserProfilePreference("download.default_directory", DownloadsPath);
             }
 
+            options.AddUserProfilePreference("profile.cookie_controls_mode", this.CookieСontrolsMode);
             return options;
         }
 
@@ -258,6 +262,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 options.SetPreference("browser.download.folderList", 2);
                 options.SetPreference("browser.download.dir", DownloadsPath);
                 options.SetPreference("browser.helperApps.neverAsk.saveToDisk", "text/csv,application/java-archive, application/x-msexcel,application/excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml,application/vnd.microsoft.portable-executable");
+                options.SetPreference("network.cookie.cookieBehavior", CookieСontrolsMode);
             }
 
             return options;
