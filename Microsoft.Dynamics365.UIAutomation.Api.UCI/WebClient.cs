@@ -872,6 +872,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+        
+        public BrowserCommandResult<bool> GoBack()
+        {
+            return Execute(GetOptions("Go Back"), driver =>
+            {
+                driver.WaitForTransaction();
+                
+                var element = driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.GoBack]));
+                
+                driver.WaitForTransaction();
+                return element != null;
+            });
+        }
 
         #endregion
 
