@@ -56,23 +56,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     return false;
                 
                 var prevQuery = GetUrlQueryParams(uri);
-                bool requiereRedirect = false;
+                bool requireRedirect = false;
                 string queryParams = "";
                 if (prevQuery.Get("flags") == null)
                 {
                     queryParams+= "&flags=easyreproautomation=true";
                     if (Browser.Options.UCITestMode)
                         queryParams += ",testmode=true";
-                    requiereRedirect = true;
+                    requireRedirect = true;
                 }
 
                 if (Browser.Options.UCIPerformanceMode && prevQuery.Get("perf") == null)
                 {
                     queryParams += "&perf=true";
-                    requiereRedirect = true;
+                    requireRedirect = true;
                 }
 
-                if (!requiereRedirect) 
+                if (!requireRedirect) 
                     return true;
                 
                 var testModeUri = uri + queryParams;
