@@ -120,7 +120,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (!online)
                 return LoginResult.Success;
 
-            driver.ClickIfVisible(By.Id("use_another_account_link"));
+            driver.ClickIfVisible(By.Id(Elements.ElementId[Reference.Login.UseAnotherAccount]));
 
             bool waitingForOtc = false;
             bool success = EnterUserName(driver, username);
@@ -865,6 +865,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.WaitForTransaction();
 
                 return true;
+            });
+        }
+        
+        public BrowserCommandResult<bool> GoBack()
+        {
+            return Execute(GetOptions("Go Back"), driver =>
+            {
+                driver.WaitForTransaction();
+                
+                var element = driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.GoBack]));
+                
+                driver.WaitForTransaction();
+                return element != null;
             });
         }
 
@@ -4937,14 +4950,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 foreach (var processStage in processStages)
                 {
-                    var labels = processStage.FindElements(By.TagName("label"));
+                    var divs = processStage.FindElements(By.TagName("div"));
 
                     //Click the Label of the Process Stage if found
-                    foreach (var label in labels)
+                    foreach (var div in divs)
                     {
-                        if (label.Text.Equals(stageName, StringComparison.OrdinalIgnoreCase))
+                        if (div.Text.Equals(stageName, StringComparison.OrdinalIgnoreCase))
                         {
-                            label.Click();
+                            div.Click();
                         }
                     }
                 }
