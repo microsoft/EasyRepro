@@ -128,6 +128,7 @@
     <Compile Include="UCI\Login\Login.cs" />
     <Compile Include="UCI\Navigation\FormSelector.cs" />
     <Compile Include="UCI\Navigation\GlobalSearch.cs" />
+    <Compile Include="UCI\Navigation\GoBackUCI.cs" />
     <Compile Include="UCI\Navigation\OpenNavigation.cs" />
     <Compile Include="UCI\Navigation\PortalAdmin.cs" />
     <Compile Include="UCI\QuickCreate\QuickCreate.cs" />
