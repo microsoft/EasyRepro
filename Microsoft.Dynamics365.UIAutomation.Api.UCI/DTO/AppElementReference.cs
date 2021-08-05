@@ -420,7 +420,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_RecordSetNavCollapseIconParent", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
             { "Entity_TabList", ".//ul[contains(@id, \"tablist\")]" },
             { "Entity_Tab", ".//li[@title='{0}']" },
-            { "Entity_MoreTabs", ".//button[@data-id='more_button']" },
+            { "Entity_MoreTabs", ".//div[@data-id='more_button']" },
             { "Entity_MoreTabsMenu", "//div[@id='__flyoutRootNode']" },
             { "Entity_SubTab", "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]" },
             { "Entity_FieldControlDateTimeContainer","//div[@data-id='[NAME]-FieldSectionItemContainer']" },
