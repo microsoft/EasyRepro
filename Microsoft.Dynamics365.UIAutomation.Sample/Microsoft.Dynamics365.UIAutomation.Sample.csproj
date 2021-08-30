@@ -106,6 +106,7 @@
     <Compile Include="UCI\Create\CreateLead.cs" />
     <Compile Include="UCI\Create\CreateActivity.cs" />
     <Compile Include="UCI\Create\CreateOpportunity.cs" />
+    <Compile Include="UCI\Login\LoginWhitoutTestBase.cs" />
     <Compile Include="UCI\Navigation\AreasAndSubAreas.cs" />
     <Compile Include="UCI\FormNotifications\ReadFormNotifications.cs" />
     <Compile Include="UCI\Labs\TestsBase\1_Lab_TestsClass.cs" />

@@ -686,7 +686,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions($"Collapse Tab: {name}"), driver =>
             {
-                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
+                if (!IsTabVisible(driver, name))
                 {
                     throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
                 }
@@ -720,6 +720,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
+
+        public BrowserCommandResult<bool> IsTabVisible(string name, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+            return Execute(GetOptions($"Is Tab Visible: {name}"), driver => IsTabVisible(driver, name));
+        }
         /// <summary>
         /// Expands the Tab on a CRM Entity form.
         /// </summary>
@@ -732,7 +738,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions($"Expand Tab: {name}"), driver =>
             {
-                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name))))
+                if (IsTabVisible(driver, name))
                 {
                     throw new InvalidOperationException($"Tab with name '{name}' does not exist.");
                 }
@@ -743,6 +749,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 return true;
             });
+        }
+
+
+        private static bool IsTabVisible(IWebDriver driver, string name)
+        {
+            return driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.Tab].Replace("[NAME]", name)));
         }
 
         /// <summary>
@@ -1892,6 +1904,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                             !optionValue && selectedValue == options.FirstOrDefault(a => a.GetAttribute("value") == "1")?.GetAttribute("title"))
                         {
                             driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Entity.CheckboxFieldContainer_Header].Replace("[NAME]", option.Name.ToLower())));
+                            driver.ClearFocus();
                         }
                     }
                     else if (hasCheckbox)
