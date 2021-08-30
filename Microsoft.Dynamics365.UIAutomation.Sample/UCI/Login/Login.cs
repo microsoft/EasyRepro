@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
@@ -11,12 +11,38 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestCleanup]
         public override void FinishTest() => base.FinishTest();
 
-        public override void NavigateToHomePage() => NavigateTo(UCIAppName.Sales, "Sales", "Accounts");
-
         [TestMethod]
         public void MultiFactorLogin()
         {
-            _xrmApp.Grid.SwitchView("All Accounts");
+           trace.Log("Login success");
+        }
+
+        [TestMethod]
+        public void MultiFactorLogin_NavigateToApp()
+        {
+            trace.Log("Login success");
+            NavigateTo(UCIAppName.Sales);
+        }
+        
+        [TestMethod]
+        public void MultiFactorLogin_NavigateToApp_CustomerService()
+        {
+            trace.Log("Login success");
+
+            NavigateTo(UCIAppName.CustomerService);
+            trace.Log("Open Customer Service Success");
+        }
+
+        [TestMethod]
+        public void MultiFactorLogin_NavigateToApp_ChangeApp()
+        {
+            trace.Log("Login success");
+            NavigateTo(UCIAppName.Sales);
+
+            trace.Log("Open Sales Success");
+            
+            NavigateTo(UCIAppName.CustomerService);
+            trace.Log("Open Customer Service Success");
         }
     }
 }
