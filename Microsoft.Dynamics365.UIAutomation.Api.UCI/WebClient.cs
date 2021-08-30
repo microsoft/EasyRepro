@@ -1543,8 +1543,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 control.WaitUntilClickable(xpathToCell,
                     cell =>
                     {
-                        var emptyDiv = cell.FindElement(By.TagName("div"));
-                        driver.Perform(action, cell, cell.LeftTo(emptyDiv));
+                        driver.Perform(action, cell);
                     },
                     $"An error occur trying to open the record at position {index}"
                     );
