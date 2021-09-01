@@ -9,8 +9,10 @@ using OtpNet;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using System.Resources;
 using System.Security;
 using System.Threading;
 using System.Web;
@@ -49,24 +51,48 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Wait for main page to load before attempting this. If you don't do this it might still be authenticating and the URL will be wrong
                 WaitForMainPage();
 
-                var uri = driver.Url;
-                var queryParams = "&flags=easyreproautomation=true";
-
-                if (Browser.Options.UCITestMode) queryParams += ",testmode=true";
-                if (Browser.Options.UCIPerformanceMode) queryParams += "&perf=true";
-
-                if (!uri.Contains(queryParams) && !uri.Contains(HttpUtility.UrlEncode(queryParams)))
+                string uri = driver.Url;
+                if (string.IsNullOrEmpty(uri))
+                    return false;
+                
+                var prevQuery = GetUrlQueryParams(uri);
+                bool requireRedirect = false;
+                string queryParams = "";
+                if (prevQuery.Get("flags") == null)
                 {
-                    var testModeUri = uri + queryParams;
-
-                    driver.Navigate().GoToUrl(testModeUri);
+                    queryParams+= "&flags=easyreproautomation=true";
+                    if (Browser.Options.UCITestMode)
+                        queryParams += ",testmode=true";
+                    requireRedirect = true;
                 }
+
+                if (Browser.Options.UCIPerformanceMode && prevQuery.Get("perf") == null)
+                {
+                    queryParams += "&perf=true";
+                    requireRedirect = true;
+                }
+
+                if (!requireRedirect) 
+                    return true;
+                
+                var testModeUri = uri + queryParams;
+                driver.Navigate().GoToUrl(testModeUri);
 
                 // Again wait for loading
                 WaitForMainPage();
-
                 return true;
             });
+        }
+
+        private NameValueCollection GetUrlQueryParams(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return null;
+
+            Uri uri = new Uri(url);
+            var query = uri.Query.ToLower();
+            NameValueCollection result = HttpUtility.ParseQueryString(query);
+            return result;
         }
 
 
@@ -179,7 +205,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return success ? LoginResult.Success : LoginResult.Failure;
         }
 
-        private bool IsUserAlreadyLogged() => WaitForMainPage(10.Seconds());
+        private bool IsUserAlreadyLogged() => WaitForMainPage(2.Seconds());
 
         private static string GenerateOneTimeCode(SecureString mfaSecretKey)
         {
@@ -244,7 +270,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         private static bool ClickStaySignedIn(IWebDriver driver)
         {
             var xpath = By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]);
-            var element = driver.ClickIfVisible(xpath, 5.Seconds());
+            var element = driver.ClickIfVisible(xpath, 2.Seconds());
             return element != null;
         }
 
@@ -364,28 +390,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForPageToLoad();
                 driver.SwitchTo().DefaultContent();
-                var success = false;
-                //Handle left hand Nav in Web Client
-                if (!driver.Url.Contains("appid"))
-                {
+                
+                var query = GetUrlQueryParams(driver.Url);
+                bool isSomeAppOpen = query.Get("appid") != null || query.Get("app") != null;
+                
+                bool success = false;
+                if (!isSomeAppOpen)
                     success = TryToClickInAppTile(appName, driver);
-                }
-
-                else if (driver.Url.Contains("forceUCI=1"))
-                {
-                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton);
-                }
                 else
-                {
-                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton);
-                }
-
+                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton) ||
+                              TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton);
 
                 if (!success)
                     throw new InvalidOperationException($"App Name {appName} not found.");
-
-                Thread.Sleep(1000);
-                WaitForMainPage();
+                
                 InitializeModes();
 
                 // Wait for app page elements to be visible (shell and sitemapLauncherButton)
@@ -397,7 +415,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!success)
                     throw new InvalidOperationException($"App '{appName}' was found but app page was not loaded.");
 
-                return success;
+                return true;
             });
         }
 
@@ -405,7 +423,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             bool found = false;
             var xpathToAppMenu = By.XPath(AppElements.Xpath[appMenuButton]);
-            driver.WaitUntilClickable(xpathToAppMenu, TimeSpan.FromSeconds(5),
+            driver.WaitUntilClickable(xpathToAppMenu, 5.Seconds(),
                         appMenu =>
                         {
                             appMenu.Click(true);
@@ -447,7 +465,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                     return true;
                 },
-                TimeSpan.FromSeconds(30)
+                5.Seconds()
                 );
 
             var xpathToAppContainer = By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]);
@@ -1276,10 +1294,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                 {
                     //Is the button in More Commands?
-                    if (items.Any(x => x.GetAttribute("aria-label").Contains("More Commands", StringComparison.OrdinalIgnoreCase)))
+                    if (items.Any(x => x.GetAttribute("aria-label").StartsWith("More Commands", StringComparison.OrdinalIgnoreCase)))
                     {
                         //Click More Commands
-                        items.FirstOrDefault(x => x.GetAttribute("aria-label").Contains("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                        items.FirstOrDefault(x => x.GetAttribute("aria-label").StartsWith("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
                         driver.WaitForTransaction();
 
                         //Click the button
@@ -2036,10 +2054,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else
                     {
                         //Is the button in More Commands Overflow?
-                        if (items.Any(x => x.GetAttribute("aria-label").Contains("More Commands", StringComparison.OrdinalIgnoreCase)))
+                        if (items.Any(x => x.GetAttribute("aria-label").StartsWith("More Commands", StringComparison.OrdinalIgnoreCase)))
                         {
                             //Click More Commands
-                            items.FirstOrDefault(x => x.GetAttribute("aria-label").Contains("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                            items.FirstOrDefault(x => x.GetAttribute("aria-label").StartsWith("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
                             driver.WaitForTransaction();
 
                             // Locate the overflow button (More Commands flyout)
@@ -5004,14 +5022,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 foreach (var processStage in processStages)
                 {
-                    var labels = processStage.FindElements(By.TagName("label"));
+                    var divs = processStage.FindElements(By.TagName("div"));
 
                     //Click the Label of the Process Stage if found
-                    foreach (var label in labels)
+                    foreach (var div in divs)
                     {
-                        if (label.Text.Equals(stageName, StringComparison.OrdinalIgnoreCase))
+                        if (div.Text.Equals(stageName, StringComparison.OrdinalIgnoreCase))
                         {
-                            label.Click();
+                            div.Click();
                         }
                     }
                 }
