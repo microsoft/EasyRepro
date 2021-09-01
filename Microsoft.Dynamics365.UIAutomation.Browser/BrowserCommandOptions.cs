@@ -33,6 +33,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         /// </summary>
         public int RetryAttempts { get; set; }
 
+        private int? retryAttemptsNotIgnoredExceptions;
+        public int RetryAttemptsNotIgnoredExceptions
+        {
+            get => retryAttemptsNotIgnoredExceptions ?? RetryAttempts / 2 + RetryAttempts % 2;
+            set => retryAttemptsNotIgnoredExceptions = value; 
+        }
+        
         /// <summary>
         /// Delay (in miliseconds) to wait between retry attempts.
         /// </summary>

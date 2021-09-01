@@ -21,7 +21,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         /// <summary>
         /// The default number of retry attempts for a command execution if it fails.
         /// </summary>
-        public const int DefaultRetryAttempts = 2;
+        public const int DefaultRetryAttempts = 5;
 
         /// <summary>
         /// The default page to direct a user to if none other is specified.
