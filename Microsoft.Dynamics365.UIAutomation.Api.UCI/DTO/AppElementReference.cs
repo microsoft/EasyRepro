@@ -367,7 +367,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             
             //Grid
-            { "Grid_Container"       , "//div[@data-type=\"Grid\"]"},
+            { "Grid_Container"       , "//div[@role=\"grid\"]"},
             { "Grid_QuickFind"       , "//*[contains(@id, \'quickFind_text\')]"},
             { "Grid_NextPage"       , "//button[contains(@data-id,'moveToNextPage')]"},
             { "Grid_PreviousPage"       , "//button[contains(@data-id,'moveToPreviousPage')]"},
