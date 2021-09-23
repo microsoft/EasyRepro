@@ -1446,5 +1446,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         }
 
+        internal bool SwitchToMain()
+        {
+            Browser.ThinkTime(3000);
+            Browser.Driver.LastWindow().SwitchTo().DefaultContent();
+            return true;
+        }
+
+        /// <summary>
+        /// Switches to Main Window from any other Pop-Up Window
+        /// </summary>
+        public bool SwitchToMainWindow()
+        {
+
+            return this.Execute("Switch to Main Window", driver => SwitchToMain());
+        }
+
     }
 }
