@@ -1544,6 +1544,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     cell =>
                     {
                         var emptyDiv = cell.FindElement(By.TagName("div"));
+                        cell.Click();
                         driver.Perform(action, cell, cell.LeftTo(emptyDiv));
                     },
                     $"An error occur trying to open the record at position {index}"
