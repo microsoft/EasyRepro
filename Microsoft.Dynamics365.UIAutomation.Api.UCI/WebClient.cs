@@ -2042,9 +2042,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandBar].Replace("[NAME]", subGridName)), out subGridCommandBar))
                 {
                     //Is the button in the ribbon?
-                    if (subGridCommandBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", name)), out var element))
+                    if (subGridCommandBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", name)), out var command))
                     {
-                        element.Click(true);
+                        command.Click(true);
                         driver.WaitForTransaction();
                     }
                     else
@@ -2060,9 +2060,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             var overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
 
                             //Click the primary button, if found
-                            if (overflowContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name)), out var overflowButton))
+                            if (overflowContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name)), out var overflowCommand))
                             {
-                                overflowButton.Click(true);
+                                overflowCommand.Click(true);
                                 driver.WaitForTransaction();
                             }
                             else
@@ -2093,9 +2093,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
 
                             //Click the primary button, if found
-                            if (overflowContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName)), out var secondOverflowButton))
+                            if (overflowContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName)), out var secondOverflowCommand))
                             {
-                                secondOverflowButton.Click(true);
+                                secondOverflowCommand.Click(true);
                                 driver.WaitForTransaction();
                             }
                             else
