@@ -356,7 +356,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_QuickLaunchButton",                "//li[contains(@title, '[NAME]')]"},
             { "Nav_QuickCreateButton", "//button[contains(@data-id,'quickCreateLauncher')]" },
             { "Nav_QuickCreateMenuList", "//ul[contains(@id,'MenuSectionItemsquickCreate')]" },
-            { "Nav_QuickCreateMenuItems", "//li[@role='menuitem']" },
+            { "Nav_QuickCreateMenuItems", "//button[@role='menuitem']" },
             { "Nav_PinnedSitemapEntity","//li[contains(@data-id,'sitemap-entity-Pinned') and contains(@role,'treeitem')]"},
             { "Nav_SitemapMenuGroup", "//ul[@role=\"group\"]"},
             { "Nav_SitemapMenuItems", "//li[contains(@data-id,'sitemap-entity')]"},
@@ -418,9 +418,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_RecordSetNavList", "//ul[contains(@data-id, 'recordSetNavList')]" },
             { "Entity_RecordSetNavCollapseIcon", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
             { "Entity_RecordSetNavCollapseIconParent", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
-            { "Entity_TabList", "//ul[contains(@id, \"tablist\")]" },
+            { "Entity_TabList", ".//ul[contains(@id, \"tablist\")]" },
             { "Entity_Tab", ".//li[@title='{0}']" },
-            { "Entity_MoreTabs", ".//button[@data-id='more_button']" },
+            { "Entity_MoreTabs", ".//div[@data-id='more_button']" },
             { "Entity_MoreTabsMenu", "//div[@id='__flyoutRootNode']" },
             { "Entity_SubTab", "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]" },
             { "Entity_FieldControlDateTimeContainer","//div[@data-id='[NAME]-FieldSectionItemContainer']" },
@@ -435,7 +435,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SubGridViewPickerFlyout", "//div[contains(@id, 'ViewSelector') and contains(@flyoutroot, 'flyoutRootNode')]" },
             { "Entity_SubGridCommandBar", ".//ul[contains(@data-id, 'CommandBar')]" },
             { "Entity_SubGridOverflowContainer", ".//div[contains(@data-id, 'flyoutRootNode')]" },
-            { "Entity_SubGridOverflowButton", ".//li[contains(@aria-label, '[NAME]')]" },
+            { "Entity_SubGridOverflowButton", ".//button[contains(@aria-label, '[NAME]')]" },
             { "Entity_SubGridHighDensityList", ".//div[contains(@data-lp-id, \"ReadOnlyGrid|[NAME]\") and contains(@class, 'editableGrid')]" },
             { "Entity_EditableSubGridList", ".//div[contains(@data-lp-id, \"[NAME]\") and contains(@class, 'editableGrid') and not(contains(@class, 'readonly'))]" },
             { "Entity_EditableSubGridListCells", ".//div[contains(@wj-part, 'cells') and contains(@class, 'wj-cells') and contains(@role, 'grid')]" },
@@ -492,7 +492,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Header_DateTimeFieldContainer","//div[@data-id='header_[NAME]-FieldSectionItemContainer']" },
                         
             //CommandBar
-            { "Cmd_Container"       , "//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
+            { "Cmd_Container"       , ".//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
             { "Cmd_ContainerGrid"       , "//ul[contains(@data-lp-id,\"commandbar-HomePageGrid\")]"},
             { "Cmd_MoreCommandsMenu"       , "//*[@id=\"__flyoutRootNode\"]"},
             { "Cmd_Button", "//*[contains(text(),'[NAME]')]"},
@@ -548,7 +548,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_CloseStageButton","//button[contains(@id,'stageContentClose')]"},
 
             //Related Grid
-            { "Related_CommandBarButton", ".//li[contains(@aria-label, '[NAME]') and contains(@id,'SubGrid')]//button"},
+            { "Related_CommandBarButton", ".//button[contains(@aria-label, '[NAME]') and contains(@id,'SubGrid')]"},
             { "Related_CommandBarOverflowContainer", "//div[contains(@data-id, 'flyoutRootNode')]"},
             { "Related_CommandBarOverflowButton", ".//button[contains(@data-id, 'OverflowButton') and contains(@data-lp-id, 'SubGridAssociated')]"},
             { "Related_CommandBarSubButton" ,".//button[contains(., '[NAME]')]"},
@@ -567,7 +567,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "CloseOpportunityDialog_CancelButton" , "//button[contains(@data-id, 'cancel_id')]" },
             { "CloseActivityDialog_CloseButton" , ".//button[contains(@data-id, 'ok_id')]" },
             { "CloseActivityDialog_CancelButton" , ".//button[contains(@data-id, 'cancel_id')]" },
-            { "Dialog_DialogContext", "//div[contains(@id,'dialogView') and contains(@role, 'dialog')]" },
+            { "Dialog_DialogContext", "//div[contains(@role, 'dialog')]" },
             { "Dialog_ActualRevenue", "//input[contains(@data-id,'actualrevenue_id')]" },
             { "Dialog_CloseDate", "//input[contains(@data-id,'closedate_id')]" },
             { "Dialog_DescriptionId", "//input[contains(@data-id,'description_id')]" },
@@ -600,7 +600,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Lookup_RecordList", ".//div[contains(@id,'RecordList') and contains(@role,'presentation')]" },
 
             //Performance Width
-            { "Performance_Widget","//div[@data-id='performance-widget']/div"},
+            { "Performance_Widget","//div[@data-id='performance-widget']//*[text()='Page load']"},
             { "Performance_WidgetPage", "//div[@data-id='performance-widget']//span[contains(text(), '[NAME]')]" }
         };
     }
