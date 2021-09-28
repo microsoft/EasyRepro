@@ -54,13 +54,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 string uri = driver.Url;
                 if (string.IsNullOrEmpty(uri))
                     return false;
-                
+
                 var prevQuery = GetUrlQueryParams(uri);
                 bool requireRedirect = false;
                 string queryParams = "";
                 if (prevQuery.Get("flags") == null)
                 {
-                    queryParams+= "&flags=easyreproautomation=true";
+                    queryParams += "&flags=easyreproautomation=true";
                     if (Browser.Options.UCITestMode)
                         queryParams += ",testmode=true";
                     requireRedirect = true;
@@ -72,9 +72,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     requireRedirect = true;
                 }
 
-                if (!requireRedirect) 
+                if (!requireRedirect)
                     return true;
-                
+
                 var testModeUri = uri + queryParams;
                 driver.Navigate().GoToUrl(testModeUri);
 
@@ -390,10 +390,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForPageToLoad();
                 driver.SwitchTo().DefaultContent();
-                
+
                 var query = GetUrlQueryParams(driver.Url);
                 bool isSomeAppOpen = query.Get("appid") != null || query.Get("app") != null;
-                
+
                 bool success = false;
                 if (!isSomeAppOpen)
                     success = TryToClickInAppTile(appName, driver);
@@ -403,7 +403,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (!success)
                     throw new InvalidOperationException($"App Name {appName} not found.");
-                
+
                 InitializeModes();
 
                 // Wait for app page elements to be visible (shell and sitemapLauncherButton)
@@ -890,15 +890,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-        
+
         public BrowserCommandResult<bool> GoBack()
         {
             return Execute(GetOptions("Go Back"), driver =>
             {
                 driver.WaitForTransaction();
-                
+
                 var element = driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.GoBack]));
-                
+
                 driver.WaitForTransaction();
                 return element != null;
             });
@@ -3713,66 +3713,57 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Find the SubGrid
                 var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
 
-                // Find list of SubGrid records
-                IWebElement subGridRecordList = null;
-                var foundGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
-
-                // Read Only Grid Found
-                if (subGridRecordList != null && foundGrid)
+                if (subGrid.HasElement(By.CssSelector(@"div.Grid\.ReadOnlyGrid")))
                 {
-                    var subGridRecords = subGridRecordList.FindElements(By.TagName("li"));
+                    // Read-only subgrid
+                    var subGridTable = subGrid.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridListCells]));
+                    var rowCount = subGridTable.GetAttribute<int>("data-row-count");
 
-                    if (subGridRecords == null)
+                    if (rowCount == 0)
+                    {
                         throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
+                    }
+                    else if (index + 1 > rowCount)
+                    {
+                        throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {rowCount}. Expected: {index + 1}");
+                    }
 
-                    if (index + 1 > subGridRecords.Count)
-                        throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {subGridRecords.Count}. Expected: {index + 1}");
+                    var row = subGridTable.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRows])).ElementAt(index + 1);
+                    var cell = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells])).ElementAt(1);
 
-                    subGridRecords[index].Click(true);
+                    new Actions(driver).DoubleClick(cell).Perform();
                     driver.WaitForTransaction();
-
-                    return true;
                 }
-                else if (!foundGrid)
+                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out var subGridRecordList))
                 {
-                    // Read Only Grid Not Found
-                    var foundEditableGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+                    // Editable subgrid
+                    var editableGridListCells = subGridRecordList.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]));
+                    var editableGridCellRows = editableGridListCells.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]));
+                    var editableGridCellRow = editableGridCellRows[index + 1].FindElements(By.XPath("./div"));
 
-                    if (foundEditableGrid)
-                    {
-                        var editableGridListCells = subGridRecordList.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]));
+                    new Actions(driver).DoubleClick(editableGridCellRow[0]).Perform();
+                    driver.WaitForTransaction();
+                }
+                else
+                {
+                    // Check for special 'Related' grid form control
+                    // This opens a limited form view in-line on the grid
 
-                        var editableGridCellRows = editableGridListCells.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]));
+                    //Get the GridName
+                    string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", string.Empty);
 
-                        var editableGridCellRow = editableGridCellRows[index + 1].FindElements(By.XPath("./div"));
+                    //cell-0 is the checkbox for each record
+                    var checkBox = driver.FindElement(
+                        By.XPath(
+                            AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox]
+                            .Replace("[INDEX]", index.ToString())
+                            .Replace("[NAME]", subGridName)));
 
-                        Actions actions = new Actions(driver);
-                        actions.DoubleClick(editableGridCellRow[0]).Perform();
-
-                        driver.WaitForTransaction();
-
-                        return true;
-                    }
-                    else
-                    {
-                        // Editable Grid Not Found
-                        // Check for special 'Related' grid form control
-                        // This opens a limited form view in-line on the grid
-
-                        //Get the GridName
-                        string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", String.Empty);
-
-                        //cell-0 is the checkbox for each record
-                        var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
-
-                        driver.DoubleClick(checkBox);
-
-                        driver.WaitForTransaction();
-                    }
+                    driver.DoubleClick(checkBox);
+                    driver.WaitForTransaction();
                 }
 
                 return true;
-
             });
         }
 
