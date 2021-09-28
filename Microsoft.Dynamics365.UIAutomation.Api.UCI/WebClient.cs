@@ -1543,8 +1543,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 control.WaitUntilClickable(xpathToCell,
                     cell =>
                     {
-                        var emptyDiv = cell.FindElement(By.TagName("div"));
-                        cell.Click();
+                        var emptyDiv = cell.FindElement(By.XPath("//div[@role='checkbox']"));
                         driver.Perform(action, cell, cell.LeftTo(emptyDiv));
                     },
                     $"An error occur trying to open the record at position {index}"
