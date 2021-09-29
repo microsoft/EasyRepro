@@ -59,6 +59,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string HideChart = "Grid_HideChart";
             public static string JumpBar = "Grid_JumpBar";
             public static string FilterByAll = "Grid_FilterByAll";
+            public static string RowsContainerCheckbox = "Grid_RowsContainerCheckbox";
             public static string RowsContainer = "Grid_RowsContainer";
             public static string Rows = "Grid_Rows";
             public static string ChartSelector = "Grid_ChartSelector";
@@ -378,6 +379,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Grid_ShowChart"       , "//button[contains(@aria-label,'Show Chart')]"},
             { "Grid_JumpBar"       , "//*[@id=\"JumpBarItemsList\"]"},
             { "Grid_FilterByAll"       , "//*[@id=\"All_link\"]"},
+            { "Grid_RowsContainerCheckbox"  ,   "//div[@role='checkbox']" },
             { "Grid_RowsContainer"       , "//div[contains(@role,'grid')]"},
             { "Grid_Rows"           , "//div[contains(@role,'row')]"},
             { "Grid_ChartSelector"           , "//span[contains(@id,'ChartSelector')]"},
