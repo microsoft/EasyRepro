@@ -54,13 +54,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 string uri = driver.Url;
                 if (string.IsNullOrEmpty(uri))
                     return false;
-                
+
                 var prevQuery = GetUrlQueryParams(uri);
                 bool requireRedirect = false;
                 string queryParams = "";
                 if (prevQuery.Get("flags") == null)
                 {
-                    queryParams+= "&flags=easyreproautomation=true";
+                    queryParams += "&flags=easyreproautomation=true";
                     if (Browser.Options.UCITestMode)
                         queryParams += ",testmode=true";
                     requireRedirect = true;
@@ -72,9 +72,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     requireRedirect = true;
                 }
 
-                if (!requireRedirect) 
+                if (!requireRedirect)
                     return true;
-                
+
                 var testModeUri = uri + queryParams;
                 driver.Navigate().GoToUrl(testModeUri);
 
@@ -390,10 +390,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForPageToLoad();
                 driver.SwitchTo().DefaultContent();
-                
+
                 var query = GetUrlQueryParams(driver.Url);
                 bool isSomeAppOpen = query.Get("appid") != null || query.Get("app") != null;
-                
+
                 bool success = false;
                 if (!isSomeAppOpen)
                     success = TryToClickInAppTile(appName, driver);
@@ -403,7 +403,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (!success)
                     throw new InvalidOperationException($"App Name {appName} not found.");
-                
+
                 InitializeModes();
 
                 // Wait for app page elements to be visible (shell and sitemapLauncherButton)
@@ -890,15 +890,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-        
+
         public BrowserCommandResult<bool> GoBack()
         {
             return Execute(GetOptions("Go Back"), driver =>
             {
                 driver.WaitForTransaction();
-                
+
                 var element = driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.GoBack]));
-                
+
                 driver.WaitForTransaction();
                 return element != null;
             });
@@ -2041,33 +2041,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Check if grid commandBar was found
                 if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandBar].Replace("[NAME]", subGridName)), out subGridCommandBar))
                 {
-                    // Locate subGrid command list
-                    //var foundCommands = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
-
-                    var items = subGridCommandBar.FindElements(By.TagName("button"));
-
                     //Is the button in the ribbon?
-                    if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
+                    if (subGridCommandBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", name)), out var command))
                     {
-                        items.FirstOrDefault(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)).Click(true);
+                        command.Click(true);
                         driver.WaitForTransaction();
                     }
                     else
                     {
-                        //Is the button in More Commands Overflow?
-                        if (items.Any(x => x.GetAttribute("aria-label").StartsWith("More Commands", StringComparison.OrdinalIgnoreCase)))
+                        // Is the button in More Commands overflow?
+                        if (subGridCommandBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", "More Commands")), out var moreCommands))
                         {
-                            //Click More Commands
-                            items.FirstOrDefault(x => x.GetAttribute("aria-label").StartsWith("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                            // Click More Commands
+                            moreCommands.Click(true);
                             driver.WaitForTransaction();
 
                             // Locate the overflow button (More Commands flyout)
                             var overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
 
                             //Click the primary button, if found
-                            if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name))))
+                            if (overflowContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name)), out var overflowCommand))
                             {
-                                overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name))).Click(true);
+                                overflowCommand.Click(true);
                                 driver.WaitForTransaction();
                             }
                             else
@@ -2083,9 +2078,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         var overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
 
                         //Click the primary button, if found
-                        if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))))
+                        if (overflowContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName)), out var overflowButton))
                         {
-                            overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))).Click(true);
+                            overflowButton.Click(true);
                             driver.WaitForTransaction();
                         }
                         else
@@ -2098,9 +2093,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
 
                             //Click the primary button, if found
-                            if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))))
+                            if (overflowContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName)), out var secondOverflowCommand))
                             {
-                                overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))).Click(true);
+                                secondOverflowCommand.Click(true);
                                 driver.WaitForTransaction();
                             }
                             else
@@ -4577,9 +4572,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
 
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]),
-        TimeSpan.FromSeconds(5),
-        "The Close Opportunity dialog is not available."
-        );
+    TimeSpan.FromSeconds(5),
+    "The Close Opportunity dialog is not available."
+    );
 
                 return true;
             });
