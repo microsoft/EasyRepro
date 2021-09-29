@@ -35,7 +35,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-                //xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
@@ -53,13 +53,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-                //xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
                 xrmApp.Grid.SwitchView("My Active Accounts");
 
-                xrmApp.Grid.OpenRecord(0);
+                xrmApp.Grid.OpenRecord(1);
             }
         }
 
@@ -72,7 +72,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-                //xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
