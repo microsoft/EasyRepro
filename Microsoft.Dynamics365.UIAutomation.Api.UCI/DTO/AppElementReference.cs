@@ -433,7 +433,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SubGridContents", "//div[@id=\"dataSetRoot_[NAME]\"]" },
             { "Entity_SubGridList", ".//ul[contains(@id, \"[NAME]-GridList\")]" },
             { "Entity_SubGridListCells", ".//div[contains(@wj-part, 'cells') and contains(@class, 'wj-cells') and contains(@role, 'grid')]" },
-            { "Entity_SubGridViewPickerButton", ".//span[contains(@id, 'ViewSelector') and contains(@role, 'button')]" },
+            { "Entity_SubGridViewPickerButton", ".//span[contains(@id, 'ViewSelector') and contains(@id, 'button')]" },
             { "Entity_SubGridViewPickerFlyout", "//div[contains(@id, 'ViewSelector') and contains(@flyoutroot, 'flyoutRootNode')]" },
             { "Entity_SubGridCommandBar", ".//ul[contains(@data-id, 'CommandBar')]" },
             { "Entity_SubGridOverflowContainer", ".//div[contains(@data-id, 'flyoutRootNode')]" },
