@@ -59,6 +59,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string HideChart = "Grid_HideChart";
             public static string JumpBar = "Grid_JumpBar";
             public static string FilterByAll = "Grid_FilterByAll";
+            public static string RowsContainerCheckbox = "Grid_RowsContainerCheckbox";
             public static string RowsContainer = "Grid_RowsContainer";
             public static string Rows = "Grid_Rows";
             public static string ChartSelector = "Grid_ChartSelector";
@@ -121,6 +122,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SubGridViewPickerButton = "Entity_SubGridViewPickerButton";
             public static string SubGridViewPickerFlyout = "Entity_SubGridViewPickerFlyout";
             public static string SubGridCommandBar = "Entity_SubGridCommandBar";
+            public static string SubGridCommandLabel = "Entity_SubGridCommandLabel";
             public static string SubGridOverflowContainer = "Entity_SubGridOverflowContainer";
             public static string SubGridOverflowButton = "Entity_SubGridOverflowButton";
             public static string SubGridHighDensityList = "Entity_SubGridHighDensityList";
@@ -377,6 +379,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Grid_ShowChart"       , "//button[contains(@aria-label,'Show Chart')]"},
             { "Grid_JumpBar"       , "//*[@id=\"JumpBarItemsList\"]"},
             { "Grid_FilterByAll"       , "//*[@id=\"All_link\"]"},
+            { "Grid_RowsContainerCheckbox"  ,   "//div[@role='checkbox']" },
             { "Grid_RowsContainer"       , "//div[contains(@role,'grid')]"},
             { "Grid_Rows"           , "//div[contains(@role,'row')]"},
             { "Grid_ChartSelector"           , "//span[contains(@id,'ChartSelector')]"},
@@ -433,9 +436,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SubGridContents", "//div[@id=\"dataSetRoot_[NAME]\"]" },
             { "Entity_SubGridList", ".//ul[contains(@id, \"[NAME]-GridList\")]" },
             { "Entity_SubGridListCells", ".//div[contains(@wj-part, 'cells') and contains(@class, 'wj-cells') and contains(@role, 'grid')]" },
-            { "Entity_SubGridViewPickerButton", ".//span[contains(@id, 'ViewSelector') and contains(@role, 'button')]" },
+            { "Entity_SubGridViewPickerButton", ".//span[contains(@id, 'ViewSelector') and contains(@id, 'button')]" },
             { "Entity_SubGridViewPickerFlyout", "//div[contains(@id, 'ViewSelector') and contains(@flyoutroot, 'flyoutRootNode')]" },
             { "Entity_SubGridCommandBar", ".//ul[contains(@data-id, 'CommandBar')]" },
+            { "Entity_SubGridCommandLabel", ".//button//span[text()=\"[NAME]\"]" },
             { "Entity_SubGridOverflowContainer", ".//div[contains(@data-id, 'flyoutRootNode')]" },
             { "Entity_SubGridOverflowButton", ".//button[contains(@aria-label, '[NAME]')]" },
             { "Entity_SubGridHighDensityList", ".//div[contains(@data-lp-id, \"ReadOnlyGrid|[NAME]\") and contains(@class, 'editableGrid')]" },
