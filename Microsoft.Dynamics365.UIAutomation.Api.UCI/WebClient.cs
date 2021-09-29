@@ -1543,8 +1543,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 control.WaitUntilClickable(xpathToCell,
                     cell =>
                     {
-                        var emptyDiv = cell.FindElement(By.TagName("div"));
-                        cell.Click();
+                        var emptyDiv = cell.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.RowsContainerCheckbox]));
                         driver.Perform(action, cell, cell.LeftTo(emptyDiv));
                     },
                     $"An error occur trying to open the record at position {index}"
@@ -2041,33 +2040,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Check if grid commandBar was found
                 if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandBar].Replace("[NAME]", subGridName)), out subGridCommandBar))
                 {
-                    // Locate subGrid command list
-                    //var foundCommands = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
-
-                    var items = subGridCommandBar.FindElements(By.TagName("button"));
-
                     //Is the button in the ribbon?
-                    if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
+                    if (subGridCommandBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", name)), out var command))
                     {
-                        items.FirstOrDefault(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)).Click(true);
+                        command.Click(true);
                         driver.WaitForTransaction();
                     }
                     else
                     {
-                        //Is the button in More Commands Overflow?
-                        if (items.Any(x => x.GetAttribute("aria-label").StartsWith("More Commands", StringComparison.OrdinalIgnoreCase)))
+                        // Is the button in More Commands overflow?
+                        if (subGridCommandBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", "More Commands")), out var moreCommands))
                         {
-                            //Click More Commands
-                            items.FirstOrDefault(x => x.GetAttribute("aria-label").StartsWith("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                            // Click More Commands
+                            moreCommands.Click(true);
                             driver.WaitForTransaction();
 
                             // Locate the overflow button (More Commands flyout)
                             var overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
 
                             //Click the primary button, if found
-                            if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name))))
+                            if (overflowContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name)), out var overflowCommand))
                             {
-                                overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name))).Click(true);
+                                overflowCommand.Click(true);
                                 driver.WaitForTransaction();
                             }
                             else
@@ -2083,9 +2077,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         var overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
 
                         //Click the primary button, if found
-                        if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))))
+                        if (overflowContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName)), out var overflowButton))
                         {
-                            overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))).Click(true);
+                            overflowButton.Click(true);
                             driver.WaitForTransaction();
                         }
                         else
@@ -2098,9 +2092,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
 
                             //Click the primary button, if found
-                            if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))))
+                            if (overflowContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName)), out var secondOverflowCommand))
                             {
-                                overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))).Click(true);
+                                secondOverflowCommand.Click(true);
                                 driver.WaitForTransaction();
                             }
                             else
@@ -4568,9 +4562,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
 
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]),
-        TimeSpan.FromSeconds(5),
-        "The Close Opportunity dialog is not available."
-        );
+    TimeSpan.FromSeconds(5),
+    "The Close Opportunity dialog is not available."
+    );
 
                 return true;
             });

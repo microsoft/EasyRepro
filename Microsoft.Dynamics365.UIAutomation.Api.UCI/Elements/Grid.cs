@@ -77,5 +77,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.Sort(columnName, sortOptionButtonText);
         }
+
+        /// <summary>
+        /// Filter the grid by the Character provided
+        /// </summary>
+        /// <param name="filter">Label of footer filter - View records that starts with this letter</param>
+        public void FilterByLetter(char filter)
+        {
+            _client.FilterByLetter(filter);
+        }
     }
 }
