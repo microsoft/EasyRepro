@@ -19,7 +19,7 @@ using System.Web;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
-    public class WebClient : BrowserPage
+    public class WebClient : BrowserPage, IDisposable
     {
         public List<ICommandResult> CommandResults => Browser.CommandResults;
         public Guid ClientSessionId;
@@ -5317,7 +5317,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             ThinkTime((int)timespan.TotalMilliseconds);
         }
 
-        internal void Dispose()
+        public void Dispose()
         {
             Browser.Dispose();
         }
