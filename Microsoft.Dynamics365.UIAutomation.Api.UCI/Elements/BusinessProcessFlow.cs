@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
+using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 
@@ -12,6 +13,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public BusinessProcessFlow(WebClient client)
         {
             _client = client;
+        }
+
+        public Field GetField(string field)
+        {
+            return _client.BPFGetField(field);
         }
 
         /// <summary>
@@ -27,7 +33,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Retrieves the value of a Lookup field
         /// </summary>
-        /// <param name="field">LookupItem with the schema name of the field to retrieve
+        /// <param name="field">LookupItem with the schema name of the field to retrieve</param>
         public string GetValue(LookupItem field)
         {
             return _client.GetValue(field);
@@ -36,8 +42,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Retrieves the value of a OptionSet field
         /// </summary>
-        /// <param name="field">OptionSet with the schema name of the field to retrieve
+        /// <param name="field">OptionSet with the schema name of the field to retrieve</param
         public string GetValue(OptionSet field)
+        {
+            return _client.GetValue(field);
+        }
+
+        /// <summary>
+        /// Retrieves the value of a BooleanItem field.
+        /// </summary>
+        /// <param name="field">BooleanItem with the schema name of the field to retrieve.</param>
+        public bool GetValue(BooleanItem field)
         {
             return _client.GetValue(field);
         }
@@ -101,18 +116,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// Sets the value of a LookupItem field
         /// </summary>
         /// <param name="field">LookupItem with the schema name of the field to retrieve</param>
-        public void SetValue(LookupItem control, int index = 0)
+        public void SetValue(LookupItem control)
         {
-            _client.SetValue(control, index);
+            _client.SetValue(control, FormContextType.BusinessProcessFlow);
         }
 
         /// <summary>
         /// Sets the value of a Date field
         /// </summary>
         /// <param name="field">Schema name of the field to retrieve</param>
-        public void SetValue(string field, DateTime date, string format = "MM dd yyyy")
+        public void SetValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
-            _client.SetValue(field, date, format);
+            _client.SetValue(field, date, FormContextType.BusinessProcessFlow, formatDate, formatTime);
         }
 
         /// <summary>
@@ -121,7 +136,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="field">MultiValueOptionSet with the schema name of the field to retrieve</param>
         public void SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
-            _client.SetValue(option, removeExistingValues);
+            _client.SetValue(option, FormContextType.BusinessProcessFlow, removeExistingValues);
         }
 
         /// <summary>

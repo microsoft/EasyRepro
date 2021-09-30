@@ -54,11 +54,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         public BrowserCommandResult<LoginResult> Login(Uri uri)
         {
-            if (this.Browser.Options.Credentials.IsDefault)
-                throw new InvalidOperationException("The default login method cannot be invoked without first setting credentials on the Browser object.");
-
-            return this.Execute(GetOptions("Login"), this.Login, uri, this.Browser.Options.Credentials.Username, this.Browser.Options.Credentials.Password, default(Action<LoginRedirectEventArgs>));
+            if (this.Browser.Options.Credentials.Username == null)
+                return PassThroughLogin(uri);
+            else
+                return this.Execute(GetOptions("Login"), this.Login, uri, this.Browser.Options.Credentials.Username, this.Browser.Options.Credentials.Password, default(Action<LoginRedirectEventArgs>));
         }
+
         /// <summary>
         /// Login Page
         /// </summary>
@@ -120,6 +121,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     redirectAction?.Invoke(new LoginRedirectEventArgs(username, password, driver));
 
                     redirect = true;
+
+                    MarkOperation(driver);
                 }
                 else
                 {
@@ -132,49 +135,80 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])))
                     {
                         driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]));
-                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])).Submit();
+
+                        //Click didn't work so use submit
+                        if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])))
+                            driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])).Submit();
                     }
 
                     driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
                         , new TimeSpan(0, 0, 60),
-                        e => 
+                        e =>
                         {
-                            e.WaitForPageToLoad();
-                            e.SwitchTo().Frame(0);
-                            e.WaitForPageToLoad();
+                            driver.WaitForPageToLoad();
+                            MarkOperation(driver);
+                            driver.SwitchTo().Frame(0);
+                            driver.WaitForPageToLoad();
                         },
-                        f => { throw new Exception("Login page failed."); });
+                        "Login page failed."
+                    );
                 }
             }
 
             return redirect ? LoginResult.Redirect : LoginResult.Success;
         }
 
-        public void ADFSLoginAction(LoginRedirectEventArgs args)
+        internal BrowserCommandResult<LoginResult> PassThroughLogin(Uri uri)
+        {
+            return this.Execute(GetOptions("Pass Through Login"), driver =>
+            {
+                driver.Navigate().GoToUrl(uri);
 
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]),
+                    new TimeSpan(0, 0, 60),
+                    e =>
+                    {
+                        driver.WaitForPageToLoad();
+                        MarkOperation(driver);
+                        driver.SwitchTo().Frame(0);
+                        driver.WaitForPageToLoad();
+                    },
+                    "Login page failed."
+                );
+                return LoginResult.Success;
+            });
+        }
+
+        private void MarkOperation(IWebDriver driver)
+        {
+            if (driver.HasElement(By.Id(Elements.ElementId[Reference.Login.TaggingId])))
+                driver.ExecuteScript($"document.getElementById('{Elements.ElementId[Reference.Login.TaggingId]}').src = '_imgs/NavBar/Invisible.gif?operation=easyrepro|web|{Guid.NewGuid().ToString()}';");
+        }
+
+        public void ADFSLoginAction(LoginRedirectEventArgs args)
         {
             //Login Page details go here.  You will need to find out the id of the password field on the form as well as the submit button. 
             //You will also need to add a reference to the Selenium Webdriver to use the base driver. 
             //Example
 
-            var d = args.Driver;
+            var driver = args.Driver;
 
-            d.FindElement(By.Id("passwordInput")).SendKeys(args.Password.ToUnsecureString());
-            d.ClickWhenAvailable(By.Id("submitButton"), new TimeSpan(0, 0, 2));
+            driver.FindElement(By.Id("passwordInput")).SendKeys(args.Password.ToUnsecureString());
+            driver.ClickWhenAvailable(By.Id("submitButton"), new TimeSpan(0, 0, 2));
 
             //Insert any additional code as required for the SSO scenario
 
             //Wait for CRM Page to load
-            d.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
-                , new TimeSpan(0, 0, 60),
-            e =>
-            {
-                e.WaitForPageToLoad();
-                e.SwitchTo().Frame(0);
-                e.WaitForPageToLoad();
-            },
-                f => { throw new Exception("Login page failed."); });
-
+            driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]),
+                TimeSpan.FromSeconds(60),
+                e =>
+                {
+                    driver.WaitForPageToLoad();
+                    driver.SwitchTo().Frame(0);
+                    driver.WaitForPageToLoad();
+                },
+                "Login page failed."
+            );
         }
     }
 }

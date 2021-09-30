@@ -744,9 +744,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <summary>
         /// Sets the current selected Stage as Active.
         /// </summary>
+        /// <param name="ignoreAlreadyActive">Used to ignore the 'Business Process is already Active' error and proceed with test execution, if desired</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
         /// <example>xrmBrowser.BusinessProcessFlow.SetActive();</example>
-        public BrowserCommandResult<bool> SetActive(int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> SetActive(bool ignoreAlreadyActive = false, int thinkTime = Constants.DefaultThinkTime)
         {
             this.Browser.ThinkTime(thinkTime);
 
@@ -756,7 +757,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     throw new Exception("Business Process Flow Set Active Element does not exist");
 
                 if (driver.FindElement(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.SetActive])).GetAttribute("class").Contains("hidden"))
-                    throw new Exception("The Business Process is already Active");
+                {
+                    if (ignoreAlreadyActive)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        throw new Exception("The Business Process is already Active");
+                    }
+                }
 
                 driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.BusinessProcessFlow.SetActive]));
 
@@ -1019,7 +1029,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
         /// <example>xrmBrowser.BusinessProcessFlow.SetValue(new CompositeControl {Id = "fullname", Fields = fields});</example>
-        public new BrowserCommandResult<bool> SetValue(CompositeControl control)
+        public BrowserCommandResult<bool> SetValue(CompositeControl control)
         {
             return this.Execute(GetOptions($"Set BPF CompositeControl Value: {control.Id}"), driver =>
             {

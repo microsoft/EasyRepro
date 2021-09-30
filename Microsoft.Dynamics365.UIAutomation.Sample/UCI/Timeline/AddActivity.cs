@@ -2,6 +2,7 @@
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Security;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
@@ -11,6 +12,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     {
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
         private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
@@ -19,11 +21,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.SwitchView("Active Accounts");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -41,11 +45,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.SwitchView("Active Accounts");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -53,21 +59,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(4000);
 
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Reference.Timeline.EmailBcc,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
-                });
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Reference.Timeline.EmailCC,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
-                });
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Reference.Timeline.EmailTo,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
-                });
+
+                xrmApp.Timeline.AddEmailContacts(CreateBccLookupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+
+
+                // This fails as it already has a value.
+                //xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
+                //{
+                //    Name = Elements.ElementId[Reference.Timeline.EmailTo],
+                //    Values = new string[] { "Test Contact", "Jay Zee3" },
+                //});
 
                 xrmApp.Timeline.SaveAndCloseEmail();
 
@@ -81,11 +83,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.SwitchView("Active Accounts");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -93,26 +97,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(4000);
 
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Reference.Timeline.EmailBcc,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
-                });
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Reference.Timeline.EmailCC,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
-                });
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Reference.Timeline.EmailTo,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
-                });
+                xrmApp.Timeline.AddEmailContacts(CreateBccLookupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+
+                // This fails as it already has a value.
+                //xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
+                //{
+                //    Name = Reference.Timeline.EmailTo,
+                //    Values = new string[] { "Test Contact", "Jay Zee3" },
+                //});
 
                 var multiselectedItems = xrmApp.Timeline.GetEmail(
                     new MultiValueOptionSet()
                     {
-                        Name = Reference.Timeline.EmailTo,
+                        Name = Elements.ElementId[Reference.Timeline.EmailTo],
                     });
 
                 xrmApp.ThinkTime(3000);
@@ -120,16 +118,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
+        [TestCategory("Fail - Bug")]
         public void UCITestAccountRemoveMultiSelectEmail()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.SwitchView("Active Accounts");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -137,17 +138,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(4000);
 
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
-                xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
-                {
-                    Name = Reference.Timeline.EmailTo,
-                    Values = new string[] { "Test Contact", "Jay Zee3" },
-                });
 
+                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+
+                // This fails with the exception of OpenQA.Selenium.ElementNotInteractableException: element not interactable
                 var success = xrmApp.Timeline.RemoveEmail(
                     new MultiValueOptionSet()
                     {
-                        Name = Reference.Timeline.EmailTo,
-                        Values = new string[] { "Test Contact", "Jay Zee3" },
+                        Name = Elements.ElementId[Reference.Timeline.EmailCC],
+                        Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
                     });
 
                 xrmApp.ThinkTime(3000);
@@ -161,11 +160,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.SwitchView("Active Accounts");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -183,11 +184,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+
+                xrmApp.Grid.SwitchView("Active Accounts");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -197,6 +200,35 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.ThinkTime(3000);
             }
+        }
+
+        private LookupItem[] CreateBccLookupItemsFor(params string[] lookupNames)
+        {
+            var lookupItemList = new List<LookupItem>();
+            foreach (var lookupName in lookupNames)
+            {
+                lookupItemList.Add(CreateLookupItem(Reference.Timeline.EmailBcc, lookupName));
+            }
+            return lookupItemList.ToArray();
+        }
+
+        private LookupItem[] CreateCcLooupItemsFor(params string[] v1)
+        {
+            var lookupItemList = new List<LookupItem>();
+            foreach (var item in v1)
+            {
+                lookupItemList.Add(CreateLookupItem(Reference.Timeline.EmailCC, item));
+            }
+            return lookupItemList.ToArray();
+        }
+
+        private LookupItem CreateLookupItem(string name, string value)
+        {
+            return new LookupItem
+            {
+                Name = Elements.ElementId[name],
+                Value = value
+            };
         }
     }
 }

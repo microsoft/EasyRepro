@@ -38,26 +38,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions($"Global Search: {searchText}"), driver =>
             {
-                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Navigation.SearchButton]),
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.SearchButton]),
                     new TimeSpan(0, 0, 5),
-                    d => { driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.SearchButton])); },
-                    d => { throw new InvalidOperationException("The Global Search button is not available."); });
+                    "The Global Search button is not available.");
 
-
-                if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Navigation.SearchLabel])))
-                {
-                    driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.SearchLabel]));
-                }
-
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.SearchLabel]), TimeSpan.FromSeconds(1));
+                
                 driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Navigation.Search]),
                     new TimeSpan(0, 0, 5),
-                    d =>
+                    e =>
                     {
-                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.Search])).SendKeys(searchText, true);
-                        Thread.Sleep(500);
-                        driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.Search])).SendKeys(Keys.Enter);
+                        e.SendKeys(searchText, true);
+                        Browser.ThinkTime(500);
+                        e.SendKeys(Keys.Enter);
                     },
-                    d => { throw new InvalidOperationException("The Global Search text field is not available."); });
+                    "The Global Search text field is not available."
+                    ); 
 
                 return true;
             });
@@ -171,12 +167,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 var dictionary = new Dictionary<string, IWebElement>();
 
+                driver.WaitUntilAvailable(By.ClassName(Elements.CssClass[Reference.Navigation.TopLevelItem]));
+
                 var topItem = driver.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.TopLevelItem])).FirstOrDefault();
                 topItem?.FindElement(By.Name(Elements.Name[Reference.Navigation.HomeTab])).Click();
 
-                //  driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.HomeTab]));
-
-                Thread.Sleep(1000);
+                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Navigation.ActionGroup]));
 
                 var element = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.ActionGroup]));
                 var subItems = element.FindElements(By.ClassName(Elements.CssClass[Reference.Navigation.ActionButtonContainer]));
@@ -357,12 +353,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 var subAreas = OpenSubMenu(areas[area]).Value;
 
-                if (!subAreas.Any(x => x.Key==subArea))
+                if (!subAreas.Any(x => x.Key == subArea))
                 {
                     throw new InvalidOperationException($"No subarea with the name '{subArea}' exists inside of '{area}'.");
                 }
 
-                subAreas.FirstOrDefault(x => x.Key==subArea).Value.Click(true);
+                subAreas.FirstOrDefault(x => x.Key == subArea).Value.Click(true);
 
                 SwitchToContent();
                 driver.WaitForPageToLoad();
@@ -371,7 +367,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
-        internal BrowserCommandResult<List<KeyValuePair<string,IWebElement>>> OpenSubMenu(IWebElement area)
+        internal BrowserCommandResult<List<KeyValuePair<string, IWebElement>>> OpenSubMenu(IWebElement area)
         {
             return this.Execute(GetOptions($"Open Sub Menu: {area}"), driver =>
             {
@@ -451,6 +447,77 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         /// <summary>
+        /// Opens About from navigation bar
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.RetrieveServerVersion();</example>
+        public BrowserCommandResult<string> RetrieveServerVersion(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Open About"), driver =>
+            {
+                OpenSettingsOption(driver, Elements.Xpath[Reference.Navigation.About]);
+
+                driver.LastWindow().SwitchTo().ActiveElement();
+
+                var versionElement = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.AboutVersionText]));
+                var listedVersions = versionElement.FindElements(By.TagName("bdo"));
+
+                var serverVersion = listedVersions[1].Text.ToString().TrimStart('(').TrimEnd(')');
+
+                return serverVersion;
+            });
+        }
+
+        /// <summary>
+        /// Retrieves a Dictionary containing all of the Areas on the main menu
+        /// </summary>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.GetAreas();</example>
+
+        public BrowserCommandResult<Dictionary<string, IWebElement>> GetAreas(int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Get Areas"), driver =>
+            {
+                var areas = OpenMenu().Value;
+
+                driver.WaitForPageToLoad();
+
+                return areas;
+            });
+        }
+
+        /// <summary>
+        /// Retrieves a list of the sub areas within a specified area
+        /// </summary>
+        /// <param name="area">The area whose subareas you want to check</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmBrowser.Navigation.GetSubAreas("Sales"); - returns all of the subareas in the Sales area</example>
+        public BrowserCommandResult<List<KeyValuePair<string, IWebElement>>> GetSubAreas(string area, int thinkTime = Constants.DefaultThinkTime)
+        {
+            Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Get SubAreas"), driver =>
+            {
+                area = area.ToLower();
+
+                var areas = OpenMenu().Value;
+
+                if (!areas.ContainsKey(area))
+                {
+                    throw new InvalidOperationException($"No area with the name '{area}' exists.");
+                }
+
+                var subAreas = OpenSubMenu(areas[area]).Value;
+
+                return subAreas;
+            });
+        }
+
+        /// <summary>
         /// SignOut
         /// </summary>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
@@ -461,10 +528,50 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return this.Execute(GetOptions($"SignOut"), driver =>
             {
-                var userInfo = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.UserInfo]));
-                userInfo?.Click();
-                var signOut = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.SignOut]));
-                signOut?.Click();
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.UserInfo]));
+
+                Browser.ThinkTime(500);
+
+                driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.SignOut]));
+                return true;
+            });
+        }
+
+        public BrowserCommandResult<bool> OpenApp(string appName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            this.Browser.ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Open App"), driver =>
+            {
+                driver.SwitchTo().DefaultContent();
+
+                if (driver.HasElement(By.XPath(Elements.Xpath[Reference.Navigation.OpenAppTabDivider])))
+                {
+                    driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.OpenAppTabDivider]));
+
+                    var container = driver.FindElement(By.XPath(Elements.Xpath[Reference.Navigation.OpenAppContainer]));
+
+                    var buttons = container.FindElements(By.TagName("button"));
+
+                    var button = buttons.FirstOrDefault(x => x.Text.Trim() == appName);
+
+                    if (button != null)
+                        button.Click(true);
+                    else
+                        throw new InvalidOperationException($"App Name {appName} not found.");
+
+                    driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]),
+                                                TimeSpan.FromSeconds(60),
+                                                e =>
+                                                {
+                                                    driver.WaitForPageToLoad();
+                                                    driver.SwitchTo().Frame(0);
+                                                    driver.WaitForPageToLoad();
+                                                },
+                                                "App Load failed."
+                                                );
+                }
+
                 return true;
             });
         }

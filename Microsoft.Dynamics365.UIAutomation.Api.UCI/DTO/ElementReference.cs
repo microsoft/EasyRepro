@@ -107,33 +107,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Grid_FirstRow", "id(\"gridBodyTable\")/tbody/tr[1]"},
 
             //Entity
-            { "Entity_Form"       , "id(\"tab0\")"},
+            { "Entity_Form"       , "//*[contains(@id, \"tablist\")]"},
             { "Entity_Close"       , "id(\"closeButton\")"},
             { "Entity_Save"       , "id(\"savefooter_statuscontrol\")"},
-            { "Entity_FormSectionContentTable" , "id(\"flyoutFormSection_ContentTable\")" }, //GitHub Issue 56
-            { "Entity_SelectFormContentTable" , "id(\"Dialog_0\")" }, //GitHub Issue 56
-            { "Entity_SelectForm",  "id(\"header_crmFormSelector\")"}, //GitHub Issue #56 - Correcting reference point for SelectForm() method
-            { "Entity_SelectFormSection",  "id(\"FormSecNavigationControl-Icon\")"}, //GitHub Issue 56
+            { "Entity_FormSelector", "//*[@data-id=\"form-selector\"]" },
+            { "Entity_FormSelectorFlyout", "//*[@data-id=\"form-selector-flyout\"]" },
+            { "Entity_FormSelectorItem", "//li[contains(@data-id, 'form-selector-item')]" },
 
             //Related MenuItems
             { "Related_Popout",                 "//li[contains(@data-id,\"tablist-tab_related\")]" },
             { "Related_Common_Activities",      "//div[contains(@data-id,\"form-tab-relatedEntity-navActivities\")]" },
 
             //Timeline
-            { "Timeline_Add_Popout",               "//li[contains(@id,\"notescontrol-action_bar_add_command\")]" },
-            { "Timeline_Add_Popout_Appointment",   "//li[contains(@id,\"notescontrol-appointment\")]" },
-            { "Timeline_Add_Popout_Email",         "//li[contains(@id,\"notescontrol-email\")]" },
-            { "Timeline_Add_Popout_PhoneCall",     "//li[contains(@id,\"notescontrol-phonecall\")]" },
-            { "Timeline_Add_Popout_Task",          "//li[contains(@id,\"notescontrol-task\")]" },
-            { "Timeline_Add_Popout_Note",          "//li[contains(@id,\"notescontrol-notes\")]" },
-            { "Timeline_Add_Popout_Post",          "//li[contains(@id,\"notescontrol-post\")]" },
+            { "Timeline_Add_Popout",               "//button[contains(@id,\"notescontrol-action_bar_add_command\")]" },
+            { "Timeline_Add_Popout_Appointment",   "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_appointment\")]" },
+            { "Timeline_Add_Popout_Email",         "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_email\")]" },
+            { "Timeline_Add_Popout_PhoneCall",     "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_phonecall\")]" },
+            { "Timeline_Add_Popout_Task",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_task\")]" },
+            { "Timeline_Add_Popout_Note",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_notes\")]" },
+            { "Timeline_Add_Popout_Post",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_post\")]" },
 
             { "Timeline_Post_Text",                "id(\"create_post_postText\")" },
             { "Timeline_Post_Add",                 "id(\"create_post_add_btn\")" },
             { "Timeline_Post_Cancel",              "id(\"create_post_cancel_btn\")" },
 
             { "Timeline_Note_Title",               "id(\"create_note_medium_title\")" },
-            { "Timeline_Note_Text",                "id(\"create_note_notesText\")" },
+            { "Timeline_Note_Text",                "//iframe[contains(@class, \"fullPageContentEditorFrame\")]" },
+            { "Timeline_Note_TextBody",            "//body[contains(@class, 'cke_wysiwyg_frame')]" },
             { "Timeline_Note_Add",                 "id(\"create_note_add_btn\")" },
             { "Timeline_Note_Cancel",              "id(\"create_note_cancel_btn\")" },
 
@@ -182,8 +182,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Login_UserId", "//input[@type='email']"},
             { "Login_Password", "//input[@type='password']"},
             { "Login_SignIn", "id(\"cred_sign_in_button\")"},
-            { "Login_CrmMainPage", "id(\"crmTopBar\")"},
+            { "Login_CrmMainPage", "//*[contains(@id,'crmTopBar') or contains(@data-id,'topBar')]"},
+            { "Login_CrmUCIMainPage", "//*[contains(@data-id,'topBar')]"},
             { "Login_StaySignedIn", "//input[@id=\"idSIButton9\"]"},
+            { "Login_OneTimeCode", "//input[@name='otc']"},
+
 
             //Notification           
             { "Notification_AppMessageBar", "id(\"crmAppMessageBar\")"},
@@ -393,7 +396,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string AddConnectionHeader = "Dialog_AddConnectionHeader";
             public static string WarningFooter = "Dialog_WarningFooter";
             public static string WarningCloseButton = "Dialog_WarningCloseButton";
-           
+
 
             public static class CloseOpportunity
             {
@@ -450,7 +453,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 public static string Add = "Dialog_AddUser";
             }
 
-}
+        }
         public static class SetValue
         {
             public static string LookupRenderClass = "SetValue_LookupRenderClass";
@@ -564,10 +567,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Close = "Entity_Close";
             public static string Tab = "Entity_TabId";
             public static string Save = "Entity_Save";
-            public static string SelectFormContentTable = "Entity_SelectFormContentTable"; //GitHub Issue 56
-            public static string FormSectionContentTable = "Entity_FormSectionContentTable"; //GitHub Issue 56
-            public static string SelectForm = "Entity_SelectForm";
-            public static string SelectFormSection = "Entity_SelectFormSection"; //GitHub Issue 56
+            public static string FormSelector = "Entity_FormSelector";
+            public static string FormSelectorFlyout = "Entity_FormSelectorFlyout";
+            public static string FormSelectorItem = "Entity_FormSelectorItem";
             public static string LookupRender = "Entity_LookupRenderClass";
             public static string Popout = "Entity_PopoutClass";
         }
@@ -593,6 +595,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             public static string NoteTitle = "Timeline_Note_Title";
             public static string NoteText = "Timeline_Note_Text";
+            public static string NoteTextBody = "Timeline_Note_TextBody";
             public static string NoteAdd = "Timeline_Note_Add";
             public static string NoteCancel = "Timeline_Note_Cancel";
 
@@ -725,7 +728,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string LoginPassword = "Login_Password";
             public static string SignIn = "Login_SignIn";
             public static string CrmMainPage = "Login_CrmMainPage";
+            public static string CrmUCIMainPage = "Login_CrmUCIMainPage";
             public static string StaySignedIn = "Login_StaySignedIn";
+            public static string OneTimeCode = "Login_OneTimeCode";
         }
         public static class Report
         {

@@ -54,13 +54,46 @@ Selenium is a set of different software tools each with a different approach to 
 Although we don't have specific commands to cover the above funcationality, we have generic commands that will allow you to still interact with those features. 
 
 ## Known Issues #
-- Edge Browser is currently not supported due to known bug that is planned for future release.
+- Microsoft Edge Browser, based on Chromium, is currently not supported.
 - Firefox has sometimes been inconsistent with testing results.  The click command is inconsistent. This is a known issue and has been reported to that team that manages that driver. 
 - IE Driver has a 32-bit version and a 64-bit version. If you're using the 32-bit version on 64-bit windows with 64-bit IE then the driver will not work as intended.  Use the appropriate version of IE Driver with the specific version of IE. 
 
 ## Setup #
 #### Install Instructions:
 The Sample project should have NUGET packages added and you just need to build the solution and restore the packages.  For the specific browser drivers, you can add them using NUGET. The default driver is Chrome and the NUGET package is already installed on the Sample project.   
+
+#### Run the Sample Project
+
+Change the keys in your `app.config` below to match your environment. Open the Test explorer window. Right click and run one test to ensure everything works. Trying the `CreateAccount` test under `Microsoft.Dynamics365.UIAutomation.Sample.Web` is a good start.
+
+```cs
+<add key="OnlineUsername" value="name@name.onmicrosoft.com" />
+<add key="OnlinePassword" value="*********" />
+<add key="OnlineCrmUrl" value="https://org.crm.dynamics.com/" />
+```
+
+#### MFA Support
+If the account you are using has MFA (Multi-Factor Authentication) enabled, you will also need to provide an MFA Secret Key.
+You can obtain an MFA secret key for your account using these instructions - you will need Microsoft's Authenticator App to get this working:
+
+<ol >
+<li>Go to your Office365 'Security info' page at: <a href="https://mysignins.microsoft.com/security-info" target="_blank">https://mysignins.microsoft.com/security-info</a></li> 
+<li>Enter your O365 login and password</li>
+<li>Click 'Add method' and select "Authenticator app" in Combobox, click Add</li>
+<li>Click on "I want to use a different authenticator app" link</li>
+<li>Click on the 'Next' button, click on the 'Next' button</li>
+<li>Click on 'Can't scan image?'</li>
+<li>Make a note of the 'Secret key' which is displayed</li>
+<li>Open Authenticator app and click the '+' to add an account and select 'work or school account'</li>
+<li>Scan the QR code displayed on the web page</li>
+<li>When the App displays a six-digit code, click 'Next' on the web page</li>
+<li>Enter the six-digit verification code from the app into the web page and Click the 'Next' button</li>
+<li>Add your MFA Secret key from step 7 <i>with the spaces removed</i> to your app.config as shown below, in the same section that you add your username and password</li>
+</ol>
+
+```cs
+<add key="MfaSecretKey" value="MfaSecretKeyWithSpacesRemoved" />
+```
 
 #### Supported Browser WebDriver
  The application supports following browser:

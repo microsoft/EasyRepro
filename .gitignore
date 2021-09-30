@@ -250,3 +250,6 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+*.DotSettings
+/Microsoft.Dynamics365.UIAutomation.Sample/UCITesting.cs
+/Microsoft.Dynamics365.UIAutomation.Sample/WEBTesting.cs

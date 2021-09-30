@@ -22,6 +22,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
         {
             using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
+
+
                 xrmBrowser.LoginPage.Login(_xrmUri, _username, _password);
                 xrmBrowser.GuidedHelp.CloseGuidedHelp();
                 
@@ -33,7 +35,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.CommandBar.ClickCommand("Run Workflow", "", true);
 
-                xrmBrowser.Dialogs.RunWorkflow("Account Set Phone Number");
+                // This test is a sample use case only. Uncomment and update the display name of the workflow you wish to run from the grid in the line below
+                // xrmBrowser.Dialogs.RunWorkflow("Account Set Phone Number");
 
                 xrmBrowser.ThinkTime(10000);
             }

@@ -1,10 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
+using OtpNet;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Security;
 using System.Threading;
@@ -15,106 +20,275 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     public class WebClient : BrowserPage
     {
         public List<ICommandResult> CommandResults => Browser.CommandResults;
+        public Guid ClientSessionId;
 
         public WebClient(BrowserOptions options)
         {
             Browser = new InteractiveBrowser(options);
             OnlineDomains = Constants.Xrm.XrmDomains;
+            ClientSessionId = Guid.NewGuid();
         }
 
         internal BrowserCommandOptions GetOptions(string commandName)
         {
             return new BrowserCommandOptions(Constants.DefaultTraceSource,
                 commandName,
-                0,
-                0,
+                Constants.DefaultRetryAttempts,
+                Constants.DefaultRetryDelay,
                 null,
                 true,
                 typeof(NoSuchElementException), typeof(StaleElementReferenceException));
         }
 
-        public string[] OnlineDomains { get; set; }
-
-        #region Login
-        internal BrowserCommandResult<LoginResult> Login(Uri orgUri, SecureString username, SecureString password)
+        internal BrowserCommandResult<bool> InitializeModes()
         {
-            return this.Execute(GetOptions("Login"), this.Login, orgUri, username, password, default(Action<LoginRedirectEventArgs>));
-        }
-
-        internal BrowserCommandResult<LoginResult> Login(Uri orgUri, SecureString username, SecureString password, Action<LoginRedirectEventArgs> redirectAction)
-        {
-            return this.Execute(GetOptions("Login"), this.Login, orgUri, username, password, redirectAction);
-        }
-
-        private LoginResult Login(IWebDriver driver, Uri uri, SecureString username, SecureString password,
-            Action<LoginRedirectEventArgs> redirectAction)
-        {
-            var redirect = false;
-            bool online = !(this.OnlineDomains != null && !this.OnlineDomains.Any(d => uri.Host.EndsWith(d)));
-            driver.Navigate().GoToUrl(uri);
-
-            if (online)
+            return this.Execute(GetOptions("Initialize Unified Interface Modes"), driver =>
             {
-                if (driver.IsVisible(By.Id("use_another_account_link")))
-                    driver.ClickWhenAvailable(By.Id("use_another_account_link"));
+                driver.SwitchTo().DefaultContent();
 
-                driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]),
-                    $"The Office 365 sign in page did not return the expected result and the user '{username}' could not be signed in.");
+                // Wait for main page to load before attempting this. If you don't do this it might still be authenticating and the URL will be wrong
+                WaitForMainPage();
 
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(username.ToUnsecureString());
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Tab);
-                driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.UserId])).SendKeys(Keys.Enter);
+                var uri = driver.Url;
+                var queryParams = "&flags=easyreproautomation=true";
 
-                Thread.Sleep(1000);
+                if (Browser.Options.UCITestMode) queryParams += ",testmode=true";
+                if (Browser.Options.UCIPerformanceMode) queryParams += "&perf=true";
 
-                if (driver.IsVisible(By.Id("aadTile")))
+                if (!uri.Contains(queryParams) && !uri.Contains(HttpUtility.UrlEncode(queryParams)))
                 {
-                    driver.FindElement(By.Id("aadTile")).Click(true);
+                    var testModeUri = uri + queryParams;
+
+                    driver.Navigate().GoToUrl(testModeUri);
                 }
 
-                Thread.Sleep(1000);
+                // Again wait for loading
+                WaitForMainPage();
+
+                return true;
+            });
+        }
+
+
+        public string[] OnlineDomains { get; set; }
+
+        #region PageWaits
+        internal bool WaitForMainPage(TimeSpan timeout, string errorMessage)
+            => WaitForMainPage(timeout, null, () => throw new InvalidOperationException(errorMessage));
+
+        internal bool WaitForMainPage(TimeSpan? timeout = null, Action<IWebElement> successCallback = null, Action failureCallback = null)
+        {
+            IWebDriver driver = Browser.Driver;
+            timeout = timeout ?? Constants.DefaultTimeout;
+            successCallback = successCallback ?? (
+                                  _ =>
+                                  {
+                                      bool isUCI = driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage]));
+                                      if (isUCI)
+                                          driver.WaitForTransaction();
+                                  });
+
+            var xpathToMainPage = By.XPath(Elements.Xpath[Reference.Login.CrmMainPage]);
+            var element = driver.WaitUntilAvailable(xpathToMainPage, timeout, successCallback, failureCallback);
+            return element != null;
+        }
+
+        #endregion
+
+        #region Login
+
+        internal BrowserCommandResult<LoginResult> Login(Uri uri)
+        {
+            var username = Browser.Options.Credentials.Username;
+            if (username == null)
+                return PassThroughLogin(uri);
+
+            var password = Browser.Options.Credentials.Password;
+            return Login(uri, username, password);
+        }
+
+        internal BrowserCommandResult<LoginResult> Login(Uri orgUri, SecureString username, SecureString password, SecureString mfaSecretKey = null, Action<LoginRedirectEventArgs> redirectAction = null)
+        {
+            return Execute(GetOptions("Login"), Login, orgUri, username, password, mfaSecretKey, redirectAction);
+        }
+
+        private LoginResult Login(IWebDriver driver, Uri uri, SecureString username, SecureString password, SecureString mfaSecretKey = null, Action<LoginRedirectEventArgs> redirectAction = null)
+        {
+            bool online = !(OnlineDomains != null && !OnlineDomains.Any(d => uri.Host.EndsWith(d)));
+            driver.Navigate().GoToUrl(uri);
+
+            if (!online)
+                return LoginResult.Success;
+
+            driver.ClickIfVisible(By.Id("use_another_account_link"));
+
+            bool waitingForOtc = false;
+            bool success = EnterUserName(driver, username);
+            if (!success)
+            {
+                var isUserAlreadyLogged = IsUserAlreadyLogged();
+                if (isUserAlreadyLogged)
+                {
+                    SwitchToDefaultContent(driver);
+                    return LoginResult.Success;
+                }
+
+                ThinkTime(1000);
+                waitingForOtc = GetOtcInput(driver) != null;
+
+                if (!waitingForOtc)
+                    throw new Exception($"Login page failed. {Reference.Login.UserId} not found.");
+            }
+
+            if (!waitingForOtc)
+            {
+                driver.ClickIfVisible(By.Id("aadTile"));
+                ThinkTime(1000);
 
                 //If expecting redirect then wait for redirect to trigger
                 if (redirectAction != null)
                 {
                     //Wait for redirect to occur.
-                    Thread.Sleep(3000);
+                    ThinkTime(3000);
 
-                    redirectAction?.Invoke(new LoginRedirectEventArgs(username, password, driver));
-
-                    redirect = true;
+                    redirectAction.Invoke(new LoginRedirectEventArgs(username, password, driver));
+                    return LoginResult.Redirect;
                 }
-                else
-                {
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).SendKeys(password.ToUnsecureString());
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).SendKeys(Keys.Tab);
-                    driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword])).Submit();
 
-                    Thread.Sleep(1000);
-
-                    driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]), new TimeSpan(0, 0, 5));
-
-                    if (driver.IsVisible(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn])))
-                    {
-                        driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]));
-                    }
-
-                    driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
-                        , new TimeSpan(0, 0, 60),
-                        e => {
-                            e.WaitForPageToLoad();
-                            e.SwitchTo().Frame(0);
-                            e.WaitForPageToLoad();
-
-                            //Switch Back to Default Content for Navigation Steps
-                            e.SwitchTo().DefaultContent();
-                        },
-                        f => { throw new Exception("Login page failed."); });
-                }
+                EnterPassword(driver, password);
+                ThinkTime(1000);
             }
 
-            return redirect ? LoginResult.Redirect : LoginResult.Success;
+            int attempts = 0;
+            bool entered=false;
+            if (mfaSecretKey != null)
+            {
+                do
+                {
+                    entered = EnterOneTimeCode(driver, mfaSecretKey);
+                    success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
+                    attempts++;
+                }
+                while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
+            }
+
+            if (entered && !success)
+                throw new InvalidOperationException("Something went wrong entering the OTC. Please check the MFA-SecretKey in configuration.");
+
+            return success ? LoginResult.Success : LoginResult.Failure;
         }
+
+        private bool IsUserAlreadyLogged() => WaitForMainPage(10.Seconds());
+
+        private static string GenerateOneTimeCode(SecureString mfaSecretKey)
+        {
+            // credits:
+            // https://dev.to/j_sakamoto/selenium-testing---how-to-sign-in-to-two-factor-authentication-2joi
+            // https://www.nuget.org/packages/Otp.NET/
+            string key = mfaSecretKey?.ToUnsecureString(); // <- this 2FA secret key.
+
+            byte[] base32Bytes = Base32Encoding.ToBytes(key);
+
+            var totp = new Totp(base32Bytes);
+            var result = totp.ComputeTotp(); // <- got 2FA coed at this time!
+            return result;
+        }
+
+        private bool EnterUserName(IWebDriver driver, SecureString username)
+        {
+            var input = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.UserId]), new TimeSpan(0, 0, 30));
+            if (input == null)
+                return false;
+
+            input.SendKeys(username.ToUnsecureString());
+            input.SendKeys(Keys.Enter);
+            return true;
+        }
+
+        private static void EnterPassword(IWebDriver driver, SecureString password)
+        {
+            var input = driver.FindElement(By.XPath(Elements.Xpath[Reference.Login.LoginPassword]));
+            input.SendKeys(password.ToUnsecureString());
+            input.Submit();
+        }
+
+        private bool EnterOneTimeCode(IWebDriver driver, SecureString mfaSecretKey)
+        {
+            try
+            {
+                IWebElement input = GetOtcInput(driver); // wait for the dialog, even if key is null, to print the right error
+                if (input == null)
+                    return true;
+
+                if (mfaSecretKey == null)
+                    throw new InvalidOperationException("The application is wait for the OTC but your MFA-SecretKey is not set. Please check your configuration.");
+
+                var oneTimeCode = GenerateOneTimeCode(mfaSecretKey);
+                SetInputValue(driver, input, oneTimeCode, 1.Seconds());
+                input.Submit();
+                return true; // input found & code was entered
+            }
+            catch (Exception e)
+            {
+                var message = $"An Error occur entering OTC. Exception: {e.Message}";
+                Trace.TraceInformation(message);
+                throw new InvalidOperationException(message, e);
+            }
+        }
+
+
+        private static IWebElement GetOtcInput(IWebDriver driver)
+            => driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Login.OneTimeCode]), TimeSpan.FromSeconds(2));
+
+        private static bool ClickStaySignedIn(IWebDriver driver)
+        {
+            var xpath = By.XPath(Elements.Xpath[Reference.Login.StaySignedIn]);
+            var element = driver.ClickIfVisible(xpath, 5.Seconds());
+            return element != null;
+        }
+
+        private static void SwitchToDefaultContent(IWebDriver driver)
+        {
+            SwitchToMainFrame(driver);
+
+            //Switch Back to Default Content for Navigation Steps
+            driver.SwitchTo().DefaultContent();
+        }
+
+        private static void SwitchToMainFrame(IWebDriver driver)
+        {
+            driver.WaitForPageToLoad();
+            driver.SwitchTo().Frame(0);
+            driver.WaitForPageToLoad();
+        }
+
+        internal BrowserCommandResult<LoginResult> PassThroughLogin(Uri uri)
+        {
+            return this.Execute(GetOptions("Pass Through Login"), driver =>
+            {
+                driver.Navigate().GoToUrl(uri);
+
+                WaitForMainPage(60.Seconds(),
+                    _ =>
+                    {
+                        //determine if we landed on the Unified Client Main page
+                        var isUCI = driver.HasElement(By.XPath(Elements.Xpath[Reference.Login.CrmUCIMainPage]));
+                        if (isUCI)
+                        {
+                            driver.WaitForPageToLoad();
+                            driver.WaitForTransaction();
+                        }
+                        else
+                            //else we landed on the Web Client main page or app picker page
+                            SwitchToDefaultContent(driver);
+                    },
+                    () => new InvalidOperationException("Load Main Page Fail.")
+                );
+
+                return LoginResult.Success;
+            });
+        }
+
 
         public void ADFSLoginAction(LoginRedirectEventArgs args)
 
@@ -123,24 +297,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //You will also need to add a reference to the Selenium Webdriver to use the base driver. 
             //Example
 
-            var d = args.Driver;
+            var driver = args.Driver;
 
-            d.FindElement(By.Id("passwordInput")).SendKeys(args.Password.ToUnsecureString());
-            d.ClickWhenAvailable(By.Id("submitButton"), new TimeSpan(0, 0, 2));
+            driver.FindElement(By.Id("passwordInput")).SendKeys(args.Password.ToUnsecureString());
+            driver.ClickWhenAvailable(By.Id("submitButton"), TimeSpan.FromSeconds(2));
 
             //Insert any additional code as required for the SSO scenario
 
             //Wait for CRM Page to load
-            d.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
-                , new TimeSpan(0, 0, 60),
-            e =>
-            {
-                e.WaitForPageToLoad();
-                e.SwitchTo().Frame(0);
-                e.WaitForPageToLoad();
-            },
-                f => { throw new Exception("Login page failed."); });
-
+            WaitForMainPage(TimeSpan.FromSeconds(60), "Login page failed.");
+            SwitchToMainFrame(driver);
         }
 
         public void MSFTLoginAction(LoginRedirectEventArgs args)
@@ -150,353 +316,461 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //You will also need to add a reference to the Selenium Webdriver to use the base driver. 
             //Example
 
-            var d = args.Driver;
+            var driver = args.Driver;
 
             //d.FindElement(By.Id("passwordInput")).SendKeys(args.Password.ToUnsecureString());
-            //d.ClickWhenAvailable(By.Id("submitButton"), new TimeSpan(0, 0, 2));
+            //d.ClickWhenAvailable(By.Id("submitButton"), TimeSpan.FromSeconds(2));
 
             //This method expects single sign-on
 
-            Browser.ThinkTime(5000);
+            ThinkTime(5000);
 
-            d.WaitUntilVisible(By.XPath("//div[@id=\"mfaGreetingDescription\"]"));
+            driver.WaitUntilVisible(By.XPath("//div[@id=\"mfaGreetingDescription\"]"));
 
-            var AzureMFA = d.FindElement(By.XPath("//a[@id=\"WindowsAzureMultiFactorAuthentication\"]"));
-            AzureMFA.Click(true);
+            var azureMFA = driver.FindElement(By.XPath("//a[@id=\"WindowsAzureMultiFactorAuthentication\"]"));
+            azureMFA.Click(true);
 
             Thread.Sleep(20000);
 
             //Insert any additional code as required for the SSO scenario
 
             //Wait for CRM Page to load
-            d.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Login.CrmMainPage])
-                , new TimeSpan(0, 0, 60),
-            e =>
-            {
-                e.WaitForPageToLoad();
-                e.SwitchTo().Frame(0);
-                e.WaitForPageToLoad();
-            },
-                f => { throw new Exception("Login page failed."); });
-
+            WaitForMainPage(TimeSpan.FromSeconds(60), "Login page failed.");
+            SwitchToMainFrame(driver);
         }
 
         #endregion
 
         #region Navigation
+
+        internal BrowserCommandResult<bool> SignOut()
+        {
+            return Execute(GetOptions("Sign out"), driver =>
+            {
+                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Navigation.AccountManagerButton])).Click();
+                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Navigation.AccountManagerSignOutButton])).Click();
+
+                return driver.WaitForPageToLoad();
+            });
+        }
+
+
         internal BrowserCommandResult<bool> OpenApp(string appName, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions("Open App"), driver =>
+            return Execute(GetOptions($"Open App {appName}"), driver =>
             {
-
+                driver.WaitForPageToLoad();
                 driver.SwitchTo().DefaultContent();
+                var success = false;
+                //Handle left hand Nav in Web Client
+                if (!driver.Url.Contains("appid"))
+                {
+                    success = TryToClickInAppTile(appName, driver);
+                }
 
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuButton]));
-
-                var container = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuContainer]));
-
-                var buttons = container.FindElements(By.TagName("button"));
-
-                var button = buttons.FirstOrDefault(x => x.Text.Trim() == appName);
-
-                if (button != null)
-                    button.Click(true);
+                else if (driver.Url.Contains("forceUCI=1"))
+                {
+                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.UCIAppMenuButton);
+                }
                 else
+                {
+                    success = TryOpenAppFromMenu(driver, appName, AppReference.Navigation.WebAppMenuButton);
+                }
+
+
+                if (!success)
                     throw new InvalidOperationException($"App Name {appName} not found.");
 
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
-                driver.WaitForPageToLoad();
+                Thread.Sleep(1000);
+                WaitForMainPage();
+                InitializeModes();
 
-                driver.WaitForTransaction();
+                // Wait for app page elements to be visible (shell and sitemapLauncherButton)
+                var shell = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
+                var sitemapLauncherButton = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
 
+                success = shell != null && sitemapLauncherButton != null;
+
+                if (!success)
+                    throw new InvalidOperationException($"App '{appName}' was found but app page was not loaded.");
+
+                return success;
+            });
+        }
+
+        private bool TryOpenAppFromMenu(IWebDriver driver, string appName, string appMenuButton)
+        {
+            bool found = false;
+            var xpathToAppMenu = By.XPath(AppElements.Xpath[appMenuButton]);
+            driver.WaitUntilClickable(xpathToAppMenu, TimeSpan.FromSeconds(5),
+                        appMenu =>
+                        {
+                            appMenu.Click(true);
+                            found = TryToClickInAppTile(appName, driver) || OpenAppFromMenu(driver, appName);
+                        });
+            return found;
+        }
+
+        internal bool OpenAppFromMenu(IWebDriver driver, string appName)
+        {
+            var container = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AppMenuContainer]));
+            var xpathToButton = "//nav[@aria-hidden='false']//button//*[text()='[TEXT]']".Replace("[TEXT]", appName);
+            var button = container.ClickWhenAvailable(By.XPath(xpathToButton),
+                                TimeSpan.FromSeconds(1)
+                            );
+
+            var success = (button != null);
+            if (!success)
+                Trace.TraceWarning($"App Name '{appName}' not found.");
+
+            return success;
+        }
+
+        private static bool TryToClickInAppTile(string appName, IWebDriver driver)
+        {
+            string message = "Frame AppLandingPage is not loaded.";
+            driver.WaitUntil(
+                d =>
+                {
+                    try
+                    {
+                        driver.SwitchTo().Frame("AppLandingPage");
+                    }
+                    catch (NoSuchFrameException ex)
+                    {
+                        message = $"{message} Exception: {ex.Message}";
+                        Trace.TraceWarning(message);
+                        return false;
+                    }
+                    return true;
+                },
+                TimeSpan.FromSeconds(30)
+                );
+
+            var xpathToAppContainer = By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppContainer]);
+            var xpathToappTile = By.XPath(AppElements.Xpath[AppReference.Navigation.UCIAppTile].Replace("[NAME]", appName));
+
+            bool success = false;
+            driver.WaitUntilVisible(xpathToAppContainer, TimeSpan.FromSeconds(5),
+                appContainer => success = appContainer.ClickWhenAvailable(xpathToappTile, TimeSpan.FromSeconds(5)) != null
+                );
+
+            if (!success)
+                Trace.TraceWarning(message);
+
+            return success;
+        }
+
+        internal BrowserCommandResult<bool> OpenGroupSubArea(string group, string subarea, int thinkTime = Constants.DefaultThinkTime)
+        {
+            ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Open Group Sub Area"), driver =>
+            {
+                //Make sure the sitemap-launcher is expanded - 9.1
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton])))
+                {
+                    var expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton])).GetAttribute("aria-expanded"));
+
+                    if (!expanded)
+                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+                }
+
+                var groups = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapMenuGroup]));
+                var groupList = groups.FirstOrDefault(g => g.GetAttribute("aria-label").ToLowerString() == group.ToLowerString());
+                if (groupList == null)
+                {
+                    throw new NotFoundException($"No group with the name '{group}' exists");
+                }
+
+                var subAreaItems = groupList.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapMenuItems]));
+                var subAreaItem = subAreaItems.FirstOrDefault(a => a.GetAttribute("data-text").ToLowerString() == subarea.ToLowerString());
+                if (subAreaItem == null)
+                {
+                    throw new NotFoundException($"No subarea with the name '{subarea}' exists inside of '{group}'");
+                }
+
+                subAreaItem.Click(true);
+
+                WaitForLoadArea(driver);
                 return true;
             });
         }
 
         internal BrowserCommandResult<bool> OpenSubArea(string area, string subarea, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions("Open Sub Area"), driver =>
+            return Execute(GetOptions("Open Sub Area"), driver =>
             {
-
-                area = area.ToLowerString();
-                subarea = subarea.ToLowerString();
-
-                var areas = OpenAreas(area).Value;
-
-                //Added for Bug
-                IWebElement menuItem = null;
-                bool foundMenuItem = areas.TryGetValue(area, out menuItem);
-                if (foundMenuItem)
+                //If the subarea is already in the left hand nav, click it
+                var success = TryOpenSubArea(driver, subarea);
+                if (!success)
                 {
-                    //For some reason, ClickWhenAvailable isn't ignoring StaleElementExceptions
-                    try
-                    {
-                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.SubArea].Replace("[NAME]", menuItem.GetAttribute("data-id"))));
-                    }
-                    catch (StaleElementReferenceException)
-                    {
-                    }
+                    success = TryOpenArea(area);
+                    if (!success)
+                        throw new InvalidOperationException($"Area with the name '{area}' not found. ");
+
+                    success = TryOpenSubArea(driver, subarea);
+                    if (!success)
+                        throw new InvalidOperationException($"No subarea with the name '{subarea}' exists inside of '{area}'.");
                 }
 
-                driver.WaitForTransaction();
-                //End Added For Bug
-
-                var subAreas = OpenSubMenu(subarea).Value;
-
-                if (!subAreas.ContainsKey(subarea))
-                {
-                    throw new InvalidOperationException($"No subarea with the name '{subarea}' exists inside of '{area}'.");
-                }
-
-                subAreas[subarea].Click(true);
-
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
-                driver.WaitForPageToLoad();
-
-                driver.WaitForTransaction();
-
+                WaitForLoadArea(driver);
                 return true;
             });
         }
 
-        public BrowserCommandResult<Dictionary<string, IWebElement>> OpenAreas(string area, int thinkTime = Constants.DefaultThinkTime)
+        private static void WaitForLoadArea(IWebDriver driver)
         {
-            Browser.ThinkTime(thinkTime);
+            driver.WaitForPageToLoad();
+            driver.WaitForTransaction();
+        }
 
-            return this.Execute(GetOptions("Open Unified Interface Area"), driver =>
+        public BrowserCommandResult<bool> OpenSubArea(string subarea)
+        {
+            return Execute(GetOptions("Open Unified Interface Sub-Area"), driver =>
             {
+                var success = TryOpenSubArea(driver, subarea);
+                WaitForLoadArea(driver);
+                return success;
+            });
+        }
 
-                //9.0.2
-                var areas = OpenMenu().Value;
+        private bool TryOpenSubArea(IWebDriver driver, string subarea)
+        {
+            subarea = subarea.ToLowerString();
+            var navSubAreas = GetSubAreaMenuItems(driver);
 
-                if (areas != null)
+            var found = navSubAreas.TryGetValue(subarea, out var element);
+            if (found)
+            {
+                var strSelected = element.GetAttribute("aria-selected");
+                bool.TryParse(strSelected, out var selected);
+                if (!selected)
                 {
-                    if (!areas.ContainsKey(area))
-                    {
-                        throw new InvalidOperationException($"No area with the name '{area}' exists.");
-                    }
-
-                    return areas;
+                    element.Click(true);
                 }
+                else
+                {
+                    // This will result in navigating back to the desired subArea -- even if already selected.
+                    // Example: If context is an Account entity record, then a call to OpenSubArea("Sales", "Accounts"),
+                    // this will click on the Accounts subArea and go back to the grid view
+                    element.Click(true);
+                }
+            }
+            return found;
+        }
 
-                //9.1
-                areas = OpenMenuFallback(area).Value;
+        public BrowserCommandResult<bool> OpenArea(string subarea)
+        {
+            return Execute(GetOptions("Open Unified Interface Area"), driver =>
+            {
+                var success = TryOpenArea(subarea);
+                WaitForLoadArea(driver);
+                return success;
+            });
+        }
+
+        private bool TryOpenArea(string area)
+        {
+            area = area.ToLowerString();
+            var areas = OpenAreas(area);
+
+            IWebElement menuItem;
+            bool found = areas.TryGetValue(area, out menuItem);
+            if (found)
+            {
+                var strSelected = menuItem.GetAttribute("aria-checked");
+                bool selected;
+                bool.TryParse(strSelected, out selected);
+                if (!selected)
+                    menuItem.Click(true);
+            }
+            return found;
+        }
+
+        public Dictionary<string, IWebElement> OpenAreas(string area, int thinkTime = Constants.DefaultThinkTime)
+        {
+            return Execute(GetOptions("Open Unified Interface Area"), driver =>
+            {
+                //  9.1 ?? 9.0.2 <- inverted order (fallback first) run quickly
+                var areas = OpenMenuFallback(area) ?? OpenMenu();
 
                 if (!areas.ContainsKey(area))
-                {
-                    // In this scenario - 
                     throw new InvalidOperationException($"No area with the name '{area}' exists.");
-                }
 
                 return areas;
             });
         }
-        public BrowserCommandResult<Dictionary<string, IWebElement>> OpenMenu(int thinkTime = Constants.DefaultThinkTime)
+
+        public Dictionary<string, IWebElement> OpenMenu(int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions("Open Menu"), driver =>
+            return Execute(GetOptions("Open Menu"), driver =>
             {
-                var dictionary = new Dictionary<string, IWebElement>();
-
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaButton]));
 
-                driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaMenu]),
-                                            new TimeSpan(0, 0, 2),
-                                            d =>
-                                            {
-                                                var menu = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaMenu]));
-                                                var menuItems = menu.FindElements(By.TagName("li"));
-                                                foreach (var item in menuItems)
-                                                {
-                                                    dictionary.Add(item.Text.ToLowerString(), item);
-                                                }
-                                            },
-                                            e =>
-                                            {
-                                                throw new InvalidOperationException("The Main Menu is not available.");
-                                            });
-
-
-                return dictionary;
+                var result = GetMenuItemsFrom(driver, AppReference.Navigation.AreaMenu);
+                return result;
             });
         }
-        public BrowserCommandResult<Dictionary<string, IWebElement>> OpenMenuFallback(string area, int thinkTime = Constants.DefaultThinkTime)
+
+        public Dictionary<string, IWebElement> OpenMenuFallback(string area, int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions("Open Menu"), driver =>
+            return Execute(GetOptions("Open Menu"), driver =>
             {
-                var dictionary = new Dictionary<string, IWebElement>();
-
                 //Make sure the sitemap-launcher is expanded - 9.1
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton])))
+                var xpathSiteMapLauncherButton = By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]);
+                bool success = driver.TryFindElement(xpathSiteMapLauncherButton, out IWebElement launcherButton);
+                if (success)
                 {
-                    bool expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton])).GetAttribute("aria-expanded"));
-
+                    bool expanded = bool.Parse(launcherButton.GetAttribute("aria-expanded"));
                     if (!expanded)
-                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+                        driver.ClickWhenAvailable(xpathSiteMapLauncherButton);
                 }
+
+                var dictionary = new Dictionary<string, IWebElement>();
 
                 //Is this the sitemap with enableunifiedinterfaceshellrefresh?
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapSwitcherButton])))
+                var xpathSitemapSwitcherButton = By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapSwitcherButton]);
+                success = driver.TryFindElement(xpathSitemapSwitcherButton, out IWebElement switcherButton);
+                if (success)
                 {
-                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapSwitcherButton])).Click(true);
-
+                    switcherButton.Click(true);
                     driver.WaitForTransaction();
 
-                    driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapSwitcherFlyout]),
-                        new TimeSpan(0, 0, 2),
-                        d =>
-                        {
-                            var menu = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapSwitcherFlyout]));
-
-                            var menuItems = menu.FindElements(By.TagName("li"));
-                            foreach (var item in menuItems)
-                            {
-                                dictionary.Add(item.Text.ToLowerString(), item);
-                            }
-                        },
-                        e =>
-                        {
-                            throw new InvalidOperationException("The Main Menu is not available.");
-                        });
+                    AddMenuItemsFrom(driver, AppReference.Navigation.SitemapSwitcherFlyout, dictionary);
                 }
 
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapAreaMoreButton])))
+                var xpathSiteMapAreaMoreButton = By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapAreaMoreButton]);
+                success = driver.TryFindElement(xpathSiteMapAreaMoreButton, out IWebElement moreButton);
+                if (!success)
+                    return dictionary;
+
+                bool isVisible = moreButton.IsVisible();
+                if (isVisible)
                 {
-                    bool isVisible = driver.IsVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapAreaMoreButton]));
-
-                    if (isVisible)
-                    {
-                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapAreaMoreButton]));
-
-                        driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaMoreMenu]),
-                                               new TimeSpan(0, 0, 2),
-                                               d =>
-                                               {
-                                                   var menu = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.AreaMoreMenu]));
-                                                   var menuItems = menu.FindElements(By.TagName("li"));
-                                                   foreach (var item in menuItems)
-                                                   {
-                                                       dictionary.Add(item.Text.ToLowerString(), item);
-                                                   }
-                                               },
-                                               e =>
-                                               {
-                                                   throw new InvalidOperationException("The Main Menu is not available.");
-                                               });
-                    }
-                    else
-                    {
-                        var singleItem = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapSingleArea].Replace("[NAME]", area)));
-
-                        char[] trimCharacters = { '', '\r', '\n', '', '', '' };
-
-                        dictionary.Add(singleItem.Text.Trim(trimCharacters).ToLowerString(), singleItem);
-
-                    }
+                    moreButton.Click();
+                    AddMenuItemsFrom(driver, AppReference.Navigation.AreaMoreMenu, dictionary);
+                }
+                else
+                {
+                    var singleItem = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapSingleArea].Replace("[NAME]", area)));
+                    dictionary.Add(singleItem.Text.ToLowerString(), singleItem);
                 }
 
                 return dictionary;
             });
         }
-        internal BrowserCommandResult<Dictionary<string, IWebElement>> OpenSubMenu(string subarea, int thinkTime = Constants.DefaultThinkTime)
+
+        private static Dictionary<string, IWebElement> GetMenuItemsFrom(IWebDriver driver, string referenceToMenuItemsContainer)
         {
-            return this.Execute(GetOptions($"Open Sub Menu: {subarea}"), driver =>
+            var result = new Dictionary<string, IWebElement>();
+            AddMenuItemsFrom(driver, referenceToMenuItemsContainer, result);
+            return result;
+        }
+
+        private static void AddMenuItemsFrom(IWebDriver driver, string referenceToMenuItemsContainer, Dictionary<string, IWebElement> dictionary)
+        {
+            driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[referenceToMenuItemsContainer]),
+                TimeSpan.FromSeconds(2),
+                menu => AddMenuItems(menu, dictionary),
+                "The Main Menu is not available."
+            );
+        }
+
+        private static void AddMenuItems(IWebElement menu, Dictionary<string, IWebElement> dictionary)
+        {
+            var menuItems = menu.FindElements(By.TagName("li"));
+            foreach (var item in menuItems)
             {
-                var dictionary = new Dictionary<string, IWebElement>();
+                string key = item.Text.ToLowerString();
+                if (dictionary.ContainsKey(key))
+                    continue;
+                dictionary.Add(key, item);
+            }
+        }
 
-                //Sitemap without enableunifiedinterfaceshellrefresh
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.PinnedSitemapEntity])))
+        public static Dictionary<string, IWebElement> GetSubAreaMenuItems(IWebDriver driver)
+        {
+            var dictionary = new Dictionary<string, IWebElement>();
+
+            //Sitemap without enableunifiedinterfaceshellrefresh
+            var hasPinnedSitemapEntity = driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Navigation.PinnedSitemapEntity]));
+            if (!hasPinnedSitemapEntity)
+            {
+                // Close SiteMap launcher since it is open
+                var xpathToLauncherCloseButton = By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherCloseButton]);
+                driver.ClickWhenAvailable(xpathToLauncherCloseButton);
+
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
+
+                var menuContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaContainer]));
+
+                var subItems = menuContainer.FindElements(By.TagName("li"));
+
+                foreach (var subItem in subItems)
                 {
-                    bool isSiteMapLauncherCloseButtonVisible = driver.IsVisible(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherCloseButton]));
+                    // Check 'Id' attribute, NULL value == Group Header
+                    var id = subItem.GetAttribute("id");
+                    if (string.IsNullOrEmpty(id))
+                        continue;
 
-                    if (isSiteMapLauncherCloseButtonVisible)
-                    {
-                        // Close SiteMap launcher since it is open
-                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherCloseButton]));
-                    }
-
-                    driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SiteMapLauncherButton]));
-
-                    var menuContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaContainer]));
-
-                    var subItems = menuContainer.FindElements(By.TagName("li"));
-
-                    foreach (var subItem in subItems)
-                    {
-                        // Check 'Id' attribute, NULL value == Group Header
-                        if (!String.IsNullOrEmpty(subItem.GetAttribute("Id")))
-                        {
-                            // Filter out duplicate entity keys - click the first one in the list
-                            if (!dictionary.ContainsKey(subItem.Text.ToLowerString()))
-                                dictionary.Add(subItem.Text.ToLowerString(), subItem);
-                        }
-                    }
-                }
-
-                else
-                {
-                    //Sitemap with enableunifiedinterfaceshellrefresh enabled
-                    var menuShell = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaContainer]));
-
-                    //The menu is broke into multiple sections. Gather all items.
-                    foreach (IWebElement menuSection in menuShell)
-                    {
-                        var menuItems = menuSection.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapMenuItems]));
-
-                        foreach (var menuItem in menuItems)
-                        {
-                            if (!String.IsNullOrEmpty(menuItem.Text))
-                            {
-                                if (!dictionary.ContainsKey(menuItem.Text.ToLower()))
-                                    dictionary.Add(menuItem.Text.ToLower(), menuItem);
-                            }
-                        }
-                    }
+                    // Filter out duplicate entity keys - click the first one in the list
+                    var key = subItem.Text.ToLowerString();
+                    if (!dictionary.ContainsKey(key))
+                        dictionary.Add(key, subItem);
                 }
 
                 return dictionary;
-            });
+            }
+
+            //Sitemap with enableunifiedinterfaceshellrefresh enabled
+            var menuShell = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SubAreaContainer]));
+
+            //The menu is broke into multiple sections. Gather all items.
+            foreach (IWebElement menuSection in menuShell)
+            {
+                var menuItems = menuSection.FindElements(By.XPath(AppElements.Xpath[AppReference.Navigation.SitemapMenuItems]));
+
+                foreach (var menuItem in menuItems)
+                {
+                    var text = menuItem.Text.ToLowerString();
+                    if (string.IsNullOrEmpty(text))
+                        continue;
+
+                    if (!dictionary.ContainsKey(text))
+                        dictionary.Add(text, menuItem);
+                }
+            }
+
+            return dictionary;
         }
 
         internal BrowserCommandResult<bool> OpenSettingsOption(string command, string dataId, int thinkTime = Constants.DefaultThinkTime)
         {
-            return this.Execute(GetOptions($"Open " + command + " " + dataId), driver =>
+            return Execute(GetOptions($"Open " + command + " " + dataId), driver =>
             {
-                var cmdButtonBar = AppElements.Xpath[AppReference.Navigation.SettingsLauncherBar].Replace("[NAME]", command);
-                var cmdLauncher = AppElements.Xpath[AppReference.Navigation.SettingsLauncher].Replace("[NAME]", command);
+                var xpathFlyout = By.XPath(AppElements.Xpath[AppReference.Navigation.SettingsLauncher].Replace("[NAME]", command));
+                var xpathToFlyoutButton = By.XPath(AppElements.Xpath[AppReference.Navigation.SettingsLauncherBar].Replace("[NAME]", command));
 
-                if (!driver.IsVisible(By.XPath(cmdLauncher)))
+                IWebElement flyout;
+                bool success = driver.TryFindElement(xpathFlyout, out flyout);
+                if (!success || !flyout.Displayed)
                 {
-                    driver.ClickWhenAvailable(By.XPath(cmdButtonBar));
-
-                    Thread.Sleep(1000);
-
-                    driver.SetVisible(By.XPath(cmdLauncher), true);
-                    driver.WaitUntilVisible(By.XPath(cmdLauncher));
+                    driver.ClickWhenAvailable(xpathToFlyoutButton, $"No command button exists that match with: {command}.");
+                    flyout = driver.WaitUntilVisible(xpathFlyout, "Flyout menu did not became visible");
                 }
 
-                var menuContainer = driver.FindElement(By.XPath(cmdLauncher));
-                var menuItems = menuContainer.FindElements(By.TagName("button"));
+                var menuItems = flyout.FindElements(By.TagName("button"));
                 var button = menuItems.FirstOrDefault(x => x.GetAttribute("data-id").Contains(dataId));
-
                 if (button != null)
                 {
                     button.Click();
-                }
-                else
-                {
-                    throw new InvalidOperationException($"No command with the exists inside of the Command Bar.");
+                    return true;
                 }
 
-                return true;
+                throw new InvalidOperationException($"No command with data-id: {dataId} exists inside of the command menu {command}");
             });
         }
 
@@ -507,7 +781,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmBrowser.Navigation.OpenGuidedHelp();</example>
         public BrowserCommandResult<bool> OpenGuidedHelp(int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Open Guided Help"), driver =>
             {
@@ -524,7 +798,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmBrowser.Navigation.OpenAdminPortal();</example>
         internal BrowserCommandResult<bool> OpenAdminPortal(int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
             return this.Execute(GetOptions("Open Admin Portal"), driver =>
             {
                 driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
@@ -541,20 +815,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmBrowser.Navigation.OpenGlobalSearch();</example>
         internal BrowserCommandResult<bool> OpenGlobalSearch(int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Open Global Search"), driver =>
             {
                 driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton]),
-                new TimeSpan(0, 0, 5),
-                d => { driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton])); },
-                d => { throw new InvalidOperationException("The Global Search button is not available."); });
+                    TimeSpan.FromSeconds(5),
+                    d => { driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton])); },
+                    "The Global Search button is not available."
+                );
                 return true;
             });
         }
+
         internal BrowserCommandResult<bool> ClickQuickLaunchButton(string toolTip, int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Quick Launch: {toolTip}"), driver =>
             {
@@ -571,7 +847,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> QuickCreate(string entityName, int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Quick Create: {entityName}"), driver =>
             {
@@ -599,6 +875,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #endregion
 
         #region Dialogs
+
         internal bool SwitchToDialog(int frameIndex = 0)
         {
             var index = "";
@@ -613,8 +890,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 //wait for the content panel to render
                 Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)),
-                                                  new TimeSpan(0, 0, 2),
-                                                  d => { Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
+                    TimeSpan.FromSeconds(2),
+                    d => { Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
                 return true;
             }
             else
@@ -622,8 +899,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // need to add this functionality
                 //SwitchToPopup();
             }
+
             return true;
         }
+
         internal BrowserCommandResult<bool> CloseWarningDialog()
         {
             return this.Execute(GetOptions($"Close Warning Dialog"), driver =>
@@ -639,9 +918,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var closeBtn = dialogFooter.FindElement(By.XPath(Elements.Xpath[Reference.Dialogs.WarningCloseButton]));
                     closeBtn.Click();
                 }
+
                 return true;
             });
         }
+
         internal BrowserCommandResult<bool> ConfirmationDialog(bool ClickConfirmButton)
         {
             //Passing true clicks the confirm button.  Passing false clicks the Cancel button.
@@ -666,63 +947,162 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     buttonToClick.Click();
                 }
+
                 return true;
             });
         }
-        internal BrowserCommandResult<bool> AssignDialog(Dialogs.AssignTo to, string userOrTeamName)
+
+        internal BrowserCommandResult<bool> DuplicateDetection(bool clickSaveOrCancel)
         {
-            return this.Execute(GetOptions($"Assign to User or Team Dialog"), driver =>
+            string operationType;
+
+            if (clickSaveOrCancel)
+            {
+                operationType = "Ignore and Save";
+            }
+            else
+                operationType = "Cancel";
+
+            //Passing true clicks the Ignore and Save button.  Passing false clicks the Cancel button.
+            return this.Execute(GetOptions($"{operationType} Duplicate Detection Dialog"), driver =>
             {
                 var inlineDialog = this.SwitchToDialog();
                 if (inlineDialog)
                 {
-                    if (to != Dialogs.AssignTo.Me)
-                    {
-                        //Click the Option to Assign to User Or Team
-                        driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogToggle]));
+                    //Wait until the buttons are available to click
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DuplicateDetectionIgnoreSaveButton]));
 
-                        var toggleButton = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogToggle]), "Me/UserTeam toggle button unavailable");
-                        if (toggleButton.Text == "Me")
-                            toggleButton.Click();
+                    if (
+                        !(dialogFooter?.FindElements(By.XPath(AppElements.Xpath[AppReference.Dialogs.DuplicateDetectionIgnoreSaveButton])).Count >
+                          0)) return true;
 
-                        //Set the User Or Team
-                        var userOrTeamField = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookup]), "User field unavailable");
+                    //Click the Confirm or Cancel button
+                    IWebElement buttonToClick;
+                    if (clickSaveOrCancel)
+                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DuplicateDetectionIgnoreSaveButton]));
+                    else
+                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DuplicateDetectionCancelButton]));
 
-                        if (userOrTeamField.FindElements(By.TagName("input")).Count > 0)
-                        {
-                            var input = userOrTeamField.FindElement(By.TagName("input"));
-                            if (input != null)
-                            {
-                                input.Click();
-
-                                driver.WaitForTransaction();
-
-                                input.SendKeys(userOrTeamName, true);
-                            }
-                        }
-
-                        //Pick the User from the list
-                        driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogUserTeamLookupResults]));
-
-                        driver.WaitForTransaction();
-
-                        var container = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogUserTeamLookupResults]));
-                        var records = container.FindElements(By.TagName("li"));
-                        foreach (var record in records)
-                        {
-                            if (record.Text.StartsWith(userOrTeamName, StringComparison.OrdinalIgnoreCase))
-                                record.Click(true);
-                        }
-                    }
-
-                    //Click Assign
-                    var okButton = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogOKButton]));
-                    okButton.Click(true);
-
+                    buttonToClick.Click();
                 }
+
+                if (clickSaveOrCancel)
+                {
+                    // Wait for Save before proceeding
+                    driver.WaitForTransaction();
+                }
+
                 return true;
             });
         }
+
+        internal BrowserCommandResult<bool> SetStateDialog(bool clickOkButton)
+        {
+            //Passing true clicks the Activate/Deactivate button.  Passing false clicks the Cancel button.
+            return this.Execute(GetOptions($"Interact with Set State Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (inlineDialog)
+                {
+                    //Wait until the buttons are available to click
+                    var dialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.SetStateDialog]));
+
+                    if (
+                        !(dialog?.FindElements(By.TagName("button")).Count >
+                          0)) return true;
+
+                    //Click the Activate/Deactivate or Cancel button
+                    IWebElement buttonToClick;
+                    if (clickOkButton)
+                        buttonToClick = dialog.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.SetStateActionButton]));
+                    else
+                        buttonToClick = dialog.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.SetStateCancelButton]));
+
+                    buttonToClick.Click();
+                }
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> PublishDialog(bool ClickConfirmButton)
+        {
+            //Passing true clicks the confirm button.  Passing false clicks the Cancel button.
+            return this.Execute(GetOptions($"Confirm or Cancel Publish Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (inlineDialog)
+                {
+                    //Wait until the buttons are available to click
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.PublishConfirmButton]));
+
+                    if (
+                        !(dialogFooter?.FindElements(By.XPath(AppElements.Xpath[AppReference.Dialogs.PublishConfirmButton])).Count >
+                          0)) return true;
+
+                    //Click the Confirm or Cancel button
+                    IWebElement buttonToClick;
+                    if (ClickConfirmButton)
+                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.PublishConfirmButton]));
+                    else
+                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.PublishCancelButton]));
+
+                    buttonToClick.Click();
+                }
+
+                return true;
+            });
+        }
+
+
+        internal BrowserCommandResult<bool> AssignDialog(Dialogs.AssignTo to, string userOrTeamName = null)
+        {
+            userOrTeamName = userOrTeamName?.Trim() ?? string.Empty;
+            return this.Execute(GetOptions($"Assign to User or Team Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (!inlineDialog)
+                    return false;
+
+                //Click the Option to Assign to User Or Team
+                var xpathToToggleButton = By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogToggle]);
+                var toggleButton = driver.WaitUntilClickable(xpathToToggleButton, "Me/UserTeam toggle button unavailable");
+
+                if (to == Dialogs.AssignTo.Me)
+                {
+                    if (toggleButton.Text != "Me")
+                        toggleButton.Click();
+                }
+                else
+                {
+                    if (toggleButton.Text == "Me")
+                        toggleButton.Click();
+
+                    driver.WaitForTransaction();
+
+                    //Set the User Or Team
+                    var userOrTeamField = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookup]), "User field unavailable");
+                    var input = userOrTeamField.ClickWhenAvailable(By.TagName("input"), "User field unavailable");
+                    input.SendKeys(userOrTeamName, true);
+
+                    ThinkTime(2000);
+
+                    //Pick the User from the list
+                    var container = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogUserTeamLookupResults]));
+                    container.WaitUntil(
+                        c => c.FindElements(By.TagName("li")).FirstOrDefault(r => r.Text.StartsWith(userOrTeamName, StringComparison.OrdinalIgnoreCase)),
+                        successCallback: e => e.Click(true),
+                        failureCallback: () => throw new InvalidOperationException($"None {to} found which match with '{userOrTeamName}'"));
+                }
+
+                //Click Assign
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogOKButton]), TimeSpan.FromSeconds(5),
+                    "Unable to click the OK button in the assign dialog");
+
+                return true;
+            });
+        }
+
         internal BrowserCommandResult<bool> SwitchProcessDialog(string processToSwitchTo)
         {
             return this.Execute(GetOptions($"Switch Process Dialog"), driver =>
@@ -749,6 +1129,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
         internal BrowserCommandResult<bool> CloseOpportunityDialog(bool clickOK)
         {
             return this.Execute(GetOptions($"Close Opportunity Dialog"), driver =>
@@ -764,21 +1145,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (!clickOK)
                         xPath = AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok];
 
-                    driver.WaitUntilClickable(By.XPath(xPath),
-                        new TimeSpan(0, 0, 5),
-                        d => { driver.ClickWhenAvailable(By.XPath(xPath)); },
-                        d => { throw new InvalidOperationException("The Close Opportunity dialog is not available."); });
+                    driver.ClickWhenAvailable(By.XPath(xPath), TimeSpan.FromSeconds(5), "The Close Opportunity dialog is not available.");
                 }
+
                 return true;
             });
         }
+
         internal BrowserCommandResult<bool> HandleSaveDialog()
         {
             //If you click save and something happens, handle it.  Duplicate Detection/Errors/etc...
             //Check for Dialog and figure out which type it is and return the dialog type.
 
             //Introduce think time to avoid timing issues on save dialog
-            Browser.ThinkTime(1000);
+            ThinkTime(1000);
 
             return this.Execute(GetOptions($"Validate Save"), driver =>
             {
@@ -812,90 +1192,75 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        /// <summary>
-        /// Opens the dialog
-        /// </summary>
-        /// <param name="dialog"></param>
-        public BrowserCommandResult<List<ListItem>> LookupResultsDropdown(IWebElement dialog)
+        internal BrowserCommandResult<string> GetBusinessProcessErrorText(int waitTimeInSeconds)
         {
-            var list = new List<ListItem>();
-            var dialogItems = dialog.FindElements(By.XPath(".//li"));
 
-            foreach (var dialogItem in dialogItems)
+            return this.Execute(GetOptions($"Get Business Process Error Text"), driver =>
             {
-                var titleLinks = dialogItem.FindElements(By.XPath(".//label"));
-                var divLinks = dialogItem.FindElements(By.XPath(".//div"));
+                string errorDetails = string.Empty;
+                var errorDialog = driver.WaitUntilAvailable(By.XPath("//div[contains(@data-id,'errorDialogdialog')]"), new TimeSpan(0, 0, waitTimeInSeconds));
 
-                if (titleLinks != null && titleLinks.Count > 0 && divLinks != null && divLinks.Count > 0)
+                // Is error dialog present?
+                if (errorDialog != null)
                 {
-                    var title = titleLinks[0].GetAttribute("innerText");
-                    var divId = divLinks[0].GetAttribute("id");
+                    var errorDetailsElement = errorDialog.FindElement(By.XPath(".//*[contains(@data-id,'errorDialog_subtitle')]"));
 
-                    list.Add(new ListItem()
+                    if (errorDetailsElement != null)
                     {
-                        Title = title,
-                        Id = divId,
-                    });
+                        if (!String.IsNullOrEmpty(errorDetailsElement.Text))
+                            errorDetails = errorDetailsElement.Text;
+                    }
                 }
-            }
 
-            return list;
+                return errorDetails;
+            });
         }
 
-        /// <summary>
-        /// Opens the dialog
-        /// </summary>
-        /// <param name="dialog"></param>
-        public BrowserCommandResult<List<ListItem>> OpenDialog(IWebElement dialog)
+        private static ICollection<IWebElement> GetListItems(IWebElement container, LookupItem control)
         {
-            var list = new List<ListItem>();
-            var dialogItems = dialog.FindElements(By.XPath(".//li"));
+            var name = control.Name;
+            var xpathToItems = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", name));
 
-            foreach (var dialogItem in dialogItems)
-            {
-                var titleLinks = dialogItem.FindElements(By.XPath(".//label/span"));
-                var divLinks = dialogItem.FindElements(By.XPath(".//div"));
+            //wait for complete the search
+            container.WaitUntil(d => d.FindVisible(xpathToItems)?.Text?.Contains(control.Value, StringComparison.OrdinalIgnoreCase) == true);
 
-                if (titleLinks != null && titleLinks.Count > 0 && divLinks != null && divLinks.Count > 0)
-                {
-                    var title = titleLinks[0].GetAttribute("innerText");
-                    var divId = divLinks[0].GetAttribute("id");
-
-                    list.Add(new ListItem()
-                    {
-                        Title = title,
-                        Id = divId,
-                    });
-                }
-            }
-
-            return list;
+            ICollection<IWebElement> result = container.WaitUntil(
+                d => d.FindElements(xpathToItems),
+                failureCallback: () => throw new InvalidOperationException($"No Results Matching {control.Value} Were Found.")
+                );
+            return result;
         }
         #endregion
 
         #region CommandBar
-        internal BrowserCommandResult<bool> ClickCommand(string name, string subname = "", bool moreCommands = false, int thinkTime = Constants.DefaultThinkTime)
+
+        internal BrowserCommandResult<bool> ClickCommand(string name, string subname = null, string subSecondName = null, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Click Command"), driver =>
+            return Execute(GetOptions($"Click Command"), driver =>
             {
-                IWebElement ribbon = null;
-
-                //Find the button in the CommandBar
-                if(driver.HasElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container])))
-                    ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]));
+                // Find the button in the CommandBar
+                IWebElement ribbon;
+                // Checking if any dialog is active
+                if (driver.HasElement(By.XPath(string.Format(AppElements.Xpath[AppReference.Dialogs.DialogContext]))))
+                {
+                    var dialogContainer = driver.FindElement(By.XPath(string.Format(AppElements.Xpath[AppReference.Dialogs.DialogContext])));
+                    ribbon = dialogContainer.WaitUntilAvailable(By.XPath(string.Format(AppElements.Xpath[AppReference.CommandBar.Container])));
+                }
+                else
+                {
+                    ribbon = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]));
+                }
+                TimeSpan.FromSeconds(5);
 
                 if (ribbon == null)
                 {
-                    if(driver.HasElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid])))
-                        ribbon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid]));
-                    else
-                        throw new InvalidOperationException("Unable to find the ribbon.");
+                    ribbon = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid]),
+                        TimeSpan.FromSeconds(5),
+                        "Unable to find the ribbon.");
                 }
 
                 //Get the CommandBar buttons
-                var items = ribbon.FindElements(By.TagName("li"));
+                var items = ribbon.FindElements(By.TagName("button"));
 
                 //Is the button in the ribbon?
                 if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
@@ -906,10 +1271,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                 {
                     //Is the button in More Commands?
-                    if (items.Any(x => x.GetAttribute("aria-label").Equals("More Commands", StringComparison.OrdinalIgnoreCase)))
+                    if (items.Any(x => x.GetAttribute("aria-label").Contains("More Commands", StringComparison.OrdinalIgnoreCase)))
                     {
                         //Click More Commands
-                        items.FirstOrDefault(x => x.GetAttribute("aria-label").Equals("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                        items.FirstOrDefault(x => x.GetAttribute("aria-label").Contains("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
                         driver.WaitForTransaction();
 
                         //Click the button
@@ -938,6 +1303,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else
                         throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
 
+                    if (!string.IsNullOrEmpty(subSecondName))
+                    {
+                        var subSecondmenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.MoreCommandsMenu]));
+
+                        var subSecondbutton = subSecondmenu.FindElements(By.TagName("button")).FirstOrDefault(x => x.Text == subSecondName);
+
+                        if (subSecondbutton != null)
+                        {
+                            subSecondbutton.Click(true);
+                        }
+                        else
+                            throw new InvalidOperationException($"No sub command with the name '{subSecondName}' exists inside of Commandbar.");
+                    }
                 }
 
                 driver.WaitForTransaction();
@@ -945,92 +1323,217 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
+
+        /// <summary>
+        /// Returns the values of CommandBar objects
+        /// </summary>
+        /// <param name="includeMoreCommandsValues">Whether or not to check the more commands overflow list</param>
+        /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
+        /// <example>xrmApp.CommandBar.GetCommandValues();</example>
+        internal BrowserCommandResult<List<string>> GetCommandValues(bool includeMoreCommandsValues = false, int thinkTime = Constants.DefaultThinkTime)
+        {
+            ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions("Get CommandBar Command Count"), driver => TryGetCommandValues(includeMoreCommandsValues, driver));
+        }
+
+        private static List<string> TryGetCommandValues(bool includeMoreCommandsValues, IWebDriver driver)
+        {
+            const string moreCommandsLabel = "more commands";
+
+            //Find the button in the CommandBar
+            IWebElement ribbon = GetRibbon(driver);
+
+            //Get the CommandBar buttons
+            Dictionary<string, IWebElement> commandBarItems = GetMenuItems(ribbon);
+            bool hasMoreCommands = commandBarItems.TryGetValue(moreCommandsLabel, out var moreCommandsButton);
+            if (includeMoreCommandsValues && hasMoreCommands)
+            {
+                moreCommandsButton.Click(true);
+
+                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.CommandBar.MoreCommandsMenu]),
+                    menu => AddMenuItems(menu, commandBarItems),
+                    "Unable to locate the 'More Commands' menu"
+                    );
+            }
+
+            var result = GetCommandNames(commandBarItems.Values);
+            return result;
+        }
+
+        private static Dictionary<string, IWebElement> GetMenuItems(IWebElement menu)
+        {
+            var result = new Dictionary<string, IWebElement>();
+            AddMenuItems(menu, result);
+            return result;
+        }
+
+        private static List<string> GetCommandNames(IEnumerable<IWebElement> commandBarItems)
+        {
+            var result = new List<string>();
+            foreach (var value in commandBarItems)
+            {
+                string commandText = value.Text.Trim();
+                if (string.IsNullOrWhiteSpace(commandText))
+                    continue;
+
+                if (commandText.Contains("\r\n"))
+                {
+                    commandText = commandText.Substring(0, commandText.IndexOf("\r\n", StringComparison.Ordinal));
+                }
+                result.Add(commandText);
+            }
+            return result;
+        }
+
+        private static IWebElement GetRibbon(IWebDriver driver)
+        {
+            var xpathCommandBarContainer = By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]);
+            var xpathCommandBarGrid = By.XPath(AppElements.Xpath[AppReference.CommandBar.ContainerGrid]);
+
+            IWebElement ribbon =
+                driver.WaitUntilAvailable(xpathCommandBarContainer, 5.Seconds()) ??
+                driver.WaitUntilAvailable(xpathCommandBarGrid, 5.Seconds()) ??
+                throw new InvalidOperationException("Unable to find the ribbon.");
+
+            return ribbon;
+        }
+
         #endregion
 
         #region Grid
-        public BrowserCommandResult<Dictionary<string, string>> OpenViewPicker(int thinkTime = Constants.DefaultThinkTime)
+
+        public BrowserCommandResult<Dictionary<string, IWebElement>> OpenViewPicker(int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions("Open View Picker"), driver =>
+            return Execute(GetOptions("Open View Picker"), driver =>
             {
-                var dictionary = new Dictionary<string, string>();
-
-                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Grid.ViewSelector]),
-                    new TimeSpan(0, 0, 20),
-                    d => { d.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.ViewSelector])); },
-                    d => { throw new Exception("Unable to click the View Picker"); });
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.ViewSelector]),
+                    TimeSpan.FromSeconds(20),
+                    "Unable to click the View Picker"
+                );
 
                 var viewContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.ViewContainer]));
                 var viewItems = viewContainer.FindElements(By.TagName("li"));
 
+                var result = new Dictionary<string, IWebElement>();
                 foreach (var viewItem in viewItems)
                 {
-                    if (viewItem.GetAttribute("role") != null && viewItem.GetAttribute("role") == "option")
-                    {
-                        dictionary.Add(viewItem.Text, viewItem.GetAttribute("id"));
-                    }
-                }
+                    var role = viewItem.GetAttribute("role");
+                    if (role != "option")
+                        continue;
 
-                return dictionary;
+                    var key = viewItem.Text.ToLowerString();
+                    if (string.IsNullOrWhiteSpace(key))
+                        continue;
+
+                    if (!result.ContainsKey(key))
+                        result.Add(key, viewItem);
+                }
+                return result;
             });
         }
-        internal BrowserCommandResult<bool> SwitchView(string viewName, int thinkTime = Constants.DefaultThinkTime)
-        {
-            this.Browser.ThinkTime(thinkTime);
 
-            return this.Execute(GetOptions($"Switch View"), driver =>
+        internal BrowserCommandResult<bool> SwitchView(string viewName, string subViewName = null, int thinkTime = Constants.DefaultThinkTime)
+        {
+            ThinkTime(thinkTime);
+
+            return Execute(GetOptions($"Switch View"), driver =>
             {
                 var views = OpenViewPicker().Value;
                 Thread.Sleep(500);
-                if (!views.ContainsKey(viewName))
+                var key = viewName.ToLowerString();
+                bool success = views.TryGetValue(key, out var view);
+                if (!success)
+                    throw new InvalidOperationException($"No view with the name '{key}' exists.");
+
+                view.Click(true);
+
+                if (subViewName != null)
                 {
-                    throw new InvalidOperationException($"No view with the name '{viewName}' exists.");
+                    // TBD
                 }
-
-                var viewId = views[viewName];
-                driver.ClickWhenAvailable(By.Id(viewId));
-
-                return true;
-            });
-        }
-        internal BrowserCommandResult<bool> OpenRecord(int index, int thinkTime = Constants.DefaultThinkTime, bool checkRecord = false)
-        {
-            this.Browser.ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Open Grid Record"), driver =>
-            {
-                var currentindex = 0;
-                //var control = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
-
-                var rows = driver.FindElements(By.ClassName("wj-row"));
-
-                //TODO: The grid only has a small subset of records. Need to load them all
-                foreach (var row in rows)
-                {
-                    if (!string.IsNullOrEmpty(row.GetAttribute("data-lp-id")))
-                    {
-                        if (currentindex == index)
-                        {
-                            var tag = checkRecord ? "div" : "a";
-                            row.FindElement(By.TagName(tag)).Click();
-                            break;
-                        }
-
-                        currentindex++;
-                    }
-                }
-
-                //driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.Form]));
 
                 driver.WaitForTransaction();
 
                 return true;
             });
         }
+
+        internal BrowserCommandResult<bool> SwitchSubGridView(string subGridName, string viewName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            ThinkTime(thinkTime);
+
+            return Execute(GetOptions($"Switch SubGrid View"), driver =>
+            {
+                // Initialize required variables
+                IWebElement viewPicker = null;
+
+                // Find the SubGrid
+                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subGridName)));
+
+                var foundPicker = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridViewPickerButton]), out viewPicker);
+
+                if (foundPicker)
+                {
+                    viewPicker.Click(true);
+
+                    // Locate the ViewSelector flyout
+                    var viewPickerFlyout = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridViewPickerFlyout]), new TimeSpan(0, 0, 2));
+
+                    var viewItems = viewPickerFlyout.FindElements(By.TagName("li"));
+
+
+                    //Is the button in the ribbon?
+                    if (viewItems.Any(x => x.GetAttribute("aria-label").Equals(viewName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        viewItems.FirstOrDefault(x => x.GetAttribute("aria-label").Equals(viewName, StringComparison.OrdinalIgnoreCase)).Click(true);
+                    }
+
+                }
+                else
+                    throw new NotFoundException($"Unable to locate the viewPicker for SubGrid {subGridName}");
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> OpenRecord(int index, int thinkTime = Constants.DefaultThinkTime, bool checkRecord = false)
+        {
+            ThinkTime(thinkTime);
+            return Execute(GetOptions("Open Grid Record"), driver =>
+            {
+                var xpathToGrid = By.XPath(AppElements.Xpath[AppReference.Grid.Container]);
+                IWebElement control = driver.WaitUntilAvailable(xpathToGrid);
+
+                Func<Actions, Actions> action;
+                if (checkRecord)
+                    action = e => e.Click();
+                else
+                    action = e => e.DoubleClick();
+
+                var xpathToCell = By.XPath($".//div[@data-id='cell-{index}-1']");
+                control.WaitUntilClickable(xpathToCell,
+                    cell =>
+                    {
+                        var emptyDiv = cell.FindElement(By.TagName("div"));
+                        driver.Perform(action, cell, cell.LeftTo(emptyDiv));
+                    },
+                    $"An error occur trying to open the record at position {index}"
+                    );
+
+                driver.WaitForTransaction();
+                return true;
+            });
+        }
+
         internal BrowserCommandResult<bool> Search(string searchCriteria, bool clearByDefault = true, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Search"), driver =>
             {
@@ -1052,7 +1555,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> ClearSearch(int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Clear Search"), driver =>
             {
@@ -1066,7 +1569,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<List<GridItem>> GetGridItems(int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions("Get Grid Items"), driver =>
             {
@@ -1086,7 +1589,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         var cells = row.FindElements(By.ClassName("wj-cell"));
                         var currentindex = 0;
                         var link =
-                           $"{new Uri(driver.Url).Scheme}://{new Uri(driver.Url).Authority}/main.aspx?etn={datalpid[2]}&pagetype=entityrecord&id=%7B{datalpid[3]}%7D";
+                            $"{new Uri(driver.Url).Scheme}://{new Uri(driver.Url).Authority}/main.aspx?etn={datalpid[2]}&pagetype=entityrecord&id=%7B{datalpid[3]}%7D";
 
                         var item = new GridItem
                         {
@@ -1101,30 +1604,35 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                             foreach (var header in rowHeaders)
                             {
-                                var id = header.GetAttribute("id");
+                                var id = header.GetAttribute("data-id") ?? header.GetAttribute("id");
                                 var className = header.GetAttribute("class");
                                 var cellData = cells[currentindex + 1].GetAttribute("title");
 
                                 if (!string.IsNullOrEmpty(id)
                                     && className.Contains("wj-cell")
                                     && !string.IsNullOrEmpty(cellData)
+                                    && !id.Contains("btnheaderselectcolumn")
                                     && cells.Count > currentindex
                                 )
                                 {
                                     item[id] = cellData.Replace("-", "");
+                                    currentindex++;
                                 }
-                                currentindex++;
+
                             }
+
                             returnList.Add(item);
                         }
                     }
                 }
+
                 return returnList;
             });
         }
+
         internal BrowserCommandResult<bool> NextPage(int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Next Page"), driver =>
             {
@@ -1135,9 +1643,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
         internal BrowserCommandResult<bool> PreviousPage(int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Previous Page"), driver =>
             {
@@ -1148,9 +1657,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
         internal BrowserCommandResult<bool> FirstPage(int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"First Page"), driver =>
             {
@@ -1161,9 +1671,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
         internal BrowserCommandResult<bool> SelectAll(int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Select All"), driver =>
             {
@@ -1174,9 +1685,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
         public BrowserCommandResult<bool> ShowChart(int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions("Show Chart"), driver =>
             {
@@ -1194,9 +1706,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
         public BrowserCommandResult<bool> HideChart(int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions("Hide Chart"), driver =>
             {
@@ -1214,9 +1727,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
         public BrowserCommandResult<bool> FilterByLetter(char filter, int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             if (!Char.IsLetter(filter) && filter != '#')
                 throw new InvalidOperationException("Filter criteria is not valid.");
@@ -1240,9 +1754,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
         public BrowserCommandResult<bool> FilterByAll(int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions("Filter by All Records"), driver =>
             {
@@ -1263,33 +1778,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
         public BrowserCommandResult<bool> SelectRecord(int index, int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions("Select Grid Record"), driver =>
             {
-                var container = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.RowsContainer]),
-                                                        $"Grid Container does not exist.");
+                var container = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.RowsContainer]), "Grid Container does not exist.");
 
                 var row = container.FindElement(By.Id("id-cell-" + index + "-1"));
-
-                if (row != null)
-                    row.Click();
-                else
+                if (row == null)
                     throw new Exception($"Row with index: {index} does not exist.");
 
-                return false;
+                row.Click();
+                return true;
             });
         }
+
         public BrowserCommandResult<bool> SwitchChart(string chartName, int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             if (!Browser.Driver.IsVisible(By.XPath(AppElements.Xpath[AppReference.Grid.ChartSelector])))
                 ShowChart();
 
-            Browser.ThinkTime(1000);
+            ThinkTime(1000);
 
             return this.Execute(GetOptions("Switch Chart"), driver =>
             {
@@ -1302,9 +1816,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-        public BrowserCommandResult<bool> Sort(string columnName, int thinkTime = Constants.DefaultThinkTime)
+
+        public BrowserCommandResult<bool> Sort(string columnName, string sortOptionButtonText, int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Sort by {columnName}"), driver =>
             {
@@ -1313,21 +1828,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (sortCol == null)
                     throw new InvalidOperationException($"Column: {columnName} Does not exist");
                 else
-                    sortCol.Click();
+                {
+                    sortCol.Click(true);
+                    driver.WaitUntilClickable(By.XPath($@"//button[@name='{sortOptionButtonText}']")).Click(true);
+                }
+
+                driver.WaitForTransaction();
                 return true;
             });
         }
+
         #endregion
 
         #region RelatedGrid
+
         /// <summary>
         /// Opens the grid record.
         /// </summary>
         /// <param name="index">The index.</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
-        public BrowserCommandResult<bool> OpenGridRow(int index, int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<bool> OpenRelatedGridRow(int index, int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions("Open Grid Item"), driver =>
             {
@@ -1341,50 +1863,308 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     gridCellContainer.FindElement(
                         By.XPath("//div[@role='gridcell'][@header-row-number='" + index + "']/following::div"));
 
-                if (link != null)
-                {
-                    link.Click();
-                }
-                else
-                {
+                if (link == null)
                     throw new InvalidOperationException($"No record with the index '{index}' exists.");
-                }
+
+                link.Click();
 
                 driver.WaitForTransaction();
                 return true;
             });
         }
 
-        public BrowserCommandResult<bool> ClickRelatedCommand(string name, string subName = null)
+        public BrowserCommandResult<bool> ClickRelatedCommand(string name, string subName = null, string subSecondName = null)
         {
             return this.Execute(GetOptions("Click Related Tab Command"), driver =>
             {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
-                    throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
+                // Locate Related Command Bar Button List
+                var relatedCommandBarButtonList = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButtonList]));
 
-                driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
-
-                driver.WaitForTransaction();
-
-                if (subName != null)
+                // Validate list has provided command bar button
+                if (relatedCommandBarButtonList.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
                 {
-                    if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
-                        throw new NotFoundException($"{subName} button not found");
-
-                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+                    relatedCommandBarButtonList.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
 
                     driver.WaitForTransaction();
+
+                    if (subName != null)
+                    {
+                        //Look for Overflow flyout
+                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer])))
+                        {
+                            var overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
+
+                            if (!overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
+                                throw new NotFoundException($"{subName} button not found");
+
+                            overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+
+                            driver.WaitForTransaction();
+                        }
+
+                        if (subSecondName != null)
+                        {
+                            //Look for Overflow flyout
+                            if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer])))
+                            {
+                                var overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
+
+                                if (!overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
+                                    throw new NotFoundException($"{subName} button not found");
+
+                                overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+
+                                driver.WaitForTransaction();
+                            }
+                        }
+                    }
+
+                    return true;
                 }
+                else
+                {
+                    // Button was not found, check if we should be looking under More Commands (OverflowButton)
+                    var moreCommands = relatedCommandBarButtonList.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton]));
+
+                    if (moreCommands)
+                    {
+                        var overFlowButton = relatedCommandBarButtonList.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton]));
+                        overFlowButton.Click(true);
+
+                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]))) //Look for Overflow
+                        {
+                            var overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
+
+                            if (overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))))
+                            {
+                                overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarButton].Replace("[NAME]", name))).Click(true);
+
+                                driver.WaitForTransaction();
+
+                                if (subName != null)
+                                {
+                                    overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
+
+                                    if (!overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
+                                        throw new NotFoundException($"{subName} button not found");
+
+                                    overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+
+                                    driver.WaitForTransaction();
+
+                                    if (subSecondName != null)
+                                    {
+                                        overFlowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowContainer]));
+
+                                        if (!overFlowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))))
+                                            throw new NotFoundException($"{subName} button not found");
+
+                                        overFlowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarSubButton].Replace("[NAME]", subName))).Click(true);
+
+                                        driver.WaitForTransaction();
+                                    }
+                                }
+
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            throw new NotFoundException($"{name} button not found in the More Commands container. Button names are case sensitive. Please check for proper casing of button name.");
+                        }
+
+                    }
+                    else
+                    {
+                        throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
+                    }
+                }
+
                 return true;
             });
         }
+
+        #endregion
+
+        #region Subgrid
+
+        /// This method is obsolete. Do not use.
+        public BrowserCommandResult<bool> ClickSubgridAddButton(string subgridName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Click add button of subgrid: {subgridName}"), driver =>
+            {
+                driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridAddButton].Replace("[NAME]", subgridName)))?.Click();
+
+                return true;
+            });
+        }
+
+        public BrowserCommandResult<bool> ClickSubGridCommand(string subGridName, string name, string subName = null, string subSecondName = null)
+        {
+            return this.Execute(GetOptions("Click SubGrid Command"), driver =>
+            {
+                // Initialize required local variables
+                IWebElement subGridCommandBar = null;
+
+                // Find the SubGrid
+                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subGridName)));
+
+                if (subGrid == null)
+                    throw new NotFoundException($"Unable to locate subgrid contents for {subGridName} subgrid.");
+
+                // Check if grid commandBar was found
+                if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandBar].Replace("[NAME]", subGridName)), out subGridCommandBar))
+                {
+                    // Locate subGrid command list
+                    //var foundCommands = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+
+                    var items = subGridCommandBar.FindElements(By.TagName("button"));
+
+                    //Is the button in the ribbon?
+                    if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        items.FirstOrDefault(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)).Click(true);
+                        driver.WaitForTransaction();
+                    }
+                    else
+                    {
+                        //Is the button in More Commands Overflow?
+                        if (items.Any(x => x.GetAttribute("aria-label").Contains("More Commands", StringComparison.OrdinalIgnoreCase)))
+                        {
+                            //Click More Commands
+                            items.FirstOrDefault(x => x.GetAttribute("aria-label").Contains("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                            driver.WaitForTransaction();
+
+                            // Locate the overflow button (More Commands flyout)
+                            var overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
+
+                            //Click the primary button, if found
+                            if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name))))
+                            {
+                                overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name))).Click(true);
+                                driver.WaitForTransaction();
+                            }
+                            else
+                                throw new InvalidOperationException($"No command with the name '{name}' exists inside of {subGridName} Commandbar.");
+                        }
+                        else
+                            throw new InvalidOperationException($"No command with the name '{name}' exists inside of {subGridName} CommandBar.");
+                    }
+
+                    if (subName != null)
+                    {
+                        // Locate the sub-button flyout if subName present
+                        var overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
+
+                        //Click the primary button, if found
+                        if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))))
+                        {
+                            overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))).Click(true);
+                            driver.WaitForTransaction();
+                        }
+                        else
+                            throw new InvalidOperationException($"No command with the name '{subName}' exists under the {name} command inside of {subGridName} Commandbar.");
+
+                        // Check if we need to go to a 3rd level
+                        if (subSecondName != null)
+                        {
+                            // Locate the sub-button flyout if subSecondName present
+                            overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
+
+                            //Click the primary button, if found
+                            if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))))
+                            {
+                                overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))).Click(true);
+                                driver.WaitForTransaction();
+                            }
+                            else
+                                throw new InvalidOperationException($"No command with the name '{subSecondName}' exists under the {subName} command inside of {name} on the {subGridName} SubGrid Commandbar.");
+                        }
+                    }
+                }
+                else
+                    throw new InvalidOperationException($"Unable to locate the Commandbar for the {subGrid} SubGrid.");
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> ClickSubgridSelectAll(string subGridName, int thinkTime = Constants.DefaultThinkTime)
+        {
+            ThinkTime(thinkTime);
+
+            return this.Execute(GetOptions($"Click Select All Button on subgrid: {subGridName}"), driver =>
+            {
+
+                // Find the SubGrid
+                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subGridName)));
+
+                if (subGrid != null)
+                {
+                    var subGridButtons = subGrid.FindElements(By.TagName("button"));
+
+                    //Is the button in the ribbon?
+                    if (subGridButtons.Any(x => x.GetAttribute("title").Equals("Select All", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        subGridButtons.FirstOrDefault(x => x.GetAttribute("title").Equals("Select All", StringComparison.OrdinalIgnoreCase)).Click(true);
+                        driver.WaitForTransaction();
+                    }
+                    else
+                        throw new NotFoundException("Select All button not found. Please make sure the grid is displayed. Card layout is not supported for Select All.");
+                }
+                else
+                    throw new NotFoundException($"Unable to locate subgrid with name {subGridName}");
+
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SearchSubGrid(string subGridName, string searchCriteria, bool clearByDefault = false)
+        {
+            return this.Execute(GetOptions($"Search SubGrid {subGridName}"), driver =>
+            {
+                IWebElement subGridSearchField = null;
+                // Find the SubGrid
+                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subGridName)));
+                if (subGrid != null)
+                {
+                    var foundSearchField = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridSearchBox]), out subGridSearchField);
+                    if (foundSearchField)
+                    {
+                        var inputElement = subGridSearchField.FindElement(By.TagName("input"));
+
+                        if (clearByDefault)
+                        {
+                            inputElement.Clear();
+                        }
+
+                        inputElement.SendKeys(searchCriteria);
+
+                        var startSearch = subGridSearchField.FindElement(By.TagName("button"));
+                        startSearch.Click(true);
+
+                        driver.WaitForTransaction();
+                    }
+                    else
+                        throw new NotFoundException($"Unable to locate the search box for subgrid {subGridName}. Please validate that view search is enabled for this subgrid");
+                }
+                else
+                    throw new NotFoundException($"Unable to locate subgrid with name {subGridName}");
+
+                return true;
+            });
+        }
+
         #endregion
 
         #region Entity
 
         internal BrowserCommandResult<bool> CancelQuickCreate(int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Cancel Quick Create"), driver =>
             {
@@ -1406,21 +2186,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="thinkTime">The think time</param>
         internal BrowserCommandResult<bool> OpenEntity(string entityName, Guid id, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Open: {entityName} {id}"), driver =>
             {
+                //https:///main.aspx?appid=98d1cf55-fc47-e911-a97c-000d3ae05a70&pagetype=entityrecord&etn=lead&id=ed975ea3-531c-e511-80d8-3863bb3ce2c8
                 var uri = new Uri(this.Browser.Driver.Url);
-                var link = $"{uri.Scheme}://{uri.Authority}/main.aspx?etn={entityName}&pagetype=entityrecord&id=%7B{id:D}%7D";
+                var qs = HttpUtility.ParseQueryString(uri.Query.ToLower());
+                var appId = qs.Get("appid");
+                var link = $"{uri.Scheme}://{uri.Authority}/main.aspx?appid={appId}&etn={entityName}&pagetype=entityrecord&id={id}";
 
-                driver.Navigate().GoToUrl(uri);
+                if (Browser.Options.UCITestMode)
+                {
+                    link += "&flags=testmode=true";
+                }
+                if (Browser.Options.UCIPerformanceMode)
+                {
+                    link += "&perf=true";
+                }
+
+                driver.Navigate().GoToUrl(link);
 
                 //SwitchToContent();
                 driver.WaitForPageToLoad();
+                driver.WaitForTransaction();
                 driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
-                    new TimeSpan(0, 0, 30),
-                    null,
-                    d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
+                    TimeSpan.FromSeconds(30),
+                    "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
                 );
 
                 return true;
@@ -1433,7 +2225,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="thinkTime"></param>
         internal BrowserCommandResult<bool> Save(int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Save"), driver =>
             {
@@ -1448,7 +2240,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> SaveQuickCreate(int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"SaveQuickCreate"), driver =>
             {
@@ -1471,7 +2263,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmBrowser.Entity.OpenRecordSetNavigator();</example>
         public BrowserCommandResult<bool> OpenRecordSetNavigator(int index = 0, int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions("Open Record Set Navigator"), driver =>
             {
@@ -1505,13 +2297,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.CloseRecordSetNavigator();</example>
         public BrowserCommandResult<bool> CloseRecordSetNavigator(int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions("Close Record Set Navigator"), driver =>
             {
-                var closeSpan =
-                    driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavCollapseIcon]));
-
+                var closeSpan = driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavCollapseIcon]));
                 if (closeSpan)
                 {
                     driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavCollapseIconParent])).Click();
@@ -1521,175 +2311,403 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        // Used by SetValue methods to determine the field context
+        private IWebElement ValidateFormContext(IWebDriver driver, FormContextType formContextType, string field, IWebElement fieldContainer)
+        {
+            if (formContextType == FormContextType.QuickCreate)
+            {
+                // Initialize the quick create form context
+                // If this is not done -- element input will go to the main form due to new flyout design
+                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
+            }
+            else if (formContextType == FormContextType.Entity)
+            {
+                // Initialize the entity form context
+                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]));
+                fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
+            }
+            else if (formContextType == FormContextType.BusinessProcessFlow)
+            {
+                // Initialize the Business Process Flow context
+                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
+                fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.TextFieldContainer].Replace("[NAME]", field)));
+            }
+            else if (formContextType == FormContextType.Header)
+            {
+                // Initialize the Header context
+                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderContext]));
+                fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
+            }
+            else if (formContextType == FormContextType.Dialog)
+            {
+                // Initialize the Dialog context
+                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+                fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
+            }
+
+            return fieldContainer;
+        }
+
         /// <summary>
         /// Set Value
         /// </summary>
         /// <param name="field">The field</param>
         /// <param name="value">The value</param>
         /// <example>xrmApp.Entity.SetValue("firstname", "Test");</example>
-        internal BrowserCommandResult<bool> SetValue(string field, string value)
+        internal BrowserCommandResult<bool> SetValue(string field, string value, FormContextType formContextType = FormContextType.Entity)
         {
-            return this.Execute(GetOptions($"Set Value"), driver =>
+            return Execute(GetOptions("Set Value"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
+                IWebElement fieldContainer = null;
+                fieldContainer = ValidateFormContext(driver, formContextType, field, fieldContainer);
 
-                if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
-                {
-                    var input = fieldContainer.FindElement(By.TagName("input"));
-                    if (input != null)
-                    {
-                        input.Click();
-                        input.SendKeys(value, true);
-                    }
-                }
-                else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
-                {
-                    fieldContainer.FindElement(By.TagName("textarea")).Click();
-                    fieldContainer.FindElement(By.TagName("textarea")).Clear();
-                    fieldContainer.FindElement(By.TagName("textarea")).SendKeys(value);
-                }
-                else
-                {
-                    throw new Exception($"Field with name {field} does not exist.");
-                }
+                IWebElement input;
+                bool found = fieldContainer.TryFindElement(By.TagName("input"), out input);
+
+                if (!found)
+                    found = fieldContainer.TryFindElement(By.TagName("textarea"), out input);
+
+                if (!found)
+                    throw new NoSuchElementException($"Field with name {field} does not exist.");
+
+                SetInputValue(driver, input, value);
 
                 return true;
             });
         }
 
+        private void SetInputValue(IWebDriver driver, IWebElement input, string value, TimeSpan? thinktime = null)
+        {
+            // Repeat set value if expected value is not set
+            // Do this to ensure that the static placeholder '---' is removed 
+            driver.RepeatUntil(() =>
+            {
+                input.Clear();
+                input.Click();
+                input.SendKeys(Keys.Control + "a");
+                input.SendKeys(Keys.Control + "a");
+                input.SendKeys(Keys.Backspace);
+                input.SendKeys(value);
+                driver.WaitForTransaction();
+            },
+                d => input.GetAttribute("value").IsValueEqualsTo(value),
+                TimeSpan.FromSeconds(9), 3,
+                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {value}. Actual: {input.GetAttribute("value")}")
+            );
+
+            driver.WaitForTransaction();
+        }
+
         /// <summary>
-        /// Sets the value of a Lookup.
+        /// Sets the value of a Lookup, Customer, Owner or ActivityParty Lookup which accepts only a single value.
         /// </summary>
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         /// <example>xrmApp.Entity.SetValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
         /// The default index position is 0, which will be the first result record in the lookup results window. Suppy a value > 0 to select a different record if multiple are present.
-        internal BrowserCommandResult<bool> SetValue(LookupItem control, int index = 0)
+        internal BrowserCommandResult<bool> SetValue(LookupItem control, FormContextType formContextType)
         {
-            return this.Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
+            return Execute(GetOptions($"Set Lookup Value: {control.Name}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
+                driver.WaitForTransaction();
 
-                if (fieldContainer.FindElements(By.TagName("input")).Count == 0)
-                {
-                    var existingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", control.Name)));
-                    existingLookupValue.Hover(driver);
+                IWebElement fieldContainer = null;
+                fieldContainer = ValidateFormContext(driver, formContextType, control.Name, fieldContainer);
 
-                    var deleteExistingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
-                    deleteExistingLookupValue.Click();
-                }
-
-                fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
-
-                if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
-                {
-                    var input = fieldContainer.FindElement(By.TagName("input"));
-                    if (input != null)
-                    {
-                        input.SendKeys(control.Value, true);
-                        input.SendKeys(Keys.Tab);
-                    }
-                }
-
-               
-                if (control.Value != null && control.Value != "")
-                {
-                    var flyoutDialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupMenu].Replace("[NAME]", control.Name)));
-                    var dialogItems = OpenDialog(flyoutDialog).Value;
-
-                    if (dialogItems.Count <= 0)
-                        throw new InvalidOperationException($"List does not contain a record with the name:  {control.Value}");
-
-                    if (index + 1 > dialogItems.Count)
-                    {
-                        throw new InvalidOperationException($"List does not contain {index + 1} records. Please provide an index value less than {dialogItems.Count} ");
-                    }
-                    else
-                    {
-                        var dialogItem = dialogItems[index];
-                        driver.ClickWhenAvailable(By.Id(dialogItem.Id));
-                    }
-                }
-                else if (control.Value == "")
-                {
-                    var lookupResultsDialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.LookupResultsDropdown].Replace("[NAME]", control.Name)));
-                    var lookupResults = LookupResultsDropdown(lookupResultsDialog).Value;
-
-                    if (lookupResults.Count > 0)
-                    {
-                        if (index + 1 > lookupResults.Count)
-                            throw new InvalidOperationException($"Recently Viewed list does not contain {index + 1} records. Please provide an index value less than {lookupResults.Count}");
-
-                        var lookupResult = lookupResults[index];
-
-                        driver.ClickWhenAvailable(By.Id(lookupResult.Id));
-                    }
-                    else
-                        throw new InvalidOperationException($"No results exist in the Recently Viewed flyout menu. Please provide a text value for {control.Name}");
-                }
-                else if (control.Value == null)
-                {
-                    throw new InvalidOperationException($"No value has been provided for the LookupItem {control.Name}. Please provide a value and try again.");
-                }
+                TryRemoveLookupValue(driver, fieldContainer, control);
+                TrySetValue(driver, fieldContainer, control);
 
                 return true;
             });
         }
 
-        /// <summary>
-        /// Sets the value of a picklist.
-        /// </summary>
-        /// <param name="option">The option you want to set.</param>
-        /// <example>xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
-        public BrowserCommandResult<bool> SetValue(OptionSet option)
+        private void TrySetValue(IWebDriver driver, IWebElement fieldContainer, LookupItem control)
         {
-            return this.Execute(GetOptions($"Set OptionSet Value: {option.Name}"), driver =>
+            IWebElement input;
+            bool found = fieldContainer.TryFindElement(By.TagName("input"), out input);
+            string value = control.Value?.Trim();
+            if (found)
+                SetInputValue(driver, input, value);
+
+            TrySetValue(driver, control);
+        }
+
+        /// <summary>
+        /// Sets the value of an ActivityParty Lookup.
+        /// </summary>
+        /// <param name="controls">The lookup field name, value or index of the lookup.</param>
+        /// <example>xrmApp.Entity.SetValue(new Lookup[] { Name = "to", Value = "Rene Valdes (sample)" }, { Name = "to", Value = "Alpine Ski House (sample)" } );</example>
+        /// The default index position is 0, which will be the first result record in the lookup results window. Suppy a value > 0 to select a different record if multiple are present.
+        internal BrowserCommandResult<bool> SetValue(LookupItem[] controls, FormContextType formContextType = FormContextType.Entity, bool clearFirst = true)
+        {
+            var control = controls.First();
+            var controlName = control.Name;
+            return Execute(GetOptions($"Set ActivityParty Lookup Value: {controlName}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
+                driver.WaitForTransaction();
 
-                if (fieldContainer.FindElements(By.TagName("select")).Count > 0)
-                {
-                    var select = fieldContainer.FindElement(By.TagName("select"));
-                    var options = select.FindElements(By.TagName("option"));
+                IWebElement fieldContainer = null;
+                fieldContainer = ValidateFormContext(driver, formContextType, controlName, fieldContainer);
 
-                    foreach (var op in options)
-                    {
-                        if (op.Text != option.Value && op.GetAttribute("value") != option.Value) continue;
-                        op.Click();
-                        break;
-                    }
-                }
-                else
-                {
-                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
-                }
+                if (clearFirst)
+                    TryRemoveLookupValue(driver, fieldContainer, control);
+
+                TryToSetValue(driver, fieldContainer, controls);
+
                 return true;
             });
+        }
+
+        private void TryToSetValue(IWebDriver driver, ISearchContext fieldContainer, LookupItem[] controls)
+        {
+            IWebElement input;
+            bool found = fieldContainer.TryFindElement(By.TagName("input"), out input);
+
+            foreach (var control in controls)
+            {
+                var value = control.Value?.Trim();
+                if (found)
+                {
+                    if (string.IsNullOrWhiteSpace(value))
+                        input.Click();
+                    else
+                    {
+                        input.SendKeys(value, true);
+                        driver.WaitForTransaction();
+                        ThinkTime(3.Seconds());
+                        input.SendKeys(Keys.Tab);
+                        input.SendKeys(Keys.Enter);
+                    }
+                }
+
+                TrySetValue(fieldContainer, control);
+            }
+
+            input.SendKeys(Keys.Escape); // IE wants to keep the flyout open on multi-value fields, this makes sure it closes
+        }
+
+        private void TrySetValue(ISearchContext container, LookupItem control)
+        {
+            string value = control.Value;
+            if (value == null)
+                control.Value = string.Empty;
+            // throw new InvalidOperationException($"No value has been provided for the LookupItem {control.Name}. Please provide a value or an empty string and try again.");
+
+            if (control.Value == string.Empty)
+                SetLookupByIndex(container, control);
+            else
+                SetLookUpByValue(container, control);
+        }
+
+        private void SetLookUpByValue(ISearchContext container, LookupItem control)
+        {
+            var controlName = control.Name;
+            var xpathToText = AppElements.Xpath[AppReference.Entity.LookupFieldNoRecordsText].Replace("[NAME]", controlName);
+            var xpathToResultList = AppElements.Xpath[AppReference.Entity.LookupFieldResultList].Replace("[NAME]", controlName);
+            var bypathResultList = By.XPath(xpathToText + "|" + xpathToResultList);
+
+            container.WaitUntilAvailable(bypathResultList, TimeSpan.FromSeconds(10));
+
+            var byPathToFlyout = By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupMenu].Replace("[NAME]", controlName));
+            var flyoutDialog = container.WaitUntilClickable(byPathToFlyout);
+
+            var items = GetListItems(flyoutDialog, control);
+
+            if (items.Count == 0)
+                throw new InvalidOperationException($"List does not contain a record with the name:  {control.Value}");
+
+            int index = control.Index;
+            if (index >= items.Count)
+                throw new InvalidOperationException($"List does not contain {index + 1} records. Please provide an index value less than {items.Count} ");
+
+            var selectedItem = items.ElementAt(index);
+            selectedItem.Click(true);
+        }
+
+        private void SetLookupByIndex(ISearchContext container, LookupItem control)
+        {
+            var controlName = control.Name;
+            var xpathToControl = By.XPath(AppElements.Xpath[AppReference.Entity.LookupResultsDropdown].Replace("[NAME]", controlName));
+            var lookupResultsDialog = container.WaitUntilVisible(xpathToControl);
+
+            var xpathFieldResultListItem = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", controlName));
+            container.WaitUntil(d => d.FindElements(xpathFieldResultListItem).Count > 0);
+
+            var items = GetListItems(lookupResultsDialog, control);
+            if (items.Count == 0)
+                throw new InvalidOperationException($"No results exist in the Recently Viewed flyout menu. Please provide a text value for {controlName}");
+
+            int index = control.Index;
+            if (index >= items.Count)
+                throw new InvalidOperationException($"Recently Viewed list does not contain {index} records. Please provide an index value less than {items.Count}");
+
+            var selectedItem = items.ElementAt(index);
+            selectedItem.Click(true);
+        }
+
+        /// <summary>
+        /// Sets the value of a picklist or status field.
+        /// </summary>
+        /// <param name="control">The option you want to set.</param>
+        /// <example>xrmApp.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
+        public BrowserCommandResult<bool> SetValue(OptionSet control, FormContextType formContextType)
+        {
+            var controlName = control.Name;
+            return Execute(GetOptions($"Set OptionSet Value: {controlName}"), driver =>
+            {
+                IWebElement fieldContainer = null;
+                fieldContainer = ValidateFormContext(driver, formContextType, controlName, fieldContainer);
+
+                TrySetValue(fieldContainer, control);
+                driver.WaitForTransaction();
+                return true;
+            });
+        }
+
+        private static void TrySetValue(IWebElement fieldContainer, OptionSet control)
+        {
+            var value = control.Value;
+            bool success = fieldContainer.TryFindElement(By.TagName("select"), out IWebElement select);
+            if (success)
+            {
+                fieldContainer.WaitUntilAvailable(By.TagName("select"));
+                var options = select.FindElements(By.TagName("option"));
+                SelectOption(options, value);
+                return;
+            }
+
+            var name = control.Name;
+            var hasStatusCombo = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityOptionsetStatusCombo].Replace("[NAME]", name)));
+            if (hasStatusCombo)
+            {
+                // This is for statuscode (type = status) that should act like an optionset doesn't doesn't follow the same pattern when rendered
+                fieldContainer.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.EntityOptionsetStatusComboButton].Replace("[NAME]", name)));
+
+                var listBox = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityOptionsetStatusComboList].Replace("[NAME]", name)));
+
+                var options = listBox.FindElements(By.TagName("li"));
+                SelectOption(options, value);
+                return;
+            }
+
+            throw new InvalidOperationException($"OptionSet Field: '{name}' does not exist");
+        }
+
+        private static void SelectOption(ReadOnlyCollection<IWebElement> options, string value)
+        {
+            var selectedOption = options.FirstOrDefault(op => op.Text == value || op.GetAttribute("value") == value);
+            selectedOption.Click(true);
         }
 
         /// <summary>
         /// Sets the value of a Boolean Item.
         /// </summary>
-        /// <param name="option">The option you want to set.</param>
-        /// <example>xrmBrowser.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
-        public BrowserCommandResult<bool> SetValue(BooleanItem option)
+        /// <param name="option">The boolean field name.</param>
+        /// <example>xrmApp.Entity.SetValue(new BooleanItem { Name = "donotemail", Value = true });</example>
+        public BrowserCommandResult<bool> SetValue(BooleanItem option, FormContextType formContextType)
         {
             return this.Execute(GetOptions($"Set BooleanItem Value: {option.Name}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
-                if (option.Value)
+                // ensure that the option.Name value is lowercase -- will cause XPath lookup issues
+                option.Name = option.Name.ToLowerInvariant();
+
+                IWebElement fieldContainer = null;
+                fieldContainer = ValidateFormContext(driver, formContextType, option.Name, fieldContainer);
+
+                var hasRadio = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioContainer].Replace("[NAME]", option.Name)));
+                var hasCheckbox = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
+                var hasList = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldList].Replace("[NAME]", option.Name)));
+                var hasToggle = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldToggle].Replace("[NAME]", option.Name)));
+                var hasFlipSwitch = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldFlipSwitchLink].Replace("[NAME]", option.Name)));
+
+                // Need to validate whether control is FlipSwitch or Button
+                IWebElement flipSwitchContainer = null;
+                var flipSwitch = hasFlipSwitch ? fieldContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldFlipSwitchContainer].Replace("[NAME]", option.Name)), out flipSwitchContainer) : false;
+                var hasButton = flipSwitchContainer != null ? flipSwitchContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldButtonTrue])) : false;
+                hasFlipSwitch = hasButton ? false : hasFlipSwitch; //flipSwitch and button have the same container reference, so if it has a button it is not a flipSwitch
+                hasFlipSwitch = hasToggle ? false : hasFlipSwitch; //flipSwitch and Toggle have the same container reference, so if it has a Toggle it is not a flipSwitch
+
+                if (hasRadio)
                 {
-                    if (!fieldContainer.Selected)
+                    var trueRadio = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioTrue].Replace("[NAME]", option.Name)));
+                    var falseRadio = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioFalse].Replace("[NAME]", option.Name)));
+
+                    if (option.Value && bool.Parse(falseRadio.GetAttribute("aria-checked")) || !option.Value && bool.Parse(trueRadio.GetAttribute("aria-checked")))
                     {
-                        fieldContainer.Click();
+                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioContainer].Replace("[NAME]", option.Name)));
+                    }
+                }
+                else if (hasCheckbox)
+                {
+                    var checkbox = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
+
+                    if (option.Value && !checkbox.Selected || !option.Value && checkbox.Selected)
+                    {
+                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckboxContainer].Replace("[NAME]", option.Name)));
+                    }
+                }
+                else if (hasList)
+                {
+                    var list = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldList].Replace("[NAME]", option.Name)));
+                    var options = list.FindElements(By.TagName("option"));
+                    var selectedOption = options.FirstOrDefault(a => a.HasAttribute("data-selected") && bool.Parse(a.GetAttribute("data-selected")));
+                    var unselectedOption = options.FirstOrDefault(a => !a.HasAttribute("data-selected"));
+
+                    var trueOptionSelected = false;
+                    if (selectedOption != null)
+                    {
+                        trueOptionSelected = selectedOption.GetAttribute("value") == "1";
+                    }
+
+                    if (option.Value && !trueOptionSelected || !option.Value && trueOptionSelected)
+                    {
+                        if (unselectedOption != null)
+                        {
+                            driver.ClickWhenAvailable(By.Id(unselectedOption.GetAttribute("id")));
+                        }
+                    }
+                }
+                else if (hasToggle)
+                {
+                    var toggle = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldToggle].Replace("[NAME]", option.Name)));
+                    var link = toggle.FindElement(By.TagName("button"));
+                    var value = bool.Parse(link.GetAttribute("aria-checked"));
+
+                    if (value != option.Value)
+                    {
+                        link.Click();
+                    }
+                }
+                else if (hasFlipSwitch)
+                {
+                    // flipSwitchContainer should exist based on earlier TryFindElement logic
+                    var link = flipSwitchContainer.FindElement(By.TagName("a"));
+                    var value = bool.Parse(link.GetAttribute("aria-checked"));
+
+                    if (value != option.Value)
+                    {
+                        link.Click();
+                    }
+                }
+                else if (hasButton)
+                {
+                    var container = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldButtonContainer].Replace("[NAME]", option.Name)));
+                    var trueButton = container.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldButtonTrue]));
+                    var falseButton = container.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldButtonFalse]));
+
+                    if (option.Value)
+                    {
+                        trueButton.Click();
+                    }
+                    else
+                    {
+                        falseButton.Click();
                     }
                 }
                 else
-                {
-                    if (fieldContainer.Selected)
-                    {
-                        fieldContainer.Click();
-                    }
-                }
+                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+
+
                 return true;
             });
         }
@@ -1697,46 +2715,237 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <summary>
         /// Sets the value of a Date Field.
         /// </summary>
-        /// <param name="field">The field id or name.</param>
-        /// <param name="date">DateTime value.</param>
-        /// <param name="format">DateTime format</param>
-        /// <example> xrmBrowser.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
-        public BrowserCommandResult<bool> SetValue(string field, DateTime date, string format = "MM dd yyyy")
+        /// <param name="field">Date field name.</param>
+        /// <param name="value">DateTime value.</param>
+        /// <param name="formatDate">Datetime format matching Short Date formatting personal options.</param>
+        /// <param name="formatTime">Datetime format matching Short Time formatting personal options.</param>
+        /// <example>xrmApp.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
+        /// <example>xrmApp.Entity.SetValue("new_actualclosedatetime", DateTime.Now, "MM/dd/yyyy", "hh:mm tt");</example>
+        /// <example>xrmApp.Entity.SetValue("estimatedclosedate", DateTime.Now);</example>
+        public BrowserCommandResult<bool> SetValue(string field, DateTime value, FormContextType formContext, string formatDate = null, string formatTime = null)
         {
-            return this.Execute(GetOptions($"Set Value: {field}"), driver =>
+            var control = new DateTimeControl(field)
             {
-                var dateField = AppElements.Xpath[AppReference.Entity.FieldControlDateTimeInputUCI].Replace("[FIELD]", field);
-
-                if (driver.HasElement(By.XPath(dateField)))
-                {
-                    var fieldElement = driver.ClickWhenAvailable(By.XPath(dateField));
-
-                    if (fieldElement.GetAttribute("value").Length > 0)
-                    {
-                        //fieldElement.Click();
-                        //fieldElement.SendKeys(date.ToString(format));
-                        //fieldElement.SendKeys(Keys.Enter);
-
-                        fieldElement.Click();
-                        fieldElement.SendKeys(Keys.Backspace);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        fieldElement.SendKeys(date.ToString(format));
-                        fieldElement.SendKeys(Keys.Tab);
-                    }
-                    else
-                    {
-                        fieldElement.SendKeys(date.ToString(format));
-                        fieldElement.SendKeys(Keys.Enter);
-                    }
-                }
-                else
-                    throw new InvalidOperationException($"Field: {field} Does not exist");
-
-                return true;
-            });
+                Value = value,
+                DateFormat = formatDate,
+                TimeFormat = formatTime
+            };
+            return SetValue(control, formContext);
         }
+
+        public BrowserCommandResult<bool> SetValue(DateTimeControl control, FormContextType formContext)
+            => Execute(GetOptions($"Set Date/Time Value: {control.Name}"),
+                driver => TrySetValue(driver, container: driver, control: control, formContext));
+
+        private bool TrySetValue(IWebDriver driver, ISearchContext container, DateTimeControl control, FormContextType formContext)
+        {
+            TrySetDateValue(driver, container, control, formContext);
+            TrySetTime(driver, container, control, formContext);
+
+            if (formContext == FormContextType.Header)
+            {
+                TryCloseHeaderFlyout(driver);
+            }
+
+            return true;
+        }
+
+        private void TrySetDateValue(IWebDriver driver, ISearchContext container, DateTimeControl control, FormContextType formContextType)
+        {
+            string controlName = control.Name;
+            IWebElement fieldContainer = null;
+            var xpathToInput = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeInputUCI].Replace("[FIELD]", controlName));
+
+            if (formContextType == FormContextType.QuickCreate)
+            {
+                // Initialize the quick create form context
+                // If this is not done -- element input will go to the main form due to new flyout design
+                var formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+
+                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+
+                if (strExpanded == null)
+                {
+                    fieldContainer = formContext.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", controlName)));
+                }
+            }
+            else if (formContextType == FormContextType.Entity)
+            {
+                // Initialize the entity form context
+                var formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]));
+                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+
+                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+
+                if (strExpanded == null)
+                {
+                    fieldContainer = formContext.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", controlName)));
+                }
+            }
+            else if (formContextType == FormContextType.BusinessProcessFlow)
+            {
+                // Initialize the Business Process Flow context
+                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
+                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+
+                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+
+                if (strExpanded == null)
+                {
+                    fieldContainer = formContext.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", controlName)));
+                }
+            }
+            else if (formContextType == FormContextType.Header)
+            {
+                // Initialize the Header context
+                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderContext]));
+                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+
+                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+
+                if (strExpanded == null)
+                {
+                    fieldContainer = formContext.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", controlName)));
+                }
+            }
+            else if (formContextType == FormContextType.Dialog)
+            {
+                // Initialize the Dialog context
+                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+
+                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+
+                if (strExpanded == null)
+                {
+                    fieldContainer = formContext.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", controlName)));
+                }
+
+            }
+
+            TrySetDateValue(driver, fieldContainer, control.DateAsString, formContextType);
+        }
+
+        private void TrySetDateValue(IWebDriver driver, IWebElement dateField, string date, FormContextType formContextType)
+        {
+            var strExpanded = dateField.GetAttribute("aria-expanded");
+
+            if (strExpanded != null)
+            {
+                bool success = bool.TryParse(strExpanded, out var isCalendarExpanded);
+                if (success && isCalendarExpanded)
+                    dateField.Click(); // close calendar
+
+                driver.RepeatUntil(() =>
+                {
+                    ClearFieldValue(dateField);
+                    if (date != null)
+                        dateField.SendKeys(date);
+                },
+                    d => dateField.GetAttribute("value").IsValueEqualsTo(date),
+                    TimeSpan.FromSeconds(9), 3,
+                    failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
+                );
+            }
+            else
+            {
+                driver.RepeatUntil(() =>
+                {
+                    dateField.Click(true);
+                    if (date != null)
+                    {
+                        dateField = dateField.FindElement(By.TagName("input"));
+
+                        // Only send Keys.Escape to avoid element not interactable exceptions with calendar flyout on forms.
+                        // This can cause the Header or BPF flyouts to close unexpectedly
+                        if (formContextType == FormContextType.Entity || formContextType == FormContextType.QuickCreate)
+                        {
+                            dateField.SendKeys(Keys.Escape);
+                        }
+
+                        ClearFieldValue(dateField);
+                        dateField.SendKeys(date);
+                    }
+                },
+                    d => dateField.GetAttribute("value").IsValueEqualsTo(date),
+                    TimeSpan.FromSeconds(9), 3,
+                    failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
+                );
+            }
+        }
+
+        private void ClearFieldValue(IWebElement field)
+        {
+            if (field.GetAttribute("value").Length > 0)
+            {
+                field.SendKeys(Keys.Control + "a");
+                field.SendKeys(Keys.Backspace);
+            }
+
+            ThinkTime(500);
+        }
+
+        private static void TrySetTime(IWebDriver driver, ISearchContext container, DateTimeControl control, FormContextType formContextType)
+        {
+            By timeFieldXPath = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", control.Name));
+
+            IWebElement formContext = null;
+
+            if (formContextType == FormContextType.QuickCreate)
+            {
+                //IWebDriver formContext;
+                // Initialize the quick create form context
+                // If this is not done -- element input will go to the main form due to new flyout design
+                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]), new TimeSpan(0, 0, 1));
+            }
+            else if (formContextType == FormContextType.Entity)
+            {
+                // Initialize the entity form context
+                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]), new TimeSpan(0, 0, 1));
+            }
+            else if (formContextType == FormContextType.BusinessProcessFlow)
+            {
+                // Initialize the Business Process Flow context
+                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]), new TimeSpan(0, 0, 1));
+            }
+            else if (formContextType == FormContextType.Header)
+            {
+                // Initialize the Header context
+                formContext = container as IWebElement;
+            }
+            else if (formContextType == FormContextType.Dialog)
+            {
+                // Initialize the Header context
+                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]), new TimeSpan(0, 0, 1));
+            }
+
+            var success = formContext.TryFindElement(timeFieldXPath, out var timeField);
+            if (success)
+                TrySetTime(driver, timeField, control.TimeAsString);
+
+        }
+
+        private static void TrySetTime(IWebDriver driver, IWebElement timeField, string time)
+        {
+            // click & wait until the time get updated after change/clear the date
+            timeField.Click();
+            driver.WaitForTransaction();
+
+            driver.RepeatUntil(() =>
+            {
+                timeField.Clear();
+                timeField.Click();
+                timeField.SendKeys(time);
+                timeField.SendKeys(Keys.Tab);
+                driver.WaitForTransaction();
+            },
+                d => timeField.GetAttribute("value").IsValueEqualsTo(time),
+                TimeSpan.FromSeconds(9), 3,
+                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {time}. Actual: {timeField.GetAttribute("value")}")
+            );
+        }
+
 
         /// <summary>
         /// Sets/Removes the value from the multselect type control
@@ -1744,18 +2953,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be set/removed</param>
         /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
         /// <returns>True on success</returns>
-        internal BrowserCommandResult<bool> SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
+        internal BrowserCommandResult<bool> SetValue(MultiValueOptionSet option, FormContextType formContextType = FormContextType.Entity, bool removeExistingValues = false)
         {
             return this.Execute(GetOptions($"Set MultiValueOptionSet Value: {option.Name}"), driver =>
             {
                 if (removeExistingValues)
                 {
-                    RemoveMultiOptions(option);
+                    RemoveMultiOptions(option, formContextType);
                 }
-                else
-                {
-                    AddMultiOptions(option);
-                }
+
+
+                AddMultiOptions(option, formContextType);
+
                 return true;
             });
         }
@@ -1765,44 +2974,61 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be removed</param>
         /// <returns></returns>
-        private BrowserCommandResult<bool> RemoveMultiOptions(MultiValueOptionSet option)
+        private BrowserCommandResult<bool> RemoveMultiOptions(MultiValueOptionSet option, FormContextType formContextType)
         {
             return this.Execute(GetOptions($"Remove Multi Select Value: {option.Name}"), driver =>
             {
-                string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name]);
-                // If there is already some pre-selected items in the div then we must determine if it
-                // actually exists and simulate a set focus event on that div so that the input textbox
-                // becomes visible.
-                var listItems = driver.FindElements(By.XPath(xpath));
-                if (listItems.Any())
+                IWebElement fieldContainer = null;
+
+                if (formContextType == FormContextType.QuickCreate)
                 {
-                    listItems.First().SendKeys("");
+                    // Initialize the quick create form context
+                    // If this is not done -- element input will go to the main form due to new flyout design
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
+                }
+                else if (formContextType == FormContextType.Entity)
+                {
+                    // Initialize the entity form context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
+                }
+                else if (formContextType == FormContextType.BusinessProcessFlow)
+                {
+                    // Initialize the Business Process Flow context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
+                }
+                else if (formContextType == FormContextType.Header)
+                {
+                    // Initialize the Header context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
+                }
+                else if (formContextType == FormContextType.Dialog)
+                {
+                    // Initialize the Header context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
 
-                // If there are large number of options selected then a small expand collapse 
-                // button needs to be clicked to expose all the list elements.
-                xpath = AppElements.Xpath[AppReference.MultiSelect.ExpandCollapseButton].Replace("[NAME]", Elements.ElementId[option.Name]);
-                var expandCollapseButtons = driver.FindElements(By.XPath(xpath));
-                if (expandCollapseButtons.Any())
+                fieldContainer.Hover(driver, true);
+
+                var selectedRecordXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord]);
+                var selectedRecords = fieldContainer.FindElements(selectedRecordXPath);
+
+                var initialCountOfSelectedOptions = selectedRecords.Count;
+                var deleteButtonXpath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedOptionDeleteButton]);
+                for (int i = 0; i < initialCountOfSelectedOptions; i++)
                 {
-                    expandCollapseButtons.First().Click(true);
+                    // With every click of the button, the underlying DOM changes and the
+                    // entire collection becomes stale, hence we only click the first occurance of
+                    // the button and loop back to again find the elements and anyother occurance
+                    selectedRecords[0].FindElement(deleteButtonXpath).Click(true);
+                    driver.WaitForTransaction();
+                    selectedRecords = fieldContainer.FindElements(selectedRecordXPath);
                 }
 
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch].Replace("[NAME]", Elements.ElementId[option.Name])));
-                foreach (var optionValue in option.Values)
-                {
-                    xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.SelectedRecordButton].Replace("[NAME]", Elements.ElementId[option.Name]), optionValue);
-                    var listItemObjects = driver.FindElements(By.XPath(xpath));
-                    var loopCounts = listItemObjects.Any() ? listItemObjects.Count : 0;
-
-                    for (int i = 0; i < loopCounts; i++)
-                    {
-                        // With every click of the button, the underlying DOM changes and the
-                        // entire collection becomes stale, hence we only click the first occurance of
-                        // the button and loop back to again find the elements and anyother occurance
-                        driver.FindElements(By.XPath(xpath)).First().Click(true);
-                    }
-                }
                 return true;
             });
         }
@@ -1812,41 +3038,65 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be set</param>
         /// <returns></returns>
-        private BrowserCommandResult<bool> AddMultiOptions(MultiValueOptionSet option)
+        private BrowserCommandResult<bool> AddMultiOptions(MultiValueOptionSet option, FormContextType formContextType)
         {
             return this.Execute(GetOptions($"Add Multi Select Value: {option.Name}"), driver =>
             {
-                string xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecord].Replace("[NAME]", Elements.ElementId[option.Name]);
-                // If there is already some pre-selected items in the div then we must determine if it
-                // actually exists and simulate a set focus event on that div so that the input textbox
-                // becomes visible.
-                var listItems = driver.FindElements(By.XPath(xpath));
-                if (listItems.Any())
+                IWebElement fieldContainer = null;
+
+                if (formContextType == FormContextType.QuickCreate)
                 {
-                    listItems.First().SendKeys("");
+                    // Initialize the quick create form context
+                    // If this is not done -- element input will go to the main form due to new flyout design
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.QuickCreateFormContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
+                }
+                else if (formContextType == FormContextType.Entity)
+                {
+                    // Initialize the entity form context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
+                }
+                else if (formContextType == FormContextType.BusinessProcessFlow)
+                {
+                    // Initialize the Business Process Flow context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
+                }
+                else if (formContextType == FormContextType.Header)
+                {
+                    // Initialize the Header context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
+                }
+                else if (formContextType == FormContextType.Dialog)
+                {
+                    // Initialize the Header context
+                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
 
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch].Replace("[NAME]", Elements.ElementId[option.Name])));
+                var inputXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch]);
+                fieldContainer.FindElement(inputXPath).SendKeys(string.Empty);
+
+                var flyoutCaretXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.FlyoutCaret]);
+                fieldContainer.FindElement(flyoutCaretXPath).Click();
+
                 foreach (var optionValue in option.Values)
                 {
-                    xpath = String.Format(AppElements.Xpath[AppReference.MultiSelect.FlyoutList].Replace("[NAME]", Elements.ElementId[option.Name]), optionValue);
-                    var flyout = driver.FindElements(By.XPath(xpath));
-                    if (flyout.Any())
+                    var flyoutOptionXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.FlyoutOption].Replace("[NAME]", optionValue));
+                    if (fieldContainer.TryFindElement(flyoutOptionXPath, out var flyoutOption))
                     {
-                        flyout.First().Click(true);
+                        var ariaSelected = flyoutOption.GetAttribute<string>("aria-selected");
+                        var selected = !string.IsNullOrEmpty(ariaSelected) && bool.Parse(ariaSelected);
+
+                        if (!selected)
+                        {
+                            flyoutOption.Click();
+                        }
                     }
                 }
 
-                // Click on the div containing textbox so that the floyout collapses or else the flyout
-                // will interfere in finding the next multiselect control which by chance will be lying
-                // behind the flyout control.
-                //driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", Elements.ElementId[option.Name])));
-                xpath = AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", Elements.ElementId[option.Name]);
-                var divElements = driver.FindElements(By.XPath(xpath));
-                if (divElements.Any())
-                {
-                    divElements.First().Click(true);
-                }
                 return true;
             });
         }
@@ -1855,11 +3105,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Get Field"), driver =>
             {
-                Field returnField = new Field(driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field))));
+                var fieldElement = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
+                Field returnField = new Field(fieldElement);
                 returnField.Name = field;
 
-                return returnField;
+                IWebElement fieldLabel = null;
+                try
+                {
+                    fieldLabel = fieldElement.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLabel].Replace("[NAME]", field)));
+                }
+                catch (NoSuchElementException)
+                {
+                    // Swallow
+                }
 
+                if (fieldLabel != null)
+                {
+                    returnField.Label = fieldLabel.Text;
+                }
+
+                return returnField;
             });
         }
 
@@ -1875,8 +3140,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var input = fieldContainer.FindElement(By.TagName("input"));
                     if (input != null)
                     {
-                        IWebElement fieldValue = input.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldValue].Replace("[NAME]", field)));
-                        text = fieldValue.GetAttribute("value").ToString();
+                        //IWebElement fieldValue = input.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldValue].Replace("[NAME]", field)));
+                        text = input.GetAttribute("value").ToString();
+
+                        // Needed if getting a date field which also displays time as there isn't a date specifc GetValue method
+                        var timefields = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field)));
+                        if (timefields.Any())
+                        {
+                            text += $" {timefields.First().GetAttribute("value")}";
+                        }
                     }
                 }
                 else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
@@ -1899,65 +3171,177 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.GetValue(new Lookup { Name = "primarycontactid" });</example>
         public BrowserCommandResult<string> GetValue(LookupItem control)
         {
-            return this.Execute($"Get Lookup Value: {control.Name}", driver =>
+            var controlName = control.Name;
+            return Execute($"Get Lookup Value: {controlName}", driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
-
-                string lookupValue = string.Empty;
-                try
-                {
-                    if (fieldContainer.FindElements(By.TagName("input")).Any())
-                    {
-                        lookupValue = fieldContainer.FindElement(By.TagName("input")).GetAttribute("value");
-                    }
-                    else if (fieldContainer.FindElements(By.XPath(".//label")).Any())
-                    {
-                        var label = fieldContainer.FindElement(By.XPath(".//label"));
-                        lookupValue = fieldContainer.FindElement(By.XPath(".//label")).GetAttribute("innerText");
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"Field: {control.Name} Does not exist");
-                    }
-                }
-                catch (Exception exp)
-                {
-                    throw new InvalidOperationException($"Field: {control.Name} Does not exist", exp);
-                }
+                var xpathToContainer = AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", controlName);
+                IWebElement fieldContainer = driver.WaitUntilAvailable(By.XPath(xpathToContainer));
+                string lookupValue = TryGetValue(fieldContainer, control);
 
                 return lookupValue;
             });
         }
+        private string TryGetValue(IWebElement fieldContainer, LookupItem control)
+        {
+            string[] lookupValues = TryGetValue(fieldContainer, new[] { control });
+            string result = string.Join("; ", lookupValues);
+            return result;
+        }
 
         /// <summary>
-        /// Gets the value of a picklist.
+        /// Gets the value of an ActivityParty Lookup.
         /// </summary>
-        /// <param name="option">The option you want to set.</param>
-        /// <example>xrmBrowser.Entity.GetValue(new OptionSet { Name = "preferredcontactmethodcode"}); </example>
-        internal BrowserCommandResult<string> GetValue(OptionSet option)
+        /// <param name="controls">The lookup field name of the lookup.</param>
+        /// <example>xrmApp.Entity.GetValue(new LookupItem[] { new LookupItem { Name = "to" } });</example>
+        public BrowserCommandResult<string[]> GetValue(LookupItem[] controls)
         {
-            return this.Execute($"Get OptionSet Value: {option.Name}", driver =>
+            var controlName = controls.First().Name;
+            return Execute($"Get ActivityParty Lookup Value: {controlName}", driver =>
             {
-                var text = string.Empty;
+                var xpathToContainer = By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", controlName));
+                var fieldContainer = driver.WaitUntilAvailable(xpathToContainer);
+                string[] result = TryGetValue(fieldContainer, controls);
+
+                return result;
+            });
+        }
+
+        private string[] TryGetValue(IWebElement fieldContainer, LookupItem[] controls)
+        {
+            var controlName = controls.First().Name;
+            var xpathToExistingValues = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldExistingValue].Replace("[NAME]", controlName));
+            var existingValues = fieldContainer.FindElements(xpathToExistingValues);
+
+            var xpathToExpandButton = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldExpandCollapseButton].Replace("[NAME]", controlName));
+            bool expandButtonFound = fieldContainer.TryFindElement(xpathToExpandButton, out var expandButton);
+            if (expandButtonFound)
+            {
+                expandButton.Click(true);
+
+                int count = existingValues.Count;
+                fieldContainer.WaitUntil(fc => fc.FindElements(xpathToExistingValues).Count > count);
+
+                existingValues = fieldContainer.FindElements(xpathToExistingValues);
+            }
+
+            Exception ex = null;
+            try
+            {
+                if (existingValues.Count > 0)
+                {
+                    string[] lookupValues = existingValues.Select(v => v.GetAttribute("innerText").TrimSpecialCharacters()).ToArray(); //IE can return line breaks
+                    return lookupValues;
+                }
+
+                if (fieldContainer.FindElements(By.TagName("input")).Any())
+                    return new string[0];
+            }
+            catch (Exception e)
+            {
+                ex = e;
+            }
+
+            throw new InvalidOperationException($"Field: {controlName} Does not exist", ex);
+        }
+
+        /// <summary>
+        /// Gets the value of a picklist or status field.
+        /// </summary>
+        /// <param name="control">The option you want to set.</param>
+        /// <example>xrmApp.Entity.GetValue(new OptionSet { Name = "preferredcontactmethodcode"}); </example>
+        internal BrowserCommandResult<string> GetValue(OptionSet control)
+        {
+            var controlName = control.Name;
+            return this.Execute($"Get OptionSet Value: {controlName}", driver =>
+            {
+                var xpathToFieldContainer = AppElements.Xpath[AppReference.Entity.OptionSetFieldContainer].Replace("[NAME]", controlName);
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(xpathToFieldContainer));
+                string result = TryGetValue(fieldContainer, control);
+
+                return result;
+            });
+        }
+
+        private static string TryGetValue(IWebElement fieldContainer, OptionSet control)
+        {
+            bool success = fieldContainer.TryFindElement(By.TagName("select"), out IWebElement select);
+            if (success)
+            {
+                var options = select.FindElements(By.TagName("option"));
+                string result = GetSelectedOption(options);
+                return result;
+            }
+
+            var name = control.Name;
+            var hasStatusCombo = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityOptionsetStatusCombo].Replace("[NAME]", name)));
+            if (hasStatusCombo)
+            {
+                // This is for statuscode (type = status) that should act like an optionset doesn't doesn't follow the same pattern when rendered
+                var valueSpan = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityOptionsetStatusTextValue].Replace("[NAME]", name)));
+                return valueSpan.Text;
+            }
+
+            throw new InvalidOperationException($"OptionSet Field: '{name}' does not exist");
+        }
+
+        private static string GetSelectedOption(ReadOnlyCollection<IWebElement> options)
+        {
+            var selectedOption = options.FirstOrDefault(op => op.Selected);
+            return selectedOption?.Text ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Sets the value of a Boolean Item.
+        /// </summary>
+        /// <param name="option">The boolean field name.</param>
+        /// <example>xrmApp.Entity.GetValue(new BooleanItem { Name = "creditonhold" });</example>
+        internal BrowserCommandResult<bool> GetValue(BooleanItem option)
+        {
+            return this.Execute($"Get BooleanItem Value: {option.Name}", driver =>
+            {
+                var check = false;
+
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
 
-                if (fieldContainer.FindElements(By.TagName("select")).Count > 0)
+                var hasRadio = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioContainer].Replace("[NAME]", option.Name)));
+                var hasCheckbox = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
+                var hasList = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldList].Replace("[NAME]", option.Name)));
+                var hasToggle = fieldContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldToggle].Replace("[NAME]", option.Name)));
+
+                if (hasRadio)
                 {
-                    var select = fieldContainer.FindElement(By.TagName("select"));
-                    var options = select.FindElements(By.TagName("option"));
-                    foreach (var op in options)
+                    var trueRadio = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldRadioTrue].Replace("[NAME]", option.Name)));
+
+                    check = bool.Parse(trueRadio.GetAttribute("aria-checked"));
+                }
+                else if (hasCheckbox)
+                {
+                    var checkbox = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldCheckbox].Replace("[NAME]", option.Name)));
+
+                    check = bool.Parse(checkbox.GetAttribute("aria-checked"));
+                }
+                else if (hasList)
+                {
+                    var list = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldList].Replace("[NAME]", option.Name)));
+                    var options = list.FindElements(By.TagName("option"));
+                    var selectedOption = options.FirstOrDefault(a => a.HasAttribute("data-selected") && bool.Parse(a.GetAttribute("data-selected")));
+
+                    if (selectedOption != null)
                     {
-                        if (!op.Selected) continue;
-                        text = op.Text;
-                        break;
+                        check = int.Parse(selectedOption.GetAttribute("value")) == 1;
                     }
                 }
-                else
+                else if (hasToggle)
                 {
-                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
-                }
-                return text;
+                    var toggle = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityBooleanFieldToggle].Replace("[NAME]", option.Name)));
+                    var link = toggle.FindElement(By.TagName("button"));
 
+                    check = bool.Parse(link.GetAttribute("aria-checked"));
+                }
+                else
+                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
+
+                return check;
             });
         }
 
@@ -1970,27 +3354,65 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Get Multi Select Value: {option.Name}"), driver =>
             {
-                // If there are large number of options selected then a small expand collapse 
-                // button needs to be clicked to expose all the list elements.
-                string xpath = AppElements.Xpath[AppReference.MultiSelect.ExpandCollapseButton].Replace("[NAME]", Elements.ElementId[option.Name]);
-                var expandCollapseButtons = driver.FindElements(By.XPath(xpath));
-                if (expandCollapseButtons.Any())
+                var containerXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name));
+                var container = driver.WaitUntilAvailable(containerXPath, $"Multi-select option set {option.Name} not found.");
+
+                container.Hover(driver, true);
+                var expandButtonXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.ExpandCollapseButton]);
+                if (container.TryFindElement(expandButtonXPath, out var expandButton) && expandButton.IsClickable())
                 {
-                    expandCollapseButtons.First().Click(true);
+                    expandButton.Click();
                 }
 
-                var returnValue = new MultiValueOptionSet();
-                returnValue.Name = option.Name;
+                var selectedOptionsXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecordLabel]);
+                var selectedOptions = container.FindElements(selectedOptionsXPath);
 
-                xpath = AppElements.Xpath[AppReference.MultiSelect.SelectedRecordLabel].Replace("[NAME]", Elements.ElementId[option.Name]);
-                var labelItems = driver.FindElements(By.XPath(xpath));
-                if (labelItems.Any())
+                return new MultiValueOptionSet
                 {
-                    returnValue.Values = labelItems.Select(x => x.Text).ToArray();
-                }
-
-                return returnValue;
+                    Name = option.Name,
+                    Values = selectedOptions.Select(o => o.Text).ToArray()
+                };
             });
+        }
+
+
+        /// <summary>
+        /// Gets the value of a Lookup.
+        /// </summary>
+        /// <param name="control">The lookup field name of the lookup.</param>
+        /// <example>xrmApp.Entity.GetValue(new DateTimeControl { Name = "scheduledstart" });</example>
+        public BrowserCommandResult<DateTime?> GetValue(DateTimeControl control)
+            => Execute($"Get DateTime Value: {control.Name}", driver => TryGetValue(driver, container: driver, control: control));
+
+        private static DateTime? TryGetValue(IWebDriver driver, ISearchContext container, DateTimeControl control)
+        {
+            string field = control.Name;
+            driver.WaitForTransaction();
+
+            var xpathToDateField = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeInputUCI].Replace("[FIELD]", field));
+
+            var dateField = container.WaitUntilAvailable(xpathToDateField, $"Field: {field} Does not exist");
+            string strDate = dateField.GetAttribute("value");
+            if (strDate.IsEmptyValue())
+                return null;
+
+            var date = DateTime.Parse(strDate);
+
+            // Try get Time
+            var timeFieldXPath = By.XPath(AppElements.Xpath[AppReference.Entity.FieldControlDateTimeTimeInputUCI].Replace("[FIELD]", field));
+            bool success = container.TryFindElement(timeFieldXPath, out var timeField);
+            if (!success || timeField == null)
+                return date;
+
+            string strTime = timeField.GetAttribute("value");
+            if (strTime.IsEmptyValue())
+                return date;
+
+            var time = DateTime.Parse(strTime);
+
+            var result = date.AddHours(time.Hour).AddMinutes(time.Minute).AddSeconds(time.Second);
+
+            return result;
         }
 
         /// <summary>
@@ -2011,94 +3433,331 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        /// <summary>
+        /// Returns the Entity Name of the entity
+        /// </summary>
+        /// <returns>Entity Name of the Entity</returns>
+        internal BrowserCommandResult<string> GetEntityName(int thinkTime = Constants.DefaultThinkTime)
+        {
+            return this.Execute(GetOptions($"Get Entity Name"), driver =>
+            {
+                var entityName = driver.ExecuteScript("return Xrm.Page.data.entity.getEntityName();").ToString();
+
+                if (string.IsNullOrEmpty(entityName))
+                {
+                    throw new NotFoundException("Unable to retrieve Entity Name for this entity");
+                }
+
+                return entityName;
+            });
+        }
+
+        /// <summary>
+        /// Returns the Form Name of the entity
+        /// </summary>
+        /// <returns>Form Name of the Entity</returns>
+        internal BrowserCommandResult<string> GetFormName(int thinkTime = Constants.DefaultThinkTime)
+        {
+            return this.Execute(GetOptions($"Get Form Name"), driver =>
+            {
+                // Wait for form selector visible
+                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.FormSelector]));
+
+                string formName = driver.ExecuteScript("return Xrm.Page.ui.formContext.ui.formSelector.getCurrentItem().getLabel();").ToString();
+
+                if (string.IsNullOrEmpty(formName))
+                {
+                    throw new NotFoundException("Unable to retrieve Form Name for this entity");
+                }
+
+                return formName;
+            });
+        }
+
+        /// <summary>
+        /// Returns the Header Title of the entity
+        /// </summary>
+        /// <returns>Header Title of the Entity</returns>
+        internal BrowserCommandResult<string> GetHeaderTitle(int thinkTime = Constants.DefaultThinkTime)
+        {
+            return this.Execute(GetOptions($"Get Header Title"), driver =>
+            {
+                // Wait for form selector visible
+                var headerTitle = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderTitle]), new TimeSpan(0, 0, 5));
+
+                var headerTitleName = headerTitle?.Text;
+
+                if (string.IsNullOrEmpty(headerTitleName))
+                {
+                    throw new NotFoundException("Unable to retrieve Header Title for this entity");
+                }
+
+                return headerTitleName;
+            });
+        }
+
+
         internal BrowserCommandResult<List<GridItem>> GetSubGridItems(string subgridName)
         {
             return this.Execute(GetOptions($"Get Subgrid Items for Subgrid {subgridName}"), driver =>
             {
+                // Initialize return object
                 List<GridItem> subGridRows = new List<GridItem>();
 
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridTitle].Replace("[NAME]", subgridName))))
-                    throw new NotFoundException($"{subgridName} subgrid not found. Subgrid names are case sensitive.  Please make sure casing is the same.");
+                // Initialize required local variables
+                IWebElement subGridRecordList = null;
+                List<string> columns = new List<string>();
+                List<string> cellValues = new List<string>();
+                GridItem item = new GridItem();
 
-                //Find the subgrid contents
+                // Find the SubGrid
                 var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
 
-                //Find the columns
-                List<string> columns = new List<string>();
+                if (subGrid == null)
+                    throw new NotFoundException($"Unable to locate subgrid contents for {subgridName} subgrid.");
 
-                var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeaders]));
-
-                foreach (IWebElement headerCell in headerCells)
+                // Check if ReadOnlyGrid was found
+                if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList))
                 {
-                    columns.Add(headerCell.Text);
-                }
+                    // Locate record list
+                    var foundRecords = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
 
-                //Find the rows
-                var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRows]));
-
-                //Process each row
-                foreach (IWebElement row in rows)
-                {
-                    List<string> cellValues = new List<string>();
-                    GridItem item = new GridItem();
-
-                    //Get the entityId and entity Type
-                    if (row.GetAttribute("data-lp-id") != null)
+                    if (foundRecords)
                     {
-                        var rowAttributes = row.GetAttribute("data-lp-id").Split('|');
-                        item.Id = Guid.Parse(rowAttributes[3]);
-                        item.EntityName = rowAttributes[4];
-                    }
+                        var subGridRecordRows = subGridRecordList.FindElements(By.TagName("li"));
 
-                    var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
-
-                    if (cells.Count > 0)
-                    {
-                        foreach (IWebElement thisCell in cells)
-                            cellValues.Add(thisCell.Text);
-
-                        for (int i = 0; i < columns.Count; i++)
+                        foreach (IWebElement recordRow in subGridRecordRows)
                         {
-                            //The first cell is always a checkbox for the record.  Ignore the checkbox.
-                            item[columns[i]] = cellValues[i + 1];
+                            var recordLabels = recordRow.FindElements(By.TagName("label"));
+
+                            foreach (IWebElement label in recordLabels)
+                            {
+                                if (label.GetAttribute("id") != null)
+                                {
+                                    var headerLabelId = label.GetAttribute("id").ToString();
+
+                                    var frontLength = (43 + (subgridName.Length) + 15);
+                                    var rearLength = 37;
+                                    // Trim calculated frontLength
+                                    var headerLabel = headerLabelId.Remove(0, frontLength);
+
+                                    // Trim calculated rearLength
+                                    headerLabel = headerLabel.Remove((headerLabel.Length - rearLength), rearLength);
+                                    columns.Add(headerLabel);
+
+                                    var rowText = label.Text;
+                                    cellValues.Add(rowText);
+                                }
+                            }
+
+
+                            for (int i = 0; i < columns.Count; i++)
+                            {
+                                item[columns[i]] = cellValues[i];
+                            }
+
+                            subGridRows.Add(item);
+
+                            // Flush Item and Cell Values To Get New Rows
+                            cellValues = new List<string>();
+                            item = new GridItem();
                         }
 
-                        subGridRows.Add(item);
                     }
+                    else
+                        throw new NotFoundException($"Unable to locate record list for subgrid {subgridName}");
+
+                }
+                // Attempt to locate the editable grid list
+                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList))
+                {
+                    //Find the columns
+                    var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersEditable]));
+
+                    foreach (IWebElement headerCell in headerCells)
+                    {
+                        var headerTitle = headerCell.GetAttribute("title");
+                        columns.Add(headerTitle);
+                    }
+
+                    //Find the rows
+                    var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridDataRowsEditable]));
+
+                    //Process each row
+                    foreach (IWebElement row in rows)
+                    {
+                        var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
+
+                        if (cells.Count > 0)
+                        {
+                            foreach (IWebElement thisCell in cells)
+                                cellValues.Add(thisCell.Text);
+
+                            for (int i = 0; i < columns.Count; i++)
+                            {
+                                //The first cell is always a checkbox for the record.  Ignore the checkbox.
+                                if (i == 0)
+                                {
+                                    // Do Nothing
+                                }
+                                else
+                                {
+                                    item[columns[i]] = cellValues[i];
+                                }
+                            }
+
+                            subGridRows.Add(item);
+
+                            // Flush Item and Cell Values To Get New Rows
+                            cellValues = new List<string>();
+                            item = new GridItem();
+                        }
+                    }
+
+                    return subGridRows;
+
+                }
+                // Special 'Related' high density grid control for entity forms
+                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHighDensityList].Replace("[NAME]", subgridName)), out subGridRecordList))
+                {
+                    //Find the columns
+                    var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersHighDensity]));
+
+                    foreach (IWebElement headerCell in headerCells)
+                    {
+                        var headerTitle = headerCell.GetAttribute("data-id");
+                        columns.Add(headerTitle);
+                    }
+
+                    //Find the rows
+                    var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRowsHighDensity]));
+
+                    //Process each row
+                    foreach (IWebElement row in rows)
+                    {
+                        //Get the entityId and entity Type
+                        if (row.GetAttribute("data-lp-id") != null)
+                        {
+                            var rowAttributes = row.GetAttribute("data-lp-id").Split('|');
+                            item.EntityName = rowAttributes[4];
+                            //The row record IDs are not in the DOM. Must be retrieved via JavaScript
+                            var getId = $"return Xrm.Page.getControl(\"{subgridName}\").getGrid().getRows().get({rows.IndexOf(row)}).getData().entity.getId()";
+                            item.Id = new Guid((string)driver.ExecuteScript(getId));
+                        }
+
+                        var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
+
+                        if (cells.Count > 0)
+                        {
+                            foreach (IWebElement thisCell in cells)
+                                cellValues.Add(thisCell.Text);
+
+                            for (int i = 0; i < columns.Count; i++)
+                            {
+                                //The first cell is always a checkbox for the record.  Ignore the checkbox.
+                                if (i == 0)
+                                {
+                                    // Do Nothing
+                                }
+                                else
+                                {
+                                    item[columns[i]] = cellValues[i];
+                                }
+
+                            }
+
+                            subGridRows.Add(item);
+
+                            // Flush Item and Cell Values To Get New Rows
+                            cellValues = new List<string>();
+                            item = new GridItem();
+                        }
+                    }
+
+                    return subGridRows;
                 }
 
+                // Return rows object
                 return subGridRows;
             });
         }
 
         internal BrowserCommandResult<bool> OpenSubGridRecord(string subgridName, int index = 0)
         {
-            return this.Execute(GetOptions($"Open Subgrid record for subgrid { subgridName}"), driver =>
+            return this.Execute(GetOptions($"Open Subgrid record for subgrid {subgridName}"), driver =>
             {
-                //Find the Grid
+                // Find the SubGrid
                 var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
 
-                //Get the GridName
-                string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", String.Empty);
+                // Find list of SubGrid records
+                IWebElement subGridRecordList = null;
+                var foundGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
 
-                //cell-0 is the checkbox for each record
-                var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
+                // Read Only Grid Found
+                if (subGridRecordList != null && foundGrid)
+                {
+                    var subGridRecords = subGridRecordList.FindElements(By.TagName("li"));
 
-                driver.DoubleClick(checkBox);
+                    if (subGridRecords == null)
+                        throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
 
-                driver.WaitForTransaction();
+                    if (index + 1 > subGridRecords.Count)
+                        throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {subGridRecords.Count}. Expected: {index + 1}");
+
+                    subGridRecords[index].Click(true);
+                    driver.WaitForTransaction();
+
+                    return true;
+                }
+                else if (!foundGrid)
+                {
+                    // Read Only Grid Not Found
+                    var foundEditableGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+
+                    if (foundEditableGrid)
+                    {
+                        var editableGridListCells = subGridRecordList.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]));
+
+                        var editableGridCellRows = editableGridListCells.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]));
+
+                        var editableGridCellRow = editableGridCellRows[index + 1].FindElements(By.XPath("./div"));
+
+                        Actions actions = new Actions(driver);
+                        actions.DoubleClick(editableGridCellRow[0]).Perform();
+
+                        driver.WaitForTransaction();
+
+                        return true;
+                    }
+                    else
+                    {
+                        // Editable Grid Not Found
+                        // Check for special 'Related' grid form control
+                        // This opens a limited form view in-line on the grid
+
+                        //Get the GridName
+                        string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", String.Empty);
+
+                        //cell-0 is the checkbox for each record
+                        var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
+
+                        driver.DoubleClick(checkBox);
+
+                        driver.WaitForTransaction();
+                    }
+                }
 
                 return true;
+
             });
         }
 
         internal BrowserCommandResult<int> GetSubGridItemsCount(string subgridName)
         {
-            return this.Execute(GetOptions($"Get Subgrid Items Count for subgrid { subgridName}"), driver =>
+            return this.Execute(GetOptions($"Get Subgrid Items Count for subgrid {subgridName}"), driver =>
             {
                 List<GridItem> rows = GetSubGridItems(subgridName);
                 return rows.Count;
-
             });
         }
 
@@ -2132,12 +3791,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<string> GetHeaderValue(LookupItem control)
         {
-            return this.Execute(GetOptions($"Get Header LookupItem Value {control.Name}"), driver =>
+            var controlName = control.Name;
+            return Execute(GetOptions($"Get Header LookupItem Value {controlName}"), driver =>
             {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
-                    throw new NotFoundException("Unable to find header on the form");
+                var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.LookupFieldContainer].Replace("[NAME]", controlName);
+                string lookupValue = ExecuteInHeaderContainer(driver, xpathToContainer, container => TryGetValue(container, control));
 
-                return GetValue(control);
+                return lookupValue;
+            });
+        }
+
+        internal BrowserCommandResult<string[]> GetHeaderValue(LookupItem[] controls)
+        {
+            var controlName = controls.First().Name;
+            var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.LookupFieldContainer].Replace("[NAME]", controlName);
+            return Execute(GetOptions($"Get Header Activityparty LookupItem Value {controlName}"), driver =>
+            {
+                string[] lookupValues = ExecuteInHeaderContainer(driver, xpathToContainer, container => TryGetValue(container, controls));
+
+                return lookupValues;
             });
         }
 
@@ -2145,8 +3817,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Get Header Value {control}"), driver =>
             {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
-                    throw new NotFoundException("Unable to find header on the form");
+                TryExpandHeaderFlyout(driver);
 
                 return GetValue(control);
             });
@@ -2156,8 +3827,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Get Header MultiValueOptionSet Value {control.Name}"), driver =>
             {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
-                    throw new NotFoundException("Unable to find header on the form");
+                TryExpandHeaderFlyout(driver);
 
                 return GetValue(control);
             });
@@ -2165,31 +3835,73 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<string> GetHeaderValue(OptionSet control)
         {
-            return this.Execute(GetOptions($"Get Header OptionSet Value {control}"), driver =>
+            var controlName = control.Name;
+            var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.OptionSetFieldContainer].Replace("[NAME]", controlName);
+            return Execute(GetOptions($"Get Header OptionSet Value {controlName}"),
+                driver => ExecuteInHeaderContainer(driver, xpathToContainer, container => TryGetValue(container, control))
+            );
+        }
+
+        internal BrowserCommandResult<bool> GetHeaderValue(BooleanItem control)
+        {
+            return this.Execute(GetOptions($"Get Header BooleanItem Value {control}"), driver =>
             {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
-                    throw new NotFoundException("Unable to find header on the form");
+                TryExpandHeaderFlyout(driver);
 
                 return GetValue(control);
             });
+        }
+
+        internal BrowserCommandResult<DateTime?> GetHeaderValue(DateTimeControl control)
+        {
+            var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.DateTimeFieldContainer].Replace("[NAME]", control.Name);
+            return Execute(GetOptions($"Get Header DateTime Value {control.Name}"),
+                driver => ExecuteInHeaderContainer(driver, xpathToContainer,
+                    container => TryGetValue(driver, container, control)));
         }
 
         internal BrowserCommandResult<string> GetStatusFromFooter()
         {
             return this.Execute(GetOptions($"Get Status value from footer"), driver =>
             {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter])))
-                    throw new NotFoundException("Unable to find footer on the form");
+                IWebElement footer;
+                var footerExists = driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]), out footer);
 
-                var footer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]));
+                IWebElement status;
+                footer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FooterStatusValue]), out status);
 
-                var status = footer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FooterStatusValue]));
+                if (footerExists)
+                {
+                    if (String.IsNullOrEmpty(status.Text))
+                        return "unknown";
 
-                if (String.IsNullOrEmpty(status.Text))
-                    return "unknown";
+                    return status.Text;
+                }
+                else
+                    throw new NoSuchElementException("Unable to find the footer on the entity form");
+            });
+        }
 
-                return status.Text;
-                
+        internal BrowserCommandResult<string> GetMessageFromFooter()
+        {
+            return this.Execute(GetOptions($"Get Message value from footer"), driver =>
+            {
+                IWebElement footer;
+                var footerExists = driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]), out footer);
+
+                if (footerExists)
+                {
+                    IWebElement message;
+                    footer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FooterMessageValue]), out message);
+
+                    if (String.IsNullOrEmpty(message.Text))
+                        return string.Empty;
+
+                    return message.Text;
+                }
+                else
+                    throw new NoSuchElementException("Unable to find the footer on the entity form");
+
             });
         }
 
@@ -2197,121 +3909,343 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Set Header Value {field}"), driver =>
             {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
-                    throw new NotFoundException("Unable to find header on the form");
+                TryExpandHeaderFlyout(driver);
 
-                SetValue(field, value);
+                SetValue(field, value, FormContextType.Header);
 
+                TryCloseHeaderFlyout(driver);
                 return true;
             });
         }
 
         internal BrowserCommandResult<bool> SetHeaderValue(LookupItem control)
         {
-            return this.Execute(GetOptions($"Set Header LookupItem Value {control.Name}"), driver =>
-            {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
-                    throw new NotFoundException("Unable to find header on the form");
+            var controlName = control.Name;
+            bool isHeader = true;
+            bool removeAll = true;
+            var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.LookupFieldContainer].Replace("[NAME]", controlName);
+            return Execute(GetOptions($"Set Header LookupItem Value {controlName}"),
+                driver => ExecuteInHeaderContainer(driver, xpathToContainer,
+                    fieldContainer =>
+                    {
+                        TryRemoveLookupValue(driver, fieldContainer, control, removeAll, isHeader);
+                        TrySetValue(driver, fieldContainer, control);
 
-                SetValue(control);
+                        TryCloseHeaderFlyout(driver);
+                        return true;
+                    }));
+        }
 
-                return true;
-            });
+        internal BrowserCommandResult<bool> SetHeaderValue(LookupItem[] controls, bool clearFirst = true)
+        {
+            var control = controls.First();
+            var controlName = control.Name;
+            var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.LookupFieldContainer].Replace("[NAME]", controlName);
+            return Execute(GetOptions($"Set Header Activityparty LookupItem Value {controlName}"),
+                driver => ExecuteInHeaderContainer(driver, xpathToContainer,
+                    container =>
+                    {
+                        if (clearFirst)
+                            TryRemoveLookupValue(driver, container, control);
+
+                        TryToSetValue(driver, container, controls);
+
+                        TryCloseHeaderFlyout(driver);
+                        return true;
+                    }));
+        }
+
+        internal BrowserCommandResult<bool> SetHeaderValue(OptionSet control)
+        {
+            var controlName = control.Name;
+            var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.OptionSetFieldContainer].Replace("[NAME]", controlName);
+            return Execute(GetOptions($"Set Header OptionSet Value {controlName}"),
+                driver => ExecuteInHeaderContainer(driver, xpathToContainer,
+                    container =>
+                    {
+                        TrySetValue(container, control);
+
+                        TryCloseHeaderFlyout(driver);
+                        return true;
+                    }));
         }
 
         internal BrowserCommandResult<bool> SetHeaderValue(MultiValueOptionSet control)
         {
             return this.Execute(GetOptions($"Set Header MultiValueOptionSet Value {control.Name}"), driver =>
             {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
-                    throw new NotFoundException("Unable to find header on the form");
+                TryExpandHeaderFlyout(driver);
 
-                SetValue(control);
+                SetValue(control, FormContextType.Header);
 
+                TryCloseHeaderFlyout(driver);
                 return true;
             });
         }
 
-        internal BrowserCommandResult<bool> SetHeaderValue(OptionSet control)
+        internal BrowserCommandResult<bool> SetHeaderValue(BooleanItem control)
         {
-            return this.Execute(GetOptions($"Set Header OptionSet Value {control.Name}"), driver =>
+            return this.Execute(GetOptions($"Set Header BooleanItem Value {control.Name}"), driver =>
             {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityHeader])))
-                    throw new NotFoundException("Unable to find header on the form");
+                TryExpandHeaderFlyout(driver);
 
-                SetValue(control);
+                SetValue(control, FormContextType.Header);
 
+                TryCloseHeaderFlyout(driver);
                 return true;
             });
         }
 
-        internal BrowserCommandResult<bool> ClearValue(string fieldName)
+        internal BrowserCommandResult<bool> SetHeaderValue(string field, DateTime value, string formatDate = null, string formatTime = null)
+        {
+            var control = new DateTimeControl(field)
+            {
+                Value = value,
+                DateFormat = formatDate,
+                TimeFormat = formatTime
+            };
+            return SetHeaderValue(control);
+        }
+
+        internal BrowserCommandResult<bool> SetHeaderValue(DateTimeControl control)
+            => Execute(GetOptions($"Set Header Date/Time Value: {control.Name}"), driver => TrySetHeaderValue(driver, control));
+
+        internal BrowserCommandResult<bool> ClearHeaderValue(DateTimeControl control)
+        {
+            var controlName = control.Name;
+            return Execute(GetOptions($"Clear Header Date/Time Value: {controlName}"),
+                driver => TrySetHeaderValue(driver, new DateTimeControl(controlName)));
+        }
+
+        private bool TrySetHeaderValue(IWebDriver driver, DateTimeControl control)
+        {
+            var xpathToContainer = AppElements.Xpath[AppReference.Entity.Header.DateTimeFieldContainer].Replace("[NAME]", control.Name);
+            return ExecuteInHeaderContainer(driver, xpathToContainer,
+                container => TrySetValue(driver, container, control, FormContextType.Header));
+        }
+
+        internal BrowserCommandResult<bool> ClearValue(DateTimeControl control, FormContextType formContextType)
+            => Execute(GetOptions($"Clear Field: {control.Name}"),
+                driver => TrySetValue(driver, container: driver, control: new DateTimeControl(control.Name), formContextType)); // Pass an empty control
+
+        internal BrowserCommandResult<bool> ClearValue(string fieldName, FormContextType formContextType)
         {
             return this.Execute(GetOptions($"Clear Field {fieldName}"), driver =>
             {
-                SetValue(fieldName, String.Empty);
+                SetValue(fieldName, string.Empty, formContextType);
 
                 return true;
             });
         }
 
-        internal BrowserCommandResult<bool> ClearValue(LookupItem control)
+        internal BrowserCommandResult<bool> ClearValue(LookupItem control, FormContextType formContextType, bool removeAll = true)
         {
-            return this.Execute(GetOptions($"Clear Field {control.Name}"), driver =>
+            var controlName = control.Name;
+            return Execute(GetOptions($"Clear Field {controlName}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", control.Name)));
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupFieldContainer].Replace("[NAME]", controlName)));
+                TryRemoveLookupValue(driver, fieldContainer, control, removeAll);
+                return true;
+            });
+        }
 
-                if (fieldContainer.FindElements(By.TagName("input")).Count == 0)
+        private static void TryRemoveLookupValue(IWebDriver driver, IWebElement fieldContainer, LookupItem control, bool removeAll = true, bool isHeader = false)
+        {
+            var controlName = control.Name;
+            fieldContainer.Hover(driver);
+
+            var xpathDeleteExistingValues = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", controlName));
+            var existingValues = fieldContainer.FindElements(xpathDeleteExistingValues);
+
+            var xpathToExpandButton = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldExpandCollapseButton].Replace("[NAME]", controlName));
+            bool success = fieldContainer.TryFindElement(xpathToExpandButton, out var expandButton);
+            if (success)
+            {
+                expandButton.Click(true);
+
+                var count = existingValues.Count;
+                fieldContainer.WaitUntil(x => x.FindElements(xpathDeleteExistingValues).Count > count);
+            }
+
+            fieldContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookupSearchButton].Replace("[NAME]", controlName)));
+
+            existingValues = fieldContainer.FindElements(xpathDeleteExistingValues);
+            if (existingValues.Count == 0)
+                return;
+
+            if (removeAll)
+            {
+                // Removes all selected items
+
+                while (existingValues.Count > 0)
                 {
-                    var existingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldHoverExistingValue].Replace("[NAME]", control.Name)));
-                    existingLookupValue.Hover(driver);
+                    foreach (var v in existingValues)
+                        v.Click(true);
 
-                    var deleteExistingLookupValue = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldDeleteExistingValue].Replace("[NAME]", control.Name)));
-                    deleteExistingLookupValue.Click();
+                    existingValues = fieldContainer.FindElements(xpathDeleteExistingValues);
                 }
 
-                return true;
-            });
+                return;
+            }
+
+            // Removes an individual item by value or index
+            var value = control.Value;
+            if (value == null)
+                throw new InvalidOperationException($"No value or index has been provided for the LookupItem {controlName}. Please provide an value or an empty string or an index and try again.");
+
+            if (value == string.Empty)
+            {
+                var index = control.Index;
+                if (index >= existingValues.Count)
+                    throw new InvalidOperationException($"Field '{controlName}' does not contain {index + 1} records. Please provide an index value less than {existingValues.Count}");
+
+                existingValues[index].Click(true);
+                return;
+            }
+
+            var existingValue = existingValues.FirstOrDefault(v => v.GetAttribute("aria-label").EndsWith(value));
+            if (existingValue == null)
+                throw new InvalidOperationException($"Field '{controlName}' does not contain a record with the name:  {value}");
+
+            existingValue.Click(true);
+            driver.WaitForTransaction();
         }
 
-        internal BrowserCommandResult<bool> ClearValue(OptionSet control)
+        internal BrowserCommandResult<bool> ClearValue(OptionSet control, FormContextType formContextType)
         {
             return this.Execute(GetOptions($"Clear Field {control.Name}"), driver =>
             {
                 control.Value = "-1";
-                SetValue(control);
+                SetValue(control, formContextType);
 
                 return true;
             });
         }
 
-        internal BrowserCommandResult<bool> ClearValue(MultiValueOptionSet control)
+        internal BrowserCommandResult<bool> ClearValue(MultiValueOptionSet control, FormContextType formContextType)
         {
             return this.Execute(GetOptions($"Clear Field {control.Name}"), driver =>
             {
-                RemoveMultiOptions(control);
+                RemoveMultiOptions(control, formContextType);
 
                 return true;
             });
+        }
+
+        internal BrowserCommandResult<bool> SelectForm(string formName)
+        {
+            return this.Execute(GetOptions($"Select Form {formName}"), driver =>
+            {
+                driver.WaitForTransaction();
+
+                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.FormSelector])))
+                    throw new NotFoundException("Unable to find form selector on the form");
+
+                var formSelector = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.FormSelector]));
+                // Click didn't work with IE
+                formSelector.SendKeys(Keys.Enter);
+
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Entity.FormSelectorFlyout]));
+
+                var flyout = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.FormSelectorFlyout]));
+                var forms = flyout.FindElements(By.XPath(Elements.Xpath[Reference.Entity.FormSelectorItem]));
+
+                var form = forms.FirstOrDefault(a => a.GetAttribute("data-text").EndsWith(formName, StringComparison.OrdinalIgnoreCase));
+                if (form == null)
+                    throw new NotFoundException($"Form {formName} is not in the form selector");
+
+                driver.ClickWhenAvailable(By.Id(form.GetAttribute("id")));
+
+                driver.WaitForPageToLoad();
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> AddValues(LookupItem[] controls)
+        {
+            return Execute(GetOptions($"Add values {controls.First().Name}"), driver =>
+            {
+                SetValue(controls, FormContextType.Entity, false);
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> RemoveValues(LookupItem[] controls)
+        {
+            return Execute(GetOptions($"Remove values {controls.First().Name}"), driver =>
+            {
+                foreach (var control in controls)
+                    ClearValue(control, FormContextType.Entity, false);
+
+                return true;
+            });
+        }
+
+        internal TResult ExecuteInHeaderContainer<TResult>(IWebDriver driver, string xpathToContainer, Func<IWebElement, TResult> function)
+        {
+            TResult lookupValue = default(TResult);
+
+            TryExpandHeaderFlyout(driver);
+
+            var xpathToFlyout = AppElements.Xpath[AppReference.Entity.Header.Flyout];
+            driver.WaitUntilVisible(By.XPath(xpathToFlyout), TimeSpan.FromSeconds(5),
+                flyout =>
+                {
+                    IWebElement container = flyout.FindElement(By.XPath(xpathToContainer));
+                    lookupValue = function(container);
+                });
+
+            return lookupValue;
+        }
+
+        internal void TryExpandHeaderFlyout(IWebDriver driver)
+        {
+            driver.WaitUntilAvailable(
+                By.XPath(AppElements.Xpath[AppReference.Entity.Header.Container]),
+                "Unable to find header on the form");
+
+            var xPath = By.XPath(AppElements.Xpath[AppReference.Entity.Header.FlyoutButton]);
+            var headerFlyoutButton = driver.FindElement(xPath);
+            bool expanded = bool.Parse(headerFlyoutButton.GetAttribute("aria-expanded"));
+
+            if (!expanded)
+                headerFlyoutButton.Click(true);
+        }
+
+        internal void TryCloseHeaderFlyout(IWebDriver driver)
+        {
+            bool hasHeader = driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.Header.Container]));
+            if (!hasHeader)
+                throw new NotFoundException("Unable to find header on the form");
+
+            var xPath = By.XPath(AppElements.Xpath[AppReference.Entity.Header.FlyoutButton]);
+            var headerFlyoutButton = driver.FindElement(xPath);
+            bool expanded = bool.Parse(headerFlyoutButton.GetAttribute("aria-expanded"));
+
+            if (expanded)
+                headerFlyoutButton.Click(true);
         }
 
         #endregion
 
         #region Lookup 
+
         internal BrowserCommandResult<bool> OpenLookupRecord(int index)
         {
             return this.Execute(GetOptions("Select Lookup Record"), driver =>
             {
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows])))
+                driver.WaitForTransaction();
+
+                var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows]));
+                if (!rows.Any())
                 {
-                    var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows]));
-
-                    if (rows.Count > 0)
-                        rows.FirstOrDefault().Click(true);
-                }
-                else
                     throw new NotFoundException("No rows found");
+                }
 
+                rows.ElementAt(index).Click();
                 driver.WaitForTransaction();
 
                 return true;
@@ -2324,7 +4258,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 //Click in the field and enter values
                 control.Value = searchCriteria;
-                SetValue(control);
+                SetValue(control, FormContextType.Entity);
 
                 driver.WaitForTransaction();
 
@@ -2350,7 +4284,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> SwitchLookupView(string viewName)
         {
-            return this.Execute(GetOptions($"Select Lookup View {viewName}"), driver =>
+            return Execute(GetOptions($"Select Lookup View {viewName}"), driver =>
             {
                 if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.ChangeViewButton])))
                 {
@@ -2373,8 +4307,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.WaitForTransaction();
                 return true;
             });
-
-            return true;
         }
 
         internal BrowserCommandResult<bool> SelectLookupNewButton()
@@ -2399,6 +4331,83 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<IReadOnlyList<FormNotification>> GetFormNotifications()
+        {
+            return Execute(GetOptions($"Get all form notifications"), driver =>
+            {
+                List<FormNotification> notifications = new List<FormNotification>();
+
+                // Look for notificationMessageAndButtons bar
+                var notificationMessage = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormMessageBar]), TimeSpan.FromSeconds(2));
+
+                if (notificationMessage != null)
+                {
+                    IWebElement icon = null;
+
+                    try
+                    {
+                        icon = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormMessageBarTypeIcon]));
+                    }
+                    catch (NoSuchElementException)
+                    {
+                        // Swallow the exception
+                    }
+
+                    if (icon != null)
+                    {
+                        var notification = new FormNotification
+                        {
+                            Message = notificationMessage?.Text
+                        };
+                        string classes = icon.GetAttribute("class");
+                        notification.SetTypeFromClass(classes);
+                        notifications.Add(notification);
+                    }
+                }
+
+                // Look for the notification wrapper, if it doesn't exist there are no notificatios
+                var notificationBar = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationBar]), TimeSpan.FromSeconds(2));
+                if (notificationBar == null)
+                    return notifications;
+                else
+                {
+                    // If there are multiple notifications, the notifications must be expanded first.
+                    if (notificationBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationExpandButton]), out var expandButton))
+                    {
+                        if (!Convert.ToBoolean(notificationBar.GetAttribute("aria-expanded")))
+                            expandButton.Click();
+
+                        // After expansion the list of notifications are now in a different element
+                        notificationBar = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationFlyoutRoot]), TimeSpan.FromSeconds(2), "Failed to open the form notifications");
+                    }
+
+                    var notificationList = notificationBar.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationList]));
+                    var notificationListItems = notificationList.FindElements(By.TagName("li"));
+
+                    foreach (var item in notificationListItems)
+                    {
+                        var icon = item.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationTypeIcon]));
+
+                        var notification = new FormNotification
+                        {
+                            Message = item.Text
+                        };
+                        string classes = icon.GetAttribute("class");
+                        notification.SetTypeFromClass(classes);
+                        notifications.Add(notification);
+                    }
+
+                    if (notificationBar != null)
+                    {
+                        notificationBar = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.FormNotifcationBar]), TimeSpan.FromSeconds(2));
+                        notificationBar.Click(true); // Collapse the notification bar
+                    }
+                    return notifications;
+                }
+
+            }).Value;
+        }
+
         #endregion
 
         #region Timeline
@@ -2414,7 +4423,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <returns>True on success, False on failure to invoke any action</returns>
         internal BrowserCommandResult<bool> OpenAndClickPopoutMenu(By menuName, By menuItemName, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute($"Open menu", driver =>
             {
@@ -2431,17 +4440,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     // action should take place after it and hence it is ignored.
                     return false;
                 }
+
                 return true;
             });
         }
+
         internal BrowserCommandResult<bool> Delete(int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Delete Entity"), driver =>
             {
                 var deleteBtn = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.Delete]),
-    "Delete Button is not available");
+                    "Delete Button is not available");
 
                 deleteBtn?.Click();
                 ConfirmationDialog(true);
@@ -2451,10 +4462,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
         internal BrowserCommandResult<bool> Assign(string userOrTeamToAssign, int thinkTime = Constants.DefaultThinkTime)
         {
             //Click the Assign Button on the Entity Record
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Assign Entity"), driver =>
             {
@@ -2467,45 +4479,56 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
         internal BrowserCommandResult<bool> SwitchProcess(string processToSwitchTo, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Switch BusinessProcessFlow"), driver =>
             {
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.ProcessButton]), new TimeSpan(0, 0, 5));
-                var processBtn = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.ProcessButton]));
-                processBtn?.Click();
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.ProcessButton]), TimeSpan.FromSeconds(5));
 
-                try
-                {
-                    driver.WaitUntilAvailable(
-                        By.XPath(AppElements.Xpath[AppReference.Entity.SwitchProcess]),
-                        new TimeSpan(0, 0, 5),
-                        d => { driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.SwitchProcess])); },
-                        d => { throw new InvalidOperationException("The Switch Process Button is not available."); }
-                            );
-                }
-                catch (StaleElementReferenceException)
-                {
-                    Console.WriteLine("ignoring stale element exceptions");
-                }
-                //switchProcessBtn?.Click();
-
-                SwitchProcessDialog(processToSwitchTo);
+                driver.ClickWhenAvailable(
+                    By.XPath(AppElements.Xpath[AppReference.Entity.SwitchProcess]),
+                    TimeSpan.FromSeconds(5),
+                    "The Switch Process Button is not available."
+                );
 
                 return true;
             });
         }
+
+        internal BrowserCommandResult<bool> CloseActivity(bool closeOrCancel, int thinkTime = Constants.DefaultThinkTime)
+        {
+            ThinkTime(thinkTime);
+
+            var xPathQuery = closeOrCancel
+                ? AppElements.Xpath[AppReference.Dialogs.CloseActivity.Close]
+                : AppElements.Xpath[AppReference.Dialogs.CloseActivity.Cancel];
+
+            var action = closeOrCancel ? "Close" : "Cancel";
+
+            return this.Execute(GetOptions($"{action} Activity"), driver =>
+            {
+                var dialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+
+                var actionButton = dialog.FindElement(By.XPath(xPathQuery));
+
+                actionButton?.Click();
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
         internal BrowserCommandResult<bool> CloseOpportunity(bool closeAsWon, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
-            string xPathQuery = String.Empty;
+            ThinkTime(thinkTime);
 
-            if (closeAsWon)
-                xPathQuery = AppElements.Xpath[AppReference.Entity.CloseOpportunityWin];
-            else
-                xPathQuery = AppElements.Xpath[AppReference.Entity.CloseOpportunityLoss];
+            var xPathQuery = closeAsWon
+                ? AppElements.Xpath[AppReference.Entity.CloseOpportunityWin]
+                : AppElements.Xpath[AppReference.Entity.CloseOpportunityLoss];
 
             return this.Execute(GetOptions($"Close Opportunity"), driver =>
             {
@@ -2518,20 +4541,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
         internal BrowserCommandResult<bool> CloseOpportunity(double revenue, DateTime closeDate, string description, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Close Opportunity"), driver =>
             {
-                SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.ActualRevenueId], revenue.ToString());
-                SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.CloseDateId], closeDate);
-                SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
+                //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.ActualRevenueId], revenue.ToString(CultureInfo.CurrentCulture));
+                //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.CloseDateId], closeDate);
+                //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
 
-                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]),
-                    new TimeSpan(0, 0, 5),
-                    d => { driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok])); },
-                    d => { throw new InvalidOperationException("The Close Opportunity dialog is not available."); });
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]),
+        TimeSpan.FromSeconds(5),
+        "The Close Opportunity dialog is not available."
+        );
 
                 return true;
             });
@@ -2576,6 +4600,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         // It is expected that the components will be destroyed and the next 
                         // action should take place after it and hence it is ignored.
                     }
+
                     return true;
                 }
                 else if (button.FindElements(By.TagName("button")).Any())
@@ -2615,18 +4640,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <returns>True on success, Exception on failure to invoke any action</returns>
         internal BrowserCommandResult<bool> SelectTab(string tabName, string subTabName = "", int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute($"Select Tab", driver =>
             {
-                driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
+                IWebElement tabList;
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext])))
+                {
+                    var dialogContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+                    tabList = dialogContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
+                }
+                else
+                {
+                    tabList = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
+                }
 
-                ClickTab(AppElements.Xpath[AppReference.Entity.Tab], tabName);
+                ClickTab(tabList, AppElements.Xpath[AppReference.Entity.Tab], tabName);
 
                 //Click Sub Tab if provided
                 if (!String.IsNullOrEmpty(subTabName))
                 {
-                    ClickTab(AppElements.Xpath[AppReference.Entity.SubTab], subTabName);
+                    ClickTab(tabList, AppElements.Xpath[AppReference.Entity.SubTab], subTabName);
                 }
 
                 driver.WaitForTransaction();
@@ -2634,11 +4668,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        internal void ClickTab(string xpath, string name)
+        internal void ClickTab(IWebElement tabList, string xpath, string name)
         {
-            if (this.Browser.Driver.HasElement(By.XPath(String.Format(xpath, name))))
+            IWebElement moreTabsButton;
+            IWebElement listItem;
+            // Look for the tab in the tab list, else in the more tabs menu
+            IWebElement searchScope = null;
+            if (tabList.HasElement(By.XPath(string.Format(xpath, name))))
             {
-                this.Browser.Driver.FindElement(By.XPath(String.Format(xpath, name))).Click(true);
+                searchScope = tabList;
+            }
+            else if (tabList.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabs]), out moreTabsButton))
+            {
+                moreTabsButton.Click();
+
+                // No tab to click - subtabs under 'Related' are automatically expanded in overflow menu
+                if (name == "Related")
+                {
+                    return;
+                }
+                else
+                {
+                    searchScope = Browser.Driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabsMenu]));
+                }
+            }
+
+            if (searchScope.TryFindElement(By.XPath(string.Format(xpath, name)), out listItem))
+            {
+                listItem.Click(true);
             }
             else
             {
@@ -2662,21 +4719,66 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var inputbox = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[fieldName]));
                 if (expectedTagName.Equals(inputbox.TagName, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    inputbox.Click();
-                    inputbox.Clear();
-                    inputbox.SendKeys(value);
+                    if (!inputbox.TagName.Contains("iframe", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        inputbox.Click(true);
+                        inputbox.Clear();
+                        inputbox.SendKeys(value);
+                    }
+                    else
+                    {
+                        driver.SwitchTo().Frame(inputbox);
+
+                        driver.WaitUntilAvailable(By.TagName("iframe"));
+                        driver.SwitchTo().Frame(0);
+
+                        var inputBoxBody = driver.WaitUntilAvailable(By.TagName("body"));
+                        inputBoxBody.Click(true);
+                        inputBoxBody.SendKeys(value);
+
+                        driver.SwitchTo().DefaultContent();
+                    }
+
                     return true;
                 }
-                else
-                {
-                    throw new InvalidOperationException($"Field: {fieldName} with tagname {expectedTagName} Does not exist");
-                }
+
+                throw new InvalidOperationException($"Field: {fieldName} with tagname {expectedTagName} Does not exist");
             });
         }
 
         #endregion
 
         #region BusinessProcessFlow
+
+        internal BrowserCommandResult<Field> BPFGetField(string field)
+        {
+            return this.Execute(GetOptions($"Get Field"), driver =>
+            {
+
+                // Initialize the Business Process Flow context
+                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
+                var fieldElement = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.FieldSectionItemContainer].Replace("[NAME]", field)));
+                Field returnField = new Field(fieldElement);
+                returnField.Name = field;
+
+                IWebElement fieldLabel = null;
+                try
+                {
+                    fieldLabel = fieldElement.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.TextFieldLabel].Replace("[NAME]", field)));
+                }
+                catch (NoSuchElementException)
+                {
+                    // Swallow
+                }
+
+                if (fieldLabel != null)
+                {
+                    returnField.Label = fieldLabel.Text;
+                }
+
+                return returnField;
+            });
+        }
 
         /// <summary>
         /// Set Value
@@ -2695,15 +4797,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var input = fieldContainer.FindElement(By.TagName("input"));
                     if (input != null)
                     {
-                        //input.Click(true);
+                        input.Click(true);
+                        input.Clear();
                         input.SendKeys(value, true);
+                        input.SendKeys(Keys.Tab);
                     }
                 }
                 else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
                 {
-                    fieldContainer.FindElement(By.TagName("textarea")).Click();
-                    fieldContainer.FindElement(By.TagName("textarea")).Clear();
-                    fieldContainer.FindElement(By.TagName("textarea")).SendKeys(value);
+                    var textarea = fieldContainer.FindElement(By.TagName("textarea"));
+                    textarea.Click();
+                    textarea.Clear();
+                    textarea.SendKeys(value);
                 }
                 else
                 {
@@ -2741,6 +4846,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     throw new InvalidOperationException($"Field: {option.Name} Does not exist");
                 }
+
                 return true;
             });
         }
@@ -2755,28 +4861,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Set BPF Value: {option.Name}"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BooleanFieldContainer].Replace("[NAME]", option.Name)));
-                if (!option.Value)
+                var selectedOption = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BooleanFieldSelectedOption].Replace("[NAME]", option.Name)));
+
+                var existingValue = selectedOption.GetAttribute<string>("Title") == "Yes";
+                if (option.Value != existingValue)
                 {
-                    if (!fieldContainer.Selected)
-                    {
-                        fieldContainer.Click(true);
-                    }
-                    else
-                    {
-                        fieldContainer.Click(true);
-                    }
+                    fieldContainer.Click();
                 }
-                else
-                {
-                    if (fieldContainer.Selected)
-                    {
-                        fieldContainer.Click(true);
-                    }
-                    else
-                    {
-                        fieldContainer.Click(true);
-                    }
-                }
+
                 return true;
             });
         }
@@ -2805,36 +4897,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         //fieldElement.SendKeys(Keys.Enter);
 
                         fieldElement.Click();
-                        this.Browser.ThinkTime(250);
+                        ThinkTime(250);
                         fieldElement.Click();
-                        this.Browser.ThinkTime(250);
+                        ThinkTime(250);
                         fieldElement.SendKeys(Keys.Backspace);
-                        this.Browser.ThinkTime(250);
+                        ThinkTime(250);
                         fieldElement.SendKeys(Keys.Backspace);
-                        this.Browser.ThinkTime(250);
+                        ThinkTime(250);
                         fieldElement.SendKeys(Keys.Backspace);
-                        this.Browser.ThinkTime(250);
+                        ThinkTime(250);
                         fieldElement.SendKeys(date.ToString(format), true);
-                        this.Browser.ThinkTime(500);
+                        ThinkTime(500);
                         fieldElement.SendKeys(Keys.Tab);
-                        this.Browser.ThinkTime(250);
+                        ThinkTime(250);
                     }
                     else
                     {
                         fieldElement.Click();
-                        this.Browser.ThinkTime(250);
+                        ThinkTime(250);
                         fieldElement.Click();
-                        this.Browser.ThinkTime(250);
+                        ThinkTime(250);
                         fieldElement.SendKeys(Keys.Backspace);
-                        this.Browser.ThinkTime(250);
+                        ThinkTime(250);
                         fieldElement.SendKeys(Keys.Backspace);
-                        this.Browser.ThinkTime(250);
+                        ThinkTime(250);
                         fieldElement.SendKeys(Keys.Backspace);
-                        this.Browser.ThinkTime(250);
+                        ThinkTime(250);
                         fieldElement.SendKeys(date.ToString(format));
-                        this.Browser.ThinkTime(250);
+                        ThinkTime(250);
                         fieldElement.SendKeys(Keys.Tab);
-                        this.Browser.ThinkTime(250);
+                        ThinkTime(250);
                     }
                 }
                 else
@@ -2846,7 +4938,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> NextStage(string stageName, Field businessProcessFlowField = null, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Next Stage"), driver =>
             {
@@ -2902,7 +4994,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Select Stage: {stageName}"), driver =>
             {
-
                 //Find the Business Process Stages
                 var processStages = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStage_UCI]));
 
@@ -2928,7 +5019,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> SetActive(string stageName = "", int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Set Active Stage: {stageName}"), driver =>
             {
@@ -2937,7 +5028,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     SelectStage(stageName);
 
                     if (!driver.HasElement(By.XPath("//button[contains(@data-id,'setActiveButton')]")))
-                        throw new NotFoundException($"Unable to find the Set Active button. Please verify the stage name { stageName } is correct.");
+                        throw new NotFoundException($"Unable to find the Set Active button. Please verify the stage name {stageName} is correct.");
 
                     driver.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.SetActiveButton])).Click(true);
 
@@ -2989,6 +5080,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #endregion
 
         #region GlobalSearch
+
         /// <summary>
         /// Searches for the specified criteria in Global Search.
         /// </summary>
@@ -2997,35 +5089,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmBrowser.GlobalSearch.Search("Contoso");</example>
         internal BrowserCommandResult<bool> GlobalSearch(string criteria, int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Global Search: {criteria}"), driver =>
             {
-                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton]),
-                new TimeSpan(0, 0, 5),
-                d => { driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton])); },
-                d => { throw new InvalidOperationException("The Global Search button is not available."); });
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton]),
+                    TimeSpan.FromSeconds(5),
+                    "The Global Search button is not available.");
 
+                var input = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Text]), "The Global Search text field is not available.");
 
-                if (driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Text])))
-                {
-                    var button = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Button]));
-                    var input = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Text]));
-
-                    if (button != null && input != null)
+                string reference = null;
+                driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type]),
+                    e =>
                     {
-                        input.SendKeys(criteria, true);
-                        button.Click();
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("The Global Search text field is not available.");
-                    }
-                }
-                else
-                {
-                    throw new InvalidOperationException("The Global Search is not available.");
-                }
+                        var searchType = e.GetAttribute("value");
+                        reference =
+                            searchType == "0" ? AppReference.GlobalSearch.RelevanceSearchButton :
+                            searchType == "1" ? AppReference.GlobalSearch.CategorizedSearchButton :
+                            throw new InvalidOperationException("The Global Search type is not available.");
+                    },
+                    "The Global Search type is not available."
+                );
+
+                IWebElement button = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[reference]), "The Global Search Button is not available.");
+
+                input.SendKeys(criteria, true);
+                button.Click(true);
                 return true;
             });
         }
@@ -3038,25 +5128,49 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmBrowser.GlobalSearch.FilterWith("Account");</example>
         public BrowserCommandResult<bool> FilterWith(string entity, int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Filter With: {entity}"), driver =>
             {
-                if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Filter])))
-                    throw new InvalidOperationException("Filter With picklist is not available");
+                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Filter]),
+                    TimeSpan.FromSeconds(10),
+                    picklist =>
+                    {
+                        var options = picklist.FindElements(By.TagName("option"));
+                        var option = options.FirstOrDefault(x => x.Text == entity);
+                        if (option == null)
+                            throw new InvalidOperationException($"Entity '{entity}' does not exist in the Filter options.");
 
-                var picklist = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Filter]));
-                var options = picklist.FindElements(By.TagName("option"));
+                        picklist.Click();
+                        option.Click();
+                    },
+                    "Filter With picklist is not available. The timeout period elapsed waiting for the picklist to be available."
+                );
 
-                picklist.Click();
 
-                IWebElement option = options.FirstOrDefault(x => x.Text == entity);
+                return true;
+            });
+        }
 
-                if (option == null)
-                    throw new InvalidOperationException($"Entity '{entity}' does not exist in the Filter options.");
+        /// <summary>
+        /// Filter by group and value in the Global Search Results.
+        /// </summary>
+        /// <param name="filterby">The Group that contains the filter you want to use.</param>
+        /// <param name="value">The value listed in the group by area.</param>
+        /// <example>xrmBrowser.GlobalSearch.Filter("Record Type", "Accounts");</example>
+        public BrowserCommandResult<bool> Filter(string filterBy, string value, int thinkTime = Constants.DefaultThinkTime)
+        {
+            ThinkTime(thinkTime);
 
-                option.Click();
-
+            return this.Execute(GetOptions($"Filter With: {value}"), driver =>
+            {
+                var xpathToContainer = By.XPath(AppElements.Xpath[AppReference.GlobalSearch.GroupContainer].Replace("[NAME]", filterBy));
+                var xpathToValue = By.XPath(AppElements.Xpath[AppReference.GlobalSearch.FilterValue].Replace("[NAME]", value));
+                driver.WaitUntilVisible(xpathToContainer,
+                    TimeSpan.FromSeconds(10),
+                    groupContainer => groupContainer.ClickWhenAvailable(xpathToValue, $"Filter By Value '{value}' does not exist in the Filter options."),
+                    "Filter With picklist is not available. The timeout period elapsed waiting for the picklist to be available."
+                );
                 return true;
             });
         }
@@ -3070,44 +5184,92 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmBrowser.GlobalSearch.OpenRecord("Accounts",0);</example>
         public BrowserCommandResult<bool> OpenGlobalSearchRecord(string entity, int index, int thinkTime = Constants.DefaultThinkTime)
         {
-            Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Open Global Search Record"), driver =>
             {
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Container]),
-                                        Constants.DefaultTimeout,
-                                        null,
-                                        d => { throw new InvalidOperationException("Search Results is not available"); });
+                var searchTypeElement = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type]), "The Global Search type is not available.");
+                var searchType = searchTypeElement.GetAttribute("value");
+
+                if (searchType == "1") //Categorized Search
+                {
+                    var resultsContainer = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Container]),
+                        Constants.DefaultTimeout,
+                        "Search Results is not available"
+                    );
+
+                    var entityContainer = resultsContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.EntityContainer].Replace("[NAME]", entity)),
+                        $"Entity {entity} was not found in the results"
+                    );
+
+                    var records = entityContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Records]));
+                    if (records == null || records.Count == 0)
+                        throw new InvalidOperationException($"No records found for entity {entity}");
+
+                    if (index >= records.Count)
+                        throw new InvalidOperationException($"There was less than {index} records in your the search result.");
+
+                    records[index].Click(true);
+
+                    driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]),
+                        TimeSpan.FromSeconds(30),
+                        "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
+                    );
+                    return true;
+                }
+
+                if (searchType == "0") //Relevance Search
+                {
+                    var resultsContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceResultsContainer]));
+                    var records = resultsContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceResults].Replace("[ENTITY]", entity.ToUpper())));
+
+                    if (index >= records.Count)
+                        throw new InvalidOperationException($"There was less than {index} records in your the search result.");
+
+                    records[index].Click(true);
+                    return true;
+                }
+
+                return false;
+            });
+        }
 
 
-                var resultsContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Container]));
+        /// <summary>
+        /// Changes the search type used for global search
+        /// </summary>
+        /// <param name="type">The type of search that you want to do.</param>
+        /// <example>xrmBrowser.GlobalSearch.ChangeSearchType("Categorized");</example>
+        public BrowserCommandResult<bool> ChangeSearchType(string type, int thinkTime = Constants.DefaultThinkTime)
+        {
+            ThinkTime(thinkTime);
 
-                var entityContainer = resultsContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.EntityContainer].Replace("[NAME]", entity)));
+            return this.Execute(GetOptions("Change Search Type"), driver =>
+            {
+                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type]),
+                    Constants.DefaultTimeout,
+                    select =>
+                    {
+                        var options = select.FindElements(By.TagName("option"));
+                        var option = options.FirstOrDefault(x => x.Text.Trim() == type);
+                        if (option == null)
+                            return;
 
-                if (entityContainer == null)
-                    throw new InvalidOperationException($"Entity {entity} was not found in the results");
-
-                var records = entityContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Records]));
-
-                if (records == null)
-                    throw new InvalidOperationException($"No records found for entity {entity}");
-
-                records[index].Click();
-                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Entity.Form]),
-                    new TimeSpan(0, 0, 30),
-                    null,
-                    d => { throw new Exception("CRM Record is Unavailable or not finished loading. Timeout Exceeded"); }
-                );
-
+                        select.Click(true);
+                        option.Click(true);
+                    },
+                    "Search Results is not available");
                 return true;
             });
         }
+
         #endregion
 
         #region Dashboard
+
         internal BrowserCommandResult<bool> SelectDashboard(string dashboardName, int thinkTime = Constants.DefaultThinkTime)
         {
-            this.Browser.ThinkTime(thinkTime);
+            ThinkTime(thinkTime);
 
             return this.Execute(GetOptions($"Select Dashboard"), driver =>
             {
@@ -3116,15 +5278,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //Select the dashboard
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dashboard.DashboardItemUCI].Replace("[NAME]", dashboardName)));
 
+                // Wait for Dashboard to load
+                driver.WaitForTransaction();
+
                 return true;
             });
         }
+
+        #endregion
+
+        #region PerformanceCenter
+
+        internal void EnablePerformanceCenter()
+        {
+            Browser.Driver.Navigate().GoToUrl($"{Browser.Driver.Url}&perf=true");
+            Browser.Driver.WaitForPageToLoad();
+            Browser.Driver.WaitForTransaction();
+        }
+
         #endregion
 
         internal void ThinkTime(int milliseconds)
         {
             Browser.ThinkTime(milliseconds);
         }
+
+        internal void ThinkTime(TimeSpan timespan)
+        {
+            ThinkTime((int)timespan.TotalMilliseconds);
+        }
+
         internal void Dispose()
         {
             Browser.Dispose();

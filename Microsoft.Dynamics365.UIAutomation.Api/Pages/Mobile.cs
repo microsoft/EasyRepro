@@ -23,6 +23,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             SwitchToDefaultContent();
         }
 
+        [Obsolete("This method has been deprectead and is no longer supported.")]
         public BrowserCommandResult<bool> Open(int thinkTime = Constants.DefaultThinkTime)
         {
             Browser.ThinkTime(thinkTime);
@@ -33,11 +34,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 driver.Navigate().GoToUrl(baseUri.GetLeftPart(System.UriPartial.Authority) + "/m");
 
-                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Mobile.Page])
-                    , new TimeSpan(0, 0, 60),
-                    e => { e.WaitForPageToLoad(); },
-                    f => { throw new Exception("Mobile page failed to load."); });
-
+                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Mobile.Page]), TimeSpan.FromSeconds(60),
+                    e => driver.WaitForPageToLoad(),
+                    "Mobile page failed to load."
+                    ); 
                 return true;
             });
         }

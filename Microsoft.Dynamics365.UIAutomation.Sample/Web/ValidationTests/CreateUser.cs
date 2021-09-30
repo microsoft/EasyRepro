@@ -18,10 +18,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
         [TestMethod]
         public void WEBTestCreateUser()
         {
-            string firstName = "Test";
-            string lastName = "User";
-            string displayName = "Test User";
-            string userName = "testuser";
+            // string firstName = "Test";
+            // string lastName = "User";
+            // string displayName = "Test User";
+            // string userName = "testuser";
 
             using (var xrmBrowser = new Api.Browser(TestSettings.Options))
             {
@@ -34,7 +34,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 xrmBrowser.CommandBar.ClickCommand("NEW");
                 
                 xrmBrowser.Dialogs.AddUser();
-                
+
+                // Legacy O365 Code Demo to show interaction outside of Dynamics 365
+                // Example Only - currently not supported
+                /* 
                 xrmBrowser.Office365.CreateUser(firstName, lastName, displayName, userName);
                 
                 xrmBrowser.Grid.Search(displayName);
@@ -45,6 +48,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 {
                     throw new InvalidOperationException("User not found or was not created.");
                 }
+                */
 
             }
         }

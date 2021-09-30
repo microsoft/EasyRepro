@@ -3,6 +3,7 @@
 
 using OpenQA.Selenium;
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using System;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -50,6 +51,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets or sets the Label of the field.
+        /// </summary>
+        /// <value>The field label</value>
+        public string Label { get; set; }
+
+        /// <summary>
         /// Returns if the field is read only.
         /// </summary>
         public bool IsReadOnly
@@ -60,7 +67,66 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     var readOnly = containerElement.FindElement(By.XPath(AppElements.Xpath[AppReference.Field.ReadOnly]));
 
-                    if(readOnly.HasAttribute("readonly"))
+                    if (readOnly.HasAttribute("aria-readonly"))
+                    {
+                        // TwoOption / Text / Lookup Condition
+                        bool isReadOnly = Convert.ToBoolean(readOnly.GetAttribute("aria-readonly"));
+                        if (isReadOnly)
+                            return true;
+                    }
+                    else if (readOnly.HasAttribute("readonly"))
+                        return true;
+                }
+                else if (containerElement.HasElement(By.TagName("select")))
+                {
+                    // Option Set Condition
+                    var readOnlySelect = containerElement.FindElement(By.TagName("select"));
+
+                    if (readOnlySelect.HasAttribute("disabled"))
+                        return true;
+
+                }
+                else if (containerElement.HasElement(By.TagName("input")))
+                {
+                    // DateTime condition
+                    var readOnlyInput = containerElement.FindElement(By.TagName("input"));
+
+                    if (readOnlyInput.HasAttribute("disabled") || readOnlyInput.HasAttribute("readonly"))
+                        return true;
+                }
+                else if (containerElement.HasElement(By.TagName("textarea")))
+                {
+                    var readOnlyTextArea = containerElement.FindElement(By.TagName("textarea"));
+                    return readOnlyTextArea.HasAttribute("readonly");
+                }
+                else
+                {
+                    // Special Lookup Field condition (e.g. transactioncurrencyid)
+                    var lookupRecordList = containerElement.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.RecordList]));
+                    var lookupDescription = lookupRecordList.FindElement(By.TagName("div"));
+
+                    if (lookupDescription != null)
+                        return lookupDescription.GetAttribute("innerText").ToLowerInvariant().Contains("readonly", StringComparison.OrdinalIgnoreCase);                   
+                    else
+                        return false;                    
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns if the field is required.
+        /// </summary>
+        public bool IsRequired
+        {
+            get
+            {
+                if (containerElement.HasElement(By.XPath(AppElements.Xpath[AppReference.Field.RequiredIcon])))
+                {
+                    var required = containerElement.FindElement(By.XPath(AppElements.Xpath[AppReference.Field.RequiredIcon]));
+
+                    if (required != null)
                         return true;
                 }
 

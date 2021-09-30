@@ -30,7 +30,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.Grid.SwitchView("All Leads");
 
-                xrmBrowser.Grid.OpenRecord(0);
+                xrmBrowser.CommandBar.ClickCommand("New");
 
                 List<Field> fields = new List<Field>
                 {
@@ -85,8 +85,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
                 xrmBrowser.ThinkTime(5000);
                 xrmBrowser.Grid.OpenRecord(0);
 
-                xrmBrowser.Entity.SetValue(new LookupItem { Name = "primarycontactid", Value = "Rene Valdes (sample)" });
-                xrmBrowser.ThinkTime(1000);
+                xrmBrowser.Entity.SetValue(new LookupItem { Name = "primarycontactid", Value = "Nancy Anderson (sample)" });
+
+                xrmBrowser.ThinkTime(5000);
 
             }
         }

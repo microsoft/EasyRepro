@@ -15,6 +15,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
         private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
@@ -23,17 +24,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
+
+                xrmApp.Grid.SwitchView("Active Contacts");
 
                 xrmApp.Grid.OpenRecord(0);
 
                 xrmApp.ThinkTime(3000);
 
                 xrmApp.Entity.SetValue("firstname", TestSettings.GetRandomString(5,10));
+
                 xrmApp.Entity.SetValue("lastname", TestSettings.GetRandomString(5,10));
 
                 xrmApp.Entity.Save();
@@ -48,13 +52,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
 
                 xrmApp.Navigation.OpenSubArea("Service", "Contacts");
 
-                xrmApp.RelatedGrid.OpenGridRow(0);
+                xrmApp.Grid.SwitchView("Active Contacts");
+
+                xrmApp.Grid.OpenRecord(0);
 
                 //xrmApp.Entity.SetHeaderValue("emailaddress1", String.Format("{0}@{1}.com", TestSettings.GetRandomString(8, 8), TestSettings.GetRandomString(5, 7)));
                 xrmApp.Entity.SetHeaderValue("telephone1", "555-555-5555");
@@ -67,27 +73,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
+        [TestCategory("Fail - Bug")]
         public void UCITestUpdateClearFields()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-                xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);
+                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-                xrmApp.Navigation.OpenSubArea("Service", "Contacts");
+                xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
 
-                xrmApp.RelatedGrid.OpenGridRow(0);
+                xrmApp.Grid.SwitchView("Active Contacts");
+
+                xrmApp.Grid.OpenRecord(0);
 
                 xrmApp.Entity.ClearValue("telephone1");
 
+                // Bug: When 
                 LookupItem account = new LookupItem() { Name = "parentcustomerid" };
                 xrmApp.Entity.ClearValue(account);
 
                 OptionSet preferredContact = new OptionSet() { Name = "preferredcontactmethodcode" };
                 xrmApp.Entity.ClearValue(preferredContact);
-                
+
                 xrmApp.Entity.SetValue("telephone1", "555-555-5555");
 
                 preferredContact.Value = "Email";

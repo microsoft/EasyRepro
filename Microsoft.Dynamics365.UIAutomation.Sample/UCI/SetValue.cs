@@ -14,6 +14,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     {
         private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
         private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
         private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
@@ -22,15 +23,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
-
-                
                 
                 xrmApp.Grid.SwitchView("My Active Accounts");
+
                 xrmApp.Grid.OpenRecord(0);
                 //xrmApp.Entity.SetValue("name", "Margaret");
             }
@@ -42,11 +42,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
+
+                xrmApp.Grid.SwitchView("Active Contacts");
 
                 xrmApp.Grid.OpenRecord(0);
 
@@ -56,22 +58,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Fail - Bug")]
         [TestMethod]
         public void UCITestOpenLookupSetValue()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
-                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password);
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
+                xrmApp.Grid.SwitchView("Active Accounts");
+
                 xrmApp.Grid.OpenRecord(0);
                 xrmApp.ThinkTime(500);
 
-                xrmApp.Entity.SetValue(new LookupItem { Name = "primarycontactid", Value = "Test" });
+                // Need to handle the Lookup Records window and select a record 
+                // Feature Request #854
+
+                // To work around the bug below, clearvalue first to initalize the field and then set it
+                xrmApp.Entity.ClearValue(new LookupItem { Name = "primarycontactid" });
+
+                // Bug - System.InvalidOperationException: No Results Matching Jim Were Found. #769
+                xrmApp.Entity.SetValue(new LookupItem { Name = "primarycontactid", Value = "Jim" });
                 xrmApp.ThinkTime(500);
             }
         }

@@ -5,6 +5,7 @@ using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Security;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
@@ -26,13 +27,30 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.Web
 
                 xrmBrowser.Navigation.OpenSubArea("Sales", "Leads");
 
+                xrmBrowser.CommandBar.ClickCommand("New");
+
+                var testLeadName = "Test EasyRepro Topic";
+                List<Field> fields = new List<Field>
+                {
+                    new Field() {Id = "firstname", Value = "EasyRepro"},
+                    new Field() {Id = "lastname", Value = "Lead Test"}
+                };
+
+
+                xrmBrowser.Entity.SetValue("subject", testLeadName);
+                xrmBrowser.Entity.SetValue(new CompositeControl { Id = "fullname", Fields = fields });
+
+                xrmBrowser.Entity.Save();
+                xrmBrowser.Entity.CloseEntity();
+
                 xrmBrowser.Grid.SwitchView("All Leads");
 
-                xrmBrowser.Grid.OpenRecord(0);
+                xrmBrowser.Grid.Search(testLeadName);
 
+                xrmBrowser.Grid.OpenRecord(0);
                
-                xrmBrowser.Entity.SetValue("subject", "Update test API Lead");
-                xrmBrowser.Entity.SetValue("description", "Test lead updation with API commands");
+                xrmBrowser.Entity.SetValue("subject", "Update Test EasyRepro Topic");
+                xrmBrowser.Entity.SetValue("description", "Test lead updated with API commands");
 
                 xrmBrowser.Entity.Save();
             }

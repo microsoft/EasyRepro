@@ -542,8 +542,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return this.Execute(GetOptions("Save"), driver =>
             {
                 SwitchToDefault();
-
                 driver.FindElement(By.XPath(Elements.Xpath[Reference.QuickCreate.Save]))?.Click();
+                SwitchToQuickCreateFrame();
+                var errorMessageElements = driver.FindElements(By.ClassName("ms-crm-Inline-Validation"));
+                if (errorMessageElements.Any(p => p.Displayed))
+                    throw new InvalidOperationException(errorMessageElements.First(p => p.Displayed).Text);
                 return true;
             });
         }
@@ -801,7 +804,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// Sets the value of a Composite control on a QuickCreate form.
         /// </summary>
         /// <param name="control">The Composite control values you want to set.</param>
-        public new BrowserCommandResult<bool> SetValue(CompositeControl control)
+        public BrowserCommandResult<bool> SetValue(CompositeControl control)
         {
             return this.Execute(GetOptions($"Set QuickCreate ConpositeControl Value: {control.Id}"), driver =>
             {
