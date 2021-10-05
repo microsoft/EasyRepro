@@ -114,7 +114,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string MoreTabs = "Entity_MoreTabs";
             public static string MoreTabsMenu = "Entity_MoreTabsMenu";
             public static string SubTab = "Entity_SubTab";
-            public static string EntityFooter = "Entity_Footer";
             public static string SubGridTitle = "Entity_SubGridTitle";
             public static string SubGridContents = "Entity_SubGridContents";
             public static string SubGridList = "Entity_SubGridList";
@@ -144,8 +143,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string DuplicateDetectionWindowMarker = "Entity_DuplicateDetectionWindowMarker";
             public static string DuplicateDetectionGridRows = "Entity_DuplicateDetectionGridRows";
             public static string DuplicateDetectionIgnoreAndSaveButton = "Entity_DuplicateDetectionIgnoreAndSaveButton";
-            public static string FooterStatusValue = "Entity_FooterStatusField";
-            public static string FooterMessageValue = "Entity_FooterMessage";
             public static string EntityBooleanFieldRadioContainer = "Entity_BooleanFieldRadioContainer";
             public static string EntityBooleanFieldRadioTrue = "Entity_BooleanFieldRadioTrue";
             public static string EntityBooleanFieldRadioFalse = "Entity_BooleanFieldRadioFalse";
@@ -431,7 +428,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_FieldControlDateTimeInputUCI",".//*[contains(@data-id, '[FIELD].fieldControl-date-time-input')]" },
             { "Entity_FieldControlDateTimeTimeInputUCI",".//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input" },
             { "Entity_LookupResultsDropdown", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
-            { "Entity_Footer", "//div[contains(@id,'footerWrapper')]" },
             { "Entity_SubGridTitle", "//div[contains(text(), '[NAME]')]" },
             { "Entity_SubGridContents", "//div[@id=\"dataSetRoot_[NAME]\"]" },
             { "Entity_SubGridList", ".//ul[contains(@id, \"[NAME]-GridList\")]" },
@@ -461,8 +457,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_DuplicateDetectionWindowMarker","//div[contains(@data-id,'ManageDuplicates')]"},
             { "Entity_DuplicateDetectionGridRows", "//div[contains(@class,'data-selectable')]" },
             { "Entity_DuplicateDetectionIgnoreAndSaveButton", "//button[contains(@data-id,'ignore_save')]"},
-            { "Entity_FooterStatusField",".//span[contains(@role,'status')]"},
-            { "Entity_FooterMessage",".//span[contains(@data-id,'footer-message')]"},
             { "Entity_BooleanFieldRadioContainer", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container') and contains(@role,'radiogroup')]"},
             { "Entity_BooleanFieldRadioTrue", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-second')]"},
             { "Entity_BooleanFieldRadioFalse", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-first')]"},

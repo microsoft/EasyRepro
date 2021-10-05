@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
@@ -3869,48 +3869,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     container => TryGetValue(driver, container, control)));
         }
 
-        internal BrowserCommandResult<string> GetStatusFromFooter()
+        internal BrowserCommandResult<string> GetStateFromForm()
         {
-            return this.Execute(GetOptions($"Get Status value from footer"), driver =>
+            return this.Execute(GetOptions($"Get Status value from form"), driver =>
             {
-                IWebElement footer;
-                var footerExists = driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]), out footer);
+                driver.WaitForTransaction();
 
-                IWebElement status;
-                footer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FooterStatusValue]), out status);
-
-                if (footerExists)
+                if (driver.TryFindElement(By.Id("message-formReadOnlyNotification"), out var readOnlyNotification))
                 {
-                    if (String.IsNullOrEmpty(status.Text))
-                        return "unknown";
-
-                    return status.Text;
+                    return readOnlyNotification.Text.Replace("Read-only This record’s status: ", string.Empty);
                 }
                 else
-                    throw new NoSuchElementException("Unable to find the footer on the entity form");
-            });
-        }
-
-        internal BrowserCommandResult<string> GetMessageFromFooter()
-        {
-            return this.Execute(GetOptions($"Get Message value from footer"), driver =>
-            {
-                IWebElement footer;
-                var footerExists = driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]), out footer);
-
-                if (footerExists)
                 {
-                    IWebElement message;
-                    footer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FooterMessageValue]), out message);
-
-                    if (String.IsNullOrEmpty(message.Text))
-                        return string.Empty;
-
-                    return message.Text;
+                    return "Active";
                 }
-                else
-                    throw new NoSuchElementException("Unable to find the footer on the entity form");
-
             });
         }
 
