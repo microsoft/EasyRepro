@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
@@ -2871,7 +2871,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     ClearFieldValue(dateField);
                     if (date != null)
+                    {
                         dateField.SendKeys(date);
+                        dateField.SendKeys(Keys.Enter);
+                    }
                 },
                     d => dateField.GetAttribute("value").IsValueEqualsTo(date),
                     TimeSpan.FromSeconds(9), 3,
@@ -2950,10 +2953,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]), new TimeSpan(0, 0, 1));
             }
 
-            var success = formContext.TryFindElement(timeFieldXPath, out var timeField);
-            if (success)
-                TrySetTime(driver, timeField, control.TimeAsString);
+            var timeField = formContext.WaitUntilAvailable(
+                timeFieldXPath,
+                5.Seconds(),
+               $"Unable to set the time component of the '{control.Name}' field as the time control was not found.");
 
+            TrySetTime(driver, timeField, control.TimeAsString);
         }
 
         private static void TrySetTime(IWebDriver driver, IWebElement timeField, string time)
@@ -2970,9 +2975,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 timeField.SendKeys(Keys.Tab);
                 driver.WaitForTransaction();
             },
-                d => timeField.GetAttribute("value").IsValueEqualsTo(time),
-                TimeSpan.FromSeconds(9), 3,
-                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {time}. Actual: {timeField.GetAttribute("value")}")
+            d => timeField.GetAttribute("value").IsValueEqualsTo(time),
+            TimeSpan.FromSeconds(9), 3,
+            failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {time}. Actual: {timeField.GetAttribute("value")}")
             );
         }
 
