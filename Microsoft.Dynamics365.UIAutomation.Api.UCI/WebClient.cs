@@ -2300,6 +2300,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavigatorOpen])))
                 {
                     driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavigator])).Click();
+                    driver.WaitForTransaction();
                 }
 
                 var navList = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavList]));
@@ -2313,7 +2314,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new InvalidOperationException($"No record with the index '{index}' exists.");
                 }
 
-                driver.WaitForPageToLoad();
+                driver.WaitForTransaction();
 
                 return true;
             });
