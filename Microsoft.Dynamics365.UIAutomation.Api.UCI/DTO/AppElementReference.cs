@@ -223,12 +223,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Container = "Search_Container";
             public static string EntityContainer = "Search_EntityContainer";
             public static string Records = "Search_Records";
-            public static string Type = "Search_Type";
             public static string GroupContainer = "Search_GroupContainer";
             public static string FilterValue = "Search_FilterValue";
-            public static string RelevanceResultsContainer = "Search_RelevanceResultsContainer";
-            public static string RelevanceResults = "Search_RelevanceResults";
-
+            public static string CategorizedResultsContainer = "Search_CategorizedResultsContainer";
+            public static string CategorizedResults = "Search_CategorizedResults";
+            public static string RelevanceSearchResultsSelectedTab = "Search_RelevanceSearchResultsSelectedTab";
+            public static string RelevanceSearchResultsTab = "Search_RelevanceSearchResultsTab";
+            public static string RelevanceSearchResultLinks = "Search_RelevanceSearchResultLinks";
         }
 
         public static class BusinessProcessFlow
@@ -505,11 +506,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Search_Container"    , "//div[@id=\"searchResultList\"]"},
             { "Search_EntityContainer"    , "//div[@id=\"View[NAME]\"]"},
             { "Search_Records"    , "//li[@role=\"row\"]" },
-            { "Search_Type"       , "//select[contains(@data-id,\"search-root-selector\")]"},
             { "Search_GroupContainer", "//label[contains(text(), '[NAME]')]/parent::div"},
             { "Search_FilterValue", "//label[contains(text(), '[NAME]')]"},
-            { "Search_RelevanceResultsContainer"       , "//div[@aria-label=\"Search Results\"]"},
-            { "Search_RelevanceResults"       , "//li//label[contains(text(), '[ENTITY]')]"},
+            { "Search_CategorizedResultsContainer"       , "//div[@id=\"searchResultList\"]"},
+            { "Search_CategorizedResults"       , "//ul[@aria-label='[ENTITY]']/li"},
+            { "Search_RelevanceSearchResultsSelectedTab", "//button[@aria-selected='true' and @role='tab']" },
+            { "Search_RelevanceSearchResultsTab", "//section[@id='searchComponent']//button[@name='[NAME]' and @role='tab']" },
+            { "Search_RelevanceSearchResultLinks", "//div[@role='rowgroup' and @ref='eCenterContainer']/div[@role='row']/div[1]" },
 
             //Timeline
             { "Timeline_SaveAndClose", "//button[contains(@data-id,\"[NAME].SaveAndClose\")]" },

@@ -838,11 +838,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Open Global Search"), driver =>
             {
-                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton]),
-                    TimeSpan.FromSeconds(5),
-                    d => { driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton])); },
-                    "The Global Search button is not available."
-                );
+                driver.WaitForTransaction();
+
+                if (driver.HasElement(By.Id("GlobalSearchBox")))
+                {
+                    return true;
+                }
+
+                driver.ClickWhenAvailable(
+                    By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton]),
+                    5.Seconds(),
+                    "The Global Search button is not available.");
+
+                driver.WaitForTransaction();
+
                 return true;
             });
         }
@@ -5074,29 +5083,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Global Search: {criteria}"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton]),
-                    TimeSpan.FromSeconds(5),
-                    "The Global Search button is not available.");
+                driver.WaitForTransaction();
 
-                var input = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Text]), "The Global Search text field is not available.");
+                IWebElement input;
+                if (driver.TryFindElement(By.Id("GlobalSearchBox"), out var globalSearch))
+                {
+                    input = globalSearch;
+                }
+                else
+                {
+                    driver.ClickWhenAvailable(
+                        By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton]),
+                        2.Seconds(),
+                        "The Global Search (Categorized Search) button is not available.");
 
-                string reference = null;
-                driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type]),
-                    e =>
-                    {
-                        var searchType = e.GetAttribute("value");
-                        reference =
-                            searchType == "0" ? AppReference.GlobalSearch.RelevanceSearchButton :
-                            searchType == "1" ? AppReference.GlobalSearch.CategorizedSearchButton :
-                            throw new InvalidOperationException("The Global Search type is not available.");
-                    },
-                    "The Global Search type is not available."
-                );
+                    input = driver.WaitUntilVisible(
+                        By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Text]),
+                        2.Seconds(),
+                        "The Categorized Search text field is not available.");
+                }
 
-                IWebElement button = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[reference]), "The Global Search Button is not available.");
-
+                input.Click();
                 input.SendKeys(criteria, true);
-                button.Click(true);
+                input.SendKeys(Keys.Enter);
+
+                driver.WaitForTransaction();
+
                 return true;
             });
         }
@@ -5113,21 +5125,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Filter With: {entity}"), driver =>
             {
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Filter]),
-                    TimeSpan.FromSeconds(10),
-                    picklist =>
+                driver.WaitForTransaction();
+
+                if (driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Filter]), out var filter))
+                {
+                    // Categorized Search
+                    var option = filter
+                        .FindElements(By.TagName("option"))
+                        .FirstOrDefault(x => x.Text == entity);
+
+                    if (option == null)
                     {
-                        var options = picklist.FindElements(By.TagName("option"));
-                        var option = options.FirstOrDefault(x => x.Text == entity);
-                        if (option == null)
-                            throw new InvalidOperationException($"Entity '{entity}' does not exist in the Filter options.");
+                        throw new InvalidOperationException($"Entity '{entity}' does not exist in the Filter options.");
+                    }
 
-                        picklist.Click();
-                        option.Click();
-                    },
-                    "Filter With picklist is not available. The timeout period elapsed waiting for the picklist to be available."
-                );
-
+                    filter.Click();
+                    option.Click();
+                }
+                else if (driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceSearchResultsTab].Replace("[NAME]", entity)), out var entityTab))
+                {
+                    // Relevance Search
+                    entityTab.Click();
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Unable to filter global search results by the '{entity}' table.");
+                }
 
                 return true;
             });
@@ -5145,13 +5168,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Filter With: {value}"), driver =>
             {
-                var xpathToContainer = By.XPath(AppElements.Xpath[AppReference.GlobalSearch.GroupContainer].Replace("[NAME]", filterBy));
-                var xpathToValue = By.XPath(AppElements.Xpath[AppReference.GlobalSearch.FilterValue].Replace("[NAME]", value));
-                driver.WaitUntilVisible(xpathToContainer,
-                    TimeSpan.FromSeconds(10),
-                    groupContainer => groupContainer.ClickWhenAvailable(xpathToValue, $"Filter By Value '{value}' does not exist in the Filter options."),
-                    "Filter With picklist is not available. The timeout period elapsed waiting for the picklist to be available."
-                );
+                driver.WaitForTransaction();
+
+                if (driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.GroupContainer].Replace("[NAME]", filterBy)), out var entityPicker))
+                {
+                    // Categorized Search
+                    entityPicker.ClickWhenAvailable(
+                    By.XPath(AppElements.Xpath[AppReference.GlobalSearch.FilterValue].Replace("[NAME]", value)),
+                    $"Filter By Value '{value}' does not exist in the Filter options.");
+                }
+                else if (filterBy == "Record Type" && driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceSearchResultsTab].Replace("[NAME]", value)), out var entityTab))
+                {
+                    // Relevance Search
+                    entityTab.Click();
+                }
+                else
+                {
+                    throw new InvalidOperationException("Unable to filter global search results.");
+                }
+
+                driver.WaitForTransaction();
+
                 return true;
             });
         }
@@ -5169,77 +5206,43 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Open Global Search Record"), driver =>
             {
-                var searchTypeElement = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type]), "The Global Search type is not available.");
-                var searchType = searchTypeElement.GetAttribute("value");
+                driver.WaitForTransaction();
 
-                if (searchType == "1") //Categorized Search
+                if (driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.CategorizedResultsContainer]), out var categorizedContainer))
                 {
-                    var resultsContainer = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Container]),
-                        Constants.DefaultTimeout,
-                        "Search Results is not available"
-                    );
-
-                    var entityContainer = resultsContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.EntityContainer].Replace("[NAME]", entity)),
-                        $"Entity {entity} was not found in the results"
-                    );
-
-                    var records = entityContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Records]));
-                    if (records == null || records.Count == 0)
-                        throw new InvalidOperationException($"No records found for entity {entity}");
-
+                    // Categorized Search
+                    var records = categorizedContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.CategorizedResults].Replace("[ENTITY]", entity)));
                     if (index >= records.Count)
-                        throw new InvalidOperationException($"There was less than {index} records in your the search result.");
-
-                    records[index].Click(true);
-
-                    driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]),
-                        TimeSpan.FromSeconds(30),
-                        "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
-                    );
-                    return true;
-                }
-
-                if (searchType == "0") //Relevance Search
-                {
-                    var resultsContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceResultsContainer]));
-                    var records = resultsContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceResults].Replace("[ENTITY]", entity.ToUpper())));
-
-                    if (index >= records.Count)
-                        throw new InvalidOperationException($"There was less than {index} records in your the search result.");
-
-                    records[index].Click(true);
-                    return true;
-                }
-
-                return false;
-            });
-        }
-
-
-        /// <summary>
-        /// Changes the search type used for global search
-        /// </summary>
-        /// <param name="type">The type of search that you want to do.</param>
-        /// <example>xrmBrowser.GlobalSearch.ChangeSearchType("Categorized");</example>
-        public BrowserCommandResult<bool> ChangeSearchType(string type, int thinkTime = Constants.DefaultThinkTime)
-        {
-            ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions("Change Search Type"), driver =>
-            {
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type]),
-                    Constants.DefaultTimeout,
-                    select =>
                     {
-                        var options = select.FindElements(By.TagName("option"));
-                        var option = options.FirstOrDefault(x => x.Text.Trim() == type);
-                        if (option == null)
-                            return;
+                        throw new InvalidOperationException($"There was less than {index + 1} records in the search result.");
+                    }
 
-                        select.Click(true);
-                        option.Click(true);
-                    },
-                    "Search Results is not available");
+                    records[index].Click(true);
+                }
+                else if (driver.TryFindElement(By.Id("resultsContainer-view"), out var relevanceContainer))
+                {
+                    // Relevance Search
+                    var selectedTab = relevanceContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceSearchResultsSelectedTab]));
+                    if (selectedTab.GetAttribute("name") != entity)
+                    {
+                        this.FilterWith(entity);
+                    }
+
+                    var links = relevanceContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceSearchResultLinks]));
+                    if (index >= links.Count)
+                    {
+                        throw new InvalidOperationException($"There was less than {index + 1} records in the search result.");
+                    }
+
+                    new Actions(driver).DoubleClick(links[index]).Perform();
+                }
+                else
+                {
+                    throw new NotFoundException("Unable to locate global search results.");
+                }
+
+                driver.WaitForTransaction();
+
                 return true;
             });
         }
