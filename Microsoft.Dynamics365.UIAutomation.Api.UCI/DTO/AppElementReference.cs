@@ -295,11 +295,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public static class Lookup
         {
             public static string RelatedEntityLabel = "Lookup_RelatedEntityLabel";
-            public static string ChangeViewButton = "Lookup_ChangeViewButton";
+            public static string AdvancedLookupButton = "Lookup_AdvancedLookupButton";
             public static string ViewRows = "Lookup_ViewRows";
             public static string LookupResultRows = "Lookup_ResultRows";
             public static string NewButton = "Lookup_NewButton";
             public static string RecordList = "Lookup_RecordList";
+        }
+
+        public static class AdvancedLookup
+        {
+            public static string Container = "AdvancedLookup_Container";
+            public static string SearchInput = "AdvancedLookup_SearchInput";
+            public static string ResultRows = "AdvancedLookup_ResultRows";
+            public static string FilterTables = "AdvancedLookup_FilterTables";
+            public static string FilterTable = "AdvancedLookup_FilterTable";
+            public static string AddNewTables = "AdvancedLookup_AddNewTables";
+            public static string DoneButton = "AdvancedLookup_DoneButton";
+            public static string AddNewRecordButton = "AdvancedLookup_AddNewRecordButton";
+            public static string AddNewButton = "AdvancedLookup_AddNewButton";
+            public static string ViewSelectorCaret = "AdvancedLookup_ViewSelectorCaret";
+            public static string ViewDropdownList = "AdvancedLookup_ViewDropdownList";
+            public static string ViewDropdownListItem = "AdvancedLookup_ViewDropdownListItem";
         }
 
         public static class Related
@@ -596,11 +612,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             //Lookup
             { "Lookup_RelatedEntityLabel", "//li[contains(@aria-label,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]" },
-            { "Lookup_ChangeViewButton", "//button[contains(@data-id,'changeViewBtn')]"},
+            { "Lookup_AdvancedLookupButton", "//button[.//label[text()='Advanced lookup']]"},
             { "Lookup_ViewRows", "//li[contains(@data-id,'viewLineContainer')]"},
             { "Lookup_ResultRows", "//li[contains(@data-id,'LookupResultsDropdown') and contains(@data-id,'resultsContainer')]"},
             { "Lookup_NewButton", "//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]" },
             { "Lookup_RecordList", ".//div[contains(@id,'RecordList') and contains(@role,'presentation')]" },
+
+            //Advanced Lookup
+            { "AdvancedLookup_Container", ".//div[contains(@data-lp-id, 'MscrmControls.FieldControls.AdvancedLookupControl')]" },
+            { "AdvancedLookup_SearchInput", "//input[@type='text' and @placeholder='Search']" },
+            { "AdvancedLookup_ViewSelectorCaret", ".//span[contains(@class, 'ms-Dropdown-caretDownWrapper')]" },
+            { "AdvancedLookup_ViewDropdownList", ".//div[contains(@class, 'dropdownItemsWrapper')]//div[@role='listbox']" },
+            { "AdvancedLookup_ViewDropdownListItem", "//button[@role='option' and @title='[NAME]']" },
+            { "AdvancedLookup_ResultRows", "//div[@ref='eLeftContainer']//div[@role='row']" },
+            { "AdvancedLookup_FilterTables",  "//li[@role='listitem']//button" },
+            { "AdvancedLookup_FilterTable",  "//li[@role='listitem']//button[.//*[text()='[NAME]']]" },
+            { "AdvancedLookup_AddNewTables",  "//ul[@role='menu']//button" },
+            { "AdvancedLookup_DoneButton", "//button[.//*[text()='Done']]" },
+            { "AdvancedLookup_AddNewButton", "//button[.//*[text()='Add new']]" },
+            { "AdvancedLookup_AddNewRecordButton", "//button[.//*[text()='Add new record']]" },
 
             //Performance Width
             { "Performance_Widget","//div[@data-id='performance-widget']//*[text()='Page load']"},
