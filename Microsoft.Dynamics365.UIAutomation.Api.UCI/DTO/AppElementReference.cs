@@ -562,7 +562,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_TextFieldContainer", ".//div[contains(@data-lp-id, \'header_process_[NAME]\')]" },
             { "BPF_TextFieldLabel", "//label[contains(@id, \'header_process_[NAME]-field-label\')]" },
             { "BPF_BooleanFieldContainer", ".//div[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-container\')]" },
-            { "BPF_BooleanFieldSelectedOption", ".//div[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-container\') and contains(@aria-checked, \'true\')]" },
+            { "BPF_BooleanFieldSelectedOption", "//div[contains(@data-id, 'header_process_[NAME].fieldControl-checkbox-container')]//option[@data-selected='true']" },
             { "BPF_DateTimeFieldContainer", ".//input[contains(@data-id, \'[NAME].fieldControl-date-time-input\')]" },
             { "BPF_FieldControlDateTimeInputUCI",".//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
             { "BPF_PinStageButton","//button[contains(@id,'stageDockModeButton')]"},
