@@ -62,9 +62,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string RowsContainerCheckbox = "Grid_RowsContainerCheckbox";
             public static string RowsContainer = "Grid_RowsContainer";
             public static string Rows = "Grid_Rows";
+            public static string Control = "Grid_Control";
             public static string ChartSelector = "Grid_ChartSelector";
             public static string ChartViewList = "Grid_ChartViewList";
             public static string GridSortColumn = "Grid_SortColumn";
+            public static string Cells = "Grid_Cells";
             public static string CellContainer = "Grid_CellContainer";
             public static string ViewSelector = "Grid_ViewSelector";
             public static string ViewContainer = "Grid_ViewContainer";
@@ -395,11 +397,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Grid_JumpBar"       , "//*[@id=\"JumpBarItemsList\"]"},
             { "Grid_FilterByAll"       , "//*[@id=\"All_link\"]"},
             { "Grid_RowsContainerCheckbox"  ,   "//div[@role='checkbox']" },
-            { "Grid_RowsContainer"       , "//div[contains(@role,'grid')]"},
+            { "Grid_RowsContainer"       , ".//div[@class='ag-center-cols-viewport']//div[@role='rowgroup']"},
             { "Grid_Rows"           , ".//div[@role='row' and ./div[@role='gridcell']]"},
+            { "Grid_Control", "//div[contains(@data-lp-id, 'MscrmControls.Grid.PCFGridControl')]" },
             { "Grid_ChartSelector"           , "//span[contains(@id,'ChartSelector')]"},
             { "Grid_ChartViewList"           , "//ul[contains(@role,'listbox')]"},
             { "Grid_SortColumn",            "//div[@role='columnheader' and .//label[text()='[COLNAME]']]"},
+            { "Grid_Cells", ".//div[@role='gridcell']"},
             { "Grid_CellContainer"    ,".//div[@role='grid' and @ref='gridBody']"},
             { "Grid_ViewSelector"   , "//button[contains(@id,'ViewSelector')]" },
             { "Grid_ViewContainer"   , "//div[contains(@data-id,'ViewSelector')]//div[@role='group']//ul" },

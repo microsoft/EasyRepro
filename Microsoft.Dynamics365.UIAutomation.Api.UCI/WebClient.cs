@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
@@ -1613,56 +1613,43 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var returnList = new List<GridItem>();
 
-                driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
+                driver.WaitForTransaction();
 
-                var rows = driver.FindElements(By.ClassName("wj-row"));
-                var columnGroup = driver.FindElement(By.ClassName("wj-colheaders"));
+                var container = driver.WaitUntilAvailable(
+                    By.XPath(AppElements.Xpath[AppReference.Grid.Container]),
+                    2.Seconds(),
+                    "Unable to find the grid.");
 
-                foreach (var row in rows)
-                {
-                    if (!string.IsNullOrEmpty(row.GetAttribute("data-lp-id")) && !string.IsNullOrEmpty(row.GetAttribute("role")))
+                var entityName = container
+                    .FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.Control]))
+                    .GetAttribute("data-lp-id")
+                    .Split('|')
+                    .ElementAt(4);
+                var appUrl = driver.ExecuteScript($"return Xrm.Utility.getGlobalContext().getCurrentAppUrl();");
+
+                returnList = container
+                    .FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.RowsContainer]))
+                    .FindElements(By.XPath(AppElements.Xpath[AppReference.Grid.Rows]))
+                    .Select((row, index) =>
                     {
-                        //MscrmControls.Grid.ReadOnlyGrid|entity_control|account|00000000-0000-0000-00aa-000010001001|account|cc-grid|grid-cell-container
-                        var datalpid = row.GetAttribute("data-lp-id").Split('|');
-                        var cells = row.FindElements(By.ClassName("wj-cell"));
-                        var currentindex = 0;
-                        var link =
-                            $"{new Uri(driver.Url).Scheme}://{new Uri(driver.Url).Authority}/main.aspx?etn={datalpid[2]}&pagetype=entityrecord&id=%7B{datalpid[3]}%7D";
-
+                        var id = new Guid(row.GetAttribute("row-id"));
                         var item = new GridItem
                         {
-                            EntityName = datalpid[2],
-                            Url = new Uri(link)
+                            EntityName = entityName,
+                            Id = id,
+                            Url = new Uri($"{appUrl}&pagetype=entityrecord&etn={entityName}&id={id}"),
                         };
 
-                        foreach (var column in columnGroup.FindElements(By.ClassName("wj-row")))
+                        var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Grid.Cells]));
+                        foreach (var cell in cells)
                         {
-                            var rowHeaders = column.FindElements(By.TagName("div"))
-                                .Where(c => !string.IsNullOrEmpty(c.GetAttribute("title")) && !string.IsNullOrEmpty(c.GetAttribute("id")));
-
-                            foreach (var header in rowHeaders)
-                            {
-                                var id = header.GetAttribute("data-id") ?? header.GetAttribute("id");
-                                var className = header.GetAttribute("class");
-                                var cellData = cells[currentindex + 1].GetAttribute("title");
-
-                                if (!string.IsNullOrEmpty(id)
-                                    && className.Contains("wj-cell")
-                                    && !string.IsNullOrEmpty(cellData)
-                                    && !id.Contains("btnheaderselectcolumn")
-                                    && cells.Count > currentindex
-                                )
-                                {
-                                    item[id] = cellData.Replace("-", "");
-                                    currentindex++;
-                                }
-
-                            }
-
-                            returnList.Add(item);
+                            var column = cell.GetAttribute<string>("col-id");
+                            item[column] = cell.Text;
                         }
-                    }
-                }
+
+                        return item;
+                    })
+                    .ToList();
 
                 return returnList;
             });
