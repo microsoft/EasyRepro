@@ -2859,12 +2859,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (date != null)
                     {
                         dateField.SendKeys(date);
-                        dateField.SendKeys(Keys.Enter);
+                        dateField.SendKeys(Keys.Tab);
                     }
                 },
-                    d => dateField.GetAttribute("value").IsValueEqualsTo(date),
-                    TimeSpan.FromSeconds(9), 3,
-                    failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
+                d => dateField.GetAttribute("value").IsValueEqualsTo(date),
+                TimeSpan.FromSeconds(9), 3,
+                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
                 );
             }
             else
@@ -2939,12 +2939,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]), new TimeSpan(0, 0, 1));
             }
 
-            var timeField = formContext.WaitUntilAvailable(
-                timeFieldXPath,
-                5.Seconds(),
-               $"Unable to set the time component of the '{control.Name}' field as the time control was not found.");
+            driver.WaitForTransaction();
 
-            TrySetTime(driver, timeField, control.TimeAsString);
+            if (formContext.TryFindElement(timeFieldXPath, out var timeField))
+            {
+                TrySetTime(driver, timeField, control.TimeAsString);
+            }
         }
 
         private static void TrySetTime(IWebDriver driver, IWebElement timeField, string time)
