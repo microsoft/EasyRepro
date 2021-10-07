@@ -2279,14 +2279,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions("Open Record Set Navigator"), driver =>
             {
                 // check if record set navigator parent div is set to open
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavigatorOpen])))
+                driver.WaitForTransaction();
+
+                if (!driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavList]), out var navList))
                 {
                     driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavigator])).Click();
                     driver.WaitForTransaction();
+                    navList = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavList]));
                 }
 
-                var navList = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavList]));
                 var links = navList.FindElements(By.TagName("li"));
+
                 try
                 {
                     links[index].Click();
