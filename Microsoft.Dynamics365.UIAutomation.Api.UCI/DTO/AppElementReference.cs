@@ -131,6 +131,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string EditableSubGridListCells = "Entity_EditableSubGridListCells";
             public static string EditableSubGridListCellRows = "Entity_EditableSubGridListCellRows";
             public static string EditableSubGridCells = "Entity_EditableSubGridCells";
+            public static string SubGridControl = "Entity_SubGridControl";
             public static string SubGridCells = "Entity_SubGridCells";
             public static string SubGridRows = "Entity_SubGridRows";
             public static string SubGridRowsHighDensity = "Entity_SubGridRowsHighDensity";
@@ -465,6 +466,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_EditableSubGridListCells", ".//div[contains(@wj-part, 'cells') and contains(@class, 'wj-cells') and contains(@role, 'grid')]" },
             { "Entity_EditableSubGridListCellRows", ".//div[contains(@class, 'wj-row') and contains(@role, 'row')]" },
             { "Entity_EditableSubGridCells", ".//div[@role='gridcell']" },
+            { "Entity_SubGridControl", "//div[contains(@data-lp-id, 'MscrmControls.Grid.PCFGridControl')]" },
             { "Entity_SubGridCells",".//div[@role='gridcell']"},
             { "Entity_SubGridRows",".//div[@role='row' and ./div[@role='gridcell']]"},
             { "Entity_SubGridRowsHighDensity",".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Data')]"},

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
@@ -3529,7 +3529,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new NotFoundException($"Unable to locate {subgridName} subgrid.");
                 }
 
-                var entityName = (string)driver.ExecuteScript($"return Xrm.Page.getControl(\"{subgridName}\").getEntityName()");
+                var entityName = subGrid
+                    .FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.Control]))
+                    .GetAttribute("data-lp-id")
+                    .Split('|')
+                    .ElementAt(4);
                 var appUrl = driver.ExecuteScript($"return Xrm.Utility.getGlobalContext().getCurrentAppUrl();");
 
                 GridItem CreateItem(int index)
@@ -3542,7 +3546,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         EntityName = entityName,
                         Id = id,
-                        Url = new Uri($"{appUrl}&&pagetype=entityrecord&etn={entityName}&id={id}"),
+                        Url = new Uri($"{appUrl}&pagetype=entityrecord&etn={entityName}&id={id}"),
                     };
                 }
 
