@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
@@ -1552,7 +1552,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 var cell = rows
                     .ElementAt(index)
-                    .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]))
+                    .FindElements(By.XPath(AppElements.Xpath[AppReference.Grid.Cells]))
                     .ElementAt(0);
 
                 if (checkRecord)
@@ -1565,6 +1565,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 driver.WaitForTransaction();
+
                 return true;
             });
         }
