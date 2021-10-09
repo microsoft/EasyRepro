@@ -3506,7 +3506,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Wait for form selector visible
                 var headerTitle = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Entity.HeaderTitle]), new TimeSpan(0, 0, 5));
 
-                var headerTitleName = headerTitle?.Text;
+                var headerTitleName = headerTitle?.GetAttribute("title");
 
                 if (string.IsNullOrEmpty(headerTitleName))
                 {
