@@ -401,7 +401,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_HeaderTitle"       , "//*[@data-id='header_title']"},
             { "Entity_HeaderContext"       , ".//div[@data-id='headerFieldsFlyout']"},
             { "Entity_Process"       , "//button[contains(@data-id,'MBPF.ConvertTo')]"},
-            { "Entity_Save"       , "//button[contains(@data-id, 'form-save-btn')]"},
+            { "Entity_Save"       , "//button[contains(@id, 'SavePrimary')]"},
             { "Entity_SwitchProcess"       , "//button[contains(@data-id,'SwitchProcess')]"},
             { "Entity_TextFieldContainer", ".//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
             { "Entity_TextFieldLabel", ".//label[contains(@id, \'[NAME]-field-label\')]" },
