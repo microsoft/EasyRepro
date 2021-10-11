@@ -19,7 +19,7 @@ using System.Web;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
-    public class WebClient : BrowserPage
+    public class WebClient : BrowserPage, IDisposable
     {
         public List<ICommandResult> CommandResults => Browser.CommandResults;
         public Guid ClientSessionId;
@@ -54,13 +54,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 string uri = driver.Url;
                 if (string.IsNullOrEmpty(uri))
                     return false;
-                
+
                 var prevQuery = GetUrlQueryParams(uri);
                 bool requireRedirect = false;
                 string queryParams = "";
                 if (prevQuery.Get("flags") == null)
                 {
-                    queryParams+= "&flags=easyreproautomation=true";
+                    queryParams += "&flags=easyreproautomation=true";
                     if (Browser.Options.UCITestMode)
                         queryParams += ",testmode=true";
                     requireRedirect = true;
@@ -72,9 +72,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     requireRedirect = true;
                 }
 
-                if (!requireRedirect) 
+                if (!requireRedirect)
                     return true;
-                
+
                 var testModeUri = uri + queryParams;
                 driver.Navigate().GoToUrl(testModeUri);
 
@@ -183,21 +183,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 EnterPassword(driver, password);
                 ThinkTime(1000);
-                success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
             }
 
             int attempts = 0;
-            bool entered = false;
-            if (mfaSecretKey != null)
+            bool entered;
+            do
             {
-                do
-                {
-                    entered = EnterOneTimeCode(driver, mfaSecretKey);
-                    success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
-                    attempts++;
-                }
-                while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
+                entered = EnterOneTimeCode(driver, mfaSecretKey);
+                success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
+                attempts++;
             }
+            while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
 
             if (entered && !success)
                 throw new InvalidOperationException("Something went wrong entering the OTC. Please check the MFA-SecretKey in configuration.");
@@ -207,17 +203,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         private bool IsUserAlreadyLogged() => WaitForMainPage(2.Seconds());
 
-        private static string GenerateOneTimeCode(SecureString mfaSecretKey)
+        private static string GenerateOneTimeCode(string key)
         {
             // credits:
             // https://dev.to/j_sakamoto/selenium-testing---how-to-sign-in-to-two-factor-authentication-2joi
             // https://www.nuget.org/packages/Otp.NET/
-            string key = mfaSecretKey?.ToUnsecureString(); // <- this 2FA secret key.
-
             byte[] base32Bytes = Base32Encoding.ToBytes(key);
 
             var totp = new Totp(base32Bytes);
-            var result = totp.ComputeTotp(); // <- got 2FA coed at this time!
+            var result = totp.ComputeTotp(); // <- got 2FA code at this time!
             return result;
         }
 
@@ -247,10 +241,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (input == null)
                     return true;
 
-                if (mfaSecretKey == null)
+                string key = mfaSecretKey?.ToUnsecureString(); // <- this 2FA secret key.
+                if (string.IsNullOrWhiteSpace(key))
                     throw new InvalidOperationException("The application is wait for the OTC but your MFA-SecretKey is not set. Please check your configuration.");
 
-                var oneTimeCode = GenerateOneTimeCode(mfaSecretKey);
+                var oneTimeCode = GenerateOneTimeCode(key);
                 SetInputValue(driver, input, oneTimeCode, 1.Seconds());
                 input.Submit();
                 return true; // input found & code was entered
@@ -390,10 +385,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForPageToLoad();
                 driver.SwitchTo().DefaultContent();
-                
+
                 var query = GetUrlQueryParams(driver.Url);
                 bool isSomeAppOpen = query.Get("appid") != null || query.Get("app") != null;
-                
+
                 bool success = false;
                 if (!isSomeAppOpen)
                     success = TryToClickInAppTile(appName, driver);
@@ -403,7 +398,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (!success)
                     throw new InvalidOperationException($"App Name {appName} not found.");
-                
+
                 InitializeModes();
 
                 // Wait for app page elements to be visible (shell and sitemapLauncherButton)
@@ -890,15 +885,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-        
+
         public BrowserCommandResult<bool> GoBack()
         {
             return Execute(GetOptions("Go Back"), driver =>
             {
                 driver.WaitForTransaction();
-                
+
                 var element = driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.GoBack]));
-                
+
                 driver.WaitForTransaction();
                 return element != null;
             });
@@ -1543,8 +1538,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 control.WaitUntilClickable(xpathToCell,
                     cell =>
                     {
-                        var emptyDiv = cell.FindElement(By.TagName("div"));
-                        cell.Click();
+                        var emptyDiv = cell.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.RowsContainerCheckbox]));
                         driver.Perform(action, cell, cell.LeftTo(emptyDiv));
                     },
                     $"An error occur trying to open the record at position {index}"
@@ -2041,33 +2035,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Check if grid commandBar was found
                 if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandBar].Replace("[NAME]", subGridName)), out subGridCommandBar))
                 {
-                    // Locate subGrid command list
-                    //var foundCommands = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
-
-                    var items = subGridCommandBar.FindElements(By.TagName("button"));
-
                     //Is the button in the ribbon?
-                    if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
+                    if (subGridCommandBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", name)), out var command))
                     {
-                        items.FirstOrDefault(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)).Click(true);
+                        command.Click(true);
                         driver.WaitForTransaction();
                     }
                     else
                     {
-                        //Is the button in More Commands Overflow?
-                        if (items.Any(x => x.GetAttribute("aria-label").StartsWith("More Commands", StringComparison.OrdinalIgnoreCase)))
+                        // Is the button in More Commands overflow?
+                        if (subGridCommandBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", "More Commands")), out var moreCommands))
                         {
-                            //Click More Commands
-                            items.FirstOrDefault(x => x.GetAttribute("aria-label").StartsWith("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                            // Click More Commands
+                            moreCommands.Click(true);
                             driver.WaitForTransaction();
 
                             // Locate the overflow button (More Commands flyout)
                             var overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
 
                             //Click the primary button, if found
-                            if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name))))
+                            if (overflowContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name)), out var overflowCommand))
                             {
-                                overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name))).Click(true);
+                                overflowCommand.Click(true);
                                 driver.WaitForTransaction();
                             }
                             else
@@ -2083,9 +2072,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         var overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
 
                         //Click the primary button, if found
-                        if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))))
+                        if (overflowContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName)), out var overflowButton))
                         {
-                            overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subName))).Click(true);
+                            overflowButton.Click(true);
                             driver.WaitForTransaction();
                         }
                         else
@@ -2098,9 +2087,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             overflowContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowContainer]));
 
                             //Click the primary button, if found
-                            if (overflowContainer.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))))
+                            if (overflowContainer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName)), out var secondOverflowCommand))
                             {
-                                overflowContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subSecondName))).Click(true);
+                                secondOverflowCommand.Click(true);
                                 driver.WaitForTransaction();
                             }
                             else
@@ -3713,66 +3702,57 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Find the SubGrid
                 var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
 
-                // Find list of SubGrid records
-                IWebElement subGridRecordList = null;
-                var foundGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
-
-                // Read Only Grid Found
-                if (subGridRecordList != null && foundGrid)
+                if (subGrid.HasElement(By.CssSelector(@"div.Grid\.ReadOnlyGrid")))
                 {
-                    var subGridRecords = subGridRecordList.FindElements(By.TagName("li"));
+                    // Read-only subgrid
+                    var subGridTable = subGrid.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridListCells]));
+                    var rowCount = subGridTable.GetAttribute<int>("data-row-count");
 
-                    if (subGridRecords == null)
+                    if (rowCount == 0)
+                    {
                         throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
+                    }
+                    else if (index + 1 > rowCount)
+                    {
+                        throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {rowCount}. Expected: {index + 1}");
+                    }
 
-                    if (index + 1 > subGridRecords.Count)
-                        throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {subGridRecords.Count}. Expected: {index + 1}");
+                    var row = subGridTable.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRows])).ElementAt(index + 1);
+                    var cell = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells])).ElementAt(1);
 
-                    subGridRecords[index].Click(true);
+                    new Actions(driver).DoubleClick(cell).Perform();
                     driver.WaitForTransaction();
-
-                    return true;
                 }
-                else if (!foundGrid)
+                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out var subGridRecordList))
                 {
-                    // Read Only Grid Not Found
-                    var foundEditableGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+                    // Editable subgrid
+                    var editableGridListCells = subGridRecordList.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]));
+                    var editableGridCellRows = editableGridListCells.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]));
+                    var editableGridCellRow = editableGridCellRows[index + 1].FindElements(By.XPath("./div"));
 
-                    if (foundEditableGrid)
-                    {
-                        var editableGridListCells = subGridRecordList.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]));
+                    new Actions(driver).DoubleClick(editableGridCellRow[0]).Perform();
+                    driver.WaitForTransaction();
+                }
+                else
+                {
+                    // Check for special 'Related' grid form control
+                    // This opens a limited form view in-line on the grid
 
-                        var editableGridCellRows = editableGridListCells.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]));
+                    //Get the GridName
+                    string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", string.Empty);
 
-                        var editableGridCellRow = editableGridCellRows[index + 1].FindElements(By.XPath("./div"));
+                    //cell-0 is the checkbox for each record
+                    var checkBox = driver.FindElement(
+                        By.XPath(
+                            AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox]
+                            .Replace("[INDEX]", index.ToString())
+                            .Replace("[NAME]", subGridName)));
 
-                        Actions actions = new Actions(driver);
-                        actions.DoubleClick(editableGridCellRow[0]).Perform();
-
-                        driver.WaitForTransaction();
-
-                        return true;
-                    }
-                    else
-                    {
-                        // Editable Grid Not Found
-                        // Check for special 'Related' grid form control
-                        // This opens a limited form view in-line on the grid
-
-                        //Get the GridName
-                        string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", String.Empty);
-
-                        //cell-0 is the checkbox for each record
-                        var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
-
-                        driver.DoubleClick(checkBox);
-
-                        driver.WaitForTransaction();
-                    }
+                    driver.DoubleClick(checkBox);
+                    driver.WaitForTransaction();
                 }
 
                 return true;
-
             });
         }
 
@@ -4577,9 +4557,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
 
                 driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]),
-        TimeSpan.FromSeconds(5),
-        "The Close Opportunity dialog is not available."
-        );
+    TimeSpan.FromSeconds(5),
+    "The Close Opportunity dialog is not available."
+    );
 
                 return true;
             });
@@ -5332,7 +5312,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             ThinkTime((int)timespan.TotalMilliseconds);
         }
 
-        internal void Dispose()
+        public void Dispose()
         {
             Browser.Dispose();
         }
