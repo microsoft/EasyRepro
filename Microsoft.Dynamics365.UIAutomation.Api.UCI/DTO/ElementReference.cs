@@ -135,8 +135,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Timeline_Note_Title",               "id(\"create_note_medium_title\")" },
             { "Timeline_Note_Text",                "//iframe[contains(@class, \"fullPageContentEditorFrame\")]" },
             { "Timeline_Note_TextBody",            "//body[contains(@class, 'cke_wysiwyg_frame')]" },
-            { "Timeline_Note_Add",                 "id(\"create_note_add_btn\")" },
-            { "Timeline_Note_Cancel",              "id(\"create_note_cancel_btn\")" },
+            { "Timeline_Note_Add",                 ".//button[text()='Add note' and contains(@data-id, 'notescontrol')]" },
+            { "Timeline_Note_Cancel",              ".//button[text()='Cancel' and contains(@data-id, 'notescontrol')]" },
 
             //Global Search
             { "Search_Filter"       , "id(\"filterCombo\")"},
