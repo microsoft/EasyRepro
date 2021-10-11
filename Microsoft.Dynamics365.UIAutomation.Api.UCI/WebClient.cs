@@ -1268,7 +1268,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     ribbon = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.Container]));
                 }
-                TimeSpan.FromSeconds(5);
+                
 
                 if (ribbon == null)
                 {
@@ -1276,29 +1276,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         TimeSpan.FromSeconds(5),
                         "Unable to find the ribbon.");
                 }
-
-                //Get the CommandBar buttons
-                var items = ribbon.FindElements(By.TagName("button"));
-
+                
                 //Is the button in the ribbon?
-                if (items.Any(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)))
+                if (ribbon.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", name)), out var command))
                 {
-                    items.FirstOrDefault(x => x.GetAttribute("aria-label").Equals(name, StringComparison.OrdinalIgnoreCase)).Click(true);
+                    command.Click(true);
                     driver.WaitForTransaction();
                 }
                 else
                 {
                     //Is the button in More Commands?
-                    if (items.Any(x => x.GetAttribute("aria-label").StartsWith("More Commands", StringComparison.OrdinalIgnoreCase)))
+                    if (ribbon.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", "More Commands")), out var moreCommands))
                     {
-                        //Click More Commands
-                        items.FirstOrDefault(x => x.GetAttribute("aria-label").StartsWith("More Commands", StringComparison.OrdinalIgnoreCase)).Click(true);
+                        // Click More Commands
+                        moreCommands.Click(true);
                         driver.WaitForTransaction();
 
                         //Click the button
-                        if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Button].Replace("[NAME]", name))))
+                        if (ribbon.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name)), out var overflowCommand))
                         {
-                            driver.FindElement(By.XPath(AppElements.Xpath[AppReference.CommandBar.Button].Replace("[NAME]", name))).Click(true);
+                            overflowCommand.Click(true);
                             driver.WaitForTransaction();
                         }
                         else
@@ -1312,7 +1309,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     var submenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.MoreCommandsMenu]));
 
-                    var subbutton = submenu.FindElements(By.TagName("button")).FirstOrDefault(x => x.Text == subname);
+                    submenu.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subname)), out var subbutton);
 
                     if (subbutton != null)
                     {
@@ -1325,7 +1322,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         var subSecondmenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.CommandBar.MoreCommandsMenu]));
 
-                        var subSecondbutton = subSecondmenu.FindElements(By.TagName("button")).FirstOrDefault(x => x.Text == subSecondName);
+                        subSecondmenu.TryFindElement(
+                            By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton]
+                                .Replace("[NAME]", subSecondName)), out var subSecondbutton);
 
                         if (subSecondbutton != null)
                         {
@@ -1542,7 +1541,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         driver.Perform(action, cell, cell.LeftTo(emptyDiv));
                     },
                     $"An error occur trying to open the record at position {index}"
-                    );
+                );
 
                 driver.WaitForTransaction();
                 return true;
