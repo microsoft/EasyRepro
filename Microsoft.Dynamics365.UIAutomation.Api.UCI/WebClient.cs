@@ -833,11 +833,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Open Global Search"), driver =>
             {
-                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton]),
-                    TimeSpan.FromSeconds(5),
-                    d => { driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton])); },
-                    "The Global Search button is not available."
-                );
+                driver.WaitForTransaction();
+
+                if (driver.HasElement(By.Id("GlobalSearchBox")))
+                {
+                    return true;
+                }
+
+                driver.ClickWhenAvailable(
+                    By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton]),
+                    5.Seconds(),
+                    "The Global Search button is not available.");
+
+                driver.WaitForTransaction();
+
                 return true;
             });
         }
@@ -1434,21 +1443,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 );
 
                 var viewContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.ViewContainer]));
-                var viewItems = viewContainer.FindElements(By.TagName("li"));
+                var viewItems = viewContainer.FindElements(By.TagName("button"));
 
                 var result = new Dictionary<string, IWebElement>();
                 foreach (var viewItem in viewItems)
                 {
-                    var role = viewItem.GetAttribute("role");
-                    if (role != "option")
-                        continue;
-
-                    var key = viewItem.Text.ToLowerString();
+                    var viewName = viewItem.FindElement(By.ClassName("ms-ContextualMenu-itemText")).Text;
+                    var key = viewName.ToLowerString();
                     if (string.IsNullOrWhiteSpace(key))
+                    {
                         continue;
-
+                    }
                     if (!result.ContainsKey(key))
+                    {
                         result.Add(key, viewItem);
+                    }
                 }
                 return result;
             });
@@ -1525,26 +1534,38 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             ThinkTime(thinkTime);
             return Execute(GetOptions("Open Grid Record"), driver =>
             {
-                var xpathToGrid = By.XPath(AppElements.Xpath[AppReference.Grid.Container]);
-                IWebElement control = driver.WaitUntilAvailable(xpathToGrid);
+                var gridContainer = driver.WaitUntilAvailable(
+                    By.XPath(AppElements.Xpath[AppReference.Grid.Container]),
+                    5.Seconds(),
+                    "Unable to find the grid.");
 
-                Func<Actions, Actions> action;
+                var rows = gridContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.Grid.Rows]));
+
+                if (rows.Count == 0)
+                {
+                    throw new NoSuchElementException($"No records were found in the grid.");
+                }
+                else if (index + 1 > rows.Count)
+                {
+                    throw new IndexOutOfRangeException($"Grid record count: {rows.Count}. Expected: {index + 1}");
+                }
+
+                var cell = rows
+                    .ElementAt(index)
+                    .FindElements(By.XPath(AppElements.Xpath[AppReference.Grid.Cells]))
+                    .ElementAt(0);
+
                 if (checkRecord)
-                    action = e => e.Click();
+                {
+                    new Actions(driver).Click(cell).Perform();
+                }
                 else
-                    action = e => e.DoubleClick();
-
-                var xpathToCell = By.XPath($".//div[@role='rowgroup']/div[@row-index={index}]"); 
-                control.WaitUntilClickable(xpathToCell,
-                    cell =>
-                    {
-                        var emptyDiv = cell.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.RowsContainerCheckbox]));
-                        driver.Perform(action, cell, cell.LeftTo(emptyDiv));
-                    },
-                    $"An error occur trying to open the record at position {index}"
-                    );
+                {
+                    new Actions(driver).DoubleClick(cell).Perform();
+                }
 
                 driver.WaitForTransaction();
+
                 return true;
             });
         }
@@ -1593,56 +1614,43 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var returnList = new List<GridItem>();
 
-                driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
+                driver.WaitForTransaction();
 
-                var rows = driver.FindElements(By.ClassName("wj-row"));
-                var columnGroup = driver.FindElement(By.ClassName("wj-colheaders"));
+                var container = driver.WaitUntilAvailable(
+                    By.XPath(AppElements.Xpath[AppReference.Grid.Container]),
+                    2.Seconds(),
+                    "Unable to find the grid.");
 
-                foreach (var row in rows)
-                {
-                    if (!string.IsNullOrEmpty(row.GetAttribute("data-lp-id")) && !string.IsNullOrEmpty(row.GetAttribute("role")))
+                var entityName = container
+                    .FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.Control]))
+                    .GetAttribute("data-lp-id")
+                    .Split('|')
+                    .ElementAt(4);
+                var appUrl = driver.ExecuteScript($"return Xrm.Utility.getGlobalContext().getCurrentAppUrl();");
+
+                returnList = container
+                    .FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.RowsContainer]))
+                    .FindElements(By.XPath(AppElements.Xpath[AppReference.Grid.Rows]))
+                    .Select((row, index) =>
                     {
-                        //MscrmControls.Grid.ReadOnlyGrid|entity_control|account|00000000-0000-0000-00aa-000010001001|account|cc-grid|grid-cell-container
-                        var datalpid = row.GetAttribute("data-lp-id").Split('|');
-                        var cells = row.FindElements(By.ClassName("wj-cell"));
-                        var currentindex = 0;
-                        var link =
-                            $"{new Uri(driver.Url).Scheme}://{new Uri(driver.Url).Authority}/main.aspx?etn={datalpid[2]}&pagetype=entityrecord&id=%7B{datalpid[3]}%7D";
-
+                        var id = new Guid(row.GetAttribute("row-id"));
                         var item = new GridItem
                         {
-                            EntityName = datalpid[2],
-                            Url = new Uri(link)
+                            EntityName = entityName,
+                            Id = id,
+                            Url = new Uri($"{appUrl}&pagetype=entityrecord&etn={entityName}&id={id}"),
                         };
 
-                        foreach (var column in columnGroup.FindElements(By.ClassName("wj-row")))
+                        var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Grid.Cells]));
+                        foreach (var cell in cells)
                         {
-                            var rowHeaders = column.FindElements(By.TagName("div"))
-                                .Where(c => !string.IsNullOrEmpty(c.GetAttribute("title")) && !string.IsNullOrEmpty(c.GetAttribute("id")));
-
-                            foreach (var header in rowHeaders)
-                            {
-                                var id = header.GetAttribute("data-id") ?? header.GetAttribute("id");
-                                var className = header.GetAttribute("class");
-                                var cellData = cells[currentindex + 1].GetAttribute("title");
-
-                                if (!string.IsNullOrEmpty(id)
-                                    && className.Contains("wj-cell")
-                                    && !string.IsNullOrEmpty(cellData)
-                                    && !id.Contains("btnheaderselectcolumn")
-                                    && cells.Count > currentindex
-                                )
-                                {
-                                    item[id] = cellData.Replace("-", "");
-                                    currentindex++;
-                                }
-
-                            }
-
-                            returnList.Add(item);
+                            var column = cell.GetAttribute<string>("col-id");
+                            item[column] = cell.Text;
                         }
-                    }
-                }
+
+                        return item;
+                    })
+                    .ToList();
 
                 return returnList;
             });
@@ -1841,17 +1849,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Sort by {columnName}"), driver =>
             {
-                var sortCol = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.GridSortColumn].Replace("[COLNAME]", columnName)));
+                var column = driver.WaitUntilAvailable(
+                    By.XPath(AppElements.Xpath[AppReference.Grid.GridSortColumn].Replace("[COLNAME]", columnName)),
+                    5.Seconds(),
+                    $"Column {columnName} was not found on the grid.");
 
-                if (sortCol == null)
-                    throw new InvalidOperationException($"Column: {columnName} Does not exist");
-                else
-                {
-                    sortCol.Click(true);
-                    driver.WaitUntilClickable(By.XPath($@"//button[@name='{sortOptionButtonText}']")).Click(true);
-                }
-
+                column.Click(true);
                 driver.WaitForTransaction();
+
+                driver.ClickWhenAvailable(By.XPath($@"//button[@name='{sortOptionButtonText}']"));
+                driver.WaitForTransaction();
+
                 return true;
             });
         }
@@ -1872,21 +1880,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions("Open Grid Item"), driver =>
             {
                 var grid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.Container]));
-                var gridCellContainer = grid.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.CellContainer]));
-                var rowCount = gridCellContainer.GetAttribute("data-row-count");
-                var count = 0;
+                var rows = grid
+                    .FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.CellContainer]))
+                    .FindElements(By.XPath(AppElements.Xpath[AppReference.Grid.Rows]));
 
-                if (rowCount == null || !int.TryParse(rowCount, out count) || count <= 0) return true;
-                var link =
-                    gridCellContainer.FindElement(
-                        By.XPath("//div[@role='gridcell'][@header-row-number='" + index + "']/following::div"));
+                if (rows.Count <= 0)
+                {
+                    return true;
+                }
+                else if (index + 1 > rows.Count)
+                {
+                    throw new IndexOutOfRangeException($"Grid record count: {rows.Count}. Expected: {index + 1}");
+                }
 
-                if (link == null)
-                    throw new InvalidOperationException($"No record with the index '{index}' exists.");
+                var row = rows.ElementAt(index + 1);
+                var cell = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells])).ElementAt(1);
 
-                link.Click();
-
+                new Actions(driver).DoubleClick(cell).Perform();
                 driver.WaitForTransaction();
+
                 return true;
             });
         }
@@ -2110,26 +2122,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Click Select All Button on subgrid: {subGridName}"), driver =>
             {
-
                 // Find the SubGrid
-                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subGridName)));
+                var subGrid = driver.WaitUntilAvailable(
+                    By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subGridName)),
+                    5.Seconds(),
+                    $"Unable to find subgrid named {subGridName}.");
 
-                if (subGrid != null)
-                {
-                    var subGridButtons = subGrid.FindElements(By.TagName("button"));
-
-                    //Is the button in the ribbon?
-                    if (subGridButtons.Any(x => x.GetAttribute("title").Equals("Select All", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        subGridButtons.FirstOrDefault(x => x.GetAttribute("title").Equals("Select All", StringComparison.OrdinalIgnoreCase)).Click(true);
-                        driver.WaitForTransaction();
-                    }
-                    else
-                        throw new NotFoundException("Select All button not found. Please make sure the grid is displayed. Card layout is not supported for Select All.");
-                }
-                else
-                    throw new NotFoundException($"Unable to locate subgrid with name {subGridName}");
-
+                subGrid.ClickWhenAvailable(By.XPath("//div[@role='columnheader']//span[@role='checkbox']"));
+                driver.WaitForTransaction();
 
                 return true;
             });
@@ -2242,8 +2242,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Save"), driver =>
             {
-                var save = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.Save]),
-                    "Save Buttton is not available");
+                var save = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.Save]), "Save Buttton is not available");
 
                 save?.Click();
 
@@ -2281,13 +2280,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions("Open Record Set Navigator"), driver =>
             {
                 // check if record set navigator parent div is set to open
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavigatorOpen])))
+                driver.WaitForTransaction();
+
+                if (!driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavList]), out var navList))
                 {
                     driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavigator])).Click();
+                    driver.WaitForTransaction();
+                    navList = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavList]));
                 }
 
-                var navList = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.RecordSetNavList]));
                 var links = navList.FindElements(By.TagName("li"));
+
                 try
                 {
                     links[index].Click();
@@ -2297,7 +2300,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new InvalidOperationException($"No record with the index '{index}' exists.");
                 }
 
-                driver.WaitForPageToLoad();
+                driver.WaitForTransaction();
 
                 return true;
             });
@@ -2854,11 +2857,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     ClearFieldValue(dateField);
                     if (date != null)
+                    {
                         dateField.SendKeys(date);
+                        dateField.SendKeys(Keys.Tab);
+                    }
                 },
-                    d => dateField.GetAttribute("value").IsValueEqualsTo(date),
-                    TimeSpan.FromSeconds(9), 3,
-                    failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
+                d => dateField.GetAttribute("value").IsValueEqualsTo(date),
+                TimeSpan.FromSeconds(9), 3,
+                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
                 );
             }
             else
@@ -2933,10 +2939,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]), new TimeSpan(0, 0, 1));
             }
 
-            var success = formContext.TryFindElement(timeFieldXPath, out var timeField);
-            if (success)
-                TrySetTime(driver, timeField, control.TimeAsString);
+            driver.WaitForTransaction();
 
+            if (formContext.TryFindElement(timeFieldXPath, out var timeField))
+            {
+                TrySetTime(driver, timeField, control.TimeAsString);
+            }
         }
 
         private static void TrySetTime(IWebDriver driver, IWebElement timeField, string time)
@@ -2953,9 +2961,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 timeField.SendKeys(Keys.Tab);
                 driver.WaitForTransaction();
             },
-                d => timeField.GetAttribute("value").IsValueEqualsTo(time),
-                TimeSpan.FromSeconds(9), 3,
-                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {time}. Actual: {timeField.GetAttribute("value")}")
+            d => timeField.GetAttribute("value").IsValueEqualsTo(time),
+            TimeSpan.FromSeconds(9), 3,
+            failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {time}. Actual: {timeField.GetAttribute("value")}")
             );
         }
 
@@ -3514,183 +3522,114 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions($"Get Subgrid Items for Subgrid {subgridName}"), driver =>
             {
-                // Initialize return object
-                List<GridItem> subGridRows = new List<GridItem>();
-
-                // Initialize required local variables
-                IWebElement subGridRecordList = null;
-                List<string> columns = new List<string>();
-                List<string> cellValues = new List<string>();
-                GridItem item = new GridItem();
+                var subGridRows = new List<GridItem>();
 
                 // Find the SubGrid
-                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
-
-                if (subGrid == null)
-                    throw new NotFoundException($"Unable to locate subgrid contents for {subgridName} subgrid.");
-
-                // Check if ReadOnlyGrid was found
-                if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList))
+                if (!driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)), out var subGrid))
                 {
-                    // Locate record list
-                    var foundRecords = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
-
-                    if (foundRecords)
-                    {
-                        var subGridRecordRows = subGridRecordList.FindElements(By.TagName("li"));
-
-                        foreach (IWebElement recordRow in subGridRecordRows)
-                        {
-                            var recordLabels = recordRow.FindElements(By.TagName("label"));
-
-                            foreach (IWebElement label in recordLabels)
-                            {
-                                if (label.GetAttribute("id") != null)
-                                {
-                                    var headerLabelId = label.GetAttribute("id").ToString();
-
-                                    var frontLength = (43 + (subgridName.Length) + 15);
-                                    var rearLength = 37;
-                                    // Trim calculated frontLength
-                                    var headerLabel = headerLabelId.Remove(0, frontLength);
-
-                                    // Trim calculated rearLength
-                                    headerLabel = headerLabel.Remove((headerLabel.Length - rearLength), rearLength);
-                                    columns.Add(headerLabel);
-
-                                    var rowText = label.Text;
-                                    cellValues.Add(rowText);
-                                }
-                            }
-
-
-                            for (int i = 0; i < columns.Count; i++)
-                            {
-                                item[columns[i]] = cellValues[i];
-                            }
-
-                            subGridRows.Add(item);
-
-                            // Flush Item and Cell Values To Get New Rows
-                            cellValues = new List<string>();
-                            item = new GridItem();
-                        }
-
-                    }
-                    else
-                        throw new NotFoundException($"Unable to locate record list for subgrid {subgridName}");
-
-                }
-                // Attempt to locate the editable grid list
-                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList))
-                {
-                    //Find the columns
-                    var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersEditable]));
-
-                    foreach (IWebElement headerCell in headerCells)
-                    {
-                        var headerTitle = headerCell.GetAttribute("title");
-                        columns.Add(headerTitle);
-                    }
-
-                    //Find the rows
-                    var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridDataRowsEditable]));
-
-                    //Process each row
-                    foreach (IWebElement row in rows)
-                    {
-                        var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
-
-                        if (cells.Count > 0)
-                        {
-                            foreach (IWebElement thisCell in cells)
-                                cellValues.Add(thisCell.Text);
-
-                            for (int i = 0; i < columns.Count; i++)
-                            {
-                                //The first cell is always a checkbox for the record.  Ignore the checkbox.
-                                if (i == 0)
-                                {
-                                    // Do Nothing
-                                }
-                                else
-                                {
-                                    item[columns[i]] = cellValues[i];
-                                }
-                            }
-
-                            subGridRows.Add(item);
-
-                            // Flush Item and Cell Values To Get New Rows
-                            cellValues = new List<string>();
-                            item = new GridItem();
-                        }
-                    }
-
-                    return subGridRows;
-
-                }
-                // Special 'Related' high density grid control for entity forms
-                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHighDensityList].Replace("[NAME]", subgridName)), out subGridRecordList))
-                {
-                    //Find the columns
-                    var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersHighDensity]));
-
-                    foreach (IWebElement headerCell in headerCells)
-                    {
-                        var headerTitle = headerCell.GetAttribute("data-id");
-                        columns.Add(headerTitle);
-                    }
-
-                    //Find the rows
-                    var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRowsHighDensity]));
-
-                    //Process each row
-                    foreach (IWebElement row in rows)
-                    {
-                        //Get the entityId and entity Type
-                        if (row.GetAttribute("data-lp-id") != null)
-                        {
-                            var rowAttributes = row.GetAttribute("data-lp-id").Split('|');
-                            item.EntityName = rowAttributes[4];
-                            //The row record IDs are not in the DOM. Must be retrieved via JavaScript
-                            var getId = $"return Xrm.Page.getControl(\"{subgridName}\").getGrid().getRows().get({rows.IndexOf(row)}).getData().entity.getId()";
-                            item.Id = new Guid((string)driver.ExecuteScript(getId));
-                        }
-
-                        var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
-
-                        if (cells.Count > 0)
-                        {
-                            foreach (IWebElement thisCell in cells)
-                                cellValues.Add(thisCell.Text);
-
-                            for (int i = 0; i < columns.Count; i++)
-                            {
-                                //The first cell is always a checkbox for the record.  Ignore the checkbox.
-                                if (i == 0)
-                                {
-                                    // Do Nothing
-                                }
-                                else
-                                {
-                                    item[columns[i]] = cellValues[i];
-                                }
-
-                            }
-
-                            subGridRows.Add(item);
-
-                            // Flush Item and Cell Values To Get New Rows
-                            cellValues = new List<string>();
-                            item = new GridItem();
-                        }
-                    }
-
-                    return subGridRows;
+                    throw new NotFoundException($"Unable to locate {subgridName} subgrid.");
                 }
 
-                // Return rows object
+                var entityName = subGrid
+                    .FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.Control]))
+                    .GetAttribute("data-lp-id")
+                    .Split('|')
+                    .ElementAt(4);
+                var appUrl = driver.ExecuteScript($"return Xrm.Utility.getGlobalContext().getCurrentAppUrl();");
+
+                GridItem CreateItem(int index)
+                {
+                    var id = new Guid(
+                        (string)driver.ExecuteScript(
+                            $"return Xrm.Page.getControl(\"{subgridName}\").getGrid().getRows().get({index}).getData().entity.getId()"));
+
+                    return new GridItem
+                    {
+                        EntityName = entityName,
+                        Id = id,
+                        Url = new Uri($"{appUrl}&pagetype=entityrecord&etn={entityName}&id={id}"),
+                    };
+                }
+
+                if (subGrid.HasElement(By.CssSelector(@"div.pcf-grid")))
+                {
+                    // Read-only subgrid
+                    subGridRows = subGrid
+                        .FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridListCells]))
+                        .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRows]))
+                        .Select((row, index) =>
+                        {
+                            var item = CreateItem(index);
+
+                            var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
+                            foreach (var cell in cells)
+                            {
+                                var column = cell.GetAttribute<string>("col-id");
+                                item[column] = cell.Text;
+                            }
+
+                            return item;
+                        })
+                        .ToList();
+                }
+                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out var editableGridList))
+                {
+                    // Editable subgrid
+                    var headers = subGrid
+                        .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersEditable]))
+                        .Select(h => h.GetAttribute("title"))
+                        // 'Select' column
+                        .Skip(1);
+
+                    subGridRows = subGrid
+                        .FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]))
+                        .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]))
+                        .Select((row, index) =>
+                        {
+                            var item = CreateItem(index);
+
+                            var cells = row
+                                .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridCells]))
+                                // 'Select' column
+                                .Skip(1);
+
+                            for (int i = 0; i < headers.Count(); i++)
+                            {
+                                item[headers.ElementAt(i)] = cells.ElementAt(i).Text;
+                            }
+
+                            return item;
+                        })
+                        .ToList();
+                }
+                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHighDensityList].Replace("[NAME]", subgridName)), out var highDensityGridList))
+                {
+                    // Special 'Related' high density grid control for entity forms
+                    var columns = subGrid
+                        .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersHighDensity]))
+                        .Select(h => h.GetAttribute("data-id"));
+
+                    subGridRows = subGrid
+                        .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRowsHighDensity]))
+                        .Select((row, index) =>
+                        {
+                            var item = CreateItem(index);
+
+                            var cells = row
+                                .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]))
+                                // 'Select' column
+                                .Skip(1);
+
+                            for (int i = 0; i < columns.Count(); i++)
+                            {
+                                item[columns.ElementAt(i)] = cells.ElementAt(i).Text;
+                            }
+
+                            return item;
+                        })
+                        .ToList();
+                }
+
                 return subGridRows;
             });
         }
@@ -3702,22 +3641,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Find the SubGrid
                 var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
 
-                if (subGrid.HasElement(By.CssSelector(@"div.Grid\.ReadOnlyGrid")))
+                if (subGrid.HasElement(By.CssSelector(@"div.pcf-grid")))
                 {
                     // Read-only subgrid
                     var subGridTable = subGrid.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridListCells]));
-                    var rowCount = subGridTable.GetAttribute<int>("data-row-count");
+                    var rows = subGridTable.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRows]));
 
-                    if (rowCount == 0)
+                    if (rows.Count == 0)
                     {
                         throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
                     }
-                    else if (index + 1 > rowCount)
+                    else if (index + 1 > rows.Count)
                     {
-                        throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {rowCount}. Expected: {index + 1}");
+                        throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {rows.Count}. Expected: {index + 1}");
                     }
 
-                    var row = subGridTable.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRows])).ElementAt(index + 1);
+                    var row = rows.ElementAt(index);
                     var cell = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells])).ElementAt(1);
 
                     new Actions(driver).DoubleClick(cell).Perform();
@@ -3864,48 +3803,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     container => TryGetValue(driver, container, control)));
         }
 
-        internal BrowserCommandResult<string> GetStatusFromFooter()
+        internal BrowserCommandResult<string> GetStateFromForm()
         {
-            return this.Execute(GetOptions($"Get Status value from footer"), driver =>
+            return this.Execute(GetOptions($"Get Status value from form"), driver =>
             {
-                IWebElement footer;
-                var footerExists = driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]), out footer);
+                driver.WaitForTransaction();
 
-                IWebElement status;
-                footer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FooterStatusValue]), out status);
-
-                if (footerExists)
+                if (driver.TryFindElement(By.Id("message-formReadOnlyNotification"), out var readOnlyNotification))
                 {
-                    if (String.IsNullOrEmpty(status.Text))
-                        return "unknown";
-
-                    return status.Text;
+                    return readOnlyNotification.Text.Replace("Read-only This record’s status: ", string.Empty);
                 }
                 else
-                    throw new NoSuchElementException("Unable to find the footer on the entity form");
-            });
-        }
-
-        internal BrowserCommandResult<string> GetMessageFromFooter()
-        {
-            return this.Execute(GetOptions($"Get Message value from footer"), driver =>
-            {
-                IWebElement footer;
-                var footerExists = driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EntityFooter]), out footer);
-
-                if (footerExists)
                 {
-                    IWebElement message;
-                    footer.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.FooterMessageValue]), out message);
-
-                    if (String.IsNullOrEmpty(message.Text))
-                        return string.Empty;
-
-                    return message.Text;
+                    return "Active";
                 }
-                else
-                    throw new NoSuchElementException("Unable to find the footer on the entity form");
-
             });
         }
 
@@ -4243,13 +4154,39 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForTransaction();
 
-                var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows]));
-                if (!rows.Any())
+                ReadOnlyCollection<IWebElement> rows = null;
+                if (driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.Container]), out var advancedLookup))
+                {
+                    // Advanced Lookup
+                    rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.ResultRows]));
+                }
+                else
+                {
+                    // Lookup
+                    rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.LookupResultRows]));
+                }
+
+                if (rows == null || !rows.Any())
                 {
                     throw new NotFoundException("No rows found");
                 }
 
-                rows.ElementAt(index).Click();
+                var row = rows.ElementAt(index);
+
+                if (advancedLookup == null)
+                {
+                    row.Click();
+                }
+                else
+                {
+                    if (!row.GetAttribute<bool?>("aria-selected").GetValueOrDefault())
+                    {
+                        row.Click();
+                    }
+
+                    advancedLookup.FindElement(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.DoneButton])).Click();
+                }
+
                 driver.WaitForTransaction();
 
                 return true;
@@ -4260,9 +4197,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions("Search Lookup Record"), driver =>
             {
-                //Click in the field and enter values
-                control.Value = searchCriteria;
-                SetValue(control, FormContextType.Entity);
+                driver.WaitForTransaction();
+
+                if (driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.Container]), out var advancedLookup))
+                {
+                    // Advanced lookup
+                    var search = advancedLookup.FindElement(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.SearchInput]));
+                    search.Click();
+                    search.SendKeys(Keys.Control + "a");
+                    search.SendKeys(Keys.Backspace);
+                    search.SendKeys(searchCriteria);
+
+                    driver.WaitForTransaction();
+
+                    OpenLookupRecord(0);
+                }
+                else
+                {
+                    // Lookup
+                    control.Value = searchCriteria;
+                    SetValue(control, FormContextType.Entity);
+                }
 
                 driver.WaitForTransaction();
 
@@ -4272,14 +4227,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<bool> SelectLookupRelatedEntity(string entityName)
         {
-            //Click the Related Entity on the Lookup Flyout
+            // Click the Related Entity on the Lookup Flyout
             return this.Execute(GetOptions($"Select Lookup Related Entity {entityName}"), driver =>
             {
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.RelatedEntityLabel].Replace("[NAME]", entityName))))
-                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.RelatedEntityLabel].Replace("[NAME]", entityName))).Click(true);
-                else
-                    throw new NotFoundException($"Lookup Entity {entityName} not found");
+                driver.WaitForTransaction();
 
+                IWebElement relatedEntity = null;
+                if (driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.Container]), out var advancedLookup))
+                {
+                    // Advanced lookup
+                    relatedEntity = advancedLookup.WaitUntilAvailable(
+                        By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.FilterTable].Replace("[NAME]", entityName)),
+                        2.Seconds());
+                }
+                else
+                {
+                    // Lookup 
+                    relatedEntity = driver.WaitUntilAvailable(
+                        By.XPath(AppElements.Xpath[AppReference.Lookup.RelatedEntityLabel].Replace("[NAME]", entityName)),
+                        2.Seconds());
+                }
+
+                if (relatedEntity == null)
+                {
+                    throw new NotFoundException($"Lookup Entity {entityName} not found.");
+                }
+
+                relatedEntity.Click();
                 driver.WaitForTransaction();
 
                 return true;
@@ -4290,25 +4264,47 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return Execute(GetOptions($"Select Lookup View {viewName}"), driver =>
             {
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.ChangeViewButton])))
+                var advancedLookup = driver.WaitUntilAvailable(
+                    By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.Container]),
+                    2.Seconds());
+
+                if (advancedLookup == null)
                 {
-                    //Click Change View 
-                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.ChangeViewButton])).Click(true);
-
-                    driver.WaitForTransaction();
-
-                    //Click View Requested 
-                    var rows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Lookup.ViewRows]));
-                    if (rows.Any(x => x.Text.Equals(viewName, StringComparison.OrdinalIgnoreCase)))
-                        rows.First(x => x.Text.Equals(viewName, StringComparison.OrdinalIgnoreCase)).Click(true);
-                    else
-                        throw new NotFoundException($"View {viewName} not found");
+                    SelectLookupAdvancedLookupButton();
+                    advancedLookup = driver.WaitUntilAvailable(
+                        By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.Container]),
+                        2.Seconds(),
+                        "Expected Advanced Lookup dialog but it was not found.");
                 }
 
-                else
-                    throw new NotFoundException("Lookup menu not visible");
+                advancedLookup
+                    .FindElement(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.ViewSelectorCaret]))
+                    .Click();
+
+                driver
+                    .WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.ViewDropdownList]))
+                    .ClickWhenAvailable(
+                     By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.ViewDropdownListItem].Replace("[NAME]", viewName)),
+                     2.Seconds(),
+                     $"The '{viewName}' view isn't in the list of available lookup views.");
 
                 driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> SelectLookupAdvancedLookupButton()
+        {
+            return this.Execute(GetOptions("Click Advanced Lookup Button"), driver =>
+            {
+                driver.ClickWhenAvailable(
+                    By.XPath(AppElements.Xpath[AppReference.Lookup.AdvancedLookupButton]),
+                    10.Seconds(),
+                    "The 'Advanced Lookup' button was not found. Ensure a search has been performed in the lookup first.");
+
+                driver.WaitForTransaction();
+
                 return true;
             });
         }
@@ -4317,17 +4313,44 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return this.Execute(GetOptions("Click New Lookup Button"), driver =>
             {
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.NewButton])))
-                {
-                    var newButton = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.NewButton]));
+                driver.WaitForTransaction();
 
-                    if (newButton.GetAttribute("disabled") == null)
-                        driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.NewButton])).Click();
-                    else
-                        throw new ElementNotInteractableException("New button is not enabled.  If this is a mulit-entity lookup, please use SelectRelatedEntity first.");
+                if (driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.Container]), out var advancedLookup))
+                {
+                    // Advanced lookup
+                    if (advancedLookup.TryFindElement(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.AddNewRecordButton]), out var addNewRecordButton))
+                    {
+                        // Single table lookup
+                        addNewRecordButton.Click();
+                    }
+                    else if (advancedLookup.TryFindElement(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.AddNewButton]), out var addNewButton))
+                    {
+                        // Composite lookup
+                        var filterTables = advancedLookup.FindElements(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.FilterTables])).ToList();
+                        var tableIndex = filterTables.FindIndex(t => t.HasAttribute("aria-current"));
+
+                        addNewButton.Click();
+                        driver.WaitForTransaction();
+
+                        var addNewTables = advancedLookup.FindElements(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.AddNewTables]));
+                        addNewTables.ElementAt(tableIndex).Click();
+                    }
                 }
                 else
-                    throw new NotFoundException("New button not found.");
+                {
+                    // Lookup
+                    if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Lookup.NewButton])))
+                    {
+                        var newButton = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.NewButton]));
+
+                        if (newButton.GetAttribute("disabled") == null)
+                            driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.NewButton])).Click();
+                        else
+                            throw new ElementNotInteractableException("New button is not enabled.  If this is a mulit-entity lookup, please use SelectRelatedEntity first.");
+                    }
+                    else
+                        throw new NotFoundException("New button not found.");
+                }
 
                 driver.WaitForTransaction();
 
@@ -4865,13 +4888,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions($"Set BPF Value: {option.Name}"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BooleanFieldContainer].Replace("[NAME]", option.Name)));
-                var selectedOption = fieldContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BooleanFieldSelectedOption].Replace("[NAME]", option.Name)));
+                var existingValue = fieldContainer.GetAttribute("Title") == "Yes";
 
-                var existingValue = selectedOption.GetAttribute<string>("Title") == "Yes";
                 if (option.Value != existingValue)
                 {
                     fieldContainer.Click();
+                    fieldContainer.ClickWhenAvailable(By.XPath("//option[not(@data-selected)]"));
                 }
+
+                driver.WaitForTransaction();
 
                 return true;
             });
@@ -5097,29 +5122,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Global Search: {criteria}"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton]),
-                    TimeSpan.FromSeconds(5),
-                    "The Global Search button is not available.");
+                driver.WaitForTransaction();
 
-                var input = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Text]), "The Global Search text field is not available.");
+                IWebElement input;
+                if (driver.TryFindElement(By.Id("GlobalSearchBox"), out var globalSearch))
+                {
+                    input = globalSearch;
+                }
+                else
+                {
+                    driver.ClickWhenAvailable(
+                        By.XPath(AppElements.Xpath[AppReference.Navigation.SearchButton]),
+                        2.Seconds(),
+                        "The Global Search (Categorized Search) button is not available.");
 
-                string reference = null;
-                driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type]),
-                    e =>
-                    {
-                        var searchType = e.GetAttribute("value");
-                        reference =
-                            searchType == "0" ? AppReference.GlobalSearch.RelevanceSearchButton :
-                            searchType == "1" ? AppReference.GlobalSearch.CategorizedSearchButton :
-                            throw new InvalidOperationException("The Global Search type is not available.");
-                    },
-                    "The Global Search type is not available."
-                );
+                    input = driver.WaitUntilVisible(
+                        By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Text]),
+                        2.Seconds(),
+                        "The Categorized Search text field is not available.");
+                }
 
-                IWebElement button = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[reference]), "The Global Search Button is not available.");
-
+                input.Click();
                 input.SendKeys(criteria, true);
-                button.Click(true);
+                input.SendKeys(Keys.Enter);
+
+                driver.WaitForTransaction();
+
                 return true;
             });
         }
@@ -5136,21 +5164,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Filter With: {entity}"), driver =>
             {
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Filter]),
-                    TimeSpan.FromSeconds(10),
-                    picklist =>
+                driver.WaitForTransaction();
+
+                if (driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Filter]), out var filter))
+                {
+                    // Categorized Search
+                    var option = filter
+                        .FindElements(By.TagName("option"))
+                        .FirstOrDefault(x => x.Text == entity);
+
+                    if (option == null)
                     {
-                        var options = picklist.FindElements(By.TagName("option"));
-                        var option = options.FirstOrDefault(x => x.Text == entity);
-                        if (option == null)
-                            throw new InvalidOperationException($"Entity '{entity}' does not exist in the Filter options.");
+                        throw new InvalidOperationException($"Entity '{entity}' does not exist in the Filter options.");
+                    }
 
-                        picklist.Click();
-                        option.Click();
-                    },
-                    "Filter With picklist is not available. The timeout period elapsed waiting for the picklist to be available."
-                );
-
+                    filter.Click();
+                    option.Click();
+                }
+                else if (driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceSearchResultsTab].Replace("[NAME]", entity)), out var entityTab))
+                {
+                    // Relevance Search
+                    entityTab.Click();
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Unable to filter global search results by the '{entity}' table.");
+                }
 
                 return true;
             });
@@ -5168,13 +5207,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Filter With: {value}"), driver =>
             {
-                var xpathToContainer = By.XPath(AppElements.Xpath[AppReference.GlobalSearch.GroupContainer].Replace("[NAME]", filterBy));
-                var xpathToValue = By.XPath(AppElements.Xpath[AppReference.GlobalSearch.FilterValue].Replace("[NAME]", value));
-                driver.WaitUntilVisible(xpathToContainer,
-                    TimeSpan.FromSeconds(10),
-                    groupContainer => groupContainer.ClickWhenAvailable(xpathToValue, $"Filter By Value '{value}' does not exist in the Filter options."),
-                    "Filter With picklist is not available. The timeout period elapsed waiting for the picklist to be available."
-                );
+                driver.WaitForTransaction();
+
+                if (driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.GroupContainer].Replace("[NAME]", filterBy)), out var entityPicker))
+                {
+                    // Categorized Search
+                    entityPicker.ClickWhenAvailable(
+                    By.XPath(AppElements.Xpath[AppReference.GlobalSearch.FilterValue].Replace("[NAME]", value)),
+                    $"Filter By Value '{value}' does not exist in the Filter options.");
+                }
+                else if (filterBy == "Record Type" && driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceSearchResultsTab].Replace("[NAME]", value)), out var entityTab))
+                {
+                    // Relevance Search
+                    entityTab.Click();
+                }
+                else
+                {
+                    throw new InvalidOperationException("Unable to filter global search results.");
+                }
+
+                driver.WaitForTransaction();
+
                 return true;
             });
         }
@@ -5192,77 +5245,43 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Open Global Search Record"), driver =>
             {
-                var searchTypeElement = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type]), "The Global Search type is not available.");
-                var searchType = searchTypeElement.GetAttribute("value");
+                driver.WaitForTransaction();
 
-                if (searchType == "1") //Categorized Search
+                if (driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.CategorizedResultsContainer]), out var categorizedContainer))
                 {
-                    var resultsContainer = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Container]),
-                        Constants.DefaultTimeout,
-                        "Search Results is not available"
-                    );
-
-                    var entityContainer = resultsContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.EntityContainer].Replace("[NAME]", entity)),
-                        $"Entity {entity} was not found in the results"
-                    );
-
-                    var records = entityContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Records]));
-                    if (records == null || records.Count == 0)
-                        throw new InvalidOperationException($"No records found for entity {entity}");
-
+                    // Categorized Search
+                    var records = categorizedContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.CategorizedResults].Replace("[ENTITY]", entity)));
                     if (index >= records.Count)
-                        throw new InvalidOperationException($"There was less than {index} records in your the search result.");
-
-                    records[index].Click(true);
-
-                    driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.FormContext]),
-                        TimeSpan.FromSeconds(30),
-                        "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
-                    );
-                    return true;
-                }
-
-                if (searchType == "0") //Relevance Search
-                {
-                    var resultsContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceResultsContainer]));
-                    var records = resultsContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceResults].Replace("[ENTITY]", entity.ToUpper())));
-
-                    if (index >= records.Count)
-                        throw new InvalidOperationException($"There was less than {index} records in your the search result.");
-
-                    records[index].Click(true);
-                    return true;
-                }
-
-                return false;
-            });
-        }
-
-
-        /// <summary>
-        /// Changes the search type used for global search
-        /// </summary>
-        /// <param name="type">The type of search that you want to do.</param>
-        /// <example>xrmBrowser.GlobalSearch.ChangeSearchType("Categorized");</example>
-        public BrowserCommandResult<bool> ChangeSearchType(string type, int thinkTime = Constants.DefaultThinkTime)
-        {
-            ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions("Change Search Type"), driver =>
-            {
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.Type]),
-                    Constants.DefaultTimeout,
-                    select =>
                     {
-                        var options = select.FindElements(By.TagName("option"));
-                        var option = options.FirstOrDefault(x => x.Text.Trim() == type);
-                        if (option == null)
-                            return;
+                        throw new InvalidOperationException($"There was less than {index + 1} records in the search result.");
+                    }
 
-                        select.Click(true);
-                        option.Click(true);
-                    },
-                    "Search Results is not available");
+                    records[index].Click(true);
+                }
+                else if (driver.TryFindElement(By.Id("resultsContainer-view"), out var relevanceContainer))
+                {
+                    // Relevance Search
+                    var selectedTab = relevanceContainer.FindElement(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceSearchResultsSelectedTab]));
+                    if (selectedTab.GetAttribute("name") != entity)
+                    {
+                        this.FilterWith(entity);
+                    }
+
+                    var links = relevanceContainer.FindElements(By.XPath(AppElements.Xpath[AppReference.GlobalSearch.RelevanceSearchResultLinks]));
+                    if (index >= links.Count)
+                    {
+                        throw new InvalidOperationException($"There was less than {index + 1} records in the search result.");
+                    }
+
+                    new Actions(driver).DoubleClick(links[index]).Perform();
+                }
+                else
+                {
+                    throw new NotFoundException("Unable to locate global search results.");
+                }
+
+                driver.WaitForTransaction();
+
                 return true;
             });
         }

@@ -14,9 +14,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Search using Relevance Search
+        /// Search using Relevance Search or Categorized Search.
         /// </summary>
-        /// <param name="criteria">Criteria to search for</param>
+        /// <param name="criteria">Criteria to search for.</param>
         /// <returns></returns>
         public bool Search(string criteria)
         {
@@ -54,17 +54,5 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.OpenGlobalSearchRecord(entity, index);
         }
-
-        /// <summary>
-        /// Changes the Global Search Type
-        /// </summary>
-        /// <param name="type">The type of search that you want to do </param>
-        /// <param name="index">The index of the record you want to open.</param>
-        /// <example>xrmBrowser.GlobalSearch.ChangeSearchType("Categorized Search");</example>
-        public bool ChangeSearchType(string type)
-        {
-            return _client.ChangeSearchType(type);
-        }
-        
     }
 }

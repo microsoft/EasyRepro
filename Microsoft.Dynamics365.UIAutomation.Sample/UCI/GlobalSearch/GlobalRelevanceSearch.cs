@@ -12,7 +12,7 @@ using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class GlobalRelevanceSearchUci: TestsBase
+    public class GlobalRelevanceSearchUci : TestsBase
     {
         [TestMethod]
         public void UCITestGlobalRelevanceSearch()
@@ -26,13 +26,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenGlobalSearch();
 
-                xrmApp.GlobalSearch.ChangeSearchType("Relevance Search");
-
-                xrmApp.GlobalSearch.Search("Adventure");
+                xrmApp.GlobalSearch.Search("Northwind Traders");
 
                 xrmApp.GlobalSearch.Filter("Record Type", "Accounts");
 
-                xrmApp.GlobalSearch.OpenRecord("account", 0);
+                xrmApp.GlobalSearch.OpenRecord("Accounts", 0);
             }
         }
     }

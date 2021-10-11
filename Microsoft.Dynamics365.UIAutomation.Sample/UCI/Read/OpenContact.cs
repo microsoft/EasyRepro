@@ -34,9 +34,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Grid.Search("Patrick");
 
                 xrmApp.Grid.OpenRecord(0);
-                
+
             }
-            
+
         }
 
         [TestMethod]
@@ -97,7 +97,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
-        [TestCategory("Fail - Bug")]
         public void UCITestLookupSearch()
         {
             var client = new WebClient(TestSettings.Options);
@@ -115,7 +114,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 LookupItem parentCustomerId = new LookupItem { Name = "parentcustomerid" };
                 xrmApp.Entity.SelectLookup(parentCustomerId);
 
-                // Bug: OpenQA.Selenium.NotFoundException: Lookup Entity Accounts not found
                 xrmApp.Lookup.SelectRelatedEntity("Accounts");
 
                 xrmApp.Lookup.SwitchView("My Active Accounts");
@@ -127,7 +125,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
-        [TestCategory("Fail - Bug")]
         public void UCITestLookupNew()
         {
             var client = new WebClient(TestSettings.Options);
@@ -145,19 +142,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 LookupItem parentCustomerId = new LookupItem { Name = "parentcustomerid" };
                 xrmApp.Entity.SelectLookup(parentCustomerId);
 
-                // Bug: OpenQA.Selenium.NotFoundException: Lookup Entity Accounts not found
                 xrmApp.Lookup.SelectRelatedEntity("Accounts");
 
                 xrmApp.Lookup.New();
 
                 xrmApp.ThinkTime(3000);
-
-
-
             }
         }
 
-        [TestCategory("Fail - Bug")]
         [TestMethod]
         public void UCITestOpenContactRetrieveHeaderValues()
         {
@@ -172,15 +164,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.RelatedGrid.OpenGridRow(0);
 
-                // Bug: Fails to resolve ownerid
-                // OpenQA.Selenium.NoSuchElementException: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@data-id='header_ownerId.fieldControl-Lookup_ownerId']"}
                 LookupItem ownerId = new LookupItem() { Name = "ownerid" };
                 string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
 
                 string emailAddress = xrmApp.Entity.GetHeaderValue("emailaddress1");
 
                 xrmApp.ThinkTime(2000);
-
             }
         }
 
