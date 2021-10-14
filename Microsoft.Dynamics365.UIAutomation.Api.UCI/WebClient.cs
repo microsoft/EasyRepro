@@ -2358,7 +2358,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (formContextType == FormContextType.Dialog)
             {
                 // Initialize the Dialog context
-                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+                driver.WaitForTransaction();
+                var formContext = driver
+                    .FindElements(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]))
+                    .LastOrDefault() ?? throw new NotFoundException("Unable to find a dialog.");
                 fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
             }
 
