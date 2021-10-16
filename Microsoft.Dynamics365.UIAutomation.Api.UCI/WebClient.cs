@@ -2056,7 +2056,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else
                     {
                         // Is the button in More Commands overflow?
-                        if (subGridCommandBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", "More Commands")), out var moreCommands))
+                        if (subGridCommandBar.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", "More commands")), out var moreCommands))
                         {
                             // Click More Commands
                             moreCommands.Click(true);
