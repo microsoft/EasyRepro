@@ -89,7 +89,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.DuplicateDetection(clickSaveOrCancel);
         }
-
+        /// <summary>
+        /// Clicks OK or Cancel on the confirmation dialog.  true = OK, false = Cancel
+        /// </summary>
+        /// <param name="clickConfirmButton"></param>
+        /// <returns></returns>
+        public bool ClickOk()
+        {
+            return _client.ClickOk();
+        }
         /// <summary>
         /// Clicks Confirm or Cancel on the Publish dialog.  true = Confirm, false = Cancel
         /// </summary>

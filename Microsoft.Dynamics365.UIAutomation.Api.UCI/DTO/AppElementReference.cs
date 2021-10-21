@@ -50,6 +50,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public static class Grid
         {
             public static string Container = "Grid_Container";
+            public static string PcfContainer = "Grid_PCFContainer";
             public static string QuickFind = "Grid_QuickFind";
             public static string FirstPage = "Grid_FirstPage";
             public static string NextPage = "Grid_NextPage";
@@ -62,6 +63,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string RowsContainerCheckbox = "Grid_RowsContainerCheckbox";
             public static string RowsContainer = "Grid_RowsContainer";
             public static string Rows = "Grid_Rows";
+            public static string Row = "Grid_Row";
+            public static string LastRow = "Grid_LastRow";
+            public static string Columns = "Grid_Columns";
             public static string Control = "Grid_Control";
             public static string ChartSelector = "Grid_ChartSelector";
             public static string ChartViewList = "Grid_ChartViewList";
@@ -70,6 +74,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string CellContainer = "Grid_CellContainer";
             public static string ViewSelector = "Grid_ViewSelector";
             public static string ViewContainer = "Grid_ViewContainer";
+            public static string ViewSelectorMenuItem = "Grid_ViewSelectorMenuItem";
             public static string SubArea = "Grid_SubArea";
         }
 
@@ -117,6 +122,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string MoreTabsMenu = "Entity_MoreTabsMenu";
             public static string SubTab = "Entity_SubTab";
             public static string SubGridTitle = "Entity_SubGridTitle";
+            public static string SubGridRow = "Entity_SubGrid_Row";
+            public static string SubGridLastRow = "Entity_SubGrid_LastRow";
             public static string SubGridContents = "Entity_SubGridContents";
             public static string SubGridList = "Entity_SubGridList";
             public static string SubGridListCells = "Entity_SubGridListCells";
@@ -274,6 +281,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string AssignDialogToggle = "AssignDialog_ToggleField";
             public static string ConfirmButton = "Dialog_ConfirmButton";
             public static string CancelButton = "Dialog_CancelButton";
+            public static string OkButton = "Dialog_OkButton";
             public static string DuplicateDetectionIgnoreSaveButton = "DuplicateDetectionDialog_IgnoreAndSaveButton";
             public static string DuplicateDetectionCancelButton = "DuplicateDetectionDialog_CancelButton";
             public static string PublishConfirmButton = "Dialog_PublishConfirmButton";
@@ -389,6 +397,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             
             //Grid
             { "Grid_Container"       , "//div[@data-id='data-set-body-container']"},
+            { "Grid_PCFContainer"       , "//div[@ref='eViewport']"},
             { "Grid_QuickFind"       , "//*[contains(@id, \'quickFind_text\')]"},
             { "Grid_NextPage"       , "//button[contains(@data-id,'moveToNextPage')]"},
             { "Grid_PreviousPage"       , "//button[contains(@data-id,'moveToPreviousPage')]"},
@@ -398,16 +407,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Grid_JumpBar"       , "//*[@id=\"JumpBarItemsList\"]"},
             { "Grid_FilterByAll"       , "//*[@id=\"All_link\"]"},
             { "Grid_RowsContainerCheckbox"  ,   "//div[@role='checkbox']" },
-            { "Grid_RowsContainer"       , ".//div[@class='ag-center-cols-viewport']//div[@role='rowgroup']"},
-            { "Grid_Rows"           , ".//div[@role='row' and ./div[@role='gridcell']]"},
+            { "Grid_RowsContainer"       , "//div[contains(@role,'grid')]"},
+            { "Grid_Rows"           , "//div[@ref='centerContainer']//div[@role='rowgroup']//div[contains(@role,'row')]"},
+            { "Grid_Row"           , "//div[@data-id='entity_control-pcf_grid_control_container']//div[@ref='centerContainer']//div[@role='rowgroup']//div[@row-index=\'[INDEX]\']"},
+            { "Grid_LastRow"           , "//div[@data-id='entity_control-pcf_grid_control_container']//div[@ref='centerContainer']//div[@role='rowgroup']//div[contains(@class, 'ag last-row')]"},
             { "Grid_Control", "//div[contains(@data-lp-id, 'MscrmControls.Grid.PCFGridControl')]" },
+            { "Grid_Columns"           , "//div[contains(@ref,'eHeaderContainer')]"},
             { "Grid_ChartSelector"           , "//span[contains(@id,'ChartSelector')]"},
             { "Grid_ChartViewList"           , "//ul[contains(@role,'listbox')]"},
-            { "Grid_SortColumn",            "//div[@role='columnheader' and .//label[text()='[COLNAME]']]"},
+            { "Grid_SortColumn",            "//div[contains(@ref,'eHeaderContainer')]//label[@title='[COLNAME]']"},
             { "Grid_Cells", ".//div[@role='gridcell']"},
-            { "Grid_CellContainer"    ,".//div[@role='grid' and @ref='gridBody']"},
+            { "Grid_CellContainer"    ,"//div[@role='grid'][@data-id='grid-cell-container']"},
             { "Grid_ViewSelector"   , "//button[contains(@id,'ViewSelector')]" },
-            { "Grid_ViewContainer"   , "//div[contains(@data-id,'ViewSelector')]//div[@role='group']//ul" },
+            //{ "Grid_ViewContainer"   , "//div[contains(@data-id,'ViewSelector')]//div[@role='group']//ul" },
+            { "Grid_ViewContainer"   , "//div[contains(@aria-label,'Views')]" },
+            { "Grid_ViewSelectorMenuItem", ".//span[contains(@class, 'ms-ContextualMenu-itemText')]" },
             { "Grid_SubArea"   , "//*[contains(@data-id,'[NAME]')]"},
             
 
@@ -451,9 +465,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_FieldControlDateTimeInputUCI",".//*[contains(@data-id, '[FIELD].fieldControl-date-time-input')]" },
             { "Entity_FieldControlDateTimeTimeInputUCI",".//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input" },
             { "Entity_LookupResultsDropdown", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
+            { "Entity_SubGrid_Row"           , "//div[@ref='centerContainer']//div[@role='rowgroup']//div[@row-index=\'[INDEX]\']"},
+            { "Entity_SubGrid_LastRow"           , "//div[@ref='centerContainer']//div[@role='rowgroup']//div[contains(@class, 'ag-row-last')]"},
             { "Entity_SubGridTitle", "//div[contains(text(), '[NAME]')]" },
             { "Entity_SubGridContents", "//div[@id=\"dataSetRoot_[NAME]\"]" },
-            { "Entity_SubGridList", ".//ul[contains(@id, \"[NAME]-GridList\")]" },
+            { "Entity_SubGridList", "//div[@data-id='[NAME]-pcf_grid_control_container']//div[@ref='centerContainer']//div[@role='rowgroup']//div[@role='row']" },
             { "Entity_SubGridListCells", ".//div[@class='ag-center-cols-viewport']//div[@role='rowgroup']" },
             { "Entity_SubGridViewPickerButton", ".//span[contains(@id, 'ViewSelector') and contains(@id, 'button')]" },
             { "Entity_SubGridViewPickerFlyout", "//div[contains(@id, 'ViewSelector') and contains(@flyoutroot, 'flyoutRootNode')]" },
@@ -600,6 +616,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Dialog_DescriptionId", "//input[contains(@data-id,'description_id')]" },
             { "Dialog_ConfirmButton" , "//*[@id=\"confirmButton\"]" },
             { "Dialog_CancelButton" , "//*[@id=\"cancelButton\"]" },
+            { "Dialog_OkButton" , "//*[@id=\"okButton\"]" },
             { "DuplicateDetectionDialog_IgnoreAndSaveButton" , "//button[contains(@data-id, 'ignore_save')]" },
             { "DuplicateDetectionDialog_CancelButton" , "//button[contains(@data-id, 'close_dialog')]" },
             { "Dialog_SetStateDialog" , "//div[@data-id=\"SetStateDialog\"]" },

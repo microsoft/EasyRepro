@@ -39,4 +39,29 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return (T)this[attributeName];
         }
     }
+    public class SerializedGridItem
+    {
+        public string value { get; set; }
+        public string label { get; set; }
+        public GridItemId id { get; set; }
+        public GridItemLookup reference { get; set; }
+    }
+
+    public class GridItemId
+    {
+        public string guid { get; set; }
+    }
+
+    public class GridItemLookup
+    {
+        public string etn { get; set; }
+        public GridItemId id { get; set; }
+        public string name { get; set; }
+    }
+    public class RecordObject
+    {
+        public KeyValuePair<string, object> etn { get; set; }
+        public KeyValuePair<string, object> id { get; set; }
+        public KeyValuePair<string, object> name { get; set; }
+    }
 }
