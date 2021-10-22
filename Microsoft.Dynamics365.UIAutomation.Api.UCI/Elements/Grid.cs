@@ -15,6 +15,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Returns HTML of Grid
+        /// </summary>
+        public string GetGridControl()
+        {
+            return _client.GetGridControl();
+        }
+        /// <summary>
         /// Switches the view to the view supplied
         /// </summary>
         /// <param name="viewName">Name of the view to select</param>

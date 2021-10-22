@@ -15,7 +15,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client = client;
         }
-
+        /// <summary>
+        /// Returns HTML of Grid
+        /// </summary>
+        public string GetSubGridControl(string subGridName)
+        {
+            return _client.GetSubGridControl(subGridName);
+        }
         /// <summary>
         /// Clicks a button in the subgrid menu
         /// </summary>
