@@ -10,9 +10,6 @@ Microsoft Visual Studio 2015, Microsoft Visual Studio 2017, Microsoft Visual Stu
 
 ### CRM Versions
 Easy Repro supports below CRM Versions	
-- Microsoft Dynamics 365 Online Version 8.2 (8.2.x) (DB 8.2.x) online
-- Microsoft Dynamics 365 Online Version 9.0 (9.0.x) (DB 9.0.x) online
-- Microsoft Dynamics 365 Online Version 9.0.2 (9.0.2) (DB 9.0.2) online
 - Microsoft Dynamics 365 Online Version 9.1 (9.1.x) (DB 9.1.x) online
 - Microsoft Dynamics 365 Online Version 9.2 (9.2.x) (DB 9.2.x) online
 
