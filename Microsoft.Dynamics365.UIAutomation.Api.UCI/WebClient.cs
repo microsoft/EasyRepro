@@ -2289,315 +2289,311 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-        //internal BrowserCommandResult<List<GridItem>> GetSubGridItems(string subgridName)
-        //{
-        //    return this.Execute(GetOptions($"Get Subgrid Items for Subgrid {subgridName}"), driver =>
-        //    {
-        //        // Initialize return object
-        //        List<GridItem> subGridRows = new List<GridItem>();
+        internal BrowserCommandResult<List<GridItem>> GetSubGridItems(string subgridName)
+        {
+            return this.Execute(GetOptions($"Get Subgrid Items for Subgrid {subgridName}"), driver =>
+            {
+                // Initialize return object
+                List<GridItem> subGridRows = new List<GridItem>();
 
-        //        // Initialize required local variables
-        //        IWebElement subGridRecordList = null;
-        //        List<string> columns = new List<string>();
-        //        List<string> cellValues = new List<string>();
-        //        GridItem item = new GridItem();
-        //        //Dictionary<string, object> WindowStateDataTest = (Dictionary<string, object>)driver.ExecuteScript($"alert('test')");
-        //        Dictionary<string, object> WindowStateData = (Dictionary<string, object>)driver.ExecuteScript($"return JSON.parse(JSON.stringify(window[Object.keys(window).find(i => !i.indexOf(\"__store$\"))].getState().data))");
-        //        // Find the SubGrid
-        //        var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
+                // Initialize required local variables
+                IWebElement subGridRecordList = null;
+                List<string> columns = new List<string>();
+                List<string> cellValues = new List<string>();
+                GridItem item = new GridItem();
+                Dictionary<string, object> WindowStateData = (Dictionary<string, object>)driver.ExecuteScript($"return JSON.parse(JSON.stringify(window[Object.keys(window).find(i => !i.indexOf(\"__store$\"))].getState().data))");
+                // Find the SubGrid
+                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
 
-        //        if (subGrid == null)
-        //            throw new NotFoundException($"Unable to locate subgrid contents for {subgridName} subgrid.");
+                if (subGrid == null)
+                    throw new NotFoundException($"Unable to locate subgrid contents for {subgridName} subgrid.");
+                // Check if ReadOnlyGrid was found
+                if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList))
+                {
 
-        //        // Check if ReadOnlyGrid was found
-        //        if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList))
-        //        {
+                    // Locate record list
+                    var foundRecords = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
 
-        //            // Locate record list
-        //            var foundRecords = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+                    if (foundRecords)
+                    {
+                        var subGridRecordRows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)));
+                        var SubGridContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
+                        string[] gridDataId = SubGridContainer.FindElement(By.XPath($"//div[contains(@data-lp-id,'{subgridName}')]")).GetAttribute("data-lp-id").Split('|');
+                        //Need to add entity name
+                        string keyForData = GetGridQueryKey(driver, gridDataId[2] + ":" + subgridName);
 
-        //            if (foundRecords)
-        //            {
-        //                var subGridRecordRows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)));
-        //                var SubGridContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
-        //                string[] gridDataId = SubGridContainer.FindElement(By.XPath($"//div[contains(@data-lp-id,'{subgridName}')]")).GetAttribute("data-lp-id").Split('|');
-        //                //Need to add entity name
-        //                string keyForData = GetGridQueryKey(driver, gridDataId[2] + ":" + subgridName);
-        //                //BrowserCommandResult<List<GridItem>> gridItems = this.GetSubGridItems(0, "account:" + subgridName);
+                        Dictionary<string, object> WindowStateDataLists = (Dictionary<string, object>)WindowStateData["lists"];
 
-        //                //string[] gridDataId = subGrid.GetAttribute("data-lp-id").Split('|');
-        //                Dictionary<string, object> WindowStateDataLists = (Dictionary<string, object>)WindowStateData["lists"];
+                        //Find Data by Key
+                        Dictionary<string, object> WindowStateDataKeyedForData = (Dictionary<string, object>)WindowStateDataLists[keyForData];
+                        //Find Record Ids for Key Data Set
+                        ReadOnlyCollection<object> WindowStateDataKeyedForDataRecordsIds = (ReadOnlyCollection<object>)WindowStateDataKeyedForData["records"];
 
-        //                //Find Data by Key
-        //                Dictionary<string, object> WindowStateDataKeyedForData = (Dictionary<string, object>)WindowStateDataLists[keyForData];
-        //                //Find Record Ids for Key Data Set
-        //                ReadOnlyCollection<object> WindowStateDataKeyedForDataRecordsIds = (ReadOnlyCollection<object>)WindowStateDataKeyedForData["records"];
-
-        //                //Get Data
-        //                Dictionary<string, object> WindowStateEntityData = (Dictionary<string, object>)WindowStateData["entities"];
-        //                Dictionary<string, object> WindowStateEntityDataEntity = (Dictionary<string, object>)WindowStateEntityData[gridDataId[2]];
-        //                foreach (Dictionary<string, object> record in WindowStateDataKeyedForDataRecordsIds)
-        //                {
-        //                    Dictionary<string, object> recordId = (Dictionary<string, object>)record["id"];
-        //                    //Dictionary<string, object> definedRecord = (Dictionary<string, object>)WindowStateEntityDataEntity[(string)recordId["guid"]];
-        //                    //Dictionary<string, object> attributes = (Dictionary<string, object>)definedRecord["fields"];
-        //                    GridItem gridItem = new GridItem()
-        //                    {
-        //                        EntityName = gridDataId[2],
-        //                        Id = new Guid((string)recordId["guid"])
-        //                    };
-        //                    //ProcessGridRowAttributes(attributes, gridItem);
-        //                    subGridRows.Add(gridItem);
-        //                }
+                        //Get Data
+                        Dictionary<string, object> WindowStateEntityData = (Dictionary<string, object>)WindowStateData["entities"];
+                        Dictionary<string, object> WindowStateEntityDataEntity = (Dictionary<string, object>)WindowStateEntityData[gridDataId[2]];
+                        foreach (Dictionary<string, object> record in WindowStateDataKeyedForDataRecordsIds)
+                        {
+                            Dictionary<string, object> recordId = (Dictionary<string, object>)record["id"];
+                            //Dictionary<string, object> definedRecord = (Dictionary<string, object>)WindowStateEntityDataEntity[(string)recordId["guid"]];
+                            //Dictionary<string, object> attributes = (Dictionary<string, object>)definedRecord["fields"];
+                            GridItem gridItem = new GridItem()
+                            {
+                                EntityName = gridDataId[2],
+                                Id = new Guid((string)recordId["guid"])
+                            };
+                            //ProcessGridRowAttributes(attributes, gridItem);
+                            subGridRows.Add(gridItem);
+                        }
 
 
-        //            }
-        //            else
-        //                throw new NotFoundException($"Unable to locate record list for subgrid {subgridName}");
+                    }
+                    else
+                        throw new NotFoundException($"Unable to locate record list for subgrid {subgridName}");
 
-        //        }
-        //        // Attempt to locate the editable grid list
-        //        else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList))
-        //        {
-        //            //Find the columns
-        //            var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersEditable]));
+                }
+                // Attempt to locate the editable grid list
+                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList))
+                {
+                    //Find the columns
+                    var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersEditable]));
 
-        //            foreach (IWebElement headerCell in headerCells)
-        //            {
-        //                var headerTitle = headerCell.GetAttribute("title");
-        //                columns.Add(headerTitle);
-        //            }
+                    foreach (IWebElement headerCell in headerCells)
+                    {
+                        var headerTitle = headerCell.GetAttribute("title");
+                        columns.Add(headerTitle);
+                    }
 
-        //            //Find the rows
-        //            var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridDataRowsEditable]));
+                    //Find the rows
+                    var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridDataRowsEditable]));
 
-        //            //Process each row
-        //            foreach (IWebElement row in rows)
-        //            {
-        //                var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
+                    //Process each row
+                    foreach (IWebElement row in rows)
+                    {
+                        var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
 
-        //                if (cells.Count > 0)
-        //                {
-        //                    foreach (IWebElement thisCell in cells)
-        //                        cellValues.Add(thisCell.Text);
+                        if (cells.Count > 0)
+                        {
+                            foreach (IWebElement thisCell in cells)
+                                cellValues.Add(thisCell.Text);
 
-        //                    for (int i = 0; i < columns.Count; i++)
-        //                    {
-        //                        //The first cell is always a checkbox for the record.  Ignore the checkbox.
-        //                        if (i == 0)
-        //                        {
-        //                            // Do Nothing
-        //                        }
-        //                        else
-        //                        {
-        //                            item[columns[i]] = cellValues[i];
-        //                        }
-        //                    }
+                            for (int i = 0; i < columns.Count; i++)
+                            {
+                                //The first cell is always a checkbox for the record.  Ignore the checkbox.
+                                if (i == 0)
+                                {
+                                    // Do Nothing
+                                }
+                                else
+                                {
+                                    item[columns[i]] = cellValues[i];
+                                }
+                            }
 
-        //                    subGridRows.Add(item);
+                            subGridRows.Add(item);
 
-        //                    // Flush Item and Cell Values To Get New Rows
-        //                    cellValues = new List<string>();
-        //                    item = new GridItem();
-        //                }
-        //            }
+                            // Flush Item and Cell Values To Get New Rows
+                            cellValues = new List<string>();
+                            item = new GridItem();
+                        }
+                    }
 
-        //            return subGridRows;
+                    return subGridRows;
 
-        //        }
-        //        // Special 'Related' high density grid control for entity forms
-        //        else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHighDensityList].Replace("[NAME]", subgridName)), out subGridRecordList))
-        //        {
-        //            //Find the columns
-        //            var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersHighDensity]));
+                }
+                // Special 'Related' high density grid control for entity forms
+                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHighDensityList].Replace("[NAME]", subgridName)), out subGridRecordList))
+                {
+                    //Find the columns
+                    var headerCells = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersHighDensity]));
 
-        //            foreach (IWebElement headerCell in headerCells)
-        //            {
-        //                var headerTitle = headerCell.GetAttribute("data-id");
-        //                columns.Add(headerTitle);
-        //            }
+                    foreach (IWebElement headerCell in headerCells)
+                    {
+                        var headerTitle = headerCell.GetAttribute("data-id");
+                        columns.Add(headerTitle);
+                    }
 
-        //            //Find the rows
-        //            var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRowsHighDensity]));
+                    //Find the rows
+                    var rows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRowsHighDensity]));
 
-        //            //Process each row
-        //            foreach (IWebElement row in rows)
-        //            {
-        //                //Get the entityId and entity Type
-        //                if (row.GetAttribute("data-lp-id") != null)
-        //                {
-        //                    var rowAttributes = row.GetAttribute("data-lp-id").Split('|');
-        //                    item.EntityName = rowAttributes[4];
-        //                    //The row record IDs are not in the DOM. Must be retrieved via JavaScript
-        //                    var getId = $"return Xrm.Page.getControl(\"{subgridName}\").getGrid().getRows().get({rows.IndexOf(row)}).getData().entity.getId()";
-        //                    item.Id = new Guid((string)driver.ExecuteScript(getId));
-        //                }
+                    //Process each row
+                    foreach (IWebElement row in rows)
+                    {
+                        //Get the entityId and entity Type
+                        if (row.GetAttribute("data-lp-id") != null)
+                        {
+                            var rowAttributes = row.GetAttribute("data-lp-id").Split('|');
+                            item.EntityName = rowAttributes[4];
+                            //The row record IDs are not in the DOM. Must be retrieved via JavaScript
+                            var getId = $"return Xrm.Page.getControl(\"{subgridName}\").getGrid().getRows().get({rows.IndexOf(row)}).getData().entity.getId()";
+                            item.Id = new Guid((string)driver.ExecuteScript(getId));
+                        }
 
-        //                var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
+                        var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
 
-        //                if (cells.Count > 0)
-        //                {
-        //                    foreach (IWebElement thisCell in cells)
-        //                        cellValues.Add(thisCell.Text);
+                        if (cells.Count > 0)
+                        {
+                            foreach (IWebElement thisCell in cells)
+                                cellValues.Add(thisCell.Text);
 
-        //                    for (int i = 0; i < columns.Count; i++)
-        //                    {
-        //                        //The first cell is always a checkbox for the record.  Ignore the checkbox.
-        //                        if (i == 0)
-        //                        {
-        //                            // Do Nothing
-        //                        }
-        //                        else
-        //                        {
-        //                            item[columns[i]] = cellValues[i];
-        //                        }
+                            for (int i = 0; i < columns.Count; i++)
+                            {
+                                //The first cell is always a checkbox for the record.  Ignore the checkbox.
+                                if (i == 0)
+                                {
+                                    // Do Nothing
+                                }
+                                else
+                                {
+                                    item[columns[i]] = cellValues[i];
+                                }
 
-        //                    }
+                            }
 
-        //                    subGridRows.Add(item);
+                            subGridRows.Add(item);
 
-        //                    // Flush Item and Cell Values To Get New Rows
-        //                    cellValues = new List<string>();
-        //                    item = new GridItem();
-        //                }
-        //            }
+                            // Flush Item and Cell Values To Get New Rows
+                            cellValues = new List<string>();
+                            item = new GridItem();
+                        }
+                    }
 
-        //            return subGridRows;
-        //        }
+                    return subGridRows;
+                }
 
-        //        // Return rows object
-        //        return subGridRows;
-        //    });
-        //}
+                // Return rows object
+                return subGridRows;
+            });
+        }
 
-        //private static Actions ClickSubGridAndPageDown(IWebDriver driver, IWebElement grid)
-        //{
-        //    Actions actions = new Actions(driver);
-        //    //var topRow = driver.FindElement(By.XPath("//div[@data-id='entity_control-pcf_grid_control_container']//div[@ref='centerContainer']//div[@role='rowgroup']//div[@role='row']"));
-        //    var topRow = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.Rows]));
-        //    //topRow.Click();
-        //    //actions.SendKeys(OpenQA.Selenium.Keys.PageDown).Perform();
+        private static Actions ClickSubGridAndPageDown(IWebDriver driver, IWebElement grid)
+        {
+            Actions actions = new Actions(driver);
+            //var topRow = driver.FindElement(By.XPath("//div[@data-id='entity_control-pcf_grid_control_container']//div[@ref='centerContainer']//div[@role='rowgroup']//div[@role='row']"));
+            var topRow = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.Rows]));
+            //topRow.Click();
+            //actions.SendKeys(OpenQA.Selenium.Keys.PageDown).Perform();
 
-        //    actions.MoveToElement(topRow.FindElement(By.XPath("//div[@role='gridcell']"))).Perform();
-        //    actions.KeyDown(OpenQA.Selenium.Keys.Alt).SendKeys(OpenQA.Selenium.Keys.ArrowDown).Build().Perform();
-        //    return actions;
+            actions.MoveToElement(topRow.FindElement(By.XPath("//div[@role='gridcell']"))).Perform();
+            actions.KeyDown(OpenQA.Selenium.Keys.Alt).SendKeys(OpenQA.Selenium.Keys.ArrowDown).Build().Perform();
+            return actions;
 
-        //}
-        //internal BrowserCommandResult<bool> OpenSubGridRecord(string subgridName, int index = 0)
-        //{
-        //    return this.Execute(GetOptions($"Open Subgrid record for subgrid {subgridName}"), driver =>
-        //    {
-        //        // Find the SubGrid
-        //        var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
+        }
+        internal BrowserCommandResult<bool> OpenSubGridRecord(string subgridName, int index = 0)
+        {
+            return this.Execute(GetOptions($"Open Subgrid record for subgrid {subgridName}"), driver =>
+            {
+                // Find the SubGrid
+                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
 
-        //        // Find list of SubGrid records
-        //        IWebElement subGridRecordList = null;
-        //        var foundGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+                // Find list of SubGrid records
+                IWebElement subGridRecordList = null;
+                var foundGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
 
-        //        // Read Only Grid Found
-        //        if (subGridRecordList != null && foundGrid)
-        //        {
-        //            var subGridRecords = subGridRecordList.FindElements(By.TagName("li"));
-        //            var recordLabels = subGridRecordList.FindElements(By.XPath("//div[@role='gridcell']"));
-        //            var subGridRecordRows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)));
-        //            if (subGridRecords == null)
-        //                throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
-        //            Actions actions = new Actions(driver);
-        //            IWebElement gridRow = null;
-        //            if (index + 1 < subGridRecordRows.Count)
-        //            {
+                // Read Only Grid Found
+                if (subGridRecordList != null && foundGrid)
+                {
+                    var subGridRecords = subGridRecordList.FindElements(By.TagName("li"));
+                    var recordLabels = subGridRecordList.FindElements(By.XPath("//div[@role='gridcell']"));
+                    var subGridRecordRows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)));
+                    if (subGridRecords == null)
+                        throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
+                    Actions actions = new Actions(driver);
+                    IWebElement gridRow = null;
+                    if (index + 1 < subGridRecordRows.Count)
+                    {
 
-        //                var grid = driver.FindElement(By.XPath("//div[@ref='eViewport']"));
-        //                actions.MoveToElement(grid).Perform();
-        //                //subGrid.Click();
-        //                bool lastRow = false;
-        //                var rowGroup = subGrid.FindElement(By.XPath("//div[@ref='centerContainer']//div[@role='rowgroup']"));
-        //                int lastKnownFloor = 0;
-        //                while (!lastRow)
-        //                {
-        //                    if (!grid.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRow].Replace("[INDEX]", index.ToString()))))
-        //                    {
-        //                        actions = ClickSubGridAndPageDown(driver, grid);
-        //                        //lastKnownFloor = ClickGridAndPageDown(driver, grid, lastKnownFloor);
-        //                    }
-        //                    else
-        //                    {
-        //                        gridRow = driver.FindElement(By.XPath
-        //                        (AppElements.Xpath[AppReference.Entity.SubGridRow].Replace("[INDEX]", index.ToString())));
-        //                        if (gridRow.Location.Y < (driver.FindElement(By.XPath("//div[@data-control-name='Subgrid_1']")).Location.Y + driver.FindElement(By.XPath("//div[@data-control-name='Subgrid_1']")).Size.Height))
-        //                        {
+                        var grid = driver.FindElement(By.XPath("//div[@ref='eViewport']"));
+                        actions.MoveToElement(grid).Perform();
+                        //subGrid.Click();
+                        bool lastRow = false;
+                        var rowGroup = subGrid.FindElement(By.XPath("//div[@ref='centerContainer']//div[@role='rowgroup']"));
+                        int lastKnownFloor = 0;
+                        while (!lastRow)
+                        {
+                            if (!grid.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRow].Replace("[INDEX]", index.ToString()))))
+                            {
+                                actions = ClickSubGridAndPageDown(driver, grid);
+                                //lastKnownFloor = ClickGridAndPageDown(driver, grid, lastKnownFloor);
+                            }
+                            else
+                            {
+                                gridRow = driver.FindElement(By.XPath
+                                (AppElements.Xpath[AppReference.Entity.SubGridRow].Replace("[INDEX]", index.ToString())));
+                                if (gridRow.Location.Y < (driver.FindElement(By.XPath("//div[@data-control-name='Subgrid_1']")).Location.Y + driver.FindElement(By.XPath("//div[@data-control-name='Subgrid_1']")).Size.Height))
+                                {
 
-        //                            lastRow = true;
-        //                        }
-        //                        else
-        //                        {
-        //                            actions = ClickSubGridAndPageDown(driver, grid);
-        //                        }
+                                    lastRow = true;
+                                }
+                                else
+                                {
+                                    actions = ClickSubGridAndPageDown(driver, grid);
+                                }
 
-        //                    }
-        //                    if (grid.HasElement(By.XPath("//div[@data-control-name='Subgrid_1']//div[@ref='centerContainer']//div[@role='rowgroup']//div[@role='row' and contains(@class, 'ag-row-last')]")))
-        //                    {
-        //                        lastRow = true;
-        //                    }
-        //                }
+                            }
+                            if (grid.HasElement(By.XPath("//div[@data-control-name='Subgrid_1']//div[@ref='centerContainer']//div[@role='rowgroup']//div[@role='row' and contains(@class, 'ag-row-last')]")))
+                            {
+                                lastRow = true;
+                            }
+                        }
 
-        //            }
-        //            else
-        //            {
-        //                var grid = driver.FindElement(By.XPath("//div[@ref='eViewport']"));
-        //                actions.DoubleClick(gridRow).Perform();
-        //                driver.WaitForTransaction();
-        //            }
-        //            if (gridRow == null)
-        //                throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {subGridRecords.Count}. Expected: {index + 1}");
+                    }
+                    else
+                    {
+                        var grid = driver.FindElement(By.XPath("//div[@ref='eViewport']"));
+                        actions.DoubleClick(gridRow).Perform();
+                        driver.WaitForTransaction();
+                    }
+                    if (gridRow == null)
+                        throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {subGridRecords.Count}. Expected: {index + 1}");
 
 
-        //            actions.DoubleClick(gridRow).Perform();
-        //            driver.WaitForTransaction();
-        //            return true;
-        //        }
-        //        else if (!foundGrid)
-        //        {
-        //            // Read Only Grid Not Found
-        //            var foundEditableGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+                    actions.DoubleClick(gridRow).Perform();
+                    driver.WaitForTransaction();
+                    return true;
+                }
+                else if (!foundGrid)
+                {
+                    // Read Only Grid Not Found
+                    var foundEditableGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
 
-        //            if (foundEditableGrid)
-        //            {
-        //                var editableGridListCells = subGridRecordList.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]));
+                    if (foundEditableGrid)
+                    {
+                        var editableGridListCells = subGridRecordList.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]));
 
-        //                var editableGridCellRows = editableGridListCells.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]));
+                        var editableGridCellRows = editableGridListCells.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]));
 
-        //                var editableGridCellRow = editableGridCellRows[index + 1].FindElements(By.XPath("./div"));
+                        var editableGridCellRow = editableGridCellRows[index + 1].FindElements(By.XPath("./div"));
 
-        //                Actions actions = new Actions(driver);
-        //                actions.DoubleClick(editableGridCellRow[0]).Perform();
+                        Actions actions = new Actions(driver);
+                        actions.DoubleClick(editableGridCellRow[0]).Perform();
 
-        //                driver.WaitForTransaction();
+                        driver.WaitForTransaction();
 
-        //                return true;
-        //            }
-        //            else
-        //            {
-        //                // Editable Grid Not Found
-        //                // Check for special 'Related' grid form control
-        //                // This opens a limited form view in-line on the grid
+                        return true;
+                    }
+                    else
+                    {
+                        // Editable Grid Not Found
+                        // Check for special 'Related' grid form control
+                        // This opens a limited form view in-line on the grid
 
-        //                //Get the GridName
-        //                string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", String.Empty);
+                        //Get the GridName
+                        string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", String.Empty);
 
-        //                //cell-0 is the checkbox for each record
-        //                var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
+                        //cell-0 is the checkbox for each record
+                        var checkBox = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox].Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
 
-        //                driver.DoubleClick(checkBox);
+                        driver.DoubleClick(checkBox);
 
-        //                driver.WaitForTransaction();
-        //            }
-        //        }
+                        driver.WaitForTransaction();
+                    }
+                }
 
-        //        return true;
+                return true;
 
-        //    });
-        //}
+            });
+        }
 
         #endregion
 
@@ -3949,182 +3945,182 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
 
-        internal BrowserCommandResult<List<GridItem>> GetSubGridItems(string subgridName)
-        {
-            return this.Execute(GetOptions($"Get Subgrid Items for Subgrid {subgridName}"), driver =>
-            {
-                var subGridRows = new List<GridItem>();
+        //internal BrowserCommandResult<List<GridItem>> GetSubGridItems(string subgridName)
+        //{
+        //    return this.Execute(GetOptions($"Get Subgrid Items for Subgrid {subgridName}"), driver =>
+        //    {
+        //        var subGridRows = new List<GridItem>();
 
-                // Find the SubGrid
-                if (!driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)), out var subGrid))
-                {
-                    throw new NotFoundException($"Unable to locate {subgridName} subgrid.");
-                }
+        //        // Find the SubGrid
+        //        if (!driver.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)), out var subGrid))
+        //        {
+        //            throw new NotFoundException($"Unable to locate {subgridName} subgrid.");
+        //        }
 
-                var entityName = subGrid
-                    .FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.Control]))
-                    .GetAttribute("data-lp-id")
-                    .Split('|')
-                    .ElementAt(4);
-                var appUrl = driver.ExecuteScript($"return Xrm.Utility.getGlobalContext().getCurrentAppUrl();");
+        //        var entityName = subGrid
+        //            .FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.Control]))
+        //            .GetAttribute("data-lp-id")
+        //            .Split('|')
+        //            .ElementAt(4);
+        //        var appUrl = driver.ExecuteScript($"return Xrm.Utility.getGlobalContext().getCurrentAppUrl();");
 
-                GridItem CreateItem(int index)
-                {
-                    var id = new Guid(
-                        (string)driver.ExecuteScript(
-                            $"return Xrm.Page.getControl(\"{subgridName}\").getGrid().getRows().get({index}).getData().entity.getId()"));
+        //        GridItem CreateItem(int index)
+        //        {
+        //            var id = new Guid(
+        //                (string)driver.ExecuteScript(
+        //                    $"return Xrm.Page.getControl(\"{subgridName}\").getGrid().getRows().get({index}).getData().entity.getId()"));
 
-                    return new GridItem
-                    {
-                        EntityName = entityName,
-                        Id = id,
-                        Url = new Uri($"{appUrl}&pagetype=entityrecord&etn={entityName}&id={id}"),
-                    };
-                }
+        //            return new GridItem
+        //            {
+        //                EntityName = entityName,
+        //                Id = id,
+        //                Url = new Uri($"{appUrl}&pagetype=entityrecord&etn={entityName}&id={id}"),
+        //            };
+        //        }
 
-                if (subGrid.HasElement(By.CssSelector(@"div.pcf-grid")))
-                {
-                    // Read-only subgrid
-                    subGridRows = subGrid
-                        .FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridListCells]))
-                        .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRows]))
-                        .Select((row, index) =>
-                        {
-                            var item = CreateItem(index);
+        //        if (subGrid.HasElement(By.CssSelector(@"div.pcf-grid")))
+        //        {
+        //            // Read-only subgrid
+        //            subGridRows = subGrid
+        //                .FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridListCells]))
+        //                .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRows]))
+        //                .Select((row, index) =>
+        //                {
+        //                    var item = CreateItem(index);
 
-                            var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
-                            foreach (var cell in cells)
-                            {
-                                var column = cell.GetAttribute<string>("col-id");
-                                item[column] = cell.Text;
-                            }
+        //                    var cells = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]));
+        //                    foreach (var cell in cells)
+        //                    {
+        //                        var column = cell.GetAttribute<string>("col-id");
+        //                        item[column] = cell.Text;
+        //                    }
 
-                            return item;
-                        })
-                        .ToList();
-                }
-                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out var editableGridList))
-                {
-                    // Editable subgrid
-                    var headers = subGrid
-                        .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersEditable]))
-                        .Select(h => h.GetAttribute("title"))
-                        // 'Select' column
-                        .Skip(1);
+        //                    return item;
+        //                })
+        //                .ToList();
+        //        }
+        //        else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out var editableGridList))
+        //        {
+        //            // Editable subgrid
+        //            var headers = subGrid
+        //                .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersEditable]))
+        //                .Select(h => h.GetAttribute("title"))
+        //                // 'Select' column
+        //                .Skip(1);
 
-                    subGridRows = subGrid
-                        .FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]))
-                        .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]))
-                        .Select((row, index) =>
-                        {
-                            var item = CreateItem(index);
+        //            subGridRows = subGrid
+        //                .FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]))
+        //                .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]))
+        //                .Select((row, index) =>
+        //                {
+        //                    var item = CreateItem(index);
 
-                            var cells = row
-                                .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridCells]))
-                                // 'Select' column
-                                .Skip(1);
+        //                    var cells = row
+        //                        .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridCells]))
+        //                        // 'Select' column
+        //                        .Skip(1);
 
-                            for (int i = 0; i < headers.Count(); i++)
-                            {
-                                item[headers.ElementAt(i)] = cells.ElementAt(i).Text;
-                            }
+        //                    for (int i = 0; i < headers.Count(); i++)
+        //                    {
+        //                        item[headers.ElementAt(i)] = cells.ElementAt(i).Text;
+        //                    }
 
-                            return item;
-                        })
-                        .ToList();
-                }
-                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHighDensityList].Replace("[NAME]", subgridName)), out var highDensityGridList))
-                {
-                    // Special 'Related' high density grid control for entity forms
-                    var columns = subGrid
-                        .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersHighDensity]))
-                        .Select(h => h.GetAttribute("data-id"));
+        //                    return item;
+        //                })
+        //                .ToList();
+        //        }
+        //        else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHighDensityList].Replace("[NAME]", subgridName)), out var highDensityGridList))
+        //        {
+        //            // Special 'Related' high density grid control for entity forms
+        //            var columns = subGrid
+        //                .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridHeadersHighDensity]))
+        //                .Select(h => h.GetAttribute("data-id"));
 
-                    subGridRows = subGrid
-                        .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRowsHighDensity]))
-                        .Select((row, index) =>
-                        {
-                            var item = CreateItem(index);
+        //            subGridRows = subGrid
+        //                .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRowsHighDensity]))
+        //                .Select((row, index) =>
+        //                {
+        //                    var item = CreateItem(index);
 
-                            var cells = row
-                                .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]))
-                                // 'Select' column
-                                .Skip(1);
+        //                    var cells = row
+        //                        .FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells]))
+        //                        // 'Select' column
+        //                        .Skip(1);
 
-                            for (int i = 0; i < columns.Count(); i++)
-                            {
-                                item[columns.ElementAt(i)] = cells.ElementAt(i).Text;
-                            }
+        //                    for (int i = 0; i < columns.Count(); i++)
+        //                    {
+        //                        item[columns.ElementAt(i)] = cells.ElementAt(i).Text;
+        //                    }
 
-                            return item;
-                        })
-                        .ToList();
-                }
+        //                    return item;
+        //                })
+        //                .ToList();
+        //        }
 
-                return subGridRows;
-            });
-        }
+        //        return subGridRows;
+        //    });
+        //}
 
-        internal BrowserCommandResult<bool> OpenSubGridRecord(string subgridName, int index = 0)
-        {
-            return this.Execute(GetOptions($"Open Subgrid record for subgrid {subgridName}"), driver =>
-            {
-                // Find the SubGrid
-                var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
+        //internal BrowserCommandResult<bool> OpenSubGridRecord(string subgridName, int index = 0)
+        //{
+        //    return this.Execute(GetOptions($"Open Subgrid record for subgrid {subgridName}"), driver =>
+        //    {
+        //        // Find the SubGrid
+        //        var subGrid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridContents].Replace("[NAME]", subgridName)));
 
-                if (subGrid.HasElement(By.CssSelector(@"div.pcf-grid")))
-                {
-                    // Read-only subgrid
-                    var subGridTable = subGrid.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridListCells]));
-                    var rows = subGridTable.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRows]));
+        //        if (subGrid.HasElement(By.CssSelector(@"div.pcf-grid")))
+        //        {
+        //            // Read-only subgrid
+        //            var subGridTable = subGrid.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridListCells]));
+        //            var rows = subGridTable.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRows]));
 
-                    if (rows.Count == 0)
-                    {
-                        throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
-                    }
-                    else if (index + 1 > rows.Count)
-                    {
-                        throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {rows.Count}. Expected: {index + 1}");
-                    }
+        //            if (rows.Count == 0)
+        //            {
+        //                throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
+        //            }
+        //            else if (index + 1 > rows.Count)
+        //            {
+        //                throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {rows.Count}. Expected: {index + 1}");
+        //            }
 
-                    var row = rows.ElementAt(index);
-                    var cell = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells])).ElementAt(1);
+        //            var row = rows.ElementAt(index);
+        //            var cell = row.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCells])).ElementAt(1);
 
-                    new Actions(driver).DoubleClick(cell).Perform();
-                    driver.WaitForTransaction();
-                }
-                else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out var subGridRecordList))
-                {
-                    // Editable subgrid
-                    var editableGridListCells = subGridRecordList.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]));
-                    var editableGridCellRows = editableGridListCells.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]));
-                    var editableGridCellRow = editableGridCellRows[index + 1].FindElements(By.XPath("./div"));
+        //            new Actions(driver).DoubleClick(cell).Perform();
+        //            driver.WaitForTransaction();
+        //        }
+        //        else if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridList].Replace("[NAME]", subgridName)), out var subGridRecordList))
+        //        {
+        //            // Editable subgrid
+        //            var editableGridListCells = subGridRecordList.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCells]));
+        //            var editableGridCellRows = editableGridListCells.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.EditableSubGridListCellRows]));
+        //            var editableGridCellRow = editableGridCellRows[index + 1].FindElements(By.XPath("./div"));
 
-                    new Actions(driver).DoubleClick(editableGridCellRow[0]).Perform();
-                    driver.WaitForTransaction();
-                }
-                else
-                {
-                    // Check for special 'Related' grid form control
-                    // This opens a limited form view in-line on the grid
+        //            new Actions(driver).DoubleClick(editableGridCellRow[0]).Perform();
+        //            driver.WaitForTransaction();
+        //        }
+        //        else
+        //        {
+        //            // Check for special 'Related' grid form control
+        //            // This opens a limited form view in-line on the grid
 
-                    //Get the GridName
-                    string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", string.Empty);
+        //            //Get the GridName
+        //            string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", string.Empty);
 
-                    //cell-0 is the checkbox for each record
-                    var checkBox = driver.FindElement(
-                        By.XPath(
-                            AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox]
-                            .Replace("[INDEX]", index.ToString())
-                            .Replace("[NAME]", subGridName)));
+        //            //cell-0 is the checkbox for each record
+        //            var checkBox = driver.FindElement(
+        //                By.XPath(
+        //                    AppElements.Xpath[AppReference.Entity.SubGridRecordCheckbox]
+        //                    .Replace("[INDEX]", index.ToString())
+        //                    .Replace("[NAME]", subGridName)));
 
-                    driver.DoubleClick(checkBox);
-                    driver.WaitForTransaction();
-                }
+        //            driver.DoubleClick(checkBox);
+        //            driver.WaitForTransaction();
+        //        }
 
-                return true;
-            });
-        }
+        //        return true;
+        //    });
+        //}
 
         internal BrowserCommandResult<int> GetSubGridItemsCount(string subgridName)
         {

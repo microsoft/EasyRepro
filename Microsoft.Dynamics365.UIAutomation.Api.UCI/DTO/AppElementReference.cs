@@ -372,7 +372,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_SiteMapSingleArea", "//li[translate(@data-text,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = '[NAME]']" },
             { "Nav_AppMenuContainer"       , "//*[@id=\"taskpane-scroll-container\"]"},
             { "Nav_SettingsLauncherBar"       , "//button[@data-id='[NAME]Launcher']"},
-            { "Nav_SettingsLauncher"       , "//div[@id='[NAME]Launcher']"},
+            { "Nav_SettingsLauncher"       , "//ul[@data-id='[NAME]Launcher']"},
             { "Nav_AccountManagerButton", "//*[@id=\"mectrl_main_trigger\"]" },
             { "Nav_AccountManagerSignOutButton", "//*[@id=\"mectrl_body_signOut\"]" },
             { "Nav_GuidedHelp"       , "//*[@id=\"helpLauncher\"]/button"},

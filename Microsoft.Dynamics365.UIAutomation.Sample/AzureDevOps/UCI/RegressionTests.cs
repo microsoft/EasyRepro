@@ -196,6 +196,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 WriteSource("GRID_", gridHtml);
                 telemetry.TrackTrace("GetGridControl Completed");
 
+                telemetry.TrackTrace("Search Started");
+                xrmApp.Grid.Search("Contoso");
+                telemetry.TrackTrace("Search Completed");
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+
                 telemetry.TrackTrace("OpenRecord Started");
                 xrmApp.Grid.OpenRecord(0);
                 telemetry.TrackTrace("OpenRecord Completed");
@@ -274,6 +279,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 var gridHtml = xrmApp.Grid.GetGridControl();
                 WriteSource("GRID_",gridHtml);
                 telemetry.TrackTrace("GetGridControl Completed");
+
+                telemetry.TrackTrace("Search Started");
+                xrmApp.Grid.Search("Contoso");
+                telemetry.TrackTrace("Search Completed");
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
 
                 telemetry.TrackTrace("OpenRecord Started");
                 xrmApp.Grid.OpenRecord(0);
