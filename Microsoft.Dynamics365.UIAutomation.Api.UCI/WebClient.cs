@@ -2666,9 +2666,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return this.Execute(GetOptions($"Save"), driver =>
             {
-                var save = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.Save]), "Save Buttton is not available");
-
-                save?.Click();
+                Actions action = new Actions(driver);
+                action.KeyDown(Keys.Control).SendKeys("S").Perform();
 
                 return true;
             });
