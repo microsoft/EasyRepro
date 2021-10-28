@@ -1286,7 +1286,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                 {
                     //Is the button in More Commands?
+<<<<<<< Updated upstream
                     if (ribbon.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", "More Commands")), out var moreCommands))
+=======
+                    if (ribbon.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowEllipsesButton].Replace("[NAME]", "More commands")), out var moreCommands))
+>>>>>>> Stashed changes
                     {
                         // Click More Commands
                         moreCommands.Click(true);

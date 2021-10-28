@@ -123,6 +123,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SubGridViewPickerFlyout = "Entity_SubGridViewPickerFlyout";
             public static string SubGridCommandBar = "Entity_SubGridCommandBar";
             public static string SubGridCommandLabel = "Entity_SubGridCommandLabel";
+            public static string SubGridOverflowEllipsesButton = "Entity_SubGridOverflowEllipsesButton";
             public static string SubGridOverflowContainer = "Entity_SubGridOverflowContainer";
             public static string SubGridOverflowButton = "Entity_SubGridOverflowButton";
             public static string SubGridHighDensityList = "Entity_SubGridHighDensityList";
@@ -441,6 +442,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SubGridCommandBar", ".//ul[contains(@data-id, 'CommandBar')]" },
             { "Entity_SubGridCommandLabel", ".//button//span[text()=\"[NAME]\"]" },
             { "Entity_SubGridOverflowContainer", ".//div[contains(@data-id, 'flyoutRootNode')]" },
+            { "Entity_SubGridOverflowEllipsesButton", ".//button[contains(@data-id, 'OverflowButton')]" },
             { "Entity_SubGridOverflowButton", ".//button[contains(@aria-label, '[NAME]')]" },
             { "Entity_SubGridHighDensityList", ".//div[contains(@data-lp-id, \"ReadOnlyGrid|[NAME]\") and contains(@class, 'editableGrid')]" },
             { "Entity_EditableSubGridList", ".//div[contains(@data-lp-id, \"[NAME]\") and contains(@class, 'editableGrid') and not(contains(@class, 'readonly'))]" },
