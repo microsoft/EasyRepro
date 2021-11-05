@@ -1320,20 +1320,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                 {
                     //Is the button in More Commands?
-                    if (ribbon.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", "More commands")), out var moreCommands))
+                    if (ribbon.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton]), out var moreCommands))
                     {
                         // Click More Commands
                         moreCommands.Click(true);
                         driver.WaitForTransaction();
 
                         //Click the button
-                        if (ribbon.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", name)), out var overflowCommand))
+                        var flyOutMenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarFlyoutButtonList])); ;
+                        if (flyOutMenu.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", name)), out var overflowCommand))
                         {
                             overflowCommand.Click(true);
                             driver.WaitForTransaction();
                         }
                         else
-                            throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
+                            throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar or the flyout menu.");
                     }
                     else
                         throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");

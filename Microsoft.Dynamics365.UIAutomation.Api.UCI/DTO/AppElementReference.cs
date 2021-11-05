@@ -337,6 +337,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string CommandBarOverflowContainer = "Related_CommandBarOverflowContainer";
             public static string CommandBarOverflowButton = "Related_CommandBarOverflowButton";
             public static string CommandBarButtonList = "Related_CommandBarButtonList";
+            public static string CommandBarFlyoutButtonList = "Related_CommandBarFlyoutButtonList";
         }
 
         public static class Field
@@ -476,6 +477,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_SubGridCommandBar", ".//ul[contains(@data-id, 'CommandBar')]" },
             { "Entity_SubGridCommandLabel", ".//button//span[text()=\"[NAME]\"]" },
             { "Entity_SubGridOverflowContainer", ".//div[contains(@data-id, 'flyoutRootNode')]" },
+            { "Entity_SubGridCommandOverflowButton", ".//button[contains(@data-id, 'OverflowButton')]" },
             { "Entity_SubGridOverflowButton", ".//button[contains(@aria-label, '[NAME]')]" },
             { "Entity_SubGridHighDensityList", ".//div[contains(@data-lp-id, \"ReadOnlyGrid|[NAME]\") and contains(@class, 'editableGrid')]" },
             { "Entity_EditableSubGridList", ".//div[contains(@data-lp-id, \"[NAME]\") and contains(@class, 'editableGrid') and not(contains(@class, 'readonly'))]" },
@@ -592,10 +594,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             //Related Grid
             { "Related_CommandBarButton", ".//button[contains(@aria-label, '[NAME]') and contains(@id,'SubGrid')]"},
+            { "Related_CommandBarOverflowButton", ".//button[contains(@data-id, 'OverflowButton') and contains(@data-lp-id, 'Grid')]"},
             { "Related_CommandBarOverflowContainer", "//div[contains(@data-id, 'flyoutRootNode')]"},
-            { "Related_CommandBarOverflowButton", ".//button[contains(@data-id, 'OverflowButton') and contains(@data-lp-id, 'SubGridAssociated')]"},
             { "Related_CommandBarSubButton" ,".//button[contains(., '[NAME]')]"},
             { "Related_CommandBarButtonList" ,"//ul[contains(@data-lp-id, 'commandbar-SubGridAssociated')]"},
+            { "Related_CommandBarFlyoutButtonList" ,"//ul[contains(@data-id, 'OverflowFlyout')]"},
 
             //Field
             {"Field_ReadOnly",".//*[@aria-readonly]" },
