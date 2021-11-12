@@ -554,7 +554,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Search_CategorizedResults"       , "//ul[@aria-label='[ENTITY]']/li"},
             { "Search_RelevanceSearchResultsSelectedTab", "//button[@aria-selected='true' and @role='tab']" },
             { "Search_RelevanceSearchResultsTab", "//section[@id='searchComponent']//button[@name='[NAME]' and @role='tab']" },
-            { "Search_RelevanceSearchResultLinks", "//div[@role='rowgroup' and @ref='eCenterContainer']/div[@role='row']/div[1]" },
+            { "Search_RelevanceSearchResultLinks", "//div[@role='rowgroup']/div[@role='row']/div[1]" },
 
             //Timeline
             { "Timeline_SaveAndClose", "//button[contains(@data-id,\"[NAME].SaveAndClose\")]" },

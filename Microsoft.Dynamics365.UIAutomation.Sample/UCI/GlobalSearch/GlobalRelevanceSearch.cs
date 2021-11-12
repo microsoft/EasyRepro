@@ -30,6 +30,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.GlobalSearch.Filter("Record Type", "Accounts");
 
+                xrmApp.ThinkTime(4000);
+
                 xrmApp.GlobalSearch.OpenRecord("Accounts", 0);
             }
         }
