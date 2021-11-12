@@ -3463,10 +3463,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 fieldContainer.Hover(driver, true);
 
                 var selectedRecordXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecord]);
+                //change to .//li
                 var selectedRecords = fieldContainer.FindElements(selectedRecordXPath);
 
                 var initialCountOfSelectedOptions = selectedRecords.Count;
                 var deleteButtonXpath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedOptionDeleteButton]);
+                //button[contains(@data-id, 'delete')]
                 for (int i = 0; i < initialCountOfSelectedOptions; i++)
                 {
                     // With every click of the button, the underlying DOM changes and the
@@ -4704,7 +4706,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var advancedLookup = driver.WaitUntilAvailable(
                     By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.Container]),
                     2.Seconds());
-
+               
                 if (advancedLookup == null)
                 {
                     SelectLookupAdvancedLookupButton();
@@ -4717,7 +4719,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 advancedLookup
                     .FindElement(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.ViewSelectorCaret]))
                     .Click();
-
+                
                 driver
                     .WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.ViewDropdownList]))
                     .ClickWhenAvailable(

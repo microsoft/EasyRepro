@@ -97,6 +97,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
+        [TestCategory("RegressionTests")]
         public void UCITestLookupSearch()
         {
             var client = new WebClient(TestSettings.Options);
@@ -115,7 +116,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Entity.SelectLookup(parentCustomerId);
 
                 xrmApp.Lookup.SelectRelatedEntity("Accounts");
-
+               
                 xrmApp.Lookup.SwitchView("My Active Accounts");
 
                 xrmApp.Lookup.OpenRecord(0);

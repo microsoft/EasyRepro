@@ -129,7 +129,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Timeline_Add_Popout_Post",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_post\")]" },
 
             { "Timeline_Post_Text",                "id(\"create_post_postText\")" },
-            { "Timeline_Post_Add",                 "id(\"create_post_add_btn\")" },
+            { "Timeline_Post_Add",                 "//button[@data-id=\"notescontrol-author_post_testsave_button\"]" },
             { "Timeline_Post_Cancel",              "id(\"create_post_cancel_btn\")" },
 
             { "Timeline_Note_Title",               "id(\"create_note_medium_title\")" },
