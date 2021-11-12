@@ -11,6 +11,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     public class CreateActivityUCI : TestsBase
     {
         [TestMethod]
+        [TestCategory("RegressionTests")]
         public void UCITestCreateActivity_SetDateTimes()
         {
             var client = new WebClient(TestSettings.Options);
@@ -25,18 +26,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.CommandBar.ClickCommand("Appointment");
 
                 xrmApp.ThinkTime(5000);
-                xrmApp.Entity.SetValue("subject", "Appointment "+ TestSettings.GetRandomString(5,10));
+                xrmApp.Dialogs.SetValue("subject", "Appointment "+ TestSettings.GetRandomString(5,10));
                 
                 DateTime expectedDate = DateTime.Today.AddDays(1).AddHours(10);
                 DateTime expectedEndDate = expectedDate.AddHours(2);
              
-                xrmApp.Entity.SetValue("scheduledstart", expectedDate);
-                xrmApp.Entity.SetValue("scheduledend",  expectedEndDate);
+                xrmApp.Dialogs.SetValue("scheduledstart", expectedDate);
+                xrmApp.Dialogs.SetValue("scheduledend",  expectedEndDate);
 
                 DateTime? date = xrmApp.Entity.GetValue(new DateTimeControl("scheduledstart"));
                 Assert.AreEqual(expectedDate, date);
-                
-                date = xrmApp.Entity.GetValue(new DateTimeControl("scheduledend"));
+
+                date = xrmApp.Dialogs.GetValue(new DateTimeControl("scheduledend"));
                 Assert.AreEqual(expectedEndDate, date);
             }
         }

@@ -561,13 +561,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             //MultiSelect
             { "MultiSelect_DivContainer",     ".//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]" },
-            { "MultiSelect_InputSearch",     ".//input[contains(@class,\"msos-input\")]" },
-            { "MultiSelect_SelectedRecord",  ".//li[contains(@class, \"msos-selected-display-item\")]" },
-            { "MultiSelect_SelectedRecord_DeleteButton", ".//button[contains(@class, \"msos-quick-delete\")]" },
+            { "MultiSelect_InputSearch",     ".//input[contains(@data-id,\"textInputBox\")]" },
+            { "MultiSelect_SelectedRecord",  ".//li" },
+            { "MultiSelect_SelectedRecord_DeleteButton", ".//button[contains(@data-id, \"delete\")]" },
             { "MultiSelect_SelectedRecord_Label",  ".//span[contains(@class, \"msos-selected-display-item-text\")]" },
             { "MultiSelect_FlyoutOption",      "//li[label[contains(@title, \"[NAME]\")] and contains(@class,\"msos-option\")]" },
             { "MultiSelect_FlyoutOptionCheckbox", "//input[contains(@class, \"msos-checkbox\")]" },
             { "MultiSelect_FlyoutCaret", "//button[contains(@class, \"msos-caret-button\")]" },
+
             { "MultiSelect_ExpandCollapseButton", ".//button[contains(@class,\"msos-selecteditems-toggle\")]" },
 
             //Dashboard
@@ -650,8 +651,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "AdvancedLookup_Container", ".//div[contains(@data-lp-id, 'MscrmControls.FieldControls.AdvancedLookupControl')]" },
             { "AdvancedLookup_SearchInput", "//input[@type='text' and @placeholder='Search']" },
             { "AdvancedLookup_ViewSelectorCaret", ".//span[contains(@class, 'ms-Dropdown-caretDownWrapper')]" },
-            { "AdvancedLookup_ViewDropdownList", ".//div[contains(@class, 'dropdownItemsWrapper')]//div[@role='listbox']" },
-            { "AdvancedLookup_ViewDropdownListItem", "//button[@role='option' and @title='[NAME]']" },
+            { "AdvancedLookup_ViewDropdownList", ".//div[contains(@class, 'dropdownItemsWrapper')]" },
+            { "AdvancedLookup_ViewDropdownListItem", "//button[.//span[text()='[NAME]']]"},
             { "AdvancedLookup_ResultRows", "//div[@ref='eLeftContainer']//div[@role='row']" },
             { "AdvancedLookup_FilterTables",  "//li[@role='listitem']//button" },
             { "AdvancedLookup_FilterTable",  "//li[@role='listitem']//button[.//*[text()='[NAME]']]" },
