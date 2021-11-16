@@ -1548,14 +1548,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 int lastRowInCurrentView = 0;
                 while (!lastRow)
                 {
-                    if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Grid.Row].Replace("[INDEX]", (index).ToString()))))
+                    if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Grid.Row].Replace("[INDEX]", (index+2).ToString()))))
                     {
                         lastRowInCurrentView = ClickGridAndPageDown(driver, grid, lastRowInCurrentView);
                     }
                     else
                     {
                         gridRow = driver.FindElement(By.XPath
-                        (AppElements.Xpath[AppReference.Grid.Row].Replace("[INDEX]", index.ToString())));
+                        (AppElements.Xpath[AppReference.Grid.Row].Replace("[INDEX]", (index+2).ToString())));
                         lastRow = true;
                     }
                     if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Grid.LastRow])))
@@ -1564,8 +1564,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                 }
                 if (gridRow == null) throw new NotFoundException($"Grid Row {index} not found.");
-                var xpathToGrid = By.XPath("//div[contains(@data-lp-id,'MscrmControls.Grid')]");
-                var gridContainer = driver.FindElement(By.XPath("//div[contains(@data-lp-id,'MscrmControls.Grid')]"));
+                var xpathToGrid = By.XPath("//div[contains(@class,'MscrmControls.Grid')]");
+                var gridContainer = driver.FindElement(By.XPath("//div[contains(@class,'MscrmControls.Grid')]"));
                 IWebElement control = driver.WaitUntilAvailable(xpathToGrid);
 
                 Func<Actions, Actions> action;
@@ -1574,16 +1574,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                     action = e => e.DoubleClick();
 
-                var xpathToCell = By.XPath(AppElements.Xpath[AppReference.Grid.Row].Replace("[INDEX]", index.ToString()));
-                control.WaitUntilClickable(xpathToCell,
-                    cell =>
-                    {
-                        var emptyDiv = cell.FindElement(By.TagName("div"));
-                        //driver.Perform(action, cell, cell.LeftTo(emptyDiv));
-                        driver.Perform(action, cell, null);
-                    },
-                    $"An error occur trying to open the record at position {index}"
-                    );
+                var xpathToCell = By.XPath(AppElements.Xpath[AppReference.Grid.Row].Replace("[INDEX]", (index + 2).ToString()) + "//div[@aria-colindex='2']");
+                driver.Perform(action, driver.FindElement(xpathToCell));
 
                 driver.WaitForTransaction();
                 return true;
