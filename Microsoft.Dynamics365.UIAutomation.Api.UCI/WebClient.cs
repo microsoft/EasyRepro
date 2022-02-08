@@ -1580,7 +1580,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         var emptyDiv = cell.FindElement(By.TagName("div"));
                         //driver.Perform(action, cell, cell.LeftTo(emptyDiv));
-                        driver.Perform(action, cell, null);
+                        driver.Perform(action, emptyDiv, null);
                     },
                     $"An error occur trying to open the record at position {index}"
                     );
