@@ -1580,7 +1580,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         var emptyDiv = cell.FindElement(By.TagName("div"));
                         //driver.Perform(action, cell, cell.LeftTo(emptyDiv));
-                        driver.Perform(action, cell, null);
+                        driver.Perform(action, emptyDiv, null);
                     },
                     $"An error occur trying to open the record at position {index}"
                     );
@@ -2475,7 +2475,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //topRow.Click();
             //actions.SendKeys(OpenQA.Selenium.Keys.PageDown).Perform();
 
-            actions.MoveToElement(topRow.FindElement(By.XPath("//div[@role='gridcell']"))).Perform();
+            actions.MoveToElement(topRow.FindElement(By.XPath("//div[@role='listitem']//button"))).Perform();
             actions.KeyDown(OpenQA.Selenium.Keys.Alt).SendKeys(OpenQA.Selenium.Keys.ArrowDown).Build().Perform();
             return actions;
 
@@ -2494,50 +2494,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Read Only Grid Found
                 if (subGridRecordList != null && foundGrid)
                 {
-                    var subGridRecords = subGridRecordList.FindElements(By.TagName("li"));
-                    var recordLabels = subGridRecordList.FindElements(By.XPath("//div[@role='gridcell']"));
                     var subGridRecordRows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)));
-                    if (subGridRecords == null)
+                    if (subGridRecordRows == null)
                         throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
                     Actions actions = new Actions(driver);
+                    actions.MoveToElement(subGrid).Perform();
+
                     IWebElement gridRow = null;
                     if (index + 1 < subGridRecordRows.Count)
                     {
-
-                        var grid = driver.FindElement(By.XPath("//div[@ref='eViewport']"));
-                        actions.MoveToElement(grid).Perform();
-                        //subGrid.Click();
-                        bool lastRow = false;
-                        var rowGroup = subGrid.FindElement(By.XPath("//div[@ref='centerContainer']//div[@role='rowgroup']"));
-                        int lastKnownFloor = 0;
-                        while (!lastRow)
-                        {
-                            if (!grid.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridRow].Replace("[INDEX]", index.ToString()))))
-                            {
-                                actions = ClickSubGridAndPageDown(driver, grid);
-                                //lastKnownFloor = ClickGridAndPageDown(driver, grid, lastKnownFloor);
-                            }
-                            else
-                            {
-                                gridRow = driver.FindElement(By.XPath
-                                (AppElements.Xpath[AppReference.Entity.SubGridRow].Replace("[INDEX]", index.ToString())));
-                                if (gridRow.Location.Y < (driver.FindElement(By.XPath("//div[@data-control-name='Subgrid_1']")).Location.Y + driver.FindElement(By.XPath("//div[@data-control-name='Subgrid_1']")).Size.Height))
-                                {
-
-                                    lastRow = true;
-                                }
-                                else
-                                {
-                                    actions = ClickSubGridAndPageDown(driver, grid);
-                                }
-
-                            }
-                            if (grid.HasElement(By.XPath("//div[@data-control-name='Subgrid_1']//div[@ref='centerContainer']//div[@role='rowgroup']//div[@role='row' and contains(@class, 'ag-row-last')]")))
-                            {
-                                lastRow = true;
-                            }
-                        }
-
+                        gridRow = subGridRecordRows[index];
                     }
                     else
                     {
@@ -2546,7 +2512,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         driver.WaitForTransaction();
                     }
                     if (gridRow == null)
-                        throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {subGridRecords.Count}. Expected: {index + 1}");
+                        throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {subGridRecordRows.Count}. Expected: {index + 1}");
 
 
                     actions.DoubleClick(gridRow).Perform();

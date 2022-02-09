@@ -157,6 +157,90 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         [TestCategory("Regression")]
         [TestCategory("2021ReleaseWave2")]
+        [TestCategory("Grid")]
+        [TestMethod]
+        public void Regression_Grid_SelectFirstCell()
+        {
+            var telemetry = new Microsoft.ApplicationInsights.TelemetryClient { InstrumentationKey = _azureKey };
+            telemetry.Context.Operation.Id = Guid.NewGuid().ToString();
+            telemetry.Context.Operation.ParentId = _sessionId;
+            telemetry.Context.GlobalProperties.Add("Test", TestContext.TestName);
+            var client = new WebClient(TestSettings.Options);
+            var xrmApp = new XrmApp(client);
+            try
+            {
+                telemetry.TrackTrace("Login Started");
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
+                telemetry.TrackTrace("Login Completed");
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+                //xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+
+                telemetry.TrackTrace("OpenAbout Started");
+                xrmApp.Navigation.OpenAbout();
+                telemetry.TrackTrace("OpenAbout Completed");
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+                xrmApp.Dialogs.ClickOk();
+
+                telemetry.TrackTrace("OpenSubArea Started");
+                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+                telemetry.TrackTrace("OpenSubArea Completed");
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+
+                telemetry.TrackTrace("SwitchView Started");
+                xrmApp.Grid.SwitchView("My Active Accounts");
+                telemetry.TrackTrace("SwitchView Completed");
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+
+                telemetry.TrackTrace("GetGridControl Started");
+                var gridHtml = xrmApp.Grid.GetGridControl();
+                WriteSource("GRID_", gridHtml);
+                telemetry.TrackTrace("GetGridControl Completed");
+
+                telemetry.TrackTrace("Search Started");
+                xrmApp.Grid.Search("Contoso");
+                telemetry.TrackTrace("Search Completed");
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+
+                telemetry.TrackTrace("OpenRecord Started");
+                xrmApp.Grid.OpenRecord(0);
+                telemetry.TrackTrace("OpenRecord Completed");
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+                #region Boolean
+                telemetry.TrackTrace("GetValue-Text Started");
+                xrmApp.Entity.GetValue("telephone1");
+                telemetry.TrackTrace("GetValue-Text Completed");
+
+                telemetry.TrackTrace("SetValue-Text Started");
+                xrmApp.Entity.SetValue("telephone1", "867-5309");
+                telemetry.TrackTrace("SetValue-Text Completed");
+                #endregion
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+                //#region Lookup
+                //telemetry.TrackTrace("SetValue-LookupItem Started");
+                //xrmApp.Entity.SetValue(new LookupItem { Name = "customerid", Value = "maria campbell", Index = 0 });
+
+                //telemetry.TrackTrace("SetValue-LookupItem Completed");
+                //#endregion
+
+
+                telemetry.TrackEvent(String.Format("{0} is successful.", TestContext.TestName));
+            }
+            catch (System.Exception ex)
+            {
+                telemetry.TrackException(ex);
+                WriteSource("EXCEPTION_Source_", client.Browser.Driver.PageSource);
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+                throw ex;
+            }
+            finally
+            {
+                xrmApp.Dispose();
+                telemetry.Flush();
+            }
+        }
+
+        [TestCategory("Regression")]
+        [TestCategory("2021ReleaseWave2")]
         [TestCategory("Controls")]
         [TestMethod]
         public void Regression_EntityControls_GetValue_SetValue()
