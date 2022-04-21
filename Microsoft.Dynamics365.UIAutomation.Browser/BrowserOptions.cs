@@ -119,6 +119,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             var options = new ChromeOptions();
 
+            options.AddArgument("lang=en-GB");
+
             if (this.StartMaximized)
             {
                 options.AddArgument("--start-maximized");
@@ -247,6 +249,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
             };
 
+
             return options;
         }
 
@@ -264,6 +267,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 options.SetPreference("browser.helperApps.neverAsk.saveToDisk", "text/csv,application/java-archive, application/x-msexcel,application/excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml,application/vnd.microsoft.portable-executable");
                 options.SetPreference("network.cookie.cookieBehavior", CookieСontrolsMode);
             }
+            options.SetPreference("intl.accept_languages", "en-GB");
 
             return options;
         }
