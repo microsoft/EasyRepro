@@ -182,7 +182,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 EnterPassword(driver, password);
-                ThinkTime(1000);
+                ThinkTime(500);
+                driver.ClickIfVisible(By.Id("signInAnotherWay"));
+                ThinkTime(500);
+                driver.ClickIfVisible(By.XPath("//div[text() = 'Use a verification code']"));
+                ThinkTime(500);
             }
 
             int attempts = 0;
