@@ -48,7 +48,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.Headless = false;
             this.Kiosk = false;
             this.TestTypeBrowser = false;
-            this.CookieСontrolsMode = 1;
+            this.CookieСontrolsMode = 0;
         }
 
         public BrowserType RemoteBrowserType { get; set; }

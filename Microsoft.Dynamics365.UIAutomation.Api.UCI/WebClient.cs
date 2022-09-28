@@ -1488,8 +1488,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (role != "presentation")
                         continue;
 
-                    var key = viewItem.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.ViewSelectorMenuItem])).Text.ToLowerString();
-
+                    //var key = viewItem.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.ViewSelectorMenuItem])).Text.ToLowerString();
+                    var key = viewItem.Text.ToLowerString();
                     if (string.IsNullOrWhiteSpace(key))
                         continue;
 
@@ -1689,7 +1689,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute(GetOptions("Get Grid Items"), driver =>
             {
                 var returnList = new List<GridItem>();
-                var gridContainer = driver.FindElement(By.XPath("//div[contains(@data-lp-id,'MscrmControls.Grid')]"));
+                //#1294
+                var gridContainer = driver.FindElement(By.XPath("//div[contains(@data-id,'data-set-body-container')]/div"));
                 string[] gridDataId = gridContainer.GetAttribute("data-lp-id").Split('|');
                 Dictionary<string, object> WindowStateData = (Dictionary<string, object>)driver.ExecuteScript($"return window[Object.keys(window).find(i => !i.indexOf(\"__store$\"))].getState().data");
                 string keyForData = GetGridQueryKey(driver, null);
