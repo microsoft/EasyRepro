@@ -252,10 +252,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public virtual FirefoxOptions ToFireFox()
         {
-            var options = new FirefoxOptions()
-            {
-                UseLegacyImplementation = false
-            };
+            var options = new FirefoxOptions();
 
             if (!string.IsNullOrEmpty(DownloadsPath))
             {
@@ -273,8 +270,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             var options = new EdgeOptions()
             {
                 PageLoadStrategy = PageLoadStrategy.Normal,
-                UseInPrivateBrowsing = PrivateMode
             };
+            options.AddArgument("inprivate");
 
             return options;
         }

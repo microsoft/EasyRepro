@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
-using System.Web.Script.Serialization;
+using Nancy.Json;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
 {

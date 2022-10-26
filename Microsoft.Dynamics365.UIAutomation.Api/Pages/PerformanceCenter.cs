@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using Nancy.Json;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
@@ -8,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
@@ -110,7 +110,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 jsSerializer.RegisterConverters(new[] { new DynamicJsonConverter() });
 
-                var jsonObj = (Dictionary<string, object>)jsSerializer.Deserialize(jsonResults, typeof(Dictionary<string, object>));
+                var jsonObj = (Dictionary<string, object>)jsSerializer.Deserialize<Dictionary<string, object>>(jsonResults);
 
                 return jsonObj;
             });

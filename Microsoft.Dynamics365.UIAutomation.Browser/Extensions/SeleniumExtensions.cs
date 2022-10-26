@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using Nancy.Json;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,7 +16,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
@@ -193,19 +194,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     $"The driver type '{driver.GetType().FullName}' does not support taking screenshots.");
 
             return screenshotDriver.GetScreenshot();
-        }
-
-        [DebuggerNonUserCode]
-        public static Bitmap TakeScreenshot(this IWebDriver driver, By by)
-        {
-            var screenshot = TakeScreenshot(driver);
-            var bmpScreen = new Bitmap(new MemoryStream(screenshot.AsByteArray));
-
-            // Measure the location of a specific element
-            IWebElement element = driver.FindElement(by);
-            var crop = new Rectangle(element.Location, element.Size);
-
-            return bmpScreen.Clone(crop, bmpScreen.PixelFormat);
         }
 
         #endregion Screenshot
