@@ -31,6 +31,5 @@
     <PackageReference Include="Selenium.WebDriver" Version="4.5.1" />
 	  <PackageReference Include="Nancy" Version="2.0.0" />
 	  <PackageReference Include="System.Net.Http" Version="4.3.4" />
-	  <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
   </ItemGroup>
 </Project>
