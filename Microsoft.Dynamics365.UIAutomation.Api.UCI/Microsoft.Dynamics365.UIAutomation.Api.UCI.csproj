@@ -21,9 +21,13 @@
     <PackageReference Include="Otp.NET" Version="1.2.2" />
     <PackageReference Include="Selenium.Support" Version="4.5.1" />
     <PackageReference Include="Selenium.WebDriver" Version="4.5.1" />
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="6.0.0" />
-    <PackageReference Include="System.Memory" Version="4.5.5" />
+	<PackageReference Include="System.Memory" Version="4.5.5">
+		<IncludeAssets>none</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="System.Buffers" Version="4.5.1">
+		<IncludeAssets>none</IncludeAssets>
+	</PackageReference>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
