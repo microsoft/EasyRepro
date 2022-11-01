@@ -8,7 +8,11 @@ using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+#if !NET462
 using Nancy.Json;
+#else
+using System.Web.Script.Serialization;
+#endif
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
 {

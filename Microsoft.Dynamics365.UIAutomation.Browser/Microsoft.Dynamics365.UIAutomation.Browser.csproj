@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net462</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
@@ -16,8 +16,18 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="SeleniumExtras.WaitHelpers" Version="1.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'net462'">
+    <PackageReference Include="SeleniumExtras.WaitHelpers" Version="1.0.2" />
+	  <PackageReference Include="Nancy" Version="2.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+	  <Reference Include="System.Web.Extensions" />
+	  <PackageReference Include="DotNetSeleniumExtras.WaitHelpers" Version="3.11.0" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
@@ -29,7 +39,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Selenium.Support" Version="4.5.1" />
     <PackageReference Include="Selenium.WebDriver" Version="4.5.1" />
-	  <PackageReference Include="Nancy" Version="2.0.0" />
 	  <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>
 </Project>
