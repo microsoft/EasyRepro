@@ -23,11 +23,11 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' != 'net462'">
     <PackageReference Include="SeleniumExtras.WaitHelpers" Version="1.0.2" />
-	  <PackageReference Include="Nancy" Version="2.0.0" />
+	<PackageReference Include="Nancy" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
-	  <Reference Include="System.Web.Extensions" />
-	  <PackageReference Include="DotNetSeleniumExtras.WaitHelpers" Version="3.11.0" />
+	<Reference Include="System.Web.Extensions" />
+	<PackageReference Include="DotNetSeleniumExtras.WaitHelpers" Version="3.11.0" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">

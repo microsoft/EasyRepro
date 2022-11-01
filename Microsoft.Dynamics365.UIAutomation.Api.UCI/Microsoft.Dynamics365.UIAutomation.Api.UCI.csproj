@@ -3,7 +3,7 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net462</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
@@ -29,6 +29,10 @@
 		<IncludeAssets>none</IncludeAssets>
 	</PackageReference>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+	<Reference Include="System.Web" />
+	<Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Controls\CrmControls.cs" />

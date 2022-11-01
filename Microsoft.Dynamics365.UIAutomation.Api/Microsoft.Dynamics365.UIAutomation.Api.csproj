@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+	<TargetFrameworks>net6.0;net462</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
@@ -19,6 +19,12 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Selenium.Support" Version="4.5.1" />
     <PackageReference Include="Selenium.WebDriver" Version="4.5.1" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'net462'">
+	<PackageReference Include="Nancy" Version="2.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+	<Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Controls\CrmControls.cs" />

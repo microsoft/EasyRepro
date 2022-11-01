@@ -1,7 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+#if !NET462
 using Nancy.Json;
+#else
+using System.Web.Script.Serialization;
+#endif
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;

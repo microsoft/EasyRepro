@@ -7,7 +7,11 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Nancy;
+#if !NET462
+using Nancy.Json;
+#else
+using System.Web.Script.Serialization;
+#endif
 using Newtonsoft.Json;
 using Microsoft.ApplicationInsights.DataContracts;
 
