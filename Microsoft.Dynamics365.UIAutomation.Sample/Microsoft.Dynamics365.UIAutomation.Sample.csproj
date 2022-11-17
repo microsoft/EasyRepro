@@ -38,6 +38,9 @@
     <Compile Remove="UCI\BusinessProcessFlow\BusinessProcessFlowActions.cs" />
     <Compile Remove="UCI\GlobalSearch\GlobalSearch.cs" />
   </ItemGroup>
+  <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
+	<Copy SourceFiles="app.config" DestinationFiles="$(OutDir)//testhost.dll.config" />
+  </Target>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
