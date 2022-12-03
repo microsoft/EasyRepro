@@ -6,6 +6,12 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
+#if !NET462
+using Nancy.Json;
+#else
+using System.Web.Script.Serialization;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,13 +20,12 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
     public static class SeleniumExtensions
     {
-        #region Click
+#region Click
 
         public static void Click(this IWebElement element, bool ignoreStaleElementException)
         {
@@ -70,12 +75,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
         }
 
-        #endregion Click
+#endregion Click
 
         public static void Click(this IWebDriver driver, IWebElement element, Func<Point> offsetFunc = null, bool ignoreStaleElementException = true)
             => driver.Perform(a => a.Click(), element, offsetFunc, ignoreStaleElementException);
 
-        #region Double Click
+#region Double Click
 
         public static void DoubleClick(this IWebDriver driver, IWebElement element, Func<Point> offsetFunc = null, bool ignoreStaleElementException = true)
             => driver.Perform(a => a.DoubleClick(), element, offsetFunc, ignoreStaleElementException);
@@ -102,9 +107,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
 
         
-        #endregion
+#endregion
 
-        #region Script Execution
+#region Script Execution
 
         [DebuggerNonUserCode]
         public static object ExecuteScript(this IWebDriver driver, string script, params object[] args)
@@ -168,9 +173,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return script;
         }
 
-        #endregion Script Execution
+#endregion Script Execution
 
-        #region Browser Options
+#region Browser Options
 
         [DebuggerNonUserCode]
         public static void ResetZoom(this IWebDriver driver)
@@ -179,9 +184,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             element.SendKeys(Keys.Control + "0");
         }
 
-        #endregion Browser Options
+#endregion Browser Options
 
-        #region Screenshot
+#region Screenshot
 
         [DebuggerNonUserCode]
         public static Screenshot TakeScreenshot(this IWebDriver driver)
@@ -195,22 +200,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return screenshotDriver.GetScreenshot();
         }
 
-        [DebuggerNonUserCode]
-        public static Bitmap TakeScreenshot(this IWebDriver driver, By by)
-        {
-            var screenshot = TakeScreenshot(driver);
-            var bmpScreen = new Bitmap(new MemoryStream(screenshot.AsByteArray));
+#endregion Screenshot
 
-            // Measure the location of a specific element
-            IWebElement element = driver.FindElement(by);
-            var crop = new Rectangle(element.Location, element.Size);
-
-            return bmpScreen.Clone(crop, bmpScreen.PixelFormat);
-        }
-
-        #endregion Screenshot
-
-        #region Elements
+#region Elements
 
         public static bool HasAttribute(this IWebElement element, string attributeName)
             => element.GetAttribute(attributeName) != null;
@@ -276,9 +268,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             driver.FindElement(By.TagName("body")).Click();
         }
 
-        #endregion Elements
+#endregion Elements
 
-        #region Waits
+#region Waits
 
         public static bool WaitForPageToLoad(this IWebDriver driver, TimeSpan? timeout = null)
         {
@@ -634,9 +626,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return success;
         }
 
-        #endregion Waits
+#endregion Waits
 
-        #region Args / Tracing
+#region Args / Tracing
 
         public static string ToTraceString(this FindElementEventArgs e)
         {
@@ -657,6 +649,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return method;
         }
 
-        #endregion Args / Tracing
+#endregion Args / Tracing
     }
 }
