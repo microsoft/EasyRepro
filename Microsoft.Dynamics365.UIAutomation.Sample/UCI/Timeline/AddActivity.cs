@@ -31,7 +31,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.OpenRecord(0);
 
-                xrmApp.Timeline.AddAppointment("Entry into Zoo", "Microsoft", "45 minutes", "Entertainment");
+                xrmApp.Timeline.AddAppointment("Entry into Zoo", "Microsoft", "45 minutes", String.Empty);
+                //xrmApp.Timeline.AddAppointment("Entry into Zoo", "Microsoft", "45 minutes", "Entertainment");
 
                 xrmApp.Timeline.SaveAndCloseAppointment();
 

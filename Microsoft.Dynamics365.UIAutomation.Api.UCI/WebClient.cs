@@ -1525,16 +1525,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-        private static int ClickGridAndPageDown(IWebDriver driver, IWebElement grid, int lastKnownFloor)
+        private static int ClickGridAndPageDown(IWebDriver driver, IWebElement grid, int lastKnownFloor, Grid.GridType gridType)
         {
             Actions actions = new Actions(driver);
-            var CurrentRows = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Grid.Rows]));
+            By rowGroupLocator = null;
+            By topRowLocator = null;
+            switch (gridType)
+            {
+                case Grid.GridType.LegacyReadOnlyGrid:
+                    rowGroupLocator = By.XPath(AppElements.Xpath[AppReference.Grid.LegacyReadOnlyRows]);
+                    topRowLocator = By.XPath(AppElements.Xpath[AppReference.Grid.Rows]);
+                    break;
+                case Grid.GridType.ReadOnlyGrid:
+                    rowGroupLocator = By.XPath(AppElements.Xpath[AppReference.Grid.Rows]);
+                    topRowLocator = By.XPath(AppElements.Xpath[AppReference.Grid.Rows]);
+                    break;
+                case Grid.GridType.PowerAppsGridControl:
+                    rowGroupLocator = By.XPath(AppElements.Xpath[AppReference.Grid.Rows]);
+                    topRowLocator = By.XPath(AppElements.Xpath[AppReference.Grid.Rows]);
+                    break;
+                default:
+                    break;
+            }
+            var CurrentRows = driver.FindElements(rowGroupLocator);
             var lastFloor = CurrentRows.Where(x => Convert.ToInt32(x.GetAttribute("row-index")) == lastKnownFloor).First();
-            var topRow = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.Rows]));
+            //var topRow = driver.FindElement(topRowLocator);
+            var topRow = CurrentRows.First();
             var firstCell = lastFloor.FindElement(By.XPath("//div[@aria-colindex='1']"));
             lastFloor.Click();
             actions.SendKeys(OpenQA.Selenium.Keys.PageDown).Perform();
-            return Convert.ToInt32(driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Grid.Rows])).Last().GetAttribute("row-index"));
+            return Convert.ToInt32(driver.FindElements(rowGroupLocator).Last().GetAttribute("row-index"));
         }
 
         internal BrowserCommandResult<bool> OpenRecord(int index, int thinkTime = Constants.DefaultThinkTime, bool checkRecord = false)
@@ -1545,12 +1565,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var grid = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.PcfContainer]));
                 bool lastRow = false;
                 IWebElement gridRow = null;
+                Grid.GridType gridType = Grid.GridType.PowerAppsGridControl;
                 int lastRowInCurrentView = 0;
                 while (!lastRow)
                 {
+                    //determine which grid
+                    if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Grid.Rows]))){
+                        gridType = Grid.GridType.PowerAppsGridControl;
+                        Trace.WriteLine("Found Power Apps Grid.");
+                    }
+                    else if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Grid.LegacyReadOnlyRows])))
+                    {
+                        gridType = Grid.GridType.LegacyReadOnlyGrid;
+                        Trace.WriteLine("Found Legacy Read Only Grid.");
+                    }
+
+
                     if (!driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Grid.Row].Replace("[INDEX]", (index).ToString()))))
                     {
-                        lastRowInCurrentView = ClickGridAndPageDown(driver, grid, lastRowInCurrentView);
+                        lastRowInCurrentView = ClickGridAndPageDown(driver, grid, lastRowInCurrentView, gridType);
                     }
                     else
                     {
@@ -1564,8 +1597,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                 }
                 if (gridRow == null) throw new NotFoundException($"Grid Row {index} not found.");
-                var xpathToGrid = By.XPath("//div[contains(@data-lp-id,'MscrmControls.Grid')]");
-                var gridContainer = driver.FindElement(By.XPath("//div[contains(@data-lp-id,'MscrmControls.Grid')]"));
+                var xpathToGrid = By.XPath("//div[contains(@data-id,'DataSetHostContainer')]");
                 IWebElement control = driver.WaitUntilAvailable(xpathToGrid);
 
                 Func<Actions, Actions> action;
@@ -1573,19 +1605,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     action = e => e.Click();
                 else
                     action = e => e.DoubleClick();
-
                 var xpathToCell = By.XPath(AppElements.Xpath[AppReference.Grid.Row].Replace("[INDEX]", index.ToString()));
                 control.WaitUntilClickable(xpathToCell,
                     cell =>
                     {
                         var emptyDiv = cell.FindElement(By.TagName("div"));
-                        //driver.Perform(action, cell, cell.LeftTo(emptyDiv));
-                        driver.Perform(action, emptyDiv, null);
+                        switch (gridType)
+                        {
+                            case Grid.GridType.LegacyReadOnlyGrid:
+                                driver.Perform(action, emptyDiv, null);
+                                break;
+                            case Grid.GridType.ReadOnlyGrid:
+                                driver.Perform(action, emptyDiv, null);
+                                break;
+                            case Grid.GridType.PowerAppsGridControl:
+                                cell.FindElement(By.XPath("//a[contains(@aria-label,'Read only')]")).Click();
+                                break;
+                            default: throw new InvalidSelectorException("Did not find Read Only or Power Apps Grid.");
+                        }
+                        Trace.WriteLine("Clicked record.");
                     },
                     $"An error occur trying to open the record at position {index}"
                     );
 
                 driver.WaitForTransaction();
+                Trace.WriteLine("Click Record transaction complete.");
                 return true;
             });
         }
