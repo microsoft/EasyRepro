@@ -102,6 +102,7 @@
     <Compile Include="UCI\CommandBar\SelectDashboard.cs" />
     <Compile Include="ConsoleTraceListener.cs" />
     <Compile Include="UCI\Controls\Grid.cs" />
+    <Compile Include="UCI\Controls\PowerApp.cs" />
     <Compile Include="UCI\Create\CreateAccount.cs" />
     <Compile Include="UCI\Create\CreateCase.cs" />
     <Compile Include="UCI\Create\CreateContact.cs" />

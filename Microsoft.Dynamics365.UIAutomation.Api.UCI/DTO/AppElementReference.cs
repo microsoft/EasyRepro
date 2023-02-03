@@ -352,6 +352,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Container = "Performance_Widget";
             public static string Page = "Performance_WidgetPage";
         }
+    
+        public static class PowerApp
+        {
+            public static string ModelFormContainer = "PowerApp_ModalFormContainer";
+            public static string Control = "PowerApp_Control";
+
+        }
     }
 
     public static class AppElements
@@ -360,6 +367,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             //Application 
             { "App_Shell"    , "//*[@id=\"ApplicationShell\"]"},
+
+            //PowerApp
+            { "PowerApp_ModalFormContainer"       , "//iframe[contains(@src,\'[NAME]\')]"},
+            { "PowerApp_Control"       , "//div[@data-control-name=\'[NAME]\']"},
 
             //Navigation
             { "Nav_AreaButton"       , "//button[@id='areaSwitcherId']"},
