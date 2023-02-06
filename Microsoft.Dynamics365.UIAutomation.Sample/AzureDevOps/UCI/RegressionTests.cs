@@ -352,12 +352,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 telemetry.TrackTrace("Begin Testing Modern Read Only Grid");
                 Trace.WriteLine("Begin Testing Modern Read Only Grid");
                 telemetry.TrackTrace("OpenSubArea Started");
-                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+                xrmApp.Navigation.OpenSubArea("Sales", "Contacts");
                 telemetry.TrackTrace("OpenSubArea Completed");
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
 
                 telemetry.TrackTrace("SwitchView Started");
-                xrmApp.Grid.SwitchView("All Accounts");
+                xrmApp.Grid.SwitchView("Active Contacts");
                 telemetry.TrackTrace("SwitchView Completed");
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
 
@@ -367,6 +367,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
                 telemetry.TrackTrace("End Testing Modern Read Only Grid");
                 Trace.WriteLine("End Testing Modern Read Only Grid");
+
+
+                telemetry.TrackTrace("GetGridControl Started");
+                var subGridHtml = xrmApp.Entity.SubGrid.GetSubGridControl("contactopportunitiesgrid");
+                WriteSource("SUBGRID_", subGridHtml);
+                telemetry.TrackTrace("GetGridControl Completed");
+
+                telemetry.TrackTrace("GetSubGridItems Started");
+                var getSubGridItems = xrmApp.Entity.SubGrid.GetSubGridItems("contactopportunitiesgrid");
+                telemetry.TrackTrace("GetSubGridItems Completed");
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+                Assert.IsTrue(getSubGridItems.Count > 0, "GetSubGridItems returned 0 records.");
+
+                xrmApp.Entity.SubGrid.OpenSubGridRecord("contactopportunitiesgrid", 0);
+
 
                 telemetry.TrackTrace("Begin Testing Modern Read Only Grid Scrolling");
                 Trace.WriteLine("Begin Testing Modern Read Only Grid Scrolling");
@@ -439,16 +454,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 telemetry.TrackTrace("OpenRecord Completed");
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
 
-                telemetry.TrackTrace("GetGridControl Started");
-                var subGridHtml = xrmApp.Entity.SubGrid.GetSubGridControl("contactopportunitiesgrid");
-                WriteSource("SUBGRID_", subGridHtml);
-                telemetry.TrackTrace("GetGridControl Completed");
 
-                telemetry.TrackTrace("GetSubGridItems Started");
-                var getSubGridItems = xrmApp.Entity.SubGrid.GetSubGridItems("Contacts");
-                telemetry.TrackTrace("GetSubGridItems Completed");
-                TakeScreenshot(client, xrmApp.CommandResults.Last());
-                Assert.IsTrue(getSubGridItems.Count > 0, "GetSubGridItems returned 0 records.");
 
                 telemetry.TrackTrace("OpenSubGridRecord Started");
                 xrmApp.Entity.SubGrid.OpenSubGridRecord("Contacts", 30);

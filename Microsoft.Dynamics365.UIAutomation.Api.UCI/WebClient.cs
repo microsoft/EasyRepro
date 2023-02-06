@@ -2356,11 +2356,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (subGrid == null)
                     throw new NotFoundException($"Unable to locate subgrid contents for {subgridName} subgrid.");
                 // Check if ReadOnlyGrid was found
-                if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList))
+                if (subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridListCells].Replace("[NAME]", subgridName)), out subGridRecordList))
                 {
 
                     // Locate record list
-                    var foundRecords = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+                    var foundRecords = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridListCells].Replace("[NAME]", subgridName)), out subGridRecordList);
 
                     if (foundRecords)
                     {
@@ -2536,12 +2536,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 // Find list of SubGrid records
                 IWebElement subGridRecordList = null;
-                var foundGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)), out subGridRecordList);
+                var foundGrid = subGrid.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridListCells].Replace("[NAME]", subgridName)), out subGridRecordList);
 
                 // Read Only Grid Found
                 if (subGridRecordList != null && foundGrid)
                 {
-                    var subGridRecordRows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridList].Replace("[NAME]", subgridName)));
+                    var subGridRecordRows = subGrid.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridListCells].Replace("[NAME]", subgridName)));
                     if (subGridRecordRows == null)
                         throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
                     Actions actions = new Actions(driver);
