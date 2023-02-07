@@ -57,7 +57,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.GetGridItems();
 
-                xrmApp.Grid.Sort("Account Name", "Z to A");
+                xrmApp.Grid.Sort("Account Name", "Sort Z to A");
 
                 xrmApp.ThinkTime(3000);
             }
