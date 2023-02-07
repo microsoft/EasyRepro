@@ -1628,7 +1628,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         Trace.WriteLine("Clicked record.");
                     },
                     $"An error occur trying to open the record at position {index}"
-                    );
+                );
 
                 driver.WaitForTransaction();
                 Trace.WriteLine("Click Record transaction complete.");

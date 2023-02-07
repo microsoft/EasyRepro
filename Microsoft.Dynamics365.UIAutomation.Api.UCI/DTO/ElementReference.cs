@@ -138,6 +138,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Timeline_Note_Add",                 "//button[contains(@id,'save_button') or contains(@id, 'create_note_add_btn')]" },
             { "Timeline_Note_Cancel",              "id(\"create_note_cancel_btn\")" },
 
+
             //Global Search
             { "Search_Filter"       , "id(\"filterCombo\")"},
             { "Search_Text"       , "id(\"searchTextBox\")"},
