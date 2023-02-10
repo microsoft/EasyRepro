@@ -44,7 +44,9 @@
     <Parameter name="OnlinePassword" value="" />
     <Parameter name="OnlineCrmUrl" value="" />
     <Parameter name="BrowserType" value="Chrome" />
+    <Parameter name="DriversPath" value="" />
     <Parameter name="AzureKey" value="" />
+    <Parameter name="SessionId" value="" />
   </TestRunParameters>
   <!-- Adapter Specific sections -->
 
