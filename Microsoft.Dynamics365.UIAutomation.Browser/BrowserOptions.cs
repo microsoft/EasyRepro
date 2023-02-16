@@ -274,7 +274,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             {
                 PageLoadStrategy = PageLoadStrategy.Normal
             };
-            options.AddArgument("inprivate");
+            if (PrivateMode) options.AddArgument("inprivate");
             return options;
         }
     }
