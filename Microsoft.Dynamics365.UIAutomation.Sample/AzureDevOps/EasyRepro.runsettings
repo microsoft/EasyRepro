@@ -43,6 +43,8 @@
     <Parameter name="OnlineUsername" value="" />
     <Parameter name="OnlinePassword" value="" />
     <Parameter name="OnlineCrmUrl" value="" />
+    <!-- 0=Selenium,1=Playwright-->
+    <Parameter name="Framework" value="" />
     <Parameter name="BrowserType" value="Chrome" />
     <Parameter name="DriversPath" value="" />
     <Parameter name="AzureKey" value="" />

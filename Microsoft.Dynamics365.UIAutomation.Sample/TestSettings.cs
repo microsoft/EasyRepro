@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System.Configuration;
+using static Microsoft.Dynamics365.UIAutomation.Browser.BrowserOptions;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
@@ -9,7 +10,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
     {
         public static string InvalidAccountLogicalName = "accounts";
 
-        //public static LookupItem LookupValues = new LookupItem { Name = "primarycontactid", Value = "Nancy Anderson (sample)" } ;
+
         public static string LookupField = "primarycontactid";
         public static string LookupName = "Nancy Anderson (sample)";
         private static readonly string Type = ConfigurationManager.AppSettings["BrowserType"];
@@ -17,10 +18,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         private static readonly string RemoteHubServerURL = ConfigurationManager.AppSettings["RemoteHubServer"];
         private static readonly string DriversPath = ConfigurationManager.AppSettings["DriversPath"] ?? string.Empty;
         private static readonly bool UsePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"] ?? bool.TrueString);
+        private static readonly int Framework = Convert.ToInt32(ConfigurationManager.AppSettings["Framework"]);
 
         // Once you change this instance will affect all follow tests executions
         public static BrowserOptions SharedOptions = new BrowserOptions
         {
+            Framework = (UiFramework)Framework,
             BrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), Type),
             PrivateMode = UsePrivateMode,
             FireEvents = false,
@@ -51,6 +54,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         // Create a new options instance, copy of the share, to use just in the current test, modifications in test will not affect other tests
         public static BrowserOptions Options => new BrowserOptions 
         {
+            Framework = SharedOptions.Framework,
             BrowserType = SharedOptions.BrowserType,
             PrivateMode = SharedOptions.PrivateMode,
             FireEvents = SharedOptions.FireEvents,
