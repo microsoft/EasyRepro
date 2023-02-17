@@ -1,20 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Support.UI;
-using System;
-using System.Collections.Generic;
+using SeleniumExtras.WaitHelpers;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Web.Script.Serialization;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
@@ -144,12 +141,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             @object = SanitizeReturnStatement(@object);
 
             var results = ExecuteScript(driver, $"return JSON.stringify({@object});").ToString();
-            var jsSerializer = new JavaScriptSerializer();
+            //var jsSerializer = new JavaScriptSerializer();
 
-            jsSerializer.RegisterConverters(new[] {new DynamicJsonConverter()});
+            //jsSerializer.RegisterConverters(new[] {new DynamicJsonConverter()});
 
-            var jsonObj = new JavaScriptSerializer().Deserialize<T>(results);
-
+            //var jsonObj = new JavaScriptSerializer().Deserialize<T>(results);
+            var jsonObj =  JsonConvert.DeserializeObject<T>(results);
             return jsonObj;
         }
 

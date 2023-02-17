@@ -38,22 +38,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.OpenRecord(0);
 
-                UCITestBusinessProcessFlowAction("Identify", "Next Stage", xrmApp, client);
-
-                UCITestBusinessProcessFlowAction("Research", "Close", xrmApp, client);
             }
         }
 
-        //Open the selected Stage and choose the button based on their title
-        [TestMethod]
-        private void UCITestBusinessProcessFlowAction(string selectStage, string BpfButtonName, XrmApp xrmApp, WebClient client)
-        {
-            var xrmBrowser = client.Browser;
-            var win = xrmBrowser.Driver.SwitchTo().Window(xrmBrowser.Driver.CurrentWindowHandle);
-            //Select the Business Process Flow stage
-            xrmApp.BusinessProcessFlow.SelectStage(selectStage);
-            //Click the button
-            win.FindElement(By.XPath("//button[@title='" + BpfButtonName + "']")).Click();
-        }
     }
 }

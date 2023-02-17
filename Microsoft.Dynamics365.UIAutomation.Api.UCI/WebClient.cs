@@ -7,19 +7,12 @@ using Newtonsoft.Json;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OtpNet;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Resources;
 using System.Security;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Web;
-using System.Web.UI;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
