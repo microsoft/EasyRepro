@@ -254,7 +254,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             var options = new FirefoxOptions()
             {
-                UseLegacyImplementation = false
+                
             };
 
             if (!string.IsNullOrEmpty(DownloadsPath))
@@ -272,10 +272,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             var options = new EdgeOptions()
             {
-                PageLoadStrategy = PageLoadStrategy.Normal,
-                UseInPrivateBrowsing = PrivateMode
+                PageLoadStrategy = PageLoadStrategy.Normal
             };
-
+            if (PrivateMode) options.AddArgument("inprivate");
             return options;
         }
     }
