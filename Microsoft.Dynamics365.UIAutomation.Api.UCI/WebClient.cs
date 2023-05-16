@@ -1621,7 +1621,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                                 driver.Perform(action, emptyDiv, null);
                                 break;
                             case Grid.GridType.PowerAppsGridControl:
-                                cell.FindElement(By.XPath("//a[contains(@aria-label,'Read only')]")).Click();
+                                try
+                                {
+                                    cell.FindElement(By.XPath("//a[contains(@aria-label,'Read only')]")).Click();
+                                }
+                                catch (Exception ex)
+                                {
+                                    cell.FindElement(By.XPath("//a[contains(@role,'link')]")).Click();
+                                }
+                                
                                 break;
                             default: throw new InvalidSelectorException("Did not find Read Only or Power Apps Grid.");
                         }
