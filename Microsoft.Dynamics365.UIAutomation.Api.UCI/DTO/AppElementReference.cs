@@ -576,11 +576,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             //MultiSelect
             { "MultiSelect_DivContainer",     ".//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]" },
-            { "MultiSelect_InputSearch",     ".//input[contains(@data-id,\"textInputBox\")]" },
+            { "MultiSelect_InputSearch",     ".//input[@class=\"msos-input\"]" },
             { "MultiSelect_SelectedRecord",  ".//li" },
             { "MultiSelect_SelectedRecord_DeleteButton", ".//button[contains(@data-id, \"delete\")]" },
             { "MultiSelect_SelectedRecord_Label",  ".//span[contains(@class, \"msos-selected-display-item-text\")]" },
-            { "MultiSelect_FlyoutOption",      "//li[label[contains(@title, \"[NAME]\")] and contains(@class,\"msos-option\")]" },
+            { "MultiSelect_FlyoutOption",      "//li[label[@title='[NAME]'] and contains(@class,'msos-option')]" },
             { "MultiSelect_FlyoutOptionCheckbox", "//input[contains(@class, \"msos-checkbox\")]" },
             { "MultiSelect_FlyoutCaret", "//button[contains(@class, \"msos-caret-button\")]" },
 
