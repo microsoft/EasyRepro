@@ -12,6 +12,7 @@ using System.Linq;
 using System.Security;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
@@ -38,7 +39,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
             _username = _testContext.Properties["OnlineUsername"].ToString().ToSecureString();
             _password = _testContext.Properties["OnlinePassword"].ToString().ToSecureString();
-            _mfaSecretKey = _testContext.Properties["OnlinePassword"].ToString().ToSecureString();
+            _mfaSecretKey = _testContext.Properties["MfaSecretKey"].ToString().ToSecureString();
             _xrmUri = new Uri(_testContext.Properties["OnlineCrmUrl"].ToString());
             _browserType = (BrowserType)Enum.Parse(typeof(BrowserType), _testContext.Properties["BrowserType"].ToString());
             _azureKey = _testContext.Properties["AzureKey"].ToString();
@@ -869,5 +870,455 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Regression")]
+        [TestCategory("Controls")]
+        [TestCategory("QuickCreate")]
+        [TestMethod]
+        public void Regression_QuickCreateControls_GetValue_SetValue_All()
+        {
+            var telemetry = new Microsoft.ApplicationInsights.TelemetryClient { InstrumentationKey = _azureKey };
+            telemetry.Context.Operation.Id = Guid.NewGuid().ToString();
+            telemetry.Context.Operation.ParentId = _sessionId;
+            telemetry.Context.GlobalProperties.Add("Test", TestContext.TestName);
+            Dictionary<string, string> localProperties = new Dictionary<string, string>();
+            var client = new WebClient(TestSettings.Options);
+            var xrmApp = new XrmApp(client);
+            try
+            {
+                telemetry.TrackTrace("Login Started");
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
+                telemetry.TrackTrace("Login Completed");
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+
+                //TODO
+                //telemetry.TrackTrace("OpenAbout Started");
+                //xrmApp.Navigation.OpenAbout();
+                //telemetry.TrackTrace("OpenAbout Completed");
+                //TakeScreenshot(client, xrmApp.CommandResults.Last());
+                //xrmApp.Dialogs.ClickOk();
+
+                telemetry.TrackTrace("Navigation.QuickCreate Started");
+                xrmApp.Navigation.QuickCreate("Test Harness");
+                telemetry.TrackTrace("Navigation.QuickCreate Completed");
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+
+                #region Attributes
+                #region Auto Number
+                //Work with AutoNumber
+                Trace.WriteLine("QuickCreate.SetValue pfe_autonumber");
+                telemetry.TrackTrace("QuickCreate.SetValue pfe_autonumber");
+                xrmApp.QuickCreate.SetValue("pfe_autonumber", TestSettings.GetRandomString(5, 10));
+                #endregion
+                #region Currency
+                //Work with Currency
+                Trace.WriteLine("QuickCreate.SetValue pfe_currency");
+                telemetry.TrackTrace("QuickCreate.SetValue pfe_currency");
+                xrmApp.QuickCreate.SetValue("pfe_currency", "1.00");
+                #endregion
+                #region Customer
+                //Work with Lookup
+                //Trace.WriteLine("SetValue pfe_customer");
+                //LookupItem pfe_customer = new LookupItem() { Name = "pfe_customer", Value = "Adventure Works (Sample)", Index = 0 };
+                //xrmApp.Entity.SetValue(pfe_customer);
+                #endregion
+                #region DateTime
+                try
+                {
+                    //Work with DateTime
+                    Trace.WriteLine("QuickCreate.SetValue pfe_dateandtime");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_dateandtime");
+                    DateTime expectedDate = DateTime.Today.AddDays(1).AddHours(10);
+                    xrmApp.QuickCreate.SetValue("pfe_dateandtime", expectedDate);
+                    DateTime? date = xrmApp.Entity.GetValue(new DateTimeControl("pfe_dateandtime"));
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_dateandtime";
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    telemetry.TrackException(ex);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw;
+                }
+                try
+                {
+                    //Work with DateOnly
+                    Trace.WriteLine("QuickCreate.SetValue pfe_dateonly");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_dateonly");
+                    DateTime expectedDate = DateTime.Today.AddDays(1).AddHours(10);
+                    xrmApp.QuickCreate.SetValue("pfe_dateonly", expectedDate);
+                    DateTime? date = xrmApp.Entity.GetValue(new DateTimeControl("pfe_dateonly"));
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_dateonly";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Decimal
+                try
+                {
+                    //Work with Decimal
+                    Trace.WriteLine("QuickCreate.SetValue pfe_decimalnumber");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_decimalnumber");
+                    xrmApp.QuickCreate.SetValue("pfe_decimalnumber", ".01");
+                    string decimalReturn = xrmApp.Entity.GetValue("pfe_decimalnumber");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_decimalnumber";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Duration
+                try
+                {
+                    //Work with Duration
+                    Trace.WriteLine("QuickCreate.SetValue pfe_duration");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_duration");
+                    xrmApp.QuickCreate.SetValue("pfe_duration", "1 hour");
+                    string decimalReturn = xrmApp.Entity.GetValue("pfe_duration");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_duration";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Email
+                try
+                {
+                    //Work with Email
+                    Trace.WriteLine("QuickCreate.SetValue pfe_email");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_email");
+                    xrmApp.QuickCreate.SetValue("pfe_email", "easyreprosupport@contoso.com");
+                    string emailReturn = xrmApp.Entity.GetValue("pfe_email");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_email";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region File - TODO
+                try
+                {
+                    //Work with File
+                    Trace.WriteLine("QuickCreate.SetValue pfe_file");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_file");
+                    xrmApp.QuickCreate.SetValue("pfe_file", "easyreprosupport@contoso.com");
+                    string fileReturn = xrmApp.QuickCreate.GetValue("pfe_file");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_file";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Floating Point Number
+                try
+                {
+                    //Work with Floating Point Number
+                    Trace.WriteLine("QuickCreate.SetValue pfe_floatingpointnumber");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_floatingpointnumber");
+                    xrmApp.QuickCreate.SetValue("pfe_floatingpointnumber", "100.001");
+                    string pfe_floatingpointnumberReturn = xrmApp.Entity.GetValue("pfe_floatingpointnumber");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_floatingpointnumber";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Image - TODO
+                try
+                {
+                    //Work with Image
+                    Trace.WriteLine("QuickCreate.SetValue pfe_image");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_image");
+                    xrmApp.QuickCreate.SetValue("pfe_image", "test.jpg");
+                    string imageReturn = xrmApp.Entity.GetValue("pfe_image");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_image";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Language - TODO
+                try
+                {
+                    //Work with Language
+                    Trace.WriteLine("QuickCreate.SetValue pfe_language");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_language");
+                    xrmApp.QuickCreate.SetValue("pfe_language", "English (United States)");
+                    string languageReturn = xrmApp.Entity.GetValue("pfe_language");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_language";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Lookup
+                try
+                {
+                    //Work with Lookup
+                    Trace.WriteLine("QuickCreate.SetValue pfe_lookup");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_lookup");
+                    LookupItem pfe_customer = new LookupItem() { Name = "pfe_lookup", Value = "Adventure Works (Sample)", Index = 0 };
+                    xrmApp.QuickCreate.SetValue(pfe_customer);
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_lookup";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Multi Line Textbox
+                try
+                {
+                    //Work with Multi Line Textbox
+                    Trace.WriteLine("QuickCreate.SetValue pfe_multilinetext");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_multilinetext");
+                    xrmApp.QuickCreate.SetValue("pfe_multilinetext", "Spanish");
+                    string multiLineTextReturn = xrmApp.Entity.GetValue("pfe_multilinetext");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_multilinetext";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Multi Select Option Set
+                try
+                {
+                    //Work with Multi Select Option Set
+                    localProperties.Clear();
+                    Trace.WriteLine("QuickCreate.SetValue pfe_multiselectoptionset");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_multiselectoptionset Started");
+                    xrmApp.QuickCreate.SetValue(new MultiValueOptionSet { Name = "pfe_multiselectoptionset", Values = new string[] { "Allowed", "Not Allowed" } });
+                    localProperties = TrackCommandExecutionMetrics(localProperties, client, xrmApp, TakeScreenshot(client, xrmApp.CommandResults.Last()));
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_multiselectoptionset Completed", ApplicationInsights.DataContracts.SeverityLevel.Information, localProperties);
+
+                    localProperties.Clear();
+                    Trace.WriteLine("QuickCreate.GetValue pfe_multiselectoptionset Started");
+                    telemetry.TrackTrace("QuickCreate.GetValue pfe_multiselectoptionset Started");
+                    string multiselectOptionSetReturn = xrmApp.QuickCreate.GetValue("pfe_multiselectoptionset");
+                    localProperties = TrackCommandExecutionMetrics(localProperties, client, xrmApp, TakeScreenshot(client, xrmApp.CommandResults.Last()));
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_multiselectoptionset Completed");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_multiselectoptionset";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Text
+                try
+                {
+                    //Work with Text
+                    Trace.WriteLine("QuickCreate.SetValue pfe_name");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_name");
+                    xrmApp.QuickCreate.SetValue("pfe_name", TestSettings.GetRandomString(5, 10));
+                    string textReturn = xrmApp.QuickCreate.GetValue("pfe_name");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_name";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Option Set - TODO
+                try
+                {
+                    //Work with Option Set
+                    Trace.WriteLine("QuickCreate.SetValue pfe_optionset");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_optionset");
+                    xrmApp.QuickCreate.SetValue(new OptionSet { Name = "pfe_optionset", Value = "Allowed" });
+                    string textReturn = xrmApp.Entity.GetValue(new OptionSet() { Name = "pfe_optionset" });
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_optionset";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Text Area
+                try
+                {
+                    //Work with Text Area
+                    Trace.WriteLine("QuickCreate.SetValue pfe_textarea");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_textarea");
+                    xrmApp.QuickCreate.SetValue("pfe_textarea", "test text area");
+                    string textAreaReturn = xrmApp.QuickCreate.GetValue("pfe_textarea");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_textarea";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Ticker Symbol
+                try
+                {
+                    //Work with tickersymbol
+                    Trace.WriteLine("QuickCreate.SetValue pfe_tickersymbol");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_tickersymbol");
+                    xrmApp.QuickCreate.SetValue("pfe_tickersymbol", "MSFT");
+                    string tickersymbolReturn = xrmApp.QuickCreate.GetValue("pfe_tickersymbol");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_tickersymbol";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Time Zone - TODO
+                try
+                {
+                    //Work with pfe_timezone
+                    Trace.WriteLine("QuickCreate.SetValue pfe_timezone");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_timezone");
+                    xrmApp.QuickCreate.SetValue("pfe_timezone", "(GMT-06:00) Central Time (US & Canada)");
+                    string pfe_timezoneReturn = xrmApp.QuickCreate.GetValue("pfe_timezone");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_timezone";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Two Options
+                try
+                {
+                    //Work with pfe_twooptions
+                    Trace.WriteLine("QuickCreate.SetValue pfe_twooptions");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_twooptions");
+                    xrmApp.QuickCreate.SetValue(new BooleanItem() { Name = "pfe_twooptions", Value = true });
+                    string pfe_timezoneReturn = xrmApp.QuickCreate.GetValue("pfe_twooptions");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_twooptions";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Url
+                try
+                {
+                    //Work with pfe_url
+                    Trace.WriteLine("QuickCreate.SetValue pfe_url");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_url");
+                    xrmApp.QuickCreate.SetValue("pfe_url", "https://microsoft.com");
+                    string pfe_urlReturn = xrmApp.QuickCreate.GetValue("pfe_url");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_url";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #region Whole Number
+                try
+                {
+                    //Work with pfe_wholenumber
+                    Trace.WriteLine("QuickCreate.SetValue pfe_wholenumber");
+                    telemetry.TrackTrace("QuickCreate.SetValue pfe_wholenumber");
+                    xrmApp.QuickCreate.SetValue("pfe_wholenumber", "10000");
+                    string pfe_wholenumberReturn = xrmApp.QuickCreate.GetValue("pfe_wholenumber");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_wholenumber";
+                    telemetry.TrackException(ex);
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
+                #endregion
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+                Trace.WriteLine("QuickCreate.Save");
+                telemetry.TrackTrace("QuickCreate.Save");
+                xrmApp.QuickCreate.Save();
+                telemetry.TrackEvent(String.Format("{0} is successful.", TestContext.TestName));
+            }
+            catch (System.Exception ex)
+            {
+                telemetry.TrackException(ex);
+                WriteSource("EXCEPTION_Source_", client.Browser.Driver.PageSource);
+                TakeScreenshot(client, xrmApp.CommandResults.Last());
+                throw ex;
+            }
+            finally
+            {
+                xrmApp.Dispose();
+                telemetry.Flush();
+            }
+        }
+
+        private Dictionary<string, string> TrackCommandExecutionMetrics(Dictionary<string, string> localProperties, WebClient client, XrmApp xrmApp, string artifactLocation)
+        {
+            localProperties.Add("Screenshot", artifactLocation);
+            localProperties.Add("Success", xrmApp.CommandResults.Last().Success.ToString());
+            localProperties.Add("StartTime", xrmApp.CommandResults.Last().StartTime.ToString());
+            localProperties.Add("StopTime", xrmApp.CommandResults.Last().StopTime.ToString());
+            localProperties.Add("ExecutionTime", xrmApp.CommandResults.Last().ExecutionTime.ToString());
+            return localProperties;
+        }
     }
 }

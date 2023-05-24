@@ -359,12 +359,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Control = "PowerApp_Control";
 
         }
+
+        public static class CustomerServiceCopilot
+        {
+            public static string ControlId = "CustomerServiceCopilot_controlId";
+            public static string ControlButtonId = "CustomerServiceCopilot_controlButtonId";
+            public static string UserInput = "CustomerServiceCopilot_UserInput";
+            public static string UserSubmit = "CustomerServiceCopilot_UserSubmit";
+        }
     }
 
     public static class AppElements
     {
         public static Dictionary<string, string> Xpath = new Dictionary<string, string>()
         {
+            //Copilot
+            { "CustomerServiceCopilot_ControlId"    , "//div[@id=\"AppSidePane_MscrmControls.CSIntelligence.AICopilotControl\"]"},
+            { "CustomerServiceCopilot_ControlButtonId"    , "//button[@id=\"sidepane-tab-button-AppSidePane_MscrmControls.CSIntelligence.AICopilotControl\"]"},
+            { "CustomerServiceCopilot_UserInput"    , "//textarea[@data-id=\"webchat-sendbox-input\"]"},
+            { "CustomerServiceCopilot_UserSubmit"    , "//div[@class=\"webchat__send-box__main\"]//button"},
+
             //Application 
             { "App_Shell"    , "//*[@id=\"ApplicationShell\"]"},
 

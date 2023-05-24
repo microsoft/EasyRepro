@@ -91,6 +91,7 @@
     <Compile Include="DTO\FormNotificationType.cs" />
     <Compile Include="DTO\KeyPerformanceIndicator.cs" />
     <Compile Include="Elements\BusinessProcessFlow.cs" />
+    <Compile Include="Elements\Copilot.cs" />
     <Compile Include="Elements\CommandBar.cs" />
     <Compile Include="Elements\PowerApp.cs" />
     <Compile Include="Elements\Subgrid.cs" />

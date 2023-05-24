@@ -92,6 +92,7 @@
   <ItemGroup>
     <Compile Include="AzureDevOps\UCI\CreateAccount.cs" />
     <Compile Include="AzureDevOps\UCI\RegressionTests.cs" />
+    <Compile Include="CustomerService\CustomerServiceCopilot.cs" />
     <Compile Include="ProjectOps\LeadQualification.cs" />
     <Compile Include="ProjectOps\CreateLead.cs" />
     <Compile Include="ProjectOps\CreateProjectTeamMember.cs" />

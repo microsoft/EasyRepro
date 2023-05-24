@@ -5836,6 +5836,93 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
         #endregion PowerApp
+
+        #region Copilot
+        private bool _coPilotEnabled = false;
+        internal IWebElement EnableCustomerServiceCopilot(IWebDriver driver)
+        {
+            IWebElement powerApp = null;
+            Trace.WriteLine("Locating Copilot");
+            if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.PowerApp.ModelFormContainer])))
+            {
+                powerApp = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.PowerApp.ModelFormContainer]));
+                driver.SwitchTo().Frame(powerApp);
+                powerApp = driver.FindElement(By.XPath("//iframe[@class='publishedAppIframe']"));
+                driver.SwitchTo().Frame(powerApp);
+                _inPowerApps = true;
+            }
+            else
+            {
+                throw new NotFoundException("Copilot not found or not enabled.");
+            }
+            return powerApp;
+        }
+        internal BrowserCommandResult<bool> EnableAskAQuestion()
+        {
+            return this.Execute(GetOptions($"Enable Ask A Question for Copilot"), driver =>
+            {
+                if (!_coPilotEnabled) EnableCustomerServiceCopilot(driver);
+                IWebElement relatedEntity = null;
+                if (driver.TryFindElement(By.XPath(""), out var copilot))
+                {
+                    // Advanced lookup
+                    //relatedEntity = advancedLookup.WaitUntilAvailable(
+                    //    By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.FilterTable].Replace("[NAME]", entityName)),
+                    //    2.Seconds());
+                }
+                else
+                {
+                    // Lookup 
+                    //relatedEntity = driver.WaitUntilAvailable(
+                    //    By.XPath(AppElements.Xpath[AppReference.Lookup.RelatedEntityLabel].Replace("[NAME]", entityName)),
+                    //    2.Seconds());
+                }
+
+                //if (relatedEntity == null)
+                //{
+                //    throw new NotFoundException($"Lookup Entity {entityName} not found.");
+                //}
+
+                //relatedEntity.Click();
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<string> AskAQuestion(string userInput)
+        {
+            return this.Execute(GetOptions($"Ask A Question for Copilot"), driver =>
+            {
+                if (!_coPilotEnabled) EnableCustomerServiceCopilot(driver);
+                IWebElement relatedEntity = null;
+                if (driver.TryFindElement(By.XPath(""), out var copilot))
+                {
+                    // Advanced lookup
+                    //relatedEntity = advancedLookup.WaitUntilAvailable(
+                    //    By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.FilterTable].Replace("[NAME]", entityName)),
+                    //    2.Seconds());
+                }
+                else
+                {
+                    // Lookup 
+                    //relatedEntity = driver.WaitUntilAvailable(
+                    //    By.XPath(AppElements.Xpath[AppReference.Lookup.RelatedEntityLabel].Replace("[NAME]", entityName)),
+                    //    2.Seconds());
+                }
+
+                //if (relatedEntity == null)
+                //{
+                //    throw new NotFoundException($"Lookup Entity {entityName} not found.");
+                //}
+
+                //relatedEntity.Click();
+                driver.WaitForTransaction();
+
+                return string.Empty;
+            });
+        }
+        #endregion
         internal void ThinkTime(int milliseconds)
         {
             Browser.ThinkTime(milliseconds);
