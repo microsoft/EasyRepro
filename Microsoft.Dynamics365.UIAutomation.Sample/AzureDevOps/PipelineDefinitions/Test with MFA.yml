@@ -1,0 +1,91 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+schedules:
+- cron: '*/15 * * * *' # cron syntax defining a schedule
+  displayName: Every 15 minutes
+  branches:
+    include:
+    - azure-pipelines2
+
+resources:
+  repositories:
+  - repository: EasyRepro # The name used to reference this repository in the checkout step
+    type: github
+    endpoint: GitHub connection 1
+    name: microsoft/EasyRepro
+    ref: users/alyousse
+
+trigger:
+- develop
+
+pool:
+  vmImage: windows-latest
+
+variables:
+- group: TestAutomation-NAM-Alan
+
+steps:
+- checkout: self
+- checkout: EasyRepro
+
+- script: echo $(OnlineUsername)
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo $(OnlineUsername)
+    echo $(OnlinePassword)
+    echo $(MfaSecretKey)
+    echo $(OnlineCrmUrl)
+    echo $(AzureKey)
+    echo $(CHROMEWEBDRIVER)
+  displayName: 'Display variables'
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      Set-DisplayResolution -Width 1920 -Height 1080 -Force
+      Start-Sleep -s 10 
+      Get-DisplayResolution
+  displayName: "Set Screen Resolution"
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+    dir $(System.DefaultWorkingDirectory)
+  displayName: 'Run a multi-line script'
+
+# - script: |
+#     Set-DisplayResolution -Width 1920 -Height 1080 -Force
+#     Start-Sleep -s 10 
+#     Get-DisplayResolution
+#   displayName: 'Set Screen Resolution'
+
+- task: NuGetToolInstaller@1
+  inputs:
+    versionSpec: 
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'
+    feedsToUse: 'select'
+- task: VSBuild@1
+  inputs:
+    solution: '**\*.sln'
+
+
+- task: VSTest@2
+  inputs:
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: |
+      **\*Sample*.dll
+      !**\*TestAdapter.dll
+      !**\obj\**
+    searchFolder: '$(System.DefaultWorkingDirectory)'
+    #testFiltercriteria: 'FullyQualifiedName~ContosoSoftware.PowerApps.UIAutomation.Tests.CustomerService.CustomerServiceTests.Test_CreateCaseWithLookup'
+    testFiltercriteria: 'FullyQualifiedName~Microsoft.Dynamics365.UIAutomation.Sample.UCI.RegressionTests.Regression_EntityControls_GetValue_SetValue_All'
+    runSettingsFile: '$(System.DefaultWorkingDirectory)\EasyRepro\Microsoft.Dynamics365.UIAutomation.Sample/AzureDevOps/EasyRepro.runsettings'
+    overrideTestrunParameters: '-OnlineUsername $(OnlineUsername) -OnlinePassword $(OnlinePassword) -MfaSecretKey $(MfaSecretKey) -OnlineCrmUrl $(OnlineCrmUrl) -AzureKey $(AzureKey) -DriversPath $(CHROMEWEBDRIVER) -SessionId $(Build.BuildNumber)'
+
