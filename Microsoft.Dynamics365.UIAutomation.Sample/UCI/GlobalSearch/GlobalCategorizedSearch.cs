@@ -17,13 +17,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Navigation.OpenGlobalSearch();
 
-                xrmApp.GlobalSearch.ChangeSearchType("Categorized Search");
-
-                xrmApp.GlobalSearch.Search("Test");
-
+                xrmApp.GlobalSearch.Search("Fabrikam, Inc.");
+                
+                // This will fail unless the organization has Dataverse Search disabled
                 xrmApp.GlobalSearch.FilterWith("Account");
 
-                xrmApp.GlobalSearch.OpenRecord("account", 0);
+                xrmApp.GlobalSearch.OpenRecord("Accounts", 0);
             }
         }
     }

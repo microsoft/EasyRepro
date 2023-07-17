@@ -27,7 +27,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
 
-                List<string> expectedAreas = new List<string> { "Accounts", "Contacts" };
+                List<string> expectedAreas = new List<string> { "sales", "app settings", "sales insights settings", "personal settings", "help and support" };
 
                 Dictionary<string, IWebElement> areas = client.OpenMenu();
 

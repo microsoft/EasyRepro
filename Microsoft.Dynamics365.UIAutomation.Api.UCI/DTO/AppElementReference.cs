@@ -50,6 +50,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public static class Grid
         {
             public static string Container = "Grid_Container";
+            public static string PcfContainer = "Grid_PCFContainer";
             public static string QuickFind = "Grid_QuickFind";
             public static string FirstPage = "Grid_FirstPage";
             public static string NextPage = "Grid_NextPage";
@@ -59,14 +60,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string HideChart = "Grid_HideChart";
             public static string JumpBar = "Grid_JumpBar";
             public static string FilterByAll = "Grid_FilterByAll";
+            public static string RowsContainerCheckbox = "Grid_RowsContainerCheckbox";
             public static string RowsContainer = "Grid_RowsContainer";
+            public static string LegacyReadOnlyRows = "Grid_LegacyReadOnly_Rows";
             public static string Rows = "Grid_Rows";
+            public static string Row = "Grid_Row";
+            public static string LastRow = "Grid_LastRow";
+            public static string Columns = "Grid_Columns";
+            public static string Control = "Grid_Control";
             public static string ChartSelector = "Grid_ChartSelector";
             public static string ChartViewList = "Grid_ChartViewList";
             public static string GridSortColumn = "Grid_SortColumn";
+            public static string Cells = "Grid_Cells";
             public static string CellContainer = "Grid_CellContainer";
             public static string ViewSelector = "Grid_ViewSelector";
             public static string ViewContainer = "Grid_ViewContainer";
+            public static string ViewSelectorMenuItem = "Grid_ViewSelectorMenuItem";
             public static string SubArea = "Grid_SubArea";
         }
 
@@ -113,19 +122,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string MoreTabs = "Entity_MoreTabs";
             public static string MoreTabsMenu = "Entity_MoreTabsMenu";
             public static string SubTab = "Entity_SubTab";
-            public static string EntityFooter = "Entity_Footer";
             public static string SubGridTitle = "Entity_SubGridTitle";
+            public static string SubGridRow = "Entity_SubGrid_Row";
+            public static string SubGridLastRow = "Entity_SubGrid_LastRow";
             public static string SubGridContents = "Entity_SubGridContents";
             public static string SubGridList = "Entity_SubGridList";
+            public static string SubGridListCells = "Entity_SubGridListCells";
             public static string SubGridViewPickerButton = "Entity_SubGridViewPickerButton";
             public static string SubGridViewPickerFlyout = "Entity_SubGridViewPickerFlyout";
             public static string SubGridCommandBar = "Entity_SubGridCommandBar";
+            public static string SubGridCommandLabel = "Entity_SubGridCommandLabel";
             public static string SubGridOverflowContainer = "Entity_SubGridOverflowContainer";
             public static string SubGridOverflowButton = "Entity_SubGridOverflowButton";
             public static string SubGridHighDensityList = "Entity_SubGridHighDensityList";
             public static string EditableSubGridList = "Entity_EditableSubGridList";
             public static string EditableSubGridListCells = "Entity_EditableSubGridListCells";
             public static string EditableSubGridListCellRows = "Entity_EditableSubGridListCellRows";
+            public static string EditableSubGridCells = "Entity_EditableSubGridCells";
+            public static string SubGridControl = "Entity_SubGridControl";
             public static string SubGridCells = "Entity_SubGridCells";
             public static string SubGridRows = "Entity_SubGridRows";
             public static string SubGridRowsHighDensity = "Entity_SubGridRowsHighDensity";
@@ -141,8 +155,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string DuplicateDetectionWindowMarker = "Entity_DuplicateDetectionWindowMarker";
             public static string DuplicateDetectionGridRows = "Entity_DuplicateDetectionGridRows";
             public static string DuplicateDetectionIgnoreAndSaveButton = "Entity_DuplicateDetectionIgnoreAndSaveButton";
-            public static string FooterStatusValue = "Entity_FooterStatusField";
-            public static string FooterMessageValue = "Entity_FooterMessage";
             public static string EntityBooleanFieldRadioContainer = "Entity_BooleanFieldRadioContainer";
             public static string EntityBooleanFieldRadioTrue = "Entity_BooleanFieldRadioTrue";
             public static string EntityBooleanFieldRadioFalse = "Entity_BooleanFieldRadioFalse";
@@ -223,12 +235,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Container = "Search_Container";
             public static string EntityContainer = "Search_EntityContainer";
             public static string Records = "Search_Records";
-            public static string Type = "Search_Type";
             public static string GroupContainer = "Search_GroupContainer";
             public static string FilterValue = "Search_FilterValue";
-            public static string RelevanceResultsContainer = "Search_RelevanceResultsContainer";
-            public static string RelevanceResults = "Search_RelevanceResults";
-
+            public static string CategorizedResultsContainer = "Search_CategorizedResultsContainer";
+            public static string CategorizedResults = "Search_CategorizedResults";
+            public static string RelevanceSearchResultsSelectedTab = "Search_RelevanceSearchResultsSelectedTab";
+            public static string RelevanceSearchResultsTab = "Search_RelevanceSearchResultsTab";
+            public static string RelevanceSearchResultLinks = "Search_RelevanceSearchResultLinks";
         }
 
         public static class BusinessProcessFlow
@@ -269,6 +282,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string AssignDialogToggle = "AssignDialog_ToggleField";
             public static string ConfirmButton = "Dialog_ConfirmButton";
             public static string CancelButton = "Dialog_CancelButton";
+            public static string OkButton = "Dialog_OkButton";
             public static string DuplicateDetectionIgnoreSaveButton = "DuplicateDetectionDialog_IgnoreAndSaveButton";
             public static string DuplicateDetectionCancelButton = "DuplicateDetectionDialog_CancelButton";
             public static string PublishConfirmButton = "Dialog_PublishConfirmButton";
@@ -294,11 +308,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public static class Lookup
         {
             public static string RelatedEntityLabel = "Lookup_RelatedEntityLabel";
-            public static string ChangeViewButton = "Lookup_ChangeViewButton";
+            public static string AdvancedLookupButton = "Lookup_AdvancedLookupButton";
             public static string ViewRows = "Lookup_ViewRows";
             public static string LookupResultRows = "Lookup_ResultRows";
             public static string NewButton = "Lookup_NewButton";
             public static string RecordList = "Lookup_RecordList";
+        }
+
+        public static class AdvancedLookup
+        {
+            public static string Container = "AdvancedLookup_Container";
+            public static string SearchInput = "AdvancedLookup_SearchInput";
+            public static string ResultRows = "AdvancedLookup_ResultRows";
+            public static string FilterTables = "AdvancedLookup_FilterTables";
+            public static string FilterTable = "AdvancedLookup_FilterTable";
+            public static string AddNewTables = "AdvancedLookup_AddNewTables";
+            public static string DoneButton = "AdvancedLookup_DoneButton";
+            public static string AddNewRecordButton = "AdvancedLookup_AddNewRecordButton";
+            public static string AddNewButton = "AdvancedLookup_AddNewButton";
+            public static string ViewSelectorCaret = "AdvancedLookup_ViewSelectorCaret";
+            public static string ViewDropdownList = "AdvancedLookup_ViewDropdownList";
+            public static string ViewDropdownListItem = "AdvancedLookup_ViewDropdownListItem";
         }
 
         public static class Related
@@ -308,6 +338,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string CommandBarOverflowContainer = "Related_CommandBarOverflowContainer";
             public static string CommandBarOverflowButton = "Related_CommandBarOverflowButton";
             public static string CommandBarButtonList = "Related_CommandBarButtonList";
+            public static string CommandBarFlyoutButtonList = "Related_CommandBarFlyoutButtonList";
         }
 
         public static class Field
@@ -321,6 +352,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Container = "Performance_Widget";
             public static string Page = "Performance_WidgetPage";
         }
+    
+        public static class PowerApp
+        {
+            public static string ModelFormContainer = "PowerApp_ModalFormContainer";
+            public static string Control = "PowerApp_Control";
+
+        }
     }
 
     public static class AppElements
@@ -329,6 +367,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             //Application 
             { "App_Shell"    , "//*[@id=\"ApplicationShell\"]"},
+
+            //PowerApp
+            { "PowerApp_ModalFormContainer"       , "//iframe[contains(@src,\'[NAME]\')]"},
+            { "PowerApp_Control"       , "//div[@data-control-name=\'[NAME]\']"},
 
             //Navigation
             { "Nav_AreaButton"       , "//button[@id='areaSwitcherId']"},
@@ -343,7 +385,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_SiteMapSingleArea", "//li[translate(@data-text,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = '[NAME]']" },
             { "Nav_AppMenuContainer"       , "//*[@id=\"taskpane-scroll-container\"]"},
             { "Nav_SettingsLauncherBar"       , "//button[@data-id='[NAME]Launcher']"},
-            { "Nav_SettingsLauncher"       , "//div[@id='[NAME]Launcher']"},
+            { "Nav_SettingsLauncher"       , "//ul[@data-id='[NAME]Launcher']"},
             { "Nav_AccountManagerButton", "//*[@id=\"mectrl_main_trigger\"]" },
             { "Nav_AccountManagerSignOutButton", "//*[@id=\"mectrl_body_signOut\"]" },
             { "Nav_GuidedHelp"       , "//*[@id=\"helpLauncher\"]/button"},
@@ -367,7 +409,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             
             //Grid
-            { "Grid_Container"       , "//div[@data-type=\"Grid\"]"},
+            { "Grid_Container"       , "//div[@data-id='data-set-body-container']"},
+            { "Grid_PCFContainer"       , "//div[@ref='eViewport']"},
             { "Grid_QuickFind"       , "//*[contains(@id, \'quickFind_text\')]"},
             { "Grid_NextPage"       , "//button[contains(@data-id,'moveToNextPage')]"},
             { "Grid_PreviousPage"       , "//button[contains(@data-id,'moveToPreviousPage')]"},
@@ -376,14 +419,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Grid_ShowChart"       , "//button[contains(@aria-label,'Show Chart')]"},
             { "Grid_JumpBar"       , "//*[@id=\"JumpBarItemsList\"]"},
             { "Grid_FilterByAll"       , "//*[@id=\"All_link\"]"},
+            { "Grid_RowsContainerCheckbox"  ,   "//div[@role='checkbox']" },
             { "Grid_RowsContainer"       , "//div[contains(@role,'grid')]"},
-            { "Grid_Rows"           , "//div[contains(@role,'row')]"},
+            { "Grid_LegacyReadOnly_Rows"           , "//div[@data-id='grid-container']//div[@class='ag-center-cols-container']//div[@role='row']"},
+            { "Grid_Rows"           , "//div[@data-id='entity_control-powerapps_onegrid_control_container']//div[@class='ag-center-cols-container']//div[@role='row']"},
+            { "Grid_Row"           , "//div[@class='ag-center-cols-container']//div[@row-index=\'[INDEX]\']"},
+            { "Grid_LastRow"           , "//div[@data-id='entity_control-pcf_grid_control_container']//div[@ref='centerContainer']//div[@role='rowgroup']//div[contains(@class, 'ag last-row')]"},
+            { "Grid_Control", "//div[contains(@data-lp-id, 'MscrmControls.Grid.PCFGridControl')]" },
+            { "Grid_Columns"           , "//div[contains(@ref,'gridHeader')]"},
             { "Grid_ChartSelector"           , "//span[contains(@id,'ChartSelector')]"},
             { "Grid_ChartViewList"           , "//ul[contains(@role,'listbox')]"},
-            { "Grid_SortColumn",            "//div[@data-type='Grid']//div[@title='[COLNAME]']//div[contains(@class,'header')]"},
+            //{ "Grid_SortColumn",            "//div[contains(@ref,'gridHeader')]//label[@title='[COLNAME]']"},
+            { "Grid_SortColumn",            "//div[contains(@role,'columnheader')]//label[@title='[COLNAME]']"},
+            { "Grid_Cells", ".//div[@role='gridcell']"},
             { "Grid_CellContainer"    ,"//div[@role='grid'][@data-id='grid-cell-container']"},
-            { "Grid_ViewSelector"   , "//span[contains(@id,'ViewSelector')]" },
-            { "Grid_ViewContainer"   , "//ul[contains(@id,'ViewSelector')]" },
+            { "Grid_ViewSelector"   , "//button[contains(@id,'ViewSelector')]" },
+            //{ "Grid_ViewContainer"   , "//div[contains(@data-id,'ViewSelector')]//div[@role='group']//ul" },
+            { "Grid_ViewContainer"   , "//div[contains(@aria-label,'Views')]" },
+            //{ "Grid_ViewSelectorMenuItem", ".//span[contains(@class, 'ms-ContextualMenu-itemText')]" },
+            { "Grid_ViewSelectorMenuItem", ".//li[contains(@class, 'ms-ContextualMenu-item')]" },
             { "Grid_SubArea"   , "//*[contains(@data-id,'[NAME]')]"},
             
 
@@ -397,7 +451,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_HeaderTitle"       , "//*[@data-id='header_title']"},
             { "Entity_HeaderContext"       , ".//div[@data-id='headerFieldsFlyout']"},
             { "Entity_Process"       , "//button[contains(@data-id,'MBPF.ConvertTo')]"},
-            { "Entity_Save"       , "//button[contains(@data-id, 'form-save-btn')]"},
+            { "Entity_Save"       , "//button[@role='menuitem' and .//*[text()='Save']]"},
             { "Entity_SwitchProcess"       , "//button[contains(@data-id,'SwitchProcess')]"},
             { "Entity_TextFieldContainer", ".//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
             { "Entity_TextFieldLabel", ".//label[contains(@id, \'[NAME]-field-label\')]" },
@@ -427,21 +481,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_FieldControlDateTimeInputUCI",".//*[contains(@data-id, '[FIELD].fieldControl-date-time-input')]" },
             { "Entity_FieldControlDateTimeTimeInputUCI",".//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input" },
             { "Entity_LookupResultsDropdown", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
-            { "Entity_Footer", "//div[contains(@id,'footerWrapper')]" },
+            { "Entity_SubGrid_Row"           , "//div[@data-id='[NAME]-pcf_grid_control_container']//div[@data-id='grid-container']//div[@data-list-index=\'[INDEX]\']"},
+            { "Entity_SubGrid_LastRow"           , "//div[@ref='centerContainer']//div[@role='rowgroup']//div[contains(@class, 'ag-row-last')]"},
             { "Entity_SubGridTitle", "//div[contains(text(), '[NAME]')]" },
             { "Entity_SubGridContents", "//div[@id=\"dataSetRoot_[NAME]\"]" },
-            { "Entity_SubGridList", ".//ul[contains(@id, \"[NAME]-GridList\")]" },
-            { "Entity_SubGridViewPickerButton", ".//span[contains(@id, 'ViewSelector') and contains(@role, 'button')]" },
+            { "Entity_SubGridList", "//div[@data-id='[NAME]-pcf_grid_control_container']//div[@data-id='grid-container']//div[@data-automationid='ListCell']" },
+            { "Entity_SubGridListCells", ".//div[@class='ag-center-cols-viewport']//div[@role='rowgroup']//div[@row-index]" },
+            { "Entity_SubGridViewPickerButton", ".//span[contains(@id, 'ViewSelector') and contains(@id, 'button')]" },
             { "Entity_SubGridViewPickerFlyout", "//div[contains(@id, 'ViewSelector') and contains(@flyoutroot, 'flyoutRootNode')]" },
             { "Entity_SubGridCommandBar", ".//ul[contains(@data-id, 'CommandBar')]" },
+            { "Entity_SubGridCommandLabel", ".//button//span[text()=\"[NAME]\"]" },
             { "Entity_SubGridOverflowContainer", ".//div[contains(@data-id, 'flyoutRootNode')]" },
+            { "Entity_SubGridCommandOverflowButton", ".//button[contains(@data-id, 'OverflowButton')]" },
             { "Entity_SubGridOverflowButton", ".//button[contains(@aria-label, '[NAME]')]" },
             { "Entity_SubGridHighDensityList", ".//div[contains(@data-lp-id, \"ReadOnlyGrid|[NAME]\") and contains(@class, 'editableGrid')]" },
             { "Entity_EditableSubGridList", ".//div[contains(@data-lp-id, \"[NAME]\") and contains(@class, 'editableGrid') and not(contains(@class, 'readonly'))]" },
             { "Entity_EditableSubGridListCells", ".//div[contains(@wj-part, 'cells') and contains(@class, 'wj-cells') and contains(@role, 'grid')]" },
             { "Entity_EditableSubGridListCellRows", ".//div[contains(@class, 'wj-row') and contains(@role, 'row')]" },
-            { "Entity_SubGridCells",".//div[contains(@role,'gridcell')]"},
-            { "Entity_SubGridRows",".//div[contains(@class,'wj-row')]"},
+            { "Entity_EditableSubGridCells", ".//div[@role='gridcell']" },
+            { "Entity_SubGridControl", "//div[contains(@data-lp-id, 'MscrmControls.Grid.PCFGridControl')]" },
+            { "Entity_SubGridCells",".//div[@role='gridcell']"},
+            { "Entity_SubGridRows",".//div[@role='row' and ./div[@role='gridcell']]"},
             { "Entity_SubGridRowsHighDensity",".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Data')]"},
             { "Entity_SubGridDataRowsEditable",".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Data')]"},
             { "Entity_SubGridHeaders",".//div[contains(@class,'grid-header-text')]"},
@@ -455,8 +515,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_DuplicateDetectionWindowMarker","//div[contains(@data-id,'ManageDuplicates')]"},
             { "Entity_DuplicateDetectionGridRows", "//div[contains(@class,'data-selectable')]" },
             { "Entity_DuplicateDetectionIgnoreAndSaveButton", "//button[contains(@data-id,'ignore_save')]"},
-            { "Entity_FooterStatusField",".//span[contains(@role,'status')]"},
-            { "Entity_FooterMessage",".//span[contains(@data-id,'footer-message')]"},
             { "Entity_BooleanFieldRadioContainer", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container') and contains(@role,'radiogroup')]"},
             { "Entity_BooleanFieldRadioTrue", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-second')]"},
             { "Entity_BooleanFieldRadioFalse", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-first')]"},
@@ -505,24 +563,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Search_Container"    , "//div[@id=\"searchResultList\"]"},
             { "Search_EntityContainer"    , "//div[@id=\"View[NAME]\"]"},
             { "Search_Records"    , "//li[@role=\"row\"]" },
-            { "Search_Type"       , "//select[contains(@data-id,\"search-root-selector\")]"},
             { "Search_GroupContainer", "//label[contains(text(), '[NAME]')]/parent::div"},
             { "Search_FilterValue", "//label[contains(text(), '[NAME]')]"},
-            { "Search_RelevanceResultsContainer"       , "//div[@aria-label=\"Search Results\"]"},
-            { "Search_RelevanceResults"       , "//li//label[contains(text(), '[ENTITY]')]"},
+            { "Search_CategorizedResultsContainer"       , "//div[@id=\"searchResultList\"]"},
+            { "Search_CategorizedResults"       , "//ul[@aria-label='[ENTITY]']/li"},
+            { "Search_RelevanceSearchResultsSelectedTab", "//button[@aria-selected='true' and @role='tab']" },
+            { "Search_RelevanceSearchResultsTab", "//section[@id='searchComponent']//button[@name='[NAME]' and @role='tab']" },
+            { "Search_RelevanceSearchResultLinks", "//div[@role='rowgroup']/div[@role='row']/div[1]" },
 
             //Timeline
             { "Timeline_SaveAndClose", "//button[contains(@data-id,\"[NAME].SaveAndClose\")]" },
 
             //MultiSelect
             { "MultiSelect_DivContainer",     ".//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]" },
-            { "MultiSelect_InputSearch",     ".//input[contains(@class,\"msos-input\")]" },
-            { "MultiSelect_SelectedRecord",  ".//li[contains(@class, \"msos-selected-display-item\")]" },
-            { "MultiSelect_SelectedRecord_DeleteButton", ".//button[contains(@class, \"msos-quick-delete\")]" },
+            { "MultiSelect_InputSearch",     ".//input[@class=\"msos-input\"]" },
+            { "MultiSelect_SelectedRecord",  ".//li" },
+            { "MultiSelect_SelectedRecord_DeleteButton", ".//button[contains(@data-id, \"delete\")]" },
             { "MultiSelect_SelectedRecord_Label",  ".//span[contains(@class, \"msos-selected-display-item-text\")]" },
-            { "MultiSelect_FlyoutOption",      "//li[label[contains(@title, \"[NAME]\")] and contains(@class,\"msos-option\")]" },
+            { "MultiSelect_FlyoutOption",      "//li[label[@title='[NAME]'] and contains(@class,'msos-option')]" },
             { "MultiSelect_FlyoutOptionCheckbox", "//input[contains(@class, \"msos-checkbox\")]" },
             { "MultiSelect_FlyoutCaret", "//button[contains(@class, \"msos-caret-button\")]" },
+
             { "MultiSelect_ExpandCollapseButton", ".//button[contains(@class,\"msos-selecteditems-toggle\")]" },
 
             //Dashboard
@@ -541,7 +602,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_TextFieldContainer", ".//div[contains(@data-lp-id, \'header_process_[NAME]\')]" },
             { "BPF_TextFieldLabel", "//label[contains(@id, \'header_process_[NAME]-field-label\')]" },
             { "BPF_BooleanFieldContainer", ".//div[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-container\')]" },
-            { "BPF_BooleanFieldSelectedOption", ".//div[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-container\') and contains(@aria-checked, \'true\')]" },
+            { "BPF_BooleanFieldSelectedOption", "//div[contains(@data-id, 'header_process_[NAME].fieldControl-checkbox-container')]//option[@data-selected='true']" },
             { "BPF_DateTimeFieldContainer", ".//input[contains(@data-id, \'[NAME].fieldControl-date-time-input\')]" },
             { "BPF_FieldControlDateTimeInputUCI",".//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
             { "BPF_PinStageButton","//button[contains(@id,'stageDockModeButton')]"},
@@ -549,10 +610,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             //Related Grid
             { "Related_CommandBarButton", ".//button[contains(@aria-label, '[NAME]') and contains(@id,'SubGrid')]"},
+            { "Related_CommandBarOverflowButton", ".//button[contains(@data-id, 'OverflowButton') and contains(@data-lp-id, 'Grid')]"},
             { "Related_CommandBarOverflowContainer", "//div[contains(@data-id, 'flyoutRootNode')]"},
-            { "Related_CommandBarOverflowButton", ".//button[contains(@data-id, 'OverflowButton') and contains(@data-lp-id, 'SubGridAssociated')]"},
             { "Related_CommandBarSubButton" ,".//button[contains(., '[NAME]')]"},
             { "Related_CommandBarButtonList" ,"//ul[contains(@data-lp-id, 'commandbar-SubGridAssociated')]"},
+            { "Related_CommandBarFlyoutButtonList" ,"//ul[contains(@data-id, 'OverflowFlyout')]"},
 
             //Field
             {"Field_ReadOnly",".//*[@aria-readonly]" },
@@ -573,6 +635,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Dialog_DescriptionId", "//input[contains(@data-id,'description_id')]" },
             { "Dialog_ConfirmButton" , "//*[@id=\"confirmButton\"]" },
             { "Dialog_CancelButton" , "//*[@id=\"cancelButton\"]" },
+            { "Dialog_OkButton" , "//*[@id=\"okButton\"]" },
             { "DuplicateDetectionDialog_IgnoreAndSaveButton" , "//button[contains(@data-id, 'ignore_save')]" },
             { "DuplicateDetectionDialog_CancelButton" , "//button[contains(@data-id, 'close_dialog')]" },
             { "Dialog_SetStateDialog" , "//div[@data-id=\"SetStateDialog\"]" },
@@ -593,11 +656,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             //Lookup
             { "Lookup_RelatedEntityLabel", "//li[contains(@aria-label,'[NAME]') and contains(@data-id,'LookupResultsDropdown')]" },
-            { "Lookup_ChangeViewButton", "//button[contains(@data-id,'changeViewBtn')]"},
+            { "Lookup_AdvancedLookupButton", "//button[.//label[text()='Advanced lookup']]"},
             { "Lookup_ViewRows", "//li[contains(@data-id,'viewLineContainer')]"},
             { "Lookup_ResultRows", "//li[contains(@data-id,'LookupResultsDropdown') and contains(@data-id,'resultsContainer')]"},
             { "Lookup_NewButton", "//button[contains(@data-id,'addNewBtnContainer') and contains(@data-id,'LookupResultsDropdown')]" },
             { "Lookup_RecordList", ".//div[contains(@id,'RecordList') and contains(@role,'presentation')]" },
+
+            //Advanced Lookup
+            { "AdvancedLookup_Container", ".//div[contains(@data-lp-id, 'MscrmControls.FieldControls.AdvancedLookupControl')]" },
+            { "AdvancedLookup_SearchInput", "//input[@type='text' and @placeholder='Search']" },
+            { "AdvancedLookup_ViewSelectorCaret", ".//span[contains(@class, 'ms-Dropdown-caretDownWrapper')]" },
+            { "AdvancedLookup_ViewDropdownList", ".//div[contains(@class, 'dropdownItemsWrapper')]" },
+            { "AdvancedLookup_ViewDropdownListItem", "//button[.//span[text()='[NAME]']]"},
+            { "AdvancedLookup_ResultRows", "//div[@ref='eLeftContainer']//div[@role='row']" },
+            { "AdvancedLookup_FilterTables",  "//li[@role='listitem']//button" },
+            { "AdvancedLookup_FilterTable",  "//li[@role='listitem']//button[.//*[text()='[NAME]']]" },
+            { "AdvancedLookup_AddNewTables",  "//ul[@role='menu']//button" },
+            { "AdvancedLookup_DoneButton", "//button[.//*[text()='Done']]" },
+            { "AdvancedLookup_AddNewButton", "//button[.//*[text()='Add new']]" },
+            { "AdvancedLookup_AddNewRecordButton", "//button[.//*[text()='Add new record']]" },
 
             //Performance Width
             { "Performance_Widget","//div[@data-id='performance-widget']//*[text()='Page load']"},

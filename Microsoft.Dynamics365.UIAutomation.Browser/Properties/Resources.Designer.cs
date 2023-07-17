@@ -19,7 +19,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -61,7 +61,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to if (typeof (Recorder) === &quot;undefined&quot;) { Recorder = { __namespace: true } }
+        ///   Looks up a localized string similar to // Copyright (c) Microsoft Corporation. All rights reserved.
+        ///// Licensed under the MIT license.
+        ///
+        ///if (typeof (Recorder) === &quot;undefined&quot;) { Recorder = { __namespace: true } }
         ///
         ///Recorder.ELEMENT_NODE = 1;
         ///
@@ -71,9 +74,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser.Properties {
         ///        if (document.addEventListener) {
         ///            document.addEventListener(&apos;mouseup&apos;, Recorder.clickHandler, false);
         ///            document.addEventListener(&apos;keypress&apos;, Recorder.keyHandler, false);
-        ///            document.addEventListener(&apos;change&apos;, Recorder.changeHandler, false);
-        ///        }
-        ///        else if ( [rest of string was truncated]&quot;;.
+        ///          [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Recorder {
             get {

@@ -34,7 +34,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             RemoteBrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), RemoteType),
             RemoteHubServer = new Uri(RemoteHubServerURL),
             UCITestMode = true,
-            UCIPerformanceMode = true,
+            UCIPerformanceMode = false,
             DriversPath = Path.IsPathRooted(DriversPath) ? DriversPath : Path.Combine(Directory.GetCurrentDirectory(), DriversPath), 
             DisableExtensions = false,
             DisableFeatures = false,
@@ -127,5 +127,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         public const string CustomerService = "Customer Service Hub";
         public const string Project = "Project Resource Hub";
         public const string FieldService = "Field Resource Hub";
+        public const string ProjectOps = "Project Operations";
     }
 }

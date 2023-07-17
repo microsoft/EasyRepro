@@ -25,7 +25,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.OpenRecord(0);
 
-                Field Name = xrmApp.Entity.GetField("telephone1");
+                Field Name = xrmApp.Entity.GetField("industrycode");
 
                 Assert.IsFalse(Name.IsRequired);
 

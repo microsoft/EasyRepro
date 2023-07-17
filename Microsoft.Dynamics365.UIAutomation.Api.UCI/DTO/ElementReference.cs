@@ -129,14 +129,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Timeline_Add_Popout_Post",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_post\")]" },
 
             { "Timeline_Post_Text",                "id(\"create_post_postText\")" },
-            { "Timeline_Post_Add",                 "id(\"create_post_add_btn\")" },
+            { "Timeline_Post_Add",                 "//button[@data-id=\"notescontrol-author_post_testsave_button\"]" },
             { "Timeline_Post_Cancel",              "id(\"create_post_cancel_btn\")" },
 
             { "Timeline_Note_Title",               "id(\"create_note_medium_title\")" },
             { "Timeline_Note_Text",                "//iframe[contains(@class, \"fullPageContentEditorFrame\")]" },
             { "Timeline_Note_TextBody",            "//body[contains(@class, 'cke_wysiwyg_frame')]" },
-            { "Timeline_Note_Add",                 "id(\"create_note_add_btn\")" },
+            { "Timeline_Note_Add",                 "//button[contains(@id,'save_button') or contains(@id, 'create_note_add_btn')]" },
             { "Timeline_Note_Cancel",              "id(\"create_note_cancel_btn\")" },
+
 
             //Global Search
             { "Search_Filter"       , "id(\"filterCombo\")"},
@@ -185,7 +186,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Login_SignIn", "id(\"cred_sign_in_button\")"},
             { "Login_CrmMainPage", "//*[contains(@id,'crmTopBar') or contains(@data-id,'topBar')]"},
             { "Login_CrmUCIMainPage", "//*[contains(@data-id,'topBar')]"},
-            { "Login_StaySignedIn", "//input[@id=\"idSIButton9\"]"},
+            { "Login_StaySignedIn", "//div[@data-viewid and contains(@data-bind, 'kmsi-view')]//input[@id='idSIButton9']"},
             { "Login_OneTimeCode", "//input[@name='otc']"},
 
 

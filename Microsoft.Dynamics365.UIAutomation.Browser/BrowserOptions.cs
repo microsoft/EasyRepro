@@ -48,7 +48,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.Headless = false;
             this.Kiosk = false;
             this.TestTypeBrowser = false;
-            this.CookieСontrolsMode = 1;
+            this.CookieСontrolsMode = 0;
         }
 
         public BrowserType RemoteBrowserType { get; set; }
@@ -254,7 +254,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             var options = new FirefoxOptions()
             {
-                UseLegacyImplementation = false
+                
             };
 
             if (!string.IsNullOrEmpty(DownloadsPath))
@@ -272,10 +272,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             var options = new EdgeOptions()
             {
-                PageLoadStrategy = PageLoadStrategy.Normal,
-                UseInPrivateBrowsing = PrivateMode
+                PageLoadStrategy = PageLoadStrategy.Normal
             };
-
+            if (PrivateMode) options.AddArgument("inprivate");
             return options;
         }
     }
