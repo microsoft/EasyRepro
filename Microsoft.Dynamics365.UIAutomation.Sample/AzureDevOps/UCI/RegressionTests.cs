@@ -512,6 +512,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Grid.OpenRecord(0);
                 telemetry.TrackTrace("OpenRecord Completed");
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
+                #region Rich Text Editor
+                try
+                {
+                    //Work with Text Area
+                    Trace.WriteLine("SetValue pfe_multilinetext1");
+                    xrmApp.Entity.SetValue("pfe_multilinetext1", "test text area");
+                    string textAreaReturn = xrmApp.Entity.GetValue("pfe_multilinetext1");
+                }
+                catch (Exception ex)
+                {
+                    string friendlyMessage = "Error occured in pfe_multilinetext1";
+                    Trace.WriteLine(friendlyMessage + " | " + ex.Message);
+                    TakeScreenshot(client, xrmApp.CommandResults.Last());
+                    //throw; 
+                }
+                #endregion
                 #region Attributes
                 #region Auto Number
                 //Work with AutoNumber
@@ -771,6 +787,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                     //throw; 
                 }
                 #endregion
+
                 #region Ticker Symbol
                 try
                 {

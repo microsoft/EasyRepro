@@ -2833,6 +2833,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     found = fieldContainer.TryFindElement(By.TagName("textarea"), out input);
 
                 if (!found)
+                {
+                    found = fieldContainer.TryFindElement(By.TagName("iframe"), out input);
+                    this.SetValue(Reference.Timeline.NoteText, value, "iframe");
+                    return true;
+                }
+
+                if (!found)
                     throw new NoSuchElementException($"Field with name {field} does not exist.");
 
                 SetInputValue(driver, input, value);
@@ -2840,6 +2847,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
+
+
 
         private void SetInputValue(IWebDriver driver, IWebElement input, string value, TimeSpan? thinktime = null)
         {
@@ -3625,6 +3634,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
                 {
                     text = fieldContainer.FindElement(By.TagName("textarea")).GetAttribute("value");
+                }
+                else if (fieldContainer.FindElements(By.TagName("iframe")).Count > 0)
+                {
+                    var inputbox = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Timeline.NoteText]));
+                    driver.SwitchTo().Frame(inputbox);
+
+                    driver.WaitUntilAvailable(By.TagName("iframe"));
+                    driver.SwitchTo().Frame(0);
+
+                    text = driver.WaitUntilAvailable(By.TagName("body")).Text;
+
+                    driver.SwitchTo().DefaultContent();
+                    //text = fieldContainer.FindElement(By.TagName("textarea")).GetAttribute("value");
                 }
                 else
                 {

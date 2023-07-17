@@ -467,7 +467,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Process"       , "//button[contains(@data-id,'MBPF.ConvertTo')]"},
             { "Entity_Save"       , "//button[@role='menuitem' and .//*[text()='Save']]"},
             { "Entity_SwitchProcess"       , "//button[contains(@data-id,'SwitchProcess')]"},
-            { "Entity_TextFieldContainer", ".//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
+            { "Entity_TextFieldContainer", ".//*[contains(@data-id, \'[NAME]-FieldSectionItemContainer\')]" },
             { "Entity_TextFieldLabel", ".//label[contains(@id, \'[NAME]-field-label\')]" },
             { "Entity_TextFieldValue", ".//input[contains(@data-id, \'[NAME].fieldControl\')]" },
             { "Entity_TextFieldLookup", ".//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
