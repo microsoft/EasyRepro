@@ -21,6 +21,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         {
             var options = TestSettings.Options;
             options.PrivateMode = true;
+            options.TimeFactor = 1.5f;
+            options.ExtraChromeArguments = new[] { "--disable-geolocation" };
+
             options.UCIPerformanceMode = false; // <= you can also change other settings here, for this tests only
 
             var client = new WebClient(options);

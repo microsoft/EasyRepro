@@ -16,11 +16,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
     {
         public BrowserOptions()
         {
+            this.TimeFactor = 1.0f;
             this.DriversPath = Path.Combine(Directory.GetCurrentDirectory()); //, @"Drivers\");
             this.DownloadsPath = null;
             this.BrowserType = BrowserType.IE;
-            this.PageLoadTimeout = new TimeSpan(0, 3, 0);
-            this.CommandTimeout = TimeSpan.FromMinutes(20);
+            this.PageLoadTimeout = TimeSpan.FromMinutes(3);
+            this.CommandTimeout = TimeSpan.FromMinutes(5);
             this.StartMaximized = true;
             this.FireEvents = false;
             this.TraceSource = Constants.DefaultTraceSource;
@@ -51,6 +52,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.CookieСontrolsMode = 0;
         }
 
+        public float TimeFactor { get; set; }
         public BrowserType RemoteBrowserType { get; set; }
         public Uri RemoteHubServer { get; set; }
         public BrowserType BrowserType { get; set; }
@@ -60,7 +62,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool PrivateMode { get; set; }
         public bool CleanSession { get; set; }
         public TimeSpan PageLoadTimeout { get; set; }
-        public TimeSpan CommandTimeout { get; set; } = TimeSpan.FromMinutes(20);
+        public TimeSpan CommandTimeout { get; set; } 
         /// <summary>
         /// When <see langword="true" /> the browser will open maximized at the highest supported resolution.
         /// </summary>
@@ -104,6 +106,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         /// Please raise any issues with this TestMode being enabled to the Microsoft/EasyRepro community on GitHub for review.
         /// </summary>
         public bool UCITestMode { get; set; }
+        public string[] ExtraChromeArguments { get; set; }
 
         /// <summary>
         /// Gets or sets the Performance Mode to enable performance center telemetry. 
@@ -127,6 +130,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             if (this.PrivateMode)
             {
                 options.AddArgument("--incognito");
+            }
+            else
+            {
+                var tempPath = Path.GetTempPath();
+                options.AddArguments($"--user-data-dir={tempPath}\\EasyRepro");
             }
 
             if (this.Headless)
@@ -215,8 +223,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             {
                 options.AddUserProfilePreference("download.default_directory", DownloadsPath);
             }
+			
+		    options.AddUserProfilePreference("profile.cookie_controls_mode", this.CookieСontrolsMode);
 
-            options.AddUserProfilePreference("profile.cookie_controls_mode", this.CookieСontrolsMode);
+		    if (ExtraChromeArguments != null)
+                foreach (var argument in ExtraChromeArguments)
+                    options.AddArgument(argument);
+
             return options;
         }
 
@@ -252,10 +265,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public virtual FirefoxOptions ToFireFox()
         {
-            var options = new FirefoxOptions()
-            {
-                
-            };
+            var options = new FirefoxOptions();
 
             if (!string.IsNullOrEmpty(DownloadsPath))
             {
