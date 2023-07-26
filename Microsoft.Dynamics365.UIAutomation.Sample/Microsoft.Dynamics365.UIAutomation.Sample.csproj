@@ -92,6 +92,7 @@
   <ItemGroup>
     <Compile Include="AzureDevOps\UCI\CreateAccount.cs" />
     <Compile Include="AzureDevOps\UCI\RegressionTests.cs" />
+    <Compile Include="CustomerService\CustomerServiceCopilot.cs" />
     <Compile Include="ProjectOps\LeadQualification.cs" />
     <Compile Include="ProjectOps\CreateLead.cs" />
     <Compile Include="ProjectOps\CreateProjectTeamMember.cs" />
@@ -262,6 +263,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="AzureDevOps\EasyRepro.runsettings" />
+    <None Include="AzureDevOps\PipelineDefinitions\Test with MFA.yml" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

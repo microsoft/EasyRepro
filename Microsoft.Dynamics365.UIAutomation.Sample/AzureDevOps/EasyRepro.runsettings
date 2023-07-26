@@ -43,6 +43,7 @@
     <Parameter name="OnlineUsername" value="" />
     <Parameter name="OnlinePassword" value="" />
     <Parameter name="OnlineCrmUrl" value="" />
+    <Parameter name="MfaSecretKey" value="" />
     <Parameter name="BrowserType" value="Chrome" />
     <Parameter name="DriversPath" value="" />
     <Parameter name="AzureKey" value="" />

@@ -21,6 +21,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public OnlineLogin OnlineLogin => this.GetElement<OnlineLogin>(_client);
         public Navigation Navigation => this.GetElement<Navigation>(_client);
         public CommandBar CommandBar => this.GetElement<CommandBar>(_client);
+        public CustomerServiceCopilot Copilot => this.GetElement<CustomerServiceCopilot>(_client);
         public Grid Grid => this.GetElement<Grid>(_client);
         public PowerApp PowerApp => this.GetElement<PowerApp>(_client);
         public Entity Entity => this.GetElement<Entity>(_client);
