@@ -144,7 +144,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         private LoginResult Login(IWebDriver driver, Uri uri, SecureString username, SecureString password, SecureString mfaSecretKey = null, Action<LoginRedirectEventArgs> redirectAction = null)
         {
+            Trace.WriteLine("WebClient Login Start");
             bool online = !(OnlineDomains != null && !OnlineDomains.Any(d => uri.Host.EndsWith(d)));
+            Trace.WriteLine("Navigate to " + uri);
             driver.Navigate().GoToUrl(uri);
 
             if (!online)
@@ -153,6 +155,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             driver.ClickIfVisible(By.Id(Elements.ElementId[Reference.Login.UseAnotherAccount]));
 
             bool waitingForOtc = false;
+            Trace.WriteLine("Enter UserName");
             bool success = EnterUserName(driver, username);
             if (!success)
             {
@@ -184,7 +187,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     redirectAction.Invoke(new LoginRedirectEventArgs(username, password, driver));
                     return LoginResult.Redirect;
                 }
-
+                Trace.WriteLine("Enter Password");
                 EnterPassword(driver, password);
                 ThinkTime(1000);
             }
@@ -194,6 +197,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             do
             {
                 entered = EnterOneTimeCode(driver, mfaSecretKey);
+                Trace.WriteLine("Click Stay Signed In");
                 success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
                 attempts++;
             }
@@ -3576,7 +3580,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         }
                     }
                 }
-
+                fieldContainer.FindElement(flyoutCaretXPath).Click();
                 return true;
             });
         }

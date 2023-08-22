@@ -105,6 +105,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 }
                 catch (Exception e)
                 {
+                    driver.TakeScreenshot();
                     bool canRetry = false;
                     if (retries < maxRetryAttempts)
                         if (retries < maxRetryAttemptsNotIgnoredExceptions)
