@@ -86,8 +86,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var xrmApp = new XrmApp(client);
             try
             {
+                Trace.WriteLine("Login Started");
                 telemetry.TrackTrace("Login Started");
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
+                Trace.WriteLine("Login Completed");
                 telemetry.TrackTrace("Login Completed");
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
                 //xrmApp.Navigation.OpenApp(UCIAppName.Sales);
