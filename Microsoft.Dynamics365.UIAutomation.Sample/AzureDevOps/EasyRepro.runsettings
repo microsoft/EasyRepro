@@ -44,7 +44,7 @@
     <Parameter name="OnlinePassword" value="" />
     <Parameter name="OnlineCrmUrl" value="" />
     <!-- 0=Selenium,1=Playwright-->
-    <Parameter name="Framework" value="Selenium" />
+    <Parameter name="Framework" value="Playwright" />
     <Parameter name="BrowserType" value="Chrome" />
     <Parameter name="DriversPath" value="" />
     <Parameter name="AzureKey" value="" />

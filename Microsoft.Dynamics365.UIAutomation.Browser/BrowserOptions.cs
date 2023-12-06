@@ -19,6 +19,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.DriversPath = Path.Combine(Directory.GetCurrentDirectory()); //, @"Drivers\");
             this.DownloadsPath = null;
             this.BrowserType = BrowserType.IE;
+            this.BrowserFramework = BrowserFramework.Playwright;
             this.PageLoadTimeout = new TimeSpan(0, 3, 0);
             this.CommandTimeout = TimeSpan.FromMinutes(20);
             this.StartMaximized = true;
@@ -50,10 +51,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.TestTypeBrowser = false;
             this.CookieСontrolsMode = 0;
         }
-        //public enum UiFramework { Selenium = 0, Playwright = 1 };
-        //public UiFramework Framework { get; set; }
-        public BrowserType RemoteBrowserType { get; set; }
-        public Uri RemoteHubServer { get; set; }
+
+        public BrowserFramework BrowserFramework { get; set; }
+        public BrowserType? RemoteBrowserType { get; set; }
+        public Uri? RemoteHubServer { get; set; }
         public BrowserType BrowserType { get; set; }
         public BrowserCredentials Credentials { get; set; }
         public string DriversPath { get; set; }

@@ -21,6 +21,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         private static SecureString _username;
         private static SecureString _password;
         private static SecureString _mfaSecretKey;
+        private static BrowserFramework _framework;
         private static BrowserType _browserType;
         private static Uri _xrmUri;
         private static string _browserVersion = "";
@@ -40,6 +41,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             _password = _testContext.Properties["OnlinePassword"].ToString().ToSecureString();
             _mfaSecretKey = _testContext.Properties["OnlinePassword"].ToString().ToSecureString();
             _xrmUri = new Uri(_testContext.Properties["OnlineCrmUrl"].ToString());
+            _framework = (BrowserFramework)Enum.Parse(typeof(BrowserFramework), _testContext.Properties["Framework"].ToString());
             _browserType = (BrowserType)Enum.Parse(typeof(BrowserType), _testContext.Properties["BrowserType"].ToString());
             _azureKey = _testContext.Properties["AzureKey"].ToString();
             _sessionId = _testContext.Properties["SessionId"].ToString() ?? Guid.NewGuid().ToString();

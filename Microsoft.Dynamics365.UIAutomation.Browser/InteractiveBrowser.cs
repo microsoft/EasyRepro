@@ -25,7 +25,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             this.Options = new BrowserOptions
             {
-                BrowserType = type
+                BrowserType = type,
+                BrowserFramework = BrowserFramework.Playwright
             };
 
             Trace = new TraceSource(this.Options.TraceSource);

@@ -14,17 +14,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         public static string LookupField = "primarycontactid";
         public static string LookupName = "Nancy Anderson (sample)";
         private static readonly string Type = "Chrome";
-        private static readonly string RemoteType = String.Empty;
+        private static string Framework = "Playwright";
+        private static readonly string RemoteType = "Chrome";
         private static readonly string RemoteHubServerURL = String.Empty;
         private static readonly string DriversPath = ConfigurationManager.AppSettings["DriversPath"] ?? string.Empty;
         private static readonly bool UsePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"] ?? bool.TrueString);
-        private static readonly string Framework = "Selenium";
+
 
         // Once you change this instance will affect all follow tests executions
         public static BrowserOptions SharedOptions = new BrowserOptions
         {
-            //Framework = (UiFramework)Enum.Parse(typeof(UiFramework), Framework),
+            //UiFramework = (UiFramework)Enum.Parse(typeof(UiFramework), Framework),
+ 
             BrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), Type),
+            BrowserFramework = (BrowserFramework)Enum.Parse(typeof(BrowserFramework), Framework),
             PrivateMode = UsePrivateMode,
             FireEvents = false,
             Headless = false,
@@ -32,7 +35,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             UserAgent = false,
             DefaultThinkTime = 2000,
             RemoteBrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), RemoteType),
-            RemoteHubServer = new Uri(RemoteHubServerURL),
+            RemoteHubServer = (!String.IsNullOrEmpty(RemoteHubServerURL)) ? new Uri(RemoteHubServerURL) : null,
             UCITestMode = true,
             UCIPerformanceMode = false,
             DriversPath = Path.IsPathRooted(DriversPath) ? DriversPath : Path.Combine(Directory.GetCurrentDirectory(), DriversPath), 
@@ -54,7 +57,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         // Create a new options instance, copy of the share, to use just in the current test, modifications in test will not affect other tests
         public static BrowserOptions Options => new BrowserOptions 
         {
-            //Framework = SharedOptions.Framework,
+            //BrowserFramework = SharedOptions.BrowserFramework,
             BrowserType = SharedOptions.BrowserType,
             PrivateMode = SharedOptions.PrivateMode,
             FireEvents = SharedOptions.FireEvents,
