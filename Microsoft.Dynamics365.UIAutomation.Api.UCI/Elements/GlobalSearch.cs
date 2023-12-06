@@ -14,9 +14,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Search using Relevance Search
+        /// Search using Relevance Search or Categorized Search.
         /// </summary>
-        /// <param name="criteria">Criteria to search for</param>
+        /// <param name="criteria">Criteria to search for.</param>
         /// <returns></returns>
         public bool Search(string criteria)
         {

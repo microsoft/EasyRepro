@@ -89,6 +89,83 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.DuplicateDetection(clickSaveOrCancel);
         }
+        /// <summary>
+        /// Clicks OK or Cancel on the confirmation dialog.  true = OK, false = Cancel
+        /// </summary>
+        /// <param name="clickConfirmButton"></param>
+        /// <returns></returns>
+        public bool ClickOk()
+        {
+            return _client.ClickOk();
+        }
+
+
+        /// <summary>
+        /// Gets the value of a Lookup.
+        /// </summary>
+        /// <param name="control">The lookup field name of the lookup.</param>
+        public string GetValue(LookupItem control)
+        {
+            return _client.GetValue(control);
+        }
+
+
+        /// <summary>
+        /// Gets the value of a Lookup.
+        /// </summary>
+        /// <param name="control">The lookup field name of the lookup.</param>
+        public DateTime? GetValue(DateTimeControl control)
+        {
+            return _client.GetValue(control);
+        }
+
+        /// <summary>
+        /// Gets the value of an ActivityParty Lookup.
+        /// </summary>
+        /// <param name="controls">The activityparty lookup field name, value or index of the lookup.</param>
+        /// <example>xrmApp.Entity.GetValue(new LookupItem[] { new LookupItem { Name = "to" } });</example>
+        public string[] GetValue(LookupItem[] controls)
+        {
+            return _client.GetValue(controls);
+        }
+
+        /// <summary>
+        /// Gets the value of a text or date field.
+        /// </summary>
+        /// <param name="control">The schema name of the field</param>
+        /// <example>xrmApp.Entity.GetValue("emailaddress1");</example>
+        public string GetValue(string field)
+        {
+            return _client.GetValue(field);
+        }
+
+        /// <summary>
+        /// Gets the value of a picklist or status field.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
+        public string GetValue(OptionSet optionSet)
+        {
+            return _client.GetValue(optionSet);
+        }
+
+        /// <summary>
+        /// Gets the value of a Boolean Item.
+        /// </summary>
+        /// <param name="option">The boolean field name.</param>
+        public bool GetValue(BooleanItem option)
+        {
+            return _client.GetValue(option);
+        }
+
+        /// <summary>
+        /// Gets the value of a MultiValueOptionSet.
+        /// </summary>
+        /// <param name="option">The option you want to set.</param>
+        public MultiValueOptionSet GetValue(MultiValueOptionSet option)
+        {
+            return _client.GetValue(option);
+        }
+
 
         /// <summary>
         /// Clicks Confirm or Cancel on the Publish dialog.  true = Confirm, false = Cancel

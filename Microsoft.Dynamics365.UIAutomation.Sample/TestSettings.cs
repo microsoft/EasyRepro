@@ -1,10 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
-using Microsoft.Dynamics365.UIAutomation.Api;
+using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using System;
 using System.Configuration;
-using System.IO;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
@@ -12,28 +10,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
     {
         public static string InvalidAccountLogicalName = "accounts";
 
-        public static LookupItem LookupValues = new LookupItem { Name = "primarycontactid", Value = "Nancy Anderson (sample)" } ;
+        public static LookupItem LookupValues = new LookupItem { Name = "primarycontactid", Value = "Nancy Anderson (sample)" };
         public static string LookupField = "primarycontactid";
         public static string LookupName = "Nancy Anderson (sample)";
-        private static readonly string Type = ConfigurationManager.AppSettings["BrowserType"];
-        private static readonly string RemoteType = ConfigurationManager.AppSettings["RemoteBrowserType"];
-        private static readonly string RemoteHubServerURL = ConfigurationManager.AppSettings["RemoteHubServer"];
+        private static readonly string Type = "Chrome";
+        private static string Framework = "Playwright";
+        private static readonly string RemoteType = "Chrome";
+        private static readonly string RemoteHubServerURL = String.Empty;
         private static readonly string DriversPath = ConfigurationManager.AppSettings["DriversPath"] ?? string.Empty;
         private static readonly bool UsePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"] ?? bool.TrueString);
+
 
         // Once you change this instance will affect all follow tests executions
         public static BrowserOptions SharedOptions = new BrowserOptions
         {
+            //UiFramework = (UiFramework)Enum.Parse(typeof(UiFramework), Framework),
+ 
             BrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), Type),
+            BrowserFramework = (BrowserFramework)Enum.Parse(typeof(BrowserFramework), Framework),
             PrivateMode = UsePrivateMode,
             FireEvents = false,
             Headless = false,
+            Kiosk = false,
             UserAgent = false,
             DefaultThinkTime = 2000,
             RemoteBrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), RemoteType),
-            RemoteHubServer = new Uri(RemoteHubServerURL),
+            RemoteHubServer = (!String.IsNullOrEmpty(RemoteHubServerURL)) ? new Uri(RemoteHubServerURL) : null,
             UCITestMode = true,
-            UCIPerformanceMode = true,
+            UCIPerformanceMode = false,
             DriversPath = Path.IsPathRooted(DriversPath) ? DriversPath : Path.Combine(Directory.GetCurrentDirectory(), DriversPath), 
             DisableExtensions = false,
             DisableFeatures = false,
@@ -53,10 +57,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         // Create a new options instance, copy of the share, to use just in the current test, modifications in test will not affect other tests
         public static BrowserOptions Options => new BrowserOptions 
         {
+            //BrowserFramework = SharedOptions.BrowserFramework,
             BrowserType = SharedOptions.BrowserType,
             PrivateMode = SharedOptions.PrivateMode,
             FireEvents = SharedOptions.FireEvents,
             Headless = SharedOptions.Headless,
+            Kiosk = SharedOptions.Kiosk,
             UserAgent = SharedOptions.UserAgent,
             DefaultThinkTime = SharedOptions.DefaultThinkTime,
             RemoteBrowserType = SharedOptions.RemoteBrowserType,
@@ -125,6 +131,5 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         public const string CustomerService = "Customer Service Hub";
         public const string Project = "Project Resource Hub";
         public const string FieldService = "Field Resource Hub";
-        public const string Web = "Dynamics 365 — custom";
     }
 }

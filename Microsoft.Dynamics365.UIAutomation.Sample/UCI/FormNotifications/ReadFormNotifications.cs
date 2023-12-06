@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
-    [TestClass] 
+    [TestClass]
     public class ReadFormNotifications : TestsBase
     {
         [TestInitialize]
@@ -18,16 +18,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestCleanup]
         public override void FinishTest() => base.FinishTest();
 
-        public override void NavigateToHomePage() => _xrmApp.Navigation.OpenSubArea("Sales", "Leads");
+        public override void NavigateToHomePage() => base.NavigateTo(UCIAppName.Sales, "Sales", "Leads");
 
-        [TestCategory("Fail - Bug")]
         [TestMethod]
         public void UCITestReadFormNotifications()
         {
             _xrmApp.CommandBar.ClickCommand("New");
-            
+
             _xrmApp.Entity.SetValue("lastname", "Vong (sample)");
-            
+
             _xrmApp.ThinkTime(5000);
             _xrmApp.Entity.Save();
 
@@ -36,7 +35,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             Assert.AreEqual(1, notifications.Count);
             Assert.AreEqual(FormNotificationType.Error, notifications[0].Type);
             Assert.AreEqual("Topic : Required fields must be filled in.", notifications[0].Message);
-            
+
         }
     }
 }

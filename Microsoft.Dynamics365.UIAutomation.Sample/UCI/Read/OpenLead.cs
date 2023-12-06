@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -67,7 +67,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 string acctName = xrmApp.BusinessProcessFlow.GetValue(account);
                 string budgetAmt = xrmApp.BusinessProcessFlow.GetValue("budgetamount");
 
-                string status = xrmApp.Entity.GetFooterStatusValue();
+                string status = xrmApp.Entity.GetFormState();
 
                 xrmApp.ThinkTime(1000);
             }
