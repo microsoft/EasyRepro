@@ -1,28 +1,30 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <IsPackable>false</IsPackable>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.16.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Otp.NET" Version="1.2.2" />
-    <PackageReference Include="Selenium.Support" Version="3.141.0" />
-    <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.30.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Otp.NET" Version="1.3.0" />
+    <PackageReference Include="Selenium.Support" Version="4.8.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.8.0" />
     <PackageReference Include="System.Buffers" Version="4.5.1" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.1" />
-    <PackageReference Include="System.Memory" Version="4.5.4" />
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="7.0.1" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Api\Microsoft.Dynamics365.UIAutomation.Api.csproj">
-      <Project>{dfe2c141-f1aa-4d4b-8df8-0fb93023cf45}</Project>
-      <Name>Microsoft.Dynamics365.UIAutomation.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Browser\Microsoft.Dynamics365.UIAutomation.Browser.csproj">
-      <Project>{c9748803-f3cb-4531-b313-bc24d4d0bf0c}</Project>
-      <Name>Microsoft.Dynamics365.UIAutomation.Browser</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Browser\Microsoft.Dynamics365.UIAutomation.Browser.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
 </Project>

@@ -31,7 +31,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.OpenRecord(0);
 
-                xrmApp.Timeline.AddAppointment("Entry into Zoo", "Microsoft", "45 minutes", "Entertainment");
+                xrmApp.Timeline.AddAppointment("Entry into Zoo", "Microsoft", "45 minutes", String.Empty);
+                //xrmApp.Timeline.AddAppointment("Entry into Zoo", "Microsoft", "45 minutes", "Entertainment");
 
                 xrmApp.Timeline.SaveAndCloseAppointment();
 
@@ -78,6 +79,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
+        [TestCategory("RegressionTests")]
         public void UCITestAccountGetMultiSelectEmail()
         {
             var client = new WebClient(TestSettings.Options);
@@ -97,8 +99,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.ThinkTime(4000);
 
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
-                xrmApp.Timeline.AddEmailContacts(CreateBccLookupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
-                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+                xrmApp.Timeline.AddEmailContacts(CreateBccLookupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"), true);
+                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"), true);
 
                 // This fails as it already has a value.
                 //xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
@@ -119,6 +121,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         [TestMethod]
         [TestCategory("Fail - Bug")]
+        [TestCategory("RegressionTests")]
         public void UCITestAccountRemoveMultiSelectEmail()
         {
             var client = new WebClient(TestSettings.Options);
@@ -139,9 +142,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
 
-                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"));
+                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"), true);
 
-                // This fails with the exception of OpenQA.Selenium.ElementNotInteractableException: element not interactable
                 var success = xrmApp.Timeline.RemoveEmail(
                     new MultiValueOptionSet()
                     {

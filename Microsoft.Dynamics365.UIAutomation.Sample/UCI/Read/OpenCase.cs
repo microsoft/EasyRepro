@@ -75,7 +75,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 // Bug: Fails to resolve ownerid
                 // OpenQA.Selenium.NoSuchElementException: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@data-id='header_ownerId.fieldControl-Lookup_ownerId']"}
-                LookupItem ownerId = new LookupItem() { Name = "ownerId" };
+                LookupItem ownerId = new LookupItem() { Name = "ownerid" };
                 string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
 
                 xrmApp.ThinkTime(2000);

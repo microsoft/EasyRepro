@@ -1,47 +1,29 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+
   <ItemGroup>
-    <None Include="AzureDevOps\EasyRepro.runsettings" />
-    <None Include="UCI\UnifiedInterface.orderedtest" />
-    <None Include="Web\WebClient.orderedtest" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
+    <PackageReference Include="coverlet.collector" Version="3.1.2" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="119.0.6045.10500" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.16.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
-    <PackageReference Include="Microsoft.TestPlatform" Version="16.8.3" />
-    <PackageReference Include="Microsoft.TestPlatform.TestHost" Version="16.8.3" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.1.2" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.1.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Selenium.Support" Version="3.141.0" />
-    <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.1" />
-    <PackageReference Include="System.Memory" Version="4.5.4" />
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.Runtime" Version="4.3.1" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
+    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Api.UCI\Microsoft.Dynamics365.UIAutomation.Api.UCI.csproj" />
+    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Browser\Microsoft.Dynamics365.UIAutomation.Browser.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Api.UCI\Microsoft.Dynamics365.UIAutomation.Api.UCI.csproj">
-      <Project>{afcb5bb5-4512-4019-a911-5d56cff4f3d0}</Project>
-      <Name>Microsoft.Dynamics365.UIAutomation.Api.UCI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Api\Microsoft.Dynamics365.UIAutomation.Api.csproj">
-      <Project>{dfe2c141-f1aa-4d4b-8df8-0fb93023cf45}</Project>
-      <Name>Microsoft.Dynamics365.UIAutomation.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Microsoft.Dynamics365.UIAutomation.Browser\Microsoft.Dynamics365.UIAutomation.Browser.csproj">
-      <Project>{c9748803-f3cb-4531-b313-bc24d4d0bf0c}</Project>
-      <Name>Microsoft.Dynamics365.UIAutomation.Browser</Name>
-    </ProjectReference>
+    <Folder Include="Properties\" />
   </ItemGroup>
-  <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
-    <Copy SourceFiles="app.config" DestinationFiles="$(OutDir)\testhost.dll.config" />
-  </Target>
+
 </Project>

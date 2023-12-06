@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
@@ -127,22 +127,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Gets the value of the status from the footer
+        /// Gets the state from the form.
         /// </summary>
-        /// <returns>Status of the entity record</returns>
-        public string GetFooterStatusValue()
+        /// <returns>The state of the record.</returns>
+        public string GetFormState()
         {
-            return _client.GetStatusFromFooter();
+            return _client.GetStateFromForm();
         }
 
-        /// <summary>
-        /// Gets the value of the message, if present, from the footer
-        /// </summary>
-        /// <returns>Message from the footer of the entity record</returns>
-        /// <returns>String.empty if no message present</returns>
-        public string GetFooterMessageValue()
+        [Obsolete("Forms no longer have footers. Use Entity.GetFormState() instead.")]
+        public string GetFooterStatusValue()
         {
-            return _client.GetMessageFromFooter();
+            return this.GetFormState();
         }
 
         public IReadOnlyList<FormNotification> GetFormNotifications()
