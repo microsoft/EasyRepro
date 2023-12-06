@@ -8,10 +8,10 @@
 
     <!-- [x86] | x64    
       - You can also change it from menu Test, Test Settings, Default Processor Architecture -->
-    <TargetPlatform>x86</TargetPlatform>
+    <TargetPlatform>x64</TargetPlatform>
 
     <!-- Framework35 | [Framework40] | Framework45 -->
-    <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
+    <TargetFrameworkVersion>net6.0</TargetFrameworkVersion>
 
     <!-- Path to Test Adapters -->
     <!--<TestAdaptersPaths>%SystemDrive%\Temp\foo;%SystemDrive%\Temp\bar</TestAdaptersPaths>-->
@@ -44,7 +44,7 @@
     <Parameter name="OnlinePassword" value="" />
     <Parameter name="OnlineCrmUrl" value="" />
     <!-- 0=Selenium,1=Playwright-->
-    <Parameter name="Framework" value="" />
+    <Parameter name="Framework" value="Selenium" />
     <Parameter name="BrowserType" value="Chrome" />
     <Parameter name="DriversPath" value="" />
     <Parameter name="AzureKey" value="" />
