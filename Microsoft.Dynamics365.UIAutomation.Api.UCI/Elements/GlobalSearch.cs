@@ -63,7 +63,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmBrowser.GlobalSearch.ChangeSearchType("Categorized Search");</example>
         public bool ChangeSearchType(string type)
         {
-            return _client.ChangeSearchType(type);
+            return true;
+            //return _client.ChangeSearchType(type);
         }
         
     }

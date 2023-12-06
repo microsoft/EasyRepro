@@ -56,7 +56,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         #region Helper Methods
         private string TakeScreenshot(WebClient client, ICommandResult command)
         {
-            ScreenshotImageFormat fileFormat = ScreenshotImageFormat.Bmp;  // Image Format -> Png, Jpeg, Gif, Bmp and Tiff.
+            ScreenshotImageFormat fileFormat = ScreenshotImageFormat.Png;  // Image Format -> Png, Jpeg, Gif, Bmp and Tiff.
             string strFileName = String.Format("{2}_{0}.{1}", DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss"), fileFormat, command.CommandName.Replace(":",""));
             client.Browser.TakeWindowScreenShot(strFileName, fileFormat);
             TestContext.AddResultFile(strFileName);
