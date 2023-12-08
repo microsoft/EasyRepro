@@ -12,13 +12,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
+    [TestClass]
     public class TestsBase
     {
-        protected readonly Uri _xrmUri = new Uri(ConfigurationManager.AppSettings["OnlineCrmUrl"]);
-        protected readonly SecureString _username = ConfigurationManager.AppSettings["OnlineUsername"]?.ToSecureString();
-        protected readonly SecureString _password = ConfigurationManager.AppSettings["OnlinePassword"]?.ToSecureString();
-        protected readonly SecureString _mfaSecretKey = ConfigurationManager.AppSettings["MfaSecretKey"]?.ToSecureString();
-        protected readonly TracingService trace;
+        protected static Uri _xrmUri;
+        protected static SecureString _username;
+        protected static SecureString _password;
+        protected static SecureString _mfaSecretKey;
+        protected TracingService trace;
         protected XrmApp _xrmApp;
         protected WebClient _client;
       
@@ -30,7 +31,38 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             trace = new TracingService(GetType(), Constants.DefaultTraceSource);
             trace.Log("Init Tracing Service - Success");
         }
-        
+
+        private static BrowserFramework _framework;
+        private static BrowserType _browserType;
+        private static string _browserVersion = "";
+        private static string _driversPath = "";
+        private static string _azureKey = "";
+        private static string _sessionId = "";
+        //public TestContext TestContext { get; set; }
+
+        private static TestContext _testContext;
+
+        [ClassInitialize(InheritanceBehavior.BeforeEachDerivedClass)]
+        public static void Initialize(TestContext TestContext)
+        {
+            _testContext = TestContext;
+
+            _username = _testContext.Properties["OnlineUsername"].ToString().ToSecureString();
+            _password = _testContext.Properties["OnlinePassword"].ToString().ToSecureString();
+            _mfaSecretKey = _testContext.Properties["OnlinePassword"].ToString().ToSecureString();
+            _xrmUri = new Uri(_testContext.Properties["OnlineCrmUrl"].ToString());
+            _framework = (BrowserFramework)Enum.Parse(typeof(BrowserFramework), _testContext.Properties["Framework"].ToString());
+            _browserType = (BrowserType)Enum.Parse(typeof(BrowserType), _testContext.Properties["BrowserType"].ToString());
+            _azureKey = _testContext.Properties["AzureKey"].ToString();
+            _sessionId = _testContext.Properties["SessionId"].ToString() ?? Guid.NewGuid().ToString();
+            _driversPath = _testContext.Properties["DriversPath"].ToString();
+            if (!String.IsNullOrEmpty(_driversPath))
+            {
+                TestSettings.SharedOptions.DriversPath = _driversPath;
+                TestSettings.Options.DriversPath = _driversPath;
+            }
+        }
+
         public virtual void InitTest()
         {
             try

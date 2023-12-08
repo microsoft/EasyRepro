@@ -10,13 +10,14 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class OpenNavigationUci
+    public class OpenNavigationUci : TestsBase
     {
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"]);
+        //private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
+        //private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        //private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
+        //private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"]);
 
+        [TestCategory("Navigation")]
         [TestMethod]
         public void UCITestOpenOptions()
         {
@@ -37,6 +38,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Navigation")]
         [TestMethod]
         public void UCITestOpenGuidedHelp()
         {
@@ -51,9 +53,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
                 xrmApp.Navigation.OpenGuidedHelp();
+                trace.Log("UCITestOpenGuidedHelp browser command count : " + client.CommandResults.Count());
             }
         }
-
+       
+        [TestCategory("Navigation")]
         [TestMethod]
         public void UCITestOpenSoftwareLicensing()
         {
@@ -71,6 +75,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Navigation")]
         [TestMethod]
         public void UCITestOpenToastNotifications()
         {
@@ -88,6 +93,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Navigation")]
         [TestMethod]
         public void UCITestOpenAbout()
         {
@@ -105,6 +111,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Navigation")]
         [TestMethod]
         public void UCITestOpenRelatedCommonActivities()
         {

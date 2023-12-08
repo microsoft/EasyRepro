@@ -6,21 +6,43 @@ using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Security;
+using System.Configuration;
+using Microsoft.Extensions.Configuration;
+using Microsoft.VisualBasic;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
     public class CreateAccountUCI
     {
+        // requires using Microsoft.Extensions.Configuration;
+        private readonly IConfiguration Configuration;
 
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
+        //[ClassInitialize]
+        public CreateAccountUCI(IConfiguration configuration)
+        {
+            var builder = new ConfigurationBuilder()
+                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                        .AddEnvironmentVariables();
+
+            Configuration = builder.Build();
+            _username = Configuration["OnlineUsername"].ToSecureString();
+            _password = Configuration["OnlinePassword"].ToSecureString();
+            _mfaSecretKey = Configuration["MfaSecretKey"].ToSecureString();
+            _xrmUri = new Uri(Configuration["OnlineCrmUrl"].ToString());
+        }
+
+        private readonly SecureString _username;// = ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
+        private readonly SecureString _password;// = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
+        private readonly SecureString _mfaSecretKey;// = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
+        private readonly Uri _xrmUri;// = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
         [TestMethod]
         public void UCITestCreateAccount()
         {
+            //var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            //var settings = configFile.AppSettings.Settings;
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {

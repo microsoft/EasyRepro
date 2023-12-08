@@ -17,6 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         /// Test that only those areas that are expected appear on the are menu
         /// </summary>
         [TestCategory("Fail - ExpectedAssertion")]
+        [TestCategory("Navigation")]
         [TestMethod]
         public void TestExpectedAreasArePresent()
         {
@@ -47,6 +48,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         /// Test that only expected subareas are visible to the user
         /// </summary>
         [TestCategory("Fail - ExpectedAssertion")]
+        [TestCategory("Navigation")]
         [TestMethod]
         public void TestExpectedSubAreasArePresent()
         {

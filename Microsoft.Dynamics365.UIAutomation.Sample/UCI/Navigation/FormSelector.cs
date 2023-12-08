@@ -9,6 +9,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     [TestClass]
     public class FormSelectorUci: TestsBase
     {
+        [TestCategory("Navigation")]
         [TestMethod]
         public void UCITestOpenGlobalSearchSelectForm()
         {

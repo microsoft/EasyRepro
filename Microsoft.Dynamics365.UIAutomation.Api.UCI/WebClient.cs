@@ -367,7 +367,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
 
-
         #region Dialogs
         internal BrowserCommandResult<bool> ClickOk()
         {
@@ -5048,7 +5047,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                 {
                     driver.ClickWhenAvailable(
-                        By.XPath(AppElements.Xpath[DTO.ElementReferences.Navigation.SearchButton]),
+                        By.XPath(AppElements.Xpath[Navigation.NavigationReference.SearchButton]),
                         2.Seconds(),
                         "The Global Search (Categorized Search) button is not available.");
 

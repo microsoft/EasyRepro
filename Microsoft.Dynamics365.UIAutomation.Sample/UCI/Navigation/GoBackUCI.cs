@@ -6,6 +6,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     [TestClass]
     public class GoBackUCI : TestsBase
     {
+        [TestCategory("Navigation")]
         [TestMethod]
         public void UCITestOpenSubArea_GoBack()
         {
@@ -28,6 +29,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Navigation")]
         [TestMethod]
         public void UCITestOpenRecord_GoBack()
         {
