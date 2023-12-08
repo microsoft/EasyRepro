@@ -17,29 +17,29 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "BPF_SelectStage"     , "id(\"stage_[STAGENUM]\")/div[2]/div/div/div/span" },
             { "BPF_Ok"     , "id(\"SwitchProcess-Select\")" },
 
-            //Dialogs
-            { "Dialog_Header"       , "id(\"dialogHeaderTitle\")"},
-            { "Dialog_DeleteHeader"       , "id(\"tdDialogHeader\")"},
-            { "Dialog_WorkflowHeader", "id(\"DlgHdContainer\")" },
-            { "Dialog_ProcessFlowHeader", "id(\"processSwitcherFlyout\")" },
-            { "Dialog_CloseOpportunityOk"       , "id(\"ok_id\")"},
-            { "Dialog_AssignOk"       , "id(\"ok_id\")"},
-            { "Dialog_DeleteOk"       , "id(\"butBegin\")"},
-            { "Dialog_DuplicateOk"       , "id(\"butBegin\")"},
-            { "Dialog_DuplicateCancel"       , "id(\"cmdDialogCancel\")"},
-            { "Dialog_ConfirmWorkflow"       , "id(\"butBegin\")"},
-            { "Dialog_ConfirmReport"       , "id(\"butBegin\")"},
-            { "Dialog_AllRecords"       , "id(\"reportDefault\")"},
-            { "Dialog_SelectedRecords"       , "id(\"reportSelected\")"},
-            { "Dialog_ViewRecords"       , "id(\"reportView\")"},
-            { "Dialog_AddUserHeader"       , "id(\"addUserDescription\")"},
-            { "Dialog_AddUser"       , "id(\"buttonNext\")"},
-            { "Dialog_AddConnectionHeader", "id(\"EntityTemplateTab.connection.NoRelationship.Form.Mscrm.Form.connection.MainTab-title\")" },
-            { "Dialog_AddConnectionSave", "id(\"connection|NoRelationship|Form|Mscrm.Form.connection.SaveAndClose-Large\")" },
-            { "Dialog_RoleLookupButton",  "id(\"record2roleid\")" },
-            { "Dialog_RoleLookupTable",   "id(\"record2roleid_IMenu\")" },
-            { "Dialog_WarningFooter" , "//*[@id=\"crmDialogFooter\"]" },
-            { "Dialog_WarningCloseButton", "//*[@id=\"butBegin\"]" },
+            ////Dialogs
+            //{ "Dialog_Header"       , "id(\"dialogHeaderTitle\")"},
+            //{ "Dialog_DeleteHeader"       , "id(\"tdDialogHeader\")"},
+            //{ "Dialog_WorkflowHeader", "id(\"DlgHdContainer\")" },
+            //{ "Dialog_ProcessFlowHeader", "id(\"processSwitcherFlyout\")" },
+            //{ "Dialog_CloseOpportunityOk"       , "id(\"ok_id\")"},
+            //{ "Dialog_AssignOk"       , "id(\"ok_id\")"},
+            //{ "Dialog_DeleteOk"       , "id(\"butBegin\")"},
+            //{ "Dialog_DuplicateOk"       , "id(\"butBegin\")"},
+            //{ "Dialog_DuplicateCancel"       , "id(\"cmdDialogCancel\")"},
+            //{ "Dialog_ConfirmWorkflow"       , "id(\"butBegin\")"},
+            //{ "Dialog_ConfirmReport"       , "id(\"butBegin\")"},
+            //{ "Dialog_AllRecords"       , "id(\"reportDefault\")"},
+            //{ "Dialog_SelectedRecords"       , "id(\"reportSelected\")"},
+            //{ "Dialog_ViewRecords"       , "id(\"reportView\")"},
+            //{ "Dialog_AddUserHeader"       , "id(\"addUserDescription\")"},
+            //{ "Dialog_AddUser"       , "id(\"buttonNext\")"},
+            //{ "Dialog_AddConnectionHeader", "id(\"EntityTemplateTab.connection.NoRelationship.Form.Mscrm.Form.connection.MainTab-title\")" },
+            //{ "Dialog_AddConnectionSave", "id(\"connection|NoRelationship|Form|Mscrm.Form.connection.SaveAndClose-Large\")" },
+            //{ "Dialog_RoleLookupButton",  "id(\"record2roleid\")" },
+            //{ "Dialog_RoleLookupTable",   "id(\"record2roleid_IMenu\")" },
+            //{ "Dialog_WarningFooter" , "//*[@id=\"crmDialogFooter\"]" },
+            //{ "Dialog_WarningCloseButton", "//*[@id=\"butBegin\"]" },
            
 
             //GuidedHelp
@@ -253,15 +253,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "SetValue_FlyOutId"       , "_compositionLinkControl_flyoutLoadingArea_flyOut"},
             { "SetValue_CompositionLinkControlId"       , "_compositionLinkControl_"},
                                 
-            //Dialogs
-            { "Dialog_ActualRevenue"       , "actualrevenue_id"},
-            { "Dialog_CloseDate"       , "closedate_id"},
-            { "Dialog_Description"       , "description_id"},
-            { "Dialog_UserOrTeamLookupId"       , "systemuserview_id"},
-            { "Dialog_AssignToId"       , "rdoMe_id"},
+            ////Dialogs
+            //{ "Dialog_ActualRevenue"       , "actualrevenue_id"},
+            //{ "Dialog_CloseDate"       , "closedate_id"},
+            //{ "Dialog_Description"       , "description_id"},
+            //{ "Dialog_UserOrTeamLookupId"       , "systemuserview_id"},
+            //{ "Dialog_AssignToId"       , "rdoMe_id"},
 
-            //Add Connection
-            { "Dialog_ConnectionDescription"  , "description"},
+            ////Add Connection
+            //{ "Dialog_ConnectionDescription"  , "description"},
 
             //Entity
             { "Entity_TabId"       , "[NAME]_TAB_header_image_div"},
@@ -332,9 +332,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Nav_RowLabelClass"       , "nav-rowLabel"},
             { "Nav_TopLevelItemClass"       , "navBarTopLevelItem"},
                       
-            //Dialogs
-            { "Dialog_SwitchProcessTitleClass"       , "ms-crm-ProcessSwitcher-ProcessTitle"},
-            { "Dialog_SelectedRadioButton"       , "ms-crm-ProcessSwitcher-Process-Selected"},
+            ////Dialogs
+            //{ "Dialog_SwitchProcessTitleClass"       , "ms-crm-ProcessSwitcher-ProcessTitle"},
+            //{ "Dialog_SelectedRadioButton"       , "ms-crm-ProcessSwitcher-Process-Selected"},
 
             //SetValue
             { "SetValue_LookupRenderClass"       , "Lookup_RenderButton_td"},
@@ -374,7 +374,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public static Dictionary<string, string> Name = new Dictionary<string, string>()
         {
-            { "Dialog_ReportHeader", "crmDialog" },
+            //{ "Dialog_ReportHeader", "crmDialog" },
             //Navigation
             { "Nav_HomeTab", "TabHome" },
         };
@@ -392,74 +392,74 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Ok = "BPF_Ok";
         }
 
-        public static class Dialogs
-        {
-            public static string Header = "Dialog_Header";
-            public static string DeleteHeader = "Dialog_DeleteHeader";
-            public static string WorkflowHeader = "Dialog_WorkflowHeader";
-            public static string ProcessFlowHeader = "Dialog_ProcessFlowHeader";
-            public static string AddConnectionHeader = "Dialog_AddConnectionHeader";
-            public static string WarningFooter = "Dialog_WarningFooter";
-            public static string WarningCloseButton = "Dialog_WarningCloseButton";
+        //public static class Dialogs
+        //{
+        //    public static string Header = "Dialog_Header";
+        //    public static string DeleteHeader = "Dialog_DeleteHeader";
+        //    public static string WorkflowHeader = "Dialog_WorkflowHeader";
+        //    public static string ProcessFlowHeader = "Dialog_ProcessFlowHeader";
+        //    public static string AddConnectionHeader = "Dialog_AddConnectionHeader";
+        //    public static string WarningFooter = "Dialog_WarningFooter";
+        //    public static string WarningCloseButton = "Dialog_WarningCloseButton";
 
 
-            public static class CloseOpportunity
-            {
-                public static string ActualRevenueId = "Dialog_ActualRevenue";
-                public static string CloseDateId = "Dialog_CloseDate";
-                public static string DescriptionId = "Dialog_Description";
-                public static string Ok = "Dialog_CloseOpportunityOk";
-            }
+        //    public static class CloseOpportunity
+        //    {
+        //        public static string ActualRevenueId = "Dialog_ActualRevenue";
+        //        public static string CloseDateId = "Dialog_CloseDate";
+        //        public static string DescriptionId = "Dialog_Description";
+        //        public static string Ok = "Dialog_CloseOpportunityOk";
+        //    }
 
-            public static class AddConnection
-            {
-                public static string DescriptionId = "Dialog_ConnectionDescription";
-                public static string Save = "Dialog_AddConnectionSave";
-                public static string RoleLookupButton = "Dialog_RoleLookupButton";
-                public static string RoleLookupTable = "Dialog_RoleLookupTable";
-            }
-            public static class Assign
-            {
-                public static string Ok = "Dialog_AssignOk";
-                public static string UserOrTeamLookupId = "Dialog_UserOrTeamLookupId";
-                public static string AssignToId = "Dialog_AssignToId";
-            }
-            public static class Delete
-            {
-                public static string Ok = "Dialog_DeleteOk";
-            }
-            public static class SwitchProcess
-            {
-                public static string Process = "Dialog_SwitchProcessTitleClass";
-                public static string SelectedRadioButton = "Dialog_SelectedRadioButton";
-            }
-            public static class DuplicateDetection
-            {
-                public static string Save = "Dialog_DuplicateOk";
-                public static string Cancel = "Dialog_DuplicateCancel";
+        //    public static class AddConnection
+        //    {
+        //        public static string DescriptionId = "Dialog_ConnectionDescription";
+        //        public static string Save = "Dialog_AddConnectionSave";
+        //        public static string RoleLookupButton = "Dialog_RoleLookupButton";
+        //        public static string RoleLookupTable = "Dialog_RoleLookupTable";
+        //    }
+        //    public static class Assign
+        //    {
+        //        public static string Ok = "Dialog_AssignOk";
+        //        public static string UserOrTeamLookupId = "Dialog_UserOrTeamLookupId";
+        //        public static string AssignToId = "Dialog_AssignToId";
+        //    }
+        //    public static class Delete
+        //    {
+        //        public static string Ok = "Dialog_DeleteOk";
+        //    }
+        //    public static class SwitchProcess
+        //    {
+        //        public static string Process = "Dialog_SwitchProcessTitleClass";
+        //        public static string SelectedRadioButton = "Dialog_SelectedRadioButton";
+        //    }
+        //    public static class DuplicateDetection
+        //    {
+        //        public static string Save = "Dialog_DuplicateOk";
+        //        public static string Cancel = "Dialog_DuplicateCancel";
 
-            }
+        //    }
 
-            public static class RunWorkflow
-            {
-                public static string Confirm = "Dialog_ConfirmWorkflow";
-            }
-            public static class RunReport
-            {
-                public static string Header = "Dialog_ReportHeader";
-                public static string Confirm = "Dialog_ConfirmReport";
-                public static string Default = "Dialog_AllRecords";
-                public static string Selected = "Dialog_SelectedRecords";
-                public static string View = "Dialog_ViewRecords";
-            }
+        //    public static class RunWorkflow
+        //    {
+        //        public static string Confirm = "Dialog_ConfirmWorkflow";
+        //    }
+        //    public static class RunReport
+        //    {
+        //        public static string Header = "Dialog_ReportHeader";
+        //        public static string Confirm = "Dialog_ConfirmReport";
+        //        public static string Default = "Dialog_AllRecords";
+        //        public static string Selected = "Dialog_SelectedRecords";
+        //        public static string View = "Dialog_ViewRecords";
+        //    }
 
-            public static class AddUser
-            {
-                public static string Header = "Dialog_AddUserHeader";
-                public static string Add = "Dialog_AddUser";
-            }
+        //    public static class AddUser
+        //    {
+        //        public static string Header = "Dialog_AddUserHeader";
+        //        public static string Add = "Dialog_AddUser";
+        //    }
 
-        }
+        //}
         public static class SetValue
         {
             public static string LookupRenderClass = "SetValue_LookupRenderClass";

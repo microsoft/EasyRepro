@@ -12,6 +12,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     {
         [TestMethod]
         [TestCategory("RegressionTests")]
+        [TestCategory("Dialogs")]
         public void UCITestCreateActivity_SetDateTimes()
         {
             var client = new WebClient(TestSettings.Options);

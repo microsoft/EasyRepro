@@ -228,40 +228,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string PinStageButton = "BPF_PinStageButton";
             public static string CloseStageButton = "BPF_CloseStageButton";
         }
-        public static class Dialogs
-        {
-            public static class CloseOpportunity
-            {
-                public static string Ok = "CloseOpportunityDialog_OKButton";
-                public static string Cancel = "CloseOpportunityDialog_CancelButton";
-                public static string ActualRevenueId = "Dialog_ActualRevenue";
-                public static string CloseDateId = "Dialog_CloseDate";
-                public static string DescriptionId = "Dialog_Description";
-            }
-            public static class CloseActivity
-            {
-                public static string Close = "CloseActivityDialog_CloseButton";
-                public static string Cancel = "CloseActivityDialog_CancelButton";
-            }
-            public static string AssignDialogUserTeamLookupResults = "AssignDialog_UserTeamLookupResults";
-            public static string AssignDialogOKButton = "AssignDialog_OKButton";
-            public static string AssignDialogToggle = "AssignDialog_ToggleField";
-            public static string ConfirmButton = "Dialog_ConfirmButton";
-            public static string CancelButton = "Dialog_CancelButton";
-            public static string OkButton = "Dialog_OkButton";
-            public static string DuplicateDetectionIgnoreSaveButton = "DuplicateDetectionDialog_IgnoreAndSaveButton";
-            public static string DuplicateDetectionCancelButton = "DuplicateDetectionDialog_CancelButton";
-            public static string PublishConfirmButton = "Dialog_PublishConfirmButton";
-            public static string PublishCancelButton = "Dialog_PublishCancelButton";
-            public static string SetStateDialog = "Dialog_SetStateDialog";
-            public static string SetStateActionButton = "Dialog_SetStateActionButton";
-            public static string SetStateCancelButton = "Dialog_SetStateCancelButton";
-            public static string SwitchProcessDialog = "Entity_SwitchProcessDialog";
-            public static string SwitchProcessDialogOK = "Entity_SwitchProcessDialogOK";
-            public static string ActiveProcessGridControlContainer = "Entity_ActiveProcessGridControlContainer";
-            public static string DialogContext = "Dialog_DialogContext";
-            public static string SwitchProcessContainer = "Dialog_SwitchProcessContainer";
-        }
+
 
         public static class QuickCreate
         {
@@ -588,31 +555,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {"Field_RequiredIcon", ".//div[contains(@data-id, 'required-icon') or contains(@id, 'required-icon')]"},
 
             //Dialogs
-            { "AssignDialog_ToggleField" , "//label[contains(@data-id,'rdoMe_id.fieldControl-checkbox-inner-first')]" },
-            { "AssignDialog_UserTeamLookupResults" , "//ul[contains(@data-id,'systemuserview_id.fieldControl-LookupResultsDropdown_systemuserview_id_tab')]" },
-            { "AssignDialog_OKButton" , "//button[contains(@data-id, 'ok_id')]" },
-            { "CloseOpportunityDialog_OKButton" , "//button[contains(@data-id, 'ok_id')]" },
-            { "CloseOpportunityDialog_CancelButton" , "//button[contains(@data-id, 'cancel_id')]" },
-            { "CloseActivityDialog_CloseButton" , ".//button[contains(@data-id, 'ok_id')]" },
-            { "CloseActivityDialog_CancelButton" , ".//button[contains(@data-id, 'cancel_id')]" },
-            { "Dialog_DialogContext", "//div[contains(@role, 'dialog')]" },
-            { "Dialog_ActualRevenue", "//input[contains(@data-id,'actualrevenue_id')]" },
-            { "Dialog_CloseDate", "//input[contains(@data-id,'closedate_id')]" },
-            { "Dialog_DescriptionId", "//input[contains(@data-id,'description_id')]" },
-            { "Dialog_ConfirmButton" , "//*[@id=\"confirmButton\"]" },
-            { "Dialog_CancelButton" , "//*[@id=\"cancelButton\"]" },
-            { "Dialog_OkButton" , "//*[@id=\"okButton\"]" },
-            { "DuplicateDetectionDialog_IgnoreAndSaveButton" , "//button[contains(@data-id, 'ignore_save')]" },
-            { "DuplicateDetectionDialog_CancelButton" , "//button[contains(@data-id, 'close_dialog')]" },
-            { "Dialog_SetStateDialog" , "//div[@data-id=\"SetStateDialog\"]" },
-            { "Dialog_SetStateActionButton" , ".//button[@data-id=\"ok_id\"]" },
-            { "Dialog_SetStateCancelButton" , ".//button[@data-id=\"cancel_id\"]" },
-            { "Dialog_PublishConfirmButton" , "//*[@data-id=\"ok_id\"]" },
-            { "Dialog_PublishCancelButton" , "//*[@data-id=\"cancel_id\"]" },
-            { "Dialog_SwitchProcessContainer" , "//div[contains(@id,'switchProcess_id-FieldSectionItemContainer')]" },
-            { "Entity_ActiveProcessGridControlContainer"       , "//div[contains(@data-lp-id,'activeProcessGridControlContainer')]"},
-            { "Entity_SwitchProcessDialogOK"       , "//button[contains(@data-id,'ok_id')]"},
-            { "SwitchProcess_Container" , "//section[contains(@id, 'popupContainer')]" },
+            //{ "AssignDialog_ToggleField" , "//label[contains(@data-id,'rdoMe_id.fieldControl-checkbox-inner-first')]" },
+            //{ "AssignDialog_UserTeamLookupResults" , "//ul[contains(@data-id,'systemuserview_id.fieldControl-LookupResultsDropdown_systemuserview_id_tab')]" },
+            //{ "AssignDialog_OKButton" , "//button[contains(@data-id, 'ok_id')]" },
+            //{ "CloseOpportunityDialog_OKButton" , "//button[contains(@data-id, 'ok_id')]" },
+            //{ "CloseOpportunityDialog_CancelButton" , "//button[contains(@data-id, 'cancel_id')]" },
+            //{ "CloseActivityDialog_CloseButton" , ".//button[contains(@data-id, 'ok_id')]" },
+            //{ "CloseActivityDialog_CancelButton" , ".//button[contains(@data-id, 'cancel_id')]" },
+            //{ "Dialog_DialogContext", "//div[contains(@role, 'dialog')]" },
+            //{ "Dialog_ActualRevenue", "//input[contains(@data-id,'actualrevenue_id')]" },
+            //{ "Dialog_CloseDate", "//input[contains(@data-id,'closedate_id')]" },
+            //{ "Dialog_DescriptionId", "//input[contains(@data-id,'description_id')]" },
+            //{ "Dialog_ConfirmButton" , "//*[@id=\"confirmButton\"]" },
+            //{ "Dialog_CancelButton" , "//*[@id=\"cancelButton\"]" },
+            //{ "Dialog_OkButton" , "//*[@id=\"okButton\"]" },
+            //{ "DuplicateDetectionDialog_IgnoreAndSaveButton" , "//button[contains(@data-id, 'ignore_save')]" },
+            //{ "DuplicateDetectionDialog_CancelButton" , "//button[contains(@data-id, 'close_dialog')]" },
+            //{ "Dialog_SetStateDialog" , "//div[@data-id=\"SetStateDialog\"]" },
+            //{ "Dialog_SetStateActionButton" , ".//button[@data-id=\"ok_id\"]" },
+            //{ "Dialog_SetStateCancelButton" , ".//button[@data-id=\"cancel_id\"]" },
+            //{ "Dialog_PublishConfirmButton" , "//*[@data-id=\"ok_id\"]" },
+            //{ "Dialog_PublishCancelButton" , "//*[@data-id=\"cancel_id\"]" },
+            //{ "Dialog_SwitchProcessContainer" , "//div[contains(@id,'switchProcess_id-FieldSectionItemContainer')]" },
+            //{ "Entity_ActiveProcessGridControlContainer"       , "//div[contains(@data-lp-id,'activeProcessGridControlContainer')]"},
+            //{ "Entity_SwitchProcessDialogOK"       , "//button[contains(@data-id,'ok_id')]"},
+            //{ "SwitchProcess_Container" , "//section[contains(@id, 'popupContainer')]" },
 			
             //QuickCreate
             { "QuickCreate_FormContext" , "//section[contains(@data-id,'quickCreateRoot')]" },

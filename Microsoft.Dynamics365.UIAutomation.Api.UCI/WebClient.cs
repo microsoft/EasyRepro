@@ -367,377 +367,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
 
-        #region Dialogs
-        internal BrowserCommandResult<bool> ClickOk()
-        {
-            //Passing true clicks the confirm button.  Passing false clicks the Cancel button.
-            return this.Execute(GetOptions($"Dialog Click OK"), driver =>
-            {
-                var inlineDialog = this.SwitchToDialog();
-                if (inlineDialog)
-                {
-                    //Wait until the buttons are available to click
-                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.OkButton]));
 
-                    if (
-                        !(dialogFooter?.FindElements(By.XPath(AppElements.Xpath[AppReference.Dialogs.OkButton])).Count >
-                          0)) return true;
-
-                    //Click the Confirm or Cancel button
-                    IWebElement buttonToClick;
-                    buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.OkButton]));
-                    buttonToClick.Click();
-                }
-
-                return true;
-            });
-        }
-        internal bool SwitchToDialog(int frameIndex = 0)
-        {
-            var index = "";
-            if (frameIndex > 0)
-                index = frameIndex.ToString();
-
-            Browser.Driver.SwitchTo().DefaultContent();
-
-            // Check to see if dialog is InlineDialog or popup
-            var inlineDialog = Browser.Driver.HasElement(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)));
-            if (inlineDialog)
-            {
-                //wait for the content panel to render
-                Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)),
-                    TimeSpan.FromSeconds(2),
-                    d => { Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
-                return true;
-            }
-            else
-            {
-                // need to add this functionality
-                //SwitchToPopup();
-            }
-
-            return true;
-        }
-
-        internal BrowserCommandResult<bool> CloseWarningDialog()
-        {
-            return this.Execute(GetOptions($"Close Warning Dialog"), driver =>
-            {
-                var inlineDialog = this.SwitchToDialog();
-                if (inlineDialog)
-                {
-                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Dialogs.WarningFooter]));
-
-                    if (
-                        !(dialogFooter?.FindElements(By.XPath(Elements.Xpath[Reference.Dialogs.WarningCloseButton])).Count >
-                          0)) return true;
-                    var closeBtn = dialogFooter.FindElement(By.XPath(Elements.Xpath[Reference.Dialogs.WarningCloseButton]));
-                    closeBtn.Click();
-                }
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> ConfirmationDialog(bool ClickConfirmButton)
-        {
-            //Passing true clicks the confirm button.  Passing false clicks the Cancel button.
-            return this.Execute(GetOptions($"Confirm or Cancel Confirmation Dialog"), driver =>
-            {
-                var inlineDialog = this.SwitchToDialog();
-                if (inlineDialog)
-                {
-                    //Wait until the buttons are available to click
-                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.ConfirmButton]));
-
-                    if (
-                        !(dialogFooter?.FindElements(By.XPath(AppElements.Xpath[AppReference.Dialogs.ConfirmButton])).Count >
-                          0)) return true;
-
-                    //Click the Confirm or Cancel button
-                    IWebElement buttonToClick;
-                    if (ClickConfirmButton)
-                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.ConfirmButton]));
-                    else
-                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.CancelButton]));
-
-                    buttonToClick.Click();
-                }
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> DuplicateDetection(bool clickSaveOrCancel)
-        {
-            string operationType;
-
-            if (clickSaveOrCancel)
-            {
-                operationType = "Ignore and Save";
-            }
-            else
-                operationType = "Cancel";
-
-            //Passing true clicks the Ignore and Save button.  Passing false clicks the Cancel button.
-            return this.Execute(GetOptions($"{operationType} Duplicate Detection Dialog"), driver =>
-            {
-                var inlineDialog = this.SwitchToDialog();
-                if (inlineDialog)
-                {
-                    //Wait until the buttons are available to click
-                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DuplicateDetectionIgnoreSaveButton]));
-
-                    if (
-                        !(dialogFooter?.FindElements(By.XPath(AppElements.Xpath[AppReference.Dialogs.DuplicateDetectionIgnoreSaveButton])).Count >
-                          0)) return true;
-
-                    //Click the Confirm or Cancel button
-                    IWebElement buttonToClick;
-                    if (clickSaveOrCancel)
-                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DuplicateDetectionIgnoreSaveButton]));
-                    else
-                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DuplicateDetectionCancelButton]));
-
-                    buttonToClick.Click();
-                }
-
-                if (clickSaveOrCancel)
-                {
-                    // Wait for Save before proceeding
-                    driver.WaitForTransaction();
-                }
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> SetStateDialog(bool clickOkButton)
-        {
-            //Passing true clicks the Activate/Deactivate button.  Passing false clicks the Cancel button.
-            return this.Execute(GetOptions($"Interact with Set State Dialog"), driver =>
-            {
-                var inlineDialog = this.SwitchToDialog();
-                if (inlineDialog)
-                {
-                    //Wait until the buttons are available to click
-                    var dialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.SetStateDialog]));
-
-                    if (
-                        !(dialog?.FindElements(By.TagName("button")).Count >
-                          0)) return true;
-
-                    //Click the Activate/Deactivate or Cancel button
-                    IWebElement buttonToClick;
-                    if (clickOkButton)
-                        buttonToClick = dialog.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.SetStateActionButton]));
-                    else
-                        buttonToClick = dialog.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.SetStateCancelButton]));
-
-                    buttonToClick.Click();
-                }
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> PublishDialog(bool ClickConfirmButton)
-        {
-            //Passing true clicks the confirm button.  Passing false clicks the Cancel button.
-            return this.Execute(GetOptions($"Confirm or Cancel Publish Dialog"), driver =>
-            {
-                var inlineDialog = this.SwitchToDialog();
-                if (inlineDialog)
-                {
-                    //Wait until the buttons are available to click
-                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.PublishConfirmButton]));
-
-                    if (
-                        !(dialogFooter?.FindElements(By.XPath(AppElements.Xpath[AppReference.Dialogs.PublishConfirmButton])).Count >
-                          0)) return true;
-
-                    //Click the Confirm or Cancel button
-                    IWebElement buttonToClick;
-                    if (ClickConfirmButton)
-                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.PublishConfirmButton]));
-                    else
-                        buttonToClick = dialogFooter.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.PublishCancelButton]));
-
-                    buttonToClick.Click();
-                }
-
-                return true;
-            });
-        }
-
-
-        internal BrowserCommandResult<bool> AssignDialog(Dialogs.AssignTo to, string userOrTeamName = null)
-        {
-            return this.Execute(GetOptions($"Assign to User or Team Dialog"), driver =>
-            {
-                var inlineDialog = this.SwitchToDialog();
-                if (!inlineDialog)
-                    return false;
-
-                if (to == Dialogs.AssignTo.Me)
-                {
-                    SetValue(new OptionSet { Name = Elements.ElementId[Reference.Dialogs.Assign.AssignToId], Value = "Me" }, FormContextType.Dialog);
-                }
-                else
-                {
-                    SetValue(new OptionSet { Name = Elements.ElementId[Reference.Dialogs.Assign.AssignToId], Value = "User or team" }, FormContextType.Dialog);
-
-                    //Set the User Or Team
-                    var userOrTeamField = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookup]), "User field unavailable");
-                    var input = userOrTeamField.ClickWhenAvailable(By.TagName("input"), "User field unavailable");
-                    input.SendKeys(userOrTeamName, true);
-
-                    ThinkTime(2000);
-
-                    //Pick the User from the list
-                    var container = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogUserTeamLookupResults]));
-                    container.WaitUntil(
-                        c => c.FindElements(By.TagName("li")).FirstOrDefault(r => r.Text.StartsWith(userOrTeamName, StringComparison.OrdinalIgnoreCase)),
-                        successCallback: e => e.Click(true),
-                        failureCallback: () => throw new InvalidOperationException($"None {to} found which match with '{userOrTeamName}'"));
-                }
-
-                //Click Assign
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.AssignDialogOKButton]), TimeSpan.FromSeconds(5),
-                    "Unable to click the OK button in the assign dialog");
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> SwitchProcessDialog(string processToSwitchTo)
-        {
-            return this.Execute(GetOptions($"Switch Process Dialog"), driver =>
-            {
-                //Wait for the Grid to load
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Dialogs.ActiveProcessGridControlContainer]));
-
-                //Select the Process
-                var popup = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.SwitchProcessContainer]));
-                var labels = popup.FindElements(By.TagName("label"));
-                foreach (var label in labels)
-                {
-                    if (label.Text.Equals(processToSwitchTo, StringComparison.OrdinalIgnoreCase))
-                    {
-                        label.Click();
-                        break;
-                    }
-                }
-
-                //Click the OK button
-                var okBtn = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.SwitchProcessDialogOK]));
-                okBtn.Click();
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> CloseOpportunityDialog(bool clickOK)
-        {
-            return this.Execute(GetOptions($"Close Opportunity Dialog"), driver =>
-            {
-                var inlineDialog = this.SwitchToDialog();
-
-                if (inlineDialog)
-                {
-                    //Close Opportunity
-                    var xPath = AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok];
-
-                    //Cancel
-                    if (!clickOK)
-                        xPath = AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok];
-
-                    driver.ClickWhenAvailable(By.XPath(xPath), TimeSpan.FromSeconds(5), "The Close Opportunity dialog is not available.");
-                }
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> HandleSaveDialog()
-        {
-            //If you click save and something happens, handle it.  Duplicate Detection/Errors/etc...
-            //Check for Dialog and figure out which type it is and return the dialog type.
-
-            //Introduce think time to avoid timing issues on save dialog
-            ThinkTime(1000);
-
-            return this.Execute(GetOptions($"Validate Save"), driver =>
-            {
-                //Is it Duplicate Detection?
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionWindowMarker])))
-                {
-                    if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionGridRows])))
-                    {
-                        //Select the first record in the grid
-                        driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionGridRows]))[0].Click(true);
-
-                        //Click Ignore and Save
-                        driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionIgnoreAndSaveButton])).Click(true);
-                        driver.WaitForTransaction();
-                    }
-                }
-
-                //Is it an Error?
-                if (driver.HasElement(By.XPath("//div[contains(@data-id,'errorDialogdialog')]")))
-                {
-                    var errorDialog = driver.FindElement(By.XPath("//div[contains(@data-id,'errorDialogdialog')]"));
-
-                    var errorDetails = errorDialog.FindElement(By.XPath(".//*[contains(@data-id,'errorDialog_subtitle')]"));
-
-                    if (!String.IsNullOrEmpty(errorDetails.Text))
-                        throw new InvalidOperationException(errorDetails.Text);
-                }
-
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<string> GetBusinessProcessErrorText(int waitTimeInSeconds)
-        {
-
-            return this.Execute(GetOptions($"Get Business Process Error Text"), driver =>
-            {
-                string errorDetails = string.Empty;
-                var errorDialog = driver.WaitUntilAvailable(By.XPath("//div[contains(@data-id,'errorDialogdialog')]"), new TimeSpan(0, 0, waitTimeInSeconds));
-
-                // Is error dialog present?
-                if (errorDialog != null)
-                {
-                    var errorDetailsElement = errorDialog.FindElement(By.XPath(".//*[contains(@data-id,'errorDialog_subtitle')]"));
-
-                    if (errorDetailsElement != null)
-                    {
-                        if (!String.IsNullOrEmpty(errorDetailsElement.Text))
-                            errorDetails = errorDetailsElement.Text;
-                    }
-                }
-
-                return errorDetails;
-            });
-        }
-
-        private static ICollection<IWebElement> GetListItems(IWebElement container, LookupItem control)
-        {
-            var name = control.Name;
-            var xpathToItems = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", name));
-
-            //wait for complete the search
-            container.WaitUntil(d => d.FindVisible(xpathToItems)?.Text?.Contains(control.Value, StringComparison.OrdinalIgnoreCase) == true);
-
-            ICollection<IWebElement> result = container.WaitUntil(
-                d => d.FindElements(xpathToItems),
-                failureCallback: () => throw new InvalidOperationException($"No Results Matching {control.Value} Were Found.")
-                );
-            return result;
-        }
-        #endregion
 
         #region CommandBar
 
@@ -748,9 +378,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Find the button in the CommandBar
                 IWebElement ribbon;
                 // Checking if any dialog is active
-                if (driver.HasElement(By.XPath(string.Format(AppElements.Xpath[AppReference.Dialogs.DialogContext]))))
+                if (driver.HasElement(By.XPath(string.Format(Dialogs.DialogsReference.DialogContext))))
                 {
-                    var dialogContainer = driver.FindElement(By.XPath(string.Format(AppElements.Xpath[AppReference.Dialogs.DialogContext])));
+                    var dialogContainer = driver.FindElement(By.XPath(string.Format(Dialogs.DialogsReference.DialogContext)));
                     ribbon = dialogContainer.WaitUntilAvailable(By.XPath(string.Format(AppElements.Xpath[AppReference.CommandBar.Container])));
                 }
                 else
@@ -2260,7 +1890,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Initialize the Dialog context
                 driver.WaitForTransaction();
                 var formContext = driver
-                    .FindElements(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]))
+                    .FindElements(By.XPath(Dialogs.DialogsReference.DialogContext))
                     .LastOrDefault() ?? throw new NotFoundException("Unable to find a dialog.");
                 fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", field)));
             }
@@ -2442,7 +2072,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var selectedItem = items.ElementAt(index);
             selectedItem.Click(true);
         }
+        internal static ICollection<IWebElement> GetListItems(IWebElement container, LookupItem control)
+        {
+            var name = control.Name;
+            var xpathToItems = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", name));
 
+            //wait for complete the search
+            container.WaitUntil(d => d.FindVisible(xpathToItems)?.Text?.Contains(control.Value, StringComparison.OrdinalIgnoreCase) == true);
+
+            ICollection<IWebElement> result = container.WaitUntil(
+                d => d.FindElements(xpathToItems),
+                failureCallback: () => throw new InvalidOperationException($"No Results Matching {control.Value} Were Found.")
+                );
+            return result;
+        }
         private void SetLookupByIndex(ISearchContext container, LookupItem control)
         {
             var controlName = control.Name;
@@ -2452,6 +2095,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var xpathFieldResultListItem = By.XPath(AppElements.Xpath[AppReference.Entity.LookupFieldResultListItem].Replace("[NAME]", controlName));
             container.WaitUntil(d => d.FindElements(xpathFieldResultListItem).Count > 0);
 
+            
             var items = GetListItems(lookupResultsDialog, control);
             if (items.Count == 0)
                 throw new InvalidOperationException($"No results exist in the Recently Viewed flyout menu. Please provide a text value for {controlName}");
@@ -2731,7 +2375,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (formContextType == FormContextType.Dialog)
             {
                 // Initialize the Dialog context
-                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+                var formContext = driver.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext));
                 fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
                 var strExpanded = fieldContainer.GetAttribute("aria-expanded");
@@ -2839,7 +2483,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (formContextType == FormContextType.Dialog)
             {
                 // Initialize the Header context
-                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]), new TimeSpan(0, 0, 1));
+                formContext = container.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext), new TimeSpan(0, 0, 1));
             }
 
             driver.WaitForTransaction();
@@ -2932,7 +2576,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else if (formContextType == FormContextType.Dialog)
                 {
                     // Initialize the Header context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+                    var formContext = driver.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext));
                     fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
 
@@ -2998,8 +2642,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else if (formContextType == FormContextType.Dialog)
                 {
                     // Initialize the Header context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
+                    var formContext = driver.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext));
+                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext.Replace("[NAME]", option.Name)));
                 }
 
                 var inputXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.InputSearch]);
@@ -4397,7 +4041,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     "Delete Button is not available");
 
                 deleteBtn?.Click();
-                ConfirmationDialog(true);
+                Dialogs dialogs = new Dialogs(this);
+                dialogs.ConfirmationDialog(true);
 
                 driver.WaitForTransaction();
 
@@ -4416,7 +4061,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     "Assign Button is not available");
 
                 assignBtn?.Click();
-                AssignDialog(Dialogs.AssignTo.User, userOrTeamToAssign);
+                Dialogs dialogs = new Dialogs(this);
+                dialogs.AssignDialog(Dialogs.AssignTo.User, userOrTeamToAssign);
 
                 return true;
             });
@@ -4445,14 +4091,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             ThinkTime(thinkTime);
 
             var xPathQuery = closeOrCancel
-                ? AppElements.Xpath[AppReference.Dialogs.CloseActivity.Close]
-                : AppElements.Xpath[AppReference.Dialogs.CloseActivity.Cancel];
+                ? Dialogs.DialogsReference.CloseActivity.Close
+                : Dialogs.DialogsReference.CloseActivity.Cancel;
 
             var action = closeOrCancel ? "Close" : "Cancel";
 
             return this.Execute(GetOptions($"{action} Activity"), driver =>
             {
-                var dialog = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+                var dialog = driver.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext));
 
                 var actionButton = dialog.FindElement(By.XPath(xPathQuery));
 
@@ -4477,8 +4123,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var closeBtn = driver.WaitUntilAvailable(By.XPath(xPathQuery), "Opportunity Close Button is not available");
 
                 closeBtn?.Click();
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]));
-                CloseOpportunityDialog(true);
+                driver.WaitUntilVisible(By.XPath(Dialogs.DialogsReference.CloseOpportunity.Ok));
+                Dialogs dialogs = new Dialogs(this);
+                dialogs.CloseOpportunityDialog(true);
 
                 return true;
             });
@@ -4494,7 +4141,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.CloseDateId], closeDate);
                 //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
 
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dialogs.CloseOpportunity.Ok]),
+                driver.ClickWhenAvailable(By.XPath(Dialogs.DialogsReference.CloseOpportunity.Ok),
     TimeSpan.FromSeconds(5),
     "The Close Opportunity dialog is not available."
     );
@@ -4587,9 +4234,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.Execute($"Select Tab", driver =>
             {
                 IWebElement tabList;
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext])))
+                if (driver.HasElement(By.XPath(Dialogs.DialogsReference.DialogContext)))
                 {
-                    var dialogContainer = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Dialogs.DialogContext]));
+                    var dialogContainer = driver.FindElement(By.XPath(Dialogs.DialogsReference.DialogContext));
                     tabList = dialogContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
                 }
                 else

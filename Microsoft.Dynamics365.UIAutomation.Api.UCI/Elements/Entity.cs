@@ -123,7 +123,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public string GetBusinessProcessError(int waitTimeInSeconds = 120)
         {
             _client.Browser.Driver.WaitForTransaction();
-            return _client.GetBusinessProcessErrorText(waitTimeInSeconds);
+            Dialogs dialogs = new Dialogs(_client);
+            return dialogs.GetBusinessProcessErrorText(waitTimeInSeconds);
         }
 
         /// <summary>
@@ -377,7 +378,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public void Save()
         {
             _client.Save();
-            _client.HandleSaveDialog();
+            Dialogs dialogs = new Dialogs(_client);
+            dialogs.HandleSaveDialog();
             _client.Browser.Driver.WaitForTransaction();
         }
 

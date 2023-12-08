@@ -2,19 +2,113 @@
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using OpenQA.Selenium;
 using System;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
     public class Dialogs : Element
     {
-        private readonly WebClient _client;
+        #region DTO
+        public static class DialogsReference
+        {
+            public static class CloseOpportunity
+            {
+                public static string Ok = "//button[contains(@data-id, 'ok_id')]";
+                public static string Cancel = "//button[contains(@data-id, 'cancel_id')]";
+                public static string ActualRevenueId = "actualrevenue_id";
+                public static string CloseDateId = "closedate_id";
+                public static string DescriptionId = "description_id";
+            }
+            public static class CloseActivity
+            {
+                public static string Close = ".//button[contains(@data-id, 'ok_id')]";
+                public static string Cancel = ".//button[contains(@data-id, 'cancel_id')]";
+            }
+            public static class AddConnection
+            {
+                public static string DescriptionId = "description";
+                public static string Save = "id(\"connection|NoRelationship|Form|Mscrm.Form.connection.SaveAndClose-Large\")";
+                public static string RoleLookupButton = "id(\"record2roleid\")";
+                public static string RoleLookupTable = "id(\"record2roleid_IMenu\")";
+            }
+            public static class Assign
+            {
+                public static string Ok = "id(\"ok_id\")";
+                public static string UserOrTeamLookupId = "systemuserview_id";
+                public static string AssignToId = "rdoMe_id";
+            }
+            public static class Delete
+            {
+                public static string Ok = "id(\"butBegin\")";
+            }
+            public static class SwitchProcess
+            {
+                public static string Process = "ms-crm-ProcessSwitcher-ProcessTitle";
+                public static string SelectedRadioButton = "ms-crm-ProcessSwitcher-Process-Selected";
+            }
+            public static class DuplicateDetection
+            {
+                public static string Save = "id(\"butBegin\")";
+                public static string Cancel = "id(\"cmdDialogCancel\")";
 
+            }
+            public static class RunWorkflow
+            {
+                public static string Confirm = "id(\"butBegin\")";
+            }
+            public static class RunReport
+            {
+                public static string Header = "crmDialog";
+                public static string Confirm = "id(\"butBegin\")";
+                public static string Default = "id(\"reportDefault\")";
+                public static string Selected = "id(\"reportSelected\")";
+                public static string View = "id(\"reportView\")";
+            }
+            public static class AddUser
+            {
+                public static string Header = "id(\"addUserDescription\")";
+                public static string Add = "id(\"buttonNext\")";
+            }
+            public static string AssignDialogUserTeamLookupResults = "//ul[contains(@data-id,'systemuserview_id.fieldControl-LookupResultsDropdown_systemuserview_id_tab')]";
+            public static string AssignDialogOKButton = "//button[contains(@data-id, 'ok_id')]";
+            public static string AssignDialogToggle = "//label[contains(@data-id,'rdoMe_id.fieldControl-checkbox-inner-first')]";
+            public static string ConfirmButton = "//*[@data-id=\"confirmButton\"]";
+            public static string CancelButton = "//*[@data-id=\"cancelButton\"]";
+            public static string OkButton = "//*[@id=\"okButton\"]";
+            public static string DuplicateDetectionIgnoreSaveButton = "//button[contains(@data-id, 'ignore_save')]";
+            public static string DuplicateDetectionCancelButton = "//button[contains(@data-id, 'close_dialog')]";
+            public static string PublishConfirmButton = "//*[@data-id=\"ok_id\"]";
+            public static string PublishCancelButton = "//*[@data-id=\"cancel_id\"]";
+            public static string SetStateDialog = "//div[@data-id=\"SetStateDialog\"]";
+            public static string SetStateActionButton = ".//button[@data-id=\"ok_id\"]";
+            public static string SetStateCancelButton = ".//button[@data-id=\"cancel_id\"]";
+            public static string SwitchProcessDialog = "Entity_SwitchProcessDialog";
+            public static string SwitchProcessDialogOK = "//button[contains(@data-id,'ok_id')]";
+            public static string ActiveProcessGridControlContainer = "//div[contains(@data-lp-id,'activeProcessGridControlContainer')]";
+            //public static string DialogContext = "//div[contains(@role, 'dialog') and @aria-hidden != 'true']";
+            public static string DialogContext = "//div[contains(@role, 'dialog') and @aria-modal = 'true']";
+            public static string SwitchProcessContainer = "//div[contains(@id,'switchProcess_id-FieldSectionItemContainer')]";
+
+            public static string Header = "id(\"dialogHeaderTitle\")";
+            public static string DeleteHeader = "id(\"tdDialogHeader\")";
+            public static string WorkflowHeader = "id(\"DlgHdContainer\")";
+            public static string ProcessFlowHeader = "id(\"processSwitcherFlyout\")";
+            public static string AddConnectionHeader = "id(\"EntityTemplateTab.connection.NoRelationship.Form.Mscrm.Form.connection.MainTab-title\")";
+            public static string WarningFooter = "//*[@id=\"crmDialogFooter\"]";
+            public static string WarningCloseButton = "//*[@id=\"butBegin\"]";
+        }
+        #endregion
+        #region prop
+        private readonly WebClient _client;
+        #endregion
+        #region ctor
         public Dialogs(WebClient client) : base()
         {
             _client = client;
         }
-
+        #endregion
+        #region public
         public enum AssignTo
         {
             Me,
@@ -29,9 +123,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="userOrTeamName">Name of the user or team to assign to</param>
         public void Assign(AssignTo to, string userOrTeamName = null)
         {
-            _client.AssignDialog(to, userOrTeamName);
+            this.AssignDialog(to, userOrTeamName);
         }
-
         /// <summary>
         /// Clicks the Close button if true, or clicks Cancel if false
         /// </summary>
@@ -61,43 +154,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.CloseOpportunity(revenue, closeDate, description);
         }
 
-        /// <summary>
-        /// Closes the warning dialog during login
-        /// </summary>
-        /// <returns></returns>
-        public bool CloseWarningDialog()
-        {
-            return _client.CloseWarningDialog();
-        }
-
-        /// <summary>
-        /// Clicks OK or Cancel on the confirmation dialog.  true = OK, false = Cancel
-        /// </summary>
-        /// <param name="clickConfirmButton"></param>
-        /// <returns></returns>
-        public bool ConfirmationDialog(bool clickConfirmButton)
-        {
-            return _client.ConfirmationDialog(clickConfirmButton);
-        }
-
-        /// <summary>
-        /// Clicks 'Ignore And Save' or 'Cancel' on the Duplicate Detection dialog.  true = Ignore And Save, false = Cancel
-        /// </summary>
-        /// <param name="clickConfirmButton"></param>
-        /// <returns></returns>
-        public bool DuplicateDetection(bool clickSaveOrCancel)
-        {
-            return _client.DuplicateDetection(clickSaveOrCancel);
-        }
-        /// <summary>
-        /// Clicks OK or Cancel on the confirmation dialog.  true = OK, false = Cancel
-        /// </summary>
-        /// <param name="clickConfirmButton"></param>
-        /// <returns></returns>
-        public bool ClickOk()
-        {
-            return _client.ClickOk();
-        }
 
 
         /// <summary>
@@ -166,16 +222,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.GetValue(option);
         }
 
-
-        /// <summary>
-        /// Clicks Confirm or Cancel on the Publish dialog.  true = Confirm, false = Cancel
-        /// </summary>
-        /// <param name="clickOkButton"></param>
-        /// <returns></returns>
-        public bool PublishDialog(bool clickConfirmButton)
-        {
-            return _client.PublishDialog(clickConfirmButton);
-        }
 
         /// <summary>
         /// Sets the value of a field
@@ -258,15 +304,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.SetValue(option, FormContextType.Dialog, removeExistingValues);
         }
 
-        /// <summary>
-        /// Clicks OK or Cancel on the Set State (Activate / Deactivate) dialog.  true = OK, false = Cancel
-        /// </summary>
-        /// <param name="clickOkButton"></param>
-        /// <returns></returns>
-        public bool SetStateDialog(bool clickOkButton)
-        {
-            return _client.SetStateDialog(clickOkButton);
-        }
 
         /// <summary>
         /// Clicks on entity dialog ribbon button
@@ -289,5 +326,395 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.SelectTab(tabName, subtabName);
         }
+        #endregion
+
+        #region WebClient public
+        ///// <summary>
+        ///// Clicks OK or Cancel on the confirmation dialog.  true = OK, false = Cancel
+        ///// </summary>
+        ///// <param name="clickConfirmButton"></param>
+        ///// <returns></returns>
+        public BrowserCommandResult<bool> ClickOk()
+        {
+            //Passing true clicks the confirm button.  Passing false clicks the Cancel button.
+            return _client.Execute(_client.GetOptions($"Dialog Click OK"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (inlineDialog)
+                {
+                    //Wait until the buttons are available to click
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(DialogsReference.OkButton));
+
+                    if (
+                        !(dialogFooter?.FindElements(By.XPath(DialogsReference.OkButton)).Count >
+                          0)) return true;
+
+                    //Click the Confirm or Cancel button
+                    IWebElement buttonToClick;
+                    buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.OkButton));
+                    buttonToClick.Click();
+                }
+
+                return true;
+            });
+        }
+        internal bool SwitchToDialog(int frameIndex = 0)
+        {
+            var index = "";
+            if (frameIndex > 0)
+                index = frameIndex.ToString();
+
+            _client.Browser.Driver.SwitchTo().DefaultContent();
+
+            // Check to see if dialog is InlineDialog or popup
+            var inlineDialog = _client.Browser.Driver.HasElement(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)));
+            if (inlineDialog)
+            {
+                //wait for the content panel to render
+                _client.Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)),
+                    TimeSpan.FromSeconds(2),
+                    d => { _client.Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
+                return true;
+            }
+            else
+            {
+                // need to add this functionality
+                //SwitchToPopup();
+            }
+
+            return true;
+        }
+        /// <summary>
+        /// Closes the warning dialog during login
+        /// </summary>
+        /// <returns></returns>
+        public BrowserCommandResult<bool> CloseWarningDialog()
+        {
+            return _client.Execute(_client.GetOptions($"Close Warning Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (inlineDialog)
+                {
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(DialogsReference.WarningFooter));
+
+                    if (
+                        !(dialogFooter?.FindElements(By.XPath(DialogsReference.WarningCloseButton)).Count >
+                          0)) return true;
+                    var closeBtn = dialogFooter.FindElement(By.XPath(DialogsReference.WarningCloseButton));
+                    closeBtn.Click();
+                }
+
+                return true;
+            });
+        }
+        /// <summary>
+        /// Clicks OK or Cancel on the confirmation dialog.  true = OK, false = Cancel
+        /// </summary>
+        /// <param name="clickConfirmButton"></param>
+        /// <returns></returns>
+        public BrowserCommandResult<bool> ConfirmationDialog(bool ClickConfirmButton)
+        {
+            //Passing true clicks the confirm button.  Passing false clicks the Cancel button.
+            return _client.Execute(_client.GetOptions($"Confirm or Cancel Confirmation Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (inlineDialog)
+                {
+                    //Wait until the buttons are available to click
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(DialogsReference.ConfirmButton));
+
+                    if (
+                        !(dialogFooter?.FindElements(By.XPath(DialogsReference.ConfirmButton)).Count >
+                          0)) return true;
+
+                    //Click the Confirm or Cancel button
+                    IWebElement buttonToClick;
+                    if (ClickConfirmButton)
+                        buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.ConfirmButton));
+                    else
+                        buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.CancelButton));
+
+                    buttonToClick.Click();
+                }
+
+                return true;
+            });
+        }
+        /// <summary>
+        /// Clicks 'Ignore And Save' or 'Cancel' on the Duplicate Detection dialog.  true = Ignore And Save, false = Cancel
+        /// </summary>
+        /// <param name="clickConfirmButton"></param>
+        /// <returns></returns>
+        public BrowserCommandResult<bool> DuplicateDetection(bool clickSaveOrCancel)
+        {
+            string operationType;
+
+            if (clickSaveOrCancel)
+            {
+                operationType = "Ignore and Save";
+            }
+            else
+                operationType = "Cancel";
+
+            //Passing true clicks the Ignore and Save button.  Passing false clicks the Cancel button.
+            return _client.Execute(_client.GetOptions($"{operationType} Duplicate Detection Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (inlineDialog)
+                {
+                    //Wait until the buttons are available to click
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(DialogsReference.DuplicateDetectionIgnoreSaveButton));
+
+                    if (
+                        !(dialogFooter?.FindElements(By.XPath(DialogsReference.DuplicateDetectionIgnoreSaveButton)).Count >
+                          0)) return true;
+
+                    //Click the Confirm or Cancel button
+                    IWebElement buttonToClick;
+                    if (clickSaveOrCancel)
+                        buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.DuplicateDetectionIgnoreSaveButton));
+                    else
+                        buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.DuplicateDetectionCancelButton));
+
+                    buttonToClick.Click();
+                }
+
+                if (clickSaveOrCancel)
+                {
+                    // Wait for Save before proceeding
+                    driver.WaitForTransaction();
+                }
+
+                return true;
+            });
+        }
+        /// <summary>
+        /// Clicks OK or Cancel on the Set State (Activate / Deactivate) dialog.  true = OK, false = Cancel
+        /// </summary>
+        /// <param name="clickOkButton"></param>
+        /// <returns></returns>
+        public BrowserCommandResult<bool> SetStateDialog(bool clickOkButton)
+        {
+            //Passing true clicks the Activate/Deactivate button.  Passing false clicks the Cancel button.
+            return _client.Execute(_client.GetOptions($"Interact with Set State Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (inlineDialog)
+                {
+                    //Wait until the buttons are available to click
+                    var dialog = driver.WaitUntilAvailable(By.XPath(DialogsReference.SetStateDialog));
+
+                    if (
+                        !(dialog?.FindElements(By.TagName("button")).Count >
+                          0)) return true;
+
+                    //Click the Activate/Deactivate or Cancel button
+                    IWebElement buttonToClick;
+                    if (clickOkButton)
+                        buttonToClick = dialog.FindElement(By.XPath(DialogsReference.SetStateActionButton));
+                    else
+                        buttonToClick = dialog.FindElement(By.XPath(DialogsReference.SetStateCancelButton));
+
+                    buttonToClick.Click();
+                }
+
+                return true;
+            });
+        }
+        /// <summary>
+        /// Clicks Confirm or Cancel on the Publish dialog.  true = Confirm, false = Cancel
+        /// </summary>
+        /// <param name="clickOkButton"></param>
+        /// <returns></returns>
+        public BrowserCommandResult<bool> PublishDialog(bool ClickConfirmButton)
+        {
+            //Passing true clicks the confirm button.  Passing false clicks the Cancel button.
+            return _client.Execute(_client.GetOptions($"Confirm or Cancel Publish Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (inlineDialog)
+                {
+                    //Wait until the buttons are available to click
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(DialogsReference.PublishConfirmButton));
+
+                    if (
+                        !(dialogFooter?.FindElements(By.XPath(DialogsReference.PublishConfirmButton)).Count >
+                          0)) return true;
+
+                    //Click the Confirm or Cancel button
+                    IWebElement buttonToClick;
+                    if (ClickConfirmButton)
+                        buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.PublishConfirmButton));
+                    else
+                        buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.PublishCancelButton));
+
+                    buttonToClick.Click();
+                }
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Assigns a record to a user or team
+        /// </summary>
+        /// <param name="to">Enum used to assign record to user or team</param>
+        /// <param name="userOrTeamName">Name of the user or team to assign to</param>
+        public BrowserCommandResult<bool> AssignDialog(Dialogs.AssignTo to, string userOrTeamName = null)
+        {
+            return _client.Execute(_client.GetOptions($"Assign to User or Team Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+                if (!inlineDialog)
+                    return false;
+
+                if (to == Dialogs.AssignTo.Me)
+                {
+                    //SetValue(new OptionSet { Name = Elements.ElementId[Reference.Dialogs.Assign.AssignToId], Value = "Me" }, FormContextType.Dialog);
+                    _client.SetValue(new OptionSet { Name = Dialogs.DialogsReference.Assign.AssignToId, Value = "Me" }, FormContextType.Dialog);
+                }
+                else
+                {
+                    _client.SetValue(new OptionSet { Name = DialogsReference.Assign.AssignToId, Value = "User or team" }, FormContextType.Dialog);
+
+                    //Set the User Or Team
+                    var userOrTeamField = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookup]), "User field unavailable");
+                    var input = userOrTeamField.ClickWhenAvailable(By.TagName("input"), "User field unavailable");
+                    input.SendKeys(userOrTeamName, true);
+
+                    _client.ThinkTime(2000);
+
+                    //Pick the User from the list
+                    var container = driver.WaitUntilVisible(By.XPath(DialogsReference.AssignDialogUserTeamLookupResults));
+                    container.WaitUntil(
+                        c => c.FindElements(By.TagName("li")).FirstOrDefault(r => r.Text.StartsWith(userOrTeamName, StringComparison.OrdinalIgnoreCase)),
+                        successCallback: e => e.Click(true),
+                        failureCallback: () => throw new InvalidOperationException($"None {to} found which match with '{userOrTeamName}'"));
+                }
+
+                //Click Assign
+                driver.ClickWhenAvailable(By.XPath(DialogsReference.AssignDialogOKButton), TimeSpan.FromSeconds(5),
+                    "Unable to click the OK button in the assign dialog");
+
+                return true;
+            });
+        }
+
+        public BrowserCommandResult<bool> SwitchProcessDialog(string processToSwitchTo)
+        {
+            return _client.Execute(_client.GetOptions($"Switch Process Dialog"), driver =>
+            {
+                //Wait for the Grid to load
+                driver.WaitUntilVisible(By.XPath(DialogsReference.ActiveProcessGridControlContainer));
+
+                //Select the Process
+                var popup = driver.FindElement(By.XPath(DialogsReference.SwitchProcessContainer));
+                var labels = popup.FindElements(By.TagName("label"));
+                foreach (var label in labels)
+                {
+                    if (label.Text.Equals(processToSwitchTo, StringComparison.OrdinalIgnoreCase))
+                    {
+                        label.Click();
+                        break;
+                    }
+                }
+
+                //Click the OK button
+                var okBtn = driver.FindElement(By.XPath(DialogsReference.SwitchProcessDialogOK));
+                okBtn.Click();
+
+                return true;
+            });
+        }
+
+        public BrowserCommandResult<bool> CloseOpportunityDialog(bool clickOK)
+        {
+            return _client.Execute(_client.GetOptions($"Close Opportunity Dialog"), driver =>
+            {
+                var inlineDialog = this.SwitchToDialog();
+
+                if (inlineDialog)
+                {
+                    //Close Opportunity
+                    var xPath = DialogsReference.CloseOpportunity.Ok;
+
+                    //Cancel
+                    if (!clickOK)
+                        xPath = DialogsReference.CloseOpportunity.Ok;
+
+                    driver.ClickWhenAvailable(By.XPath(xPath), TimeSpan.FromSeconds(5), "The Close Opportunity dialog is not available.");
+                }
+
+                return true;
+            });
+        }
+
+        public BrowserCommandResult<bool> HandleSaveDialog()
+        {
+            //If you click save and something happens, handle it.  Duplicate Detection/Errors/etc...
+            //Check for Dialog and figure out which type it is and return the dialog type.
+
+            //Introduce think time to avoid timing issues on save dialog
+            _client.ThinkTime(1000);
+
+            return _client.Execute(_client.GetOptions($"Validate Save"), driver =>
+            {
+                //Is it Duplicate Detection?
+                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionWindowMarker])))
+                {
+                    if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionGridRows])))
+                    {
+                        //Select the first record in the grid
+                        driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionGridRows]))[0].Click(true);
+
+                        //Click Ignore and Save
+                        driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionIgnoreAndSaveButton])).Click(true);
+                        driver.WaitForTransaction();
+                    }
+                }
+
+                //Is it an Error?
+                if (driver.HasElement(By.XPath("//div[contains(@data-id,'errorDialogdialog')]")))
+                {
+                    var errorDialog = driver.FindElement(By.XPath("//div[contains(@data-id,'errorDialogdialog')]"));
+
+                    var errorDetails = errorDialog.FindElement(By.XPath(".//*[contains(@data-id,'errorDialog_subtitle')]"));
+
+                    if (!String.IsNullOrEmpty(errorDetails.Text))
+                        throw new InvalidOperationException(errorDetails.Text);
+                }
+
+
+                return true;
+            });
+        }
+
+        public BrowserCommandResult<string> GetBusinessProcessErrorText(int waitTimeInSeconds)
+        {
+
+            return _client.Execute(_client.GetOptions($"Get Business Process Error Text"), driver =>
+            {
+                string errorDetails = string.Empty;
+                var errorDialog = driver.WaitUntilAvailable(By.XPath("//div[contains(@data-id,'errorDialogdialog')]"), new TimeSpan(0, 0, waitTimeInSeconds));
+
+                // Is error dialog present?
+                if (errorDialog != null)
+                {
+                    var errorDetailsElement = errorDialog.FindElement(By.XPath(".//*[contains(@data-id,'errorDialog_subtitle')]"));
+
+                    if (errorDetailsElement != null)
+                    {
+                        if (!String.IsNullOrEmpty(errorDetailsElement.Text))
+                            errorDetails = errorDetailsElement.Text;
+                    }
+                }
+
+                return errorDetails;
+            });
+        }
+
+
+        #endregion
+
     }
 }
