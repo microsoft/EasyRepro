@@ -13,7 +13,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     [TestClass]
     public class DuplicateDetectionUCI : TestsBase
     {
-
+        [TestCategory("CommandBar")]
         [TestMethod]
         public void UCITestDuplicateDetection()
         {

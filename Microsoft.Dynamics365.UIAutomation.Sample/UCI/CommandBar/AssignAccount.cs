@@ -16,6 +16,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         [TestCategory("Fail - DynamicData")]
         [TestCategory("Dialogs")]
+        [TestCategory("CommandBar")]
         [TestMethod]
         public void UCITestAssignAccount()
         {

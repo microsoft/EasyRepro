@@ -157,13 +157,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             }
         }
 
-        public static class CommandBar
-        {
-            public static string Container = "Cmd_Container";
-            public static string ContainerGrid = "Cmd_ContainerGrid";
-            public static string MoreCommandsMenu = "Cmd_MoreCommandsMenu";
-            public static string Button = "Cmd_Button";
-        }
+
 
         public static class Timeline
         {
@@ -482,11 +476,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Header_OptionSetFieldContainer", "//div[@data-id='header_[NAME]']" },
             { "Entity_Header_DateTimeFieldContainer","//div[@data-id='header_[NAME]-FieldSectionItemContainer']" },
                         
-            //CommandBar
-            { "Cmd_Container"       , ".//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
-            { "Cmd_ContainerGrid"       , "//ul[contains(@data-lp-id,\"commandbar-HomePageGrid\")]"},
-            { "Cmd_MoreCommandsMenu"       , "//*[@id=\"__flyoutRootNode\"]"},
-            { "Cmd_Button", "//*[contains(text(),'[NAME]')]"},
+            ////CommandBar
+            //{ "Cmd_Container"       , ".//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
+            //{ "Cmd_ContainerGrid"       , "//ul[contains(@data-lp-id,\"commandbar-HomePageGrid\")]"},
+            //{ "Cmd_MoreCommandsMenu"       , "//*[@id=\"__flyoutRootNode\"]"},
+            //{ "Cmd_Button", "//*[contains(text(),'[NAME]')]"},
 
             //GlobalSearch
             { "Search_RelevanceSearchButton"       , "//div[@aria-label=\"Search box\"]//button" },
