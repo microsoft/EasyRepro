@@ -14,6 +14,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     [TestClass]
     public class GlobalRelevanceSearchUci : TestsBase
     {
+        [TestCategory("Global Search")]
         [TestMethod]
         public void UCITestGlobalRelevanceSearch()
         {

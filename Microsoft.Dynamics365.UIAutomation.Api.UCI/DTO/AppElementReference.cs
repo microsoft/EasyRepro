@@ -180,24 +180,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string ExpandCollapseButton = "MultiSelect_ExpandCollapseButton";
         }
 
-        public static class GlobalSearch
-        {
-            public static string CategorizedSearchButton = "Search_CategorizedSearchButton";
-            public static string RelevanceSearchButton = "Search_RelevanceSearchButton";
-            public static string Text = "Search_Text";
-            public static string Filter = "Search_Filter";
-            public static string Results = "Search_Result";
-            public static string Container = "Search_Container";
-            public static string EntityContainer = "Search_EntityContainer";
-            public static string Records = "Search_Records";
-            public static string GroupContainer = "Search_GroupContainer";
-            public static string FilterValue = "Search_FilterValue";
-            public static string CategorizedResultsContainer = "Search_CategorizedResultsContainer";
-            public static string CategorizedResults = "Search_CategorizedResults";
-            public static string RelevanceSearchResultsSelectedTab = "Search_RelevanceSearchResultsSelectedTab";
-            public static string RelevanceSearchResultsTab = "Search_RelevanceSearchResultsTab";
-            public static string RelevanceSearchResultLinks = "Search_RelevanceSearchResultLinks";
-        }
+
 
         public static class BusinessProcessFlow
         {
@@ -478,20 +461,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //{ "Cmd_Button", "//*[contains(text(),'[NAME]')]"},
 
             //GlobalSearch
-            { "Search_RelevanceSearchButton"       , "//div[@aria-label=\"Search box\"]//button" },
-            { "Search_CategorizedSearchButton"       , "//button[contains(@data-id,'search-submit-button')]" },
-            { "Search_Text"       , "//input[@aria-label=\"Search box\"]" },
-            { "Search_Filter"       , "//select[@aria-label=\"Filter with\"]"},
-            { "Search_Container"    , "//div[@id=\"searchResultList\"]"},
-            { "Search_EntityContainer"    , "//div[@id=\"View[NAME]\"]"},
-            { "Search_Records"    , "//li[@role=\"row\"]" },
-            { "Search_GroupContainer", "//label[contains(text(), '[NAME]')]/parent::div"},
-            { "Search_FilterValue", "//label[contains(text(), '[NAME]')]"},
-            { "Search_CategorizedResultsContainer"       , "//div[@id=\"searchResultList\"]"},
-            { "Search_CategorizedResults"       , "//ul[@aria-label='[ENTITY]']/li"},
-            { "Search_RelevanceSearchResultsSelectedTab", "//button[@aria-selected='true' and @role='tab']" },
-            { "Search_RelevanceSearchResultsTab", "//section[@id='searchComponent']//button[@name='[NAME]' and @role='tab']" },
-            { "Search_RelevanceSearchResultLinks", "//div[@role='rowgroup']/div[@role='row']/div[1]" },
+            //{ "Search_RelevanceSearchButton"       , "//div[@aria-label=\"Search box\"]//button" },
+            //{ "Search_CategorizedSearchButton"       , "//button[contains(@data-id,'search-submit-button')]" },
+            //{ "Search_Text"       , "//input[@aria-label=\"Search box\"]" },
+            //{ "Search_Filter"       , "//select[@aria-label=\"Filter with\"]"},
+            //{ "Search_Container"    , "//div[@id=\"searchResultList\"]"},
+            //{ "Search_EntityContainer"    , "//div[@id=\"View[NAME]\"]"},
+            //{ "Search_Records"    , "//li[@role=\"row\"]" },
+            //{ "Search_GroupContainer", "//label[contains(text(), '[NAME]')]/parent::div"},
+            //{ "Search_FilterValue", "//label[contains(text(), '[NAME]')]"},
+            //{ "Search_CategorizedResultsContainer"       , "//div[@id=\"searchResultList\"]"},
+            //{ "Search_CategorizedResults"       , "//ul[@aria-label='[ENTITY]']/li"},
+            //{ "Search_RelevanceSearchResultsSelectedTab", "//button[@aria-selected='true' and @role='tab']" },
+            //{ "Search_RelevanceSearchResultsTab", "//section[@id='searchComponent']//button[@name='[NAME]' and @role='tab']" },
+            //{ "Search_RelevanceSearchResultLinks", "//div[@role='rowgroup']/div[@role='row']/div[1]" },
 
             //Timeline
             { "Timeline_SaveAndClose", "//button[contains(@data-id,\"[NAME].SaveAndClose\")]" },

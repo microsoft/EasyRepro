@@ -140,14 +140,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
 
             //Global Search
-            { "Search_Filter"       , "id(\"filterCombo\")"},
-            { "Search_Text"       , "id(\"searchTextBox\")"},
-            { "Search_Button"       , "id(\"SearchButton\")"},
-            { "Search_Result"       , "id(\"entityDiv_1\")"},
-            { "Search_Container"       , "id(\"panoramaContainer\")"},
+            //{ "Search_Filter"       , "id(\"filterCombo\")"},
+            //{ "Search_Text"       , "id(\"searchTextBox\")"},
+            //{ "Search_Button"       , "id(\"SearchButton\")"},
+            //{ "Search_Result"       , "id(\"entityDiv_1\")"},
+            //{ "Search_Container"       , "id(\"panoramaContainer\")"},
 
             //DashBoard
-            { "DashBoard_Selector"       , "id(\"dashboardSelector\")"},
+            //{ "DashBoard_Selector"       , "id(\"dashboardSelector\")"},
 
             //CommandBar
             { "CommandBar_RibbonManager"       , "id(\"crmRibbonManager\")"},

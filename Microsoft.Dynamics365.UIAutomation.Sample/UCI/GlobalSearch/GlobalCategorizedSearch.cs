@@ -8,6 +8,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     [TestClass]
     public class GlobalCategorizedSearchUci : TestsBase
     {
+        [TestCategory("Global Search")]
         [TestMethod]
         public void UCITestGlobalCategorizedSearch()
         {
