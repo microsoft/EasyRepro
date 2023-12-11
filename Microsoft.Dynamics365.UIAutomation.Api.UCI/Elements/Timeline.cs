@@ -118,7 +118,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public void SaveAndCloseEmail()
         {
             //Emails no longer use the quick create form so must handle as special case
-            _client.ClickCommand("Save & Close");
+            Dialogs dialogs = new Dialogs(_client);
+            dialogs.ClickCommand("Save & Close");
             //SaveAndClose(Reference.Timeline.Email);
         }
 

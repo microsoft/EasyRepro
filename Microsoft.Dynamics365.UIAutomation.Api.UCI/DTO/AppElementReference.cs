@@ -164,12 +164,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SaveAndClose = "Timeline_SaveAndClose";
         }
 
-        public static class Dashboard
-        {
-            public static string DashboardSelector = "Dashboard_Selector";
-            public static string DashboardItem = "Dashboard_Item";
-            public static string DashboardItemUCI = "Dashboard_Item_UCI";
-        }
+
 
         public static class MultiSelect
         {
@@ -514,9 +509,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "MultiSelect_ExpandCollapseButton", ".//button[contains(@class,\"msos-selecteditems-toggle\")]" },
 
             //Dashboard
-            { "Dashboard_Selector"       , "//span[contains(@id, 'Dashboard_Selector')]"},
-            { "Dashboard_Item"       , "//li[contains(@title, '[NAME]')]"},
-            { "Dashboard_Item_UCI"       , "//li[contains(@data-text, '[NAME]')]"},
+            //{ "Dashboard_Selector"       , "//span[contains(@id, 'Dashboard_Selector')]"},
+            //{ "Dashboard_Item"       , "//li[contains(@title, '[NAME]')]"},
+            //{ "Dashboard_Item_UCI"       , "//li[contains(@data-text, '[NAME]')]"},
 
             //Business Process Flow
             { "BPF_NextStage_UCI"     , "//li[contains(@id,'processHeaderStage')]" },

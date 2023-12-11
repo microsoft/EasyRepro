@@ -4669,27 +4669,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         #endregion
 
-        #region Dashboard
 
-        internal BrowserCommandResult<bool> SelectDashboard(string dashboardName, int thinkTime = Constants.DefaultThinkTime)
-        {
-            ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Select Dashboard"), driver =>
-            {
-                //Click the drop-down arrow
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dashboard.DashboardSelector]));
-                //Select the dashboard
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Dashboard.DashboardItemUCI].Replace("[NAME]", dashboardName)));
-
-                // Wait for Dashboard to load
-                driver.WaitForTransaction();
-
-                return true;
-            });
-        }
-
-        #endregion
 
         #region PerformanceCenter
 

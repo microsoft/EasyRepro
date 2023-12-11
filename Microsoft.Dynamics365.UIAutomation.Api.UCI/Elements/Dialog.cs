@@ -312,10 +312,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="buttonName">Name of button to click</param>
         /// <param name="subButtonName">Name of button on submenu to click</param>
         /// <param name="secondSubButtonName">Name of button on submenu (3rd level) to click</param>
-        public bool ClickCommand(string buttonName, string subButtonName = null, string secondSubButtonName = null)
-        {
-            return _client.ClickCommand(buttonName, subButtonName, secondSubButtonName);
-        }
+        //public bool ClickCommand(string buttonName, string subButtonName = null, string secondSubButtonName = null)
+        //{
+        //    return this.ClickCommand(buttonName, subButtonName, secondSubButtonName);
+        //}
 
         /// <summary>
         /// Clicks on entity dialog ribbon button
@@ -329,6 +329,96 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #endregion
 
         #region WebClient public
+
+        public BrowserCommandResult<bool> ClickCommand(string name, string subname = null, string subSecondName = null, int thinkTime = Constants.DefaultThinkTime)
+        {
+            return _client.Execute(_client.GetOptions($"Click Command"), driver =>
+            {
+                // Find the button in the CommandBar
+                IWebElement ribbon;
+                // Checking if any dialog is active
+                if (driver.HasElement(By.XPath(string.Format(DialogsReference.DialogContext))))
+                {
+                    var dialogContainer = driver.FindElement(By.XPath(string.Format(DialogsReference.DialogContext)));
+                    ribbon = dialogContainer.WaitUntilAvailable(By.XPath(string.Format(CommandBar.CommandBarReference.Container)));
+                }
+                else
+                {
+                    ribbon = driver.WaitUntilAvailable(By.XPath(CommandBar.CommandBarReference.Container));
+                }
+
+
+                if (ribbon == null)
+                {
+                    ribbon = driver.WaitUntilAvailable(By.XPath(CommandBar.CommandBarReference.ContainerGrid),
+                        TimeSpan.FromSeconds(5),
+                        "Unable to find the ribbon.");
+                }
+
+                //Is the button in the ribbon?
+                if (ribbon.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", name)), out var command))
+                {
+                    command.Click(true);
+                    driver.WaitForTransaction();
+                }
+                else
+                {
+                    //Is the button in More Commands?
+                    if (ribbon.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton]), out var moreCommands))
+                    {
+                        // Click More Commands
+                        moreCommands.Click(true);
+                        driver.WaitForTransaction();
+
+                        //Click the button
+                        var flyOutMenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarFlyoutButtonList])); ;
+                        if (flyOutMenu.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", name)), out var overflowCommand))
+                        {
+                            overflowCommand.Click(true);
+                            driver.WaitForTransaction();
+                        }
+                        else
+                            throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar or the flyout menu.");
+                    }
+                    else
+                        throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
+                }
+
+                if (!string.IsNullOrEmpty(subname))
+                {
+                    var submenu = driver.WaitUntilAvailable(By.XPath(CommandBar.CommandBarReference.MoreCommandsMenu));
+
+                    submenu.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subname)), out var subbutton);
+
+                    if (subbutton != null)
+                    {
+                        subbutton.Click(true);
+                    }
+                    else
+                        throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
+
+                    if (!string.IsNullOrEmpty(subSecondName))
+                    {
+                        var subSecondmenu = driver.WaitUntilAvailable(By.XPath(CommandBar.CommandBarReference.MoreCommandsMenu));
+
+                        subSecondmenu.TryFindElement(
+                            By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton]
+                                .Replace("[NAME]", subSecondName)), out var subSecondbutton);
+
+                        if (subSecondbutton != null)
+                        {
+                            subSecondbutton.Click(true);
+                        }
+                        else
+                            throw new InvalidOperationException($"No sub command with the name '{subSecondName}' exists inside of Commandbar.");
+                    }
+                }
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
         ///// <summary>
         ///// Clicks OK or Cancel on the confirmation dialog.  true = OK, false = Cancel
         ///// </summary>
