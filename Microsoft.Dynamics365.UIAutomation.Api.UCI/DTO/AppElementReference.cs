@@ -12,7 +12,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Shell = "App_Shell";
         }
        
-
         public static class Grid
         {
             public static string Container = "Grid_Container";
@@ -157,14 +156,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             }
         }
 
-
-
         public static class Timeline
         {
             public static string SaveAndClose = "Timeline_SaveAndClose";
         }
-
-
 
         public static class MultiSelect
         {
@@ -179,28 +174,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string FlyoutOptionCheckbox = "MultiSelect_FlyoutOptionCheckbox";
             public static string ExpandCollapseButton = "MultiSelect_ExpandCollapseButton";
         }
-
-
-
-        public static class BusinessProcessFlow
-        {
-            public static string NextStage_UCI = "BPF_NextStage_UCI";
-            public static string Flyout_UCI = "BPF_Flyout_UCI";
-            public static string NextStageButton = "BPF_NextStageButton_UCI";
-            public static string SetActiveButton = "BPF_SetActiveButton";
-            public static string BusinessProcessFlowFieldName = "BPF_FieldName_UCI";
-            public static string BusinessProcessFlowFormContext = "BPF_FormContext";
-            public static string TextFieldContainer = "BPF_TextFieldContainer";
-            public static string FieldSectionItemContainer = "BPF_FieldSectionItemContainer";
-            public static string TextFieldLabel = "BPF_TextFieldLabel";
-            public static string BooleanFieldContainer = "BPF_BooleanFieldContainer";
-            public static string BooleanFieldSelectedOption = "BPF_BooleanFieldSelectedOption";
-            public static string DateTimeFieldContainer = "BPF_DateTimeFieldContainer";
-            public static string FieldControlDateTimeInputUCI = "BPF_FieldControlDateTimeInputUCI";
-            public static string PinStageButton = "BPF_PinStageButton";
-            public static string CloseStageButton = "BPF_CloseStageButton";
-        }
-
 
         public static class QuickCreate
         {
@@ -454,27 +427,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Header_OptionSetFieldContainer", "//div[@data-id='header_[NAME]']" },
             { "Entity_Header_DateTimeFieldContainer","//div[@data-id='header_[NAME]-FieldSectionItemContainer']" },
                         
-            ////CommandBar
-            //{ "Cmd_Container"       , ".//ul[contains(@data-lp-id,\"commandbar-Form\")]"},
-            //{ "Cmd_ContainerGrid"       , "//ul[contains(@data-lp-id,\"commandbar-HomePageGrid\")]"},
-            //{ "Cmd_MoreCommandsMenu"       , "//*[@id=\"__flyoutRootNode\"]"},
-            //{ "Cmd_Button", "//*[contains(text(),'[NAME]')]"},
-
-            //GlobalSearch
-            //{ "Search_RelevanceSearchButton"       , "//div[@aria-label=\"Search box\"]//button" },
-            //{ "Search_CategorizedSearchButton"       , "//button[contains(@data-id,'search-submit-button')]" },
-            //{ "Search_Text"       , "//input[@aria-label=\"Search box\"]" },
-            //{ "Search_Filter"       , "//select[@aria-label=\"Filter with\"]"},
-            //{ "Search_Container"    , "//div[@id=\"searchResultList\"]"},
-            //{ "Search_EntityContainer"    , "//div[@id=\"View[NAME]\"]"},
-            //{ "Search_Records"    , "//li[@role=\"row\"]" },
-            //{ "Search_GroupContainer", "//label[contains(text(), '[NAME]')]/parent::div"},
-            //{ "Search_FilterValue", "//label[contains(text(), '[NAME]')]"},
-            //{ "Search_CategorizedResultsContainer"       , "//div[@id=\"searchResultList\"]"},
-            //{ "Search_CategorizedResults"       , "//ul[@aria-label='[ENTITY]']/li"},
-            //{ "Search_RelevanceSearchResultsSelectedTab", "//button[@aria-selected='true' and @role='tab']" },
-            //{ "Search_RelevanceSearchResultsTab", "//section[@id='searchComponent']//button[@name='[NAME]' and @role='tab']" },
-            //{ "Search_RelevanceSearchResultLinks", "//div[@role='rowgroup']/div[@role='row']/div[1]" },
 
             //Timeline
             { "Timeline_SaveAndClose", "//button[contains(@data-id,\"[NAME].SaveAndClose\")]" },
@@ -491,27 +443,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             { "MultiSelect_ExpandCollapseButton", ".//button[contains(@class,\"msos-selecteditems-toggle\")]" },
 
-            //Dashboard
-            //{ "Dashboard_Selector"       , "//span[contains(@id, 'Dashboard_Selector')]"},
-            //{ "Dashboard_Item"       , "//li[contains(@title, '[NAME]')]"},
-            //{ "Dashboard_Item_UCI"       , "//li[contains(@data-text, '[NAME]')]"},
-
-            //Business Process Flow
-            { "BPF_NextStage_UCI"     , "//li[contains(@id,'processHeaderStage')]" },
-            { "BPF_Flyout_UCI"     , "//div[contains(@id,'businessProcessFlowFlyoutHeaderContainer')]" },
-            { "BPF_NextStageButton_UCI"     , "//button[contains(@data-id,'nextButtonContainer')]" },
-            { "BPF_SetActiveButton", "//button[contains(@data-id,'setActiveButton')]" },
-            { "BPF_FieldName_UCI"     , "//input[contains(@id,'[NAME]')]" },
-            { "BPF_FieldSectionItemContainer", ".//div[contains(@id, \'header_process_[NAME]-FieldSectionItemContainer\')]" },
-            { "BPF_FormContext"     , "//div[contains(@id, \'ProcessStageControl-processHeaderStageFlyoutInnerContainer\')]" },
-            { "BPF_TextFieldContainer", ".//div[contains(@data-lp-id, \'header_process_[NAME]\')]" },
-            { "BPF_TextFieldLabel", "//label[contains(@id, \'header_process_[NAME]-field-label\')]" },
-            { "BPF_BooleanFieldContainer", ".//div[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-container\')]" },
-            { "BPF_BooleanFieldSelectedOption", "//div[contains(@data-id, 'header_process_[NAME].fieldControl-checkbox-container')]//option[@data-selected='true']" },
-            { "BPF_DateTimeFieldContainer", ".//input[contains(@data-id, \'[NAME].fieldControl-date-time-input\')]" },
-            { "BPF_FieldControlDateTimeInputUCI",".//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]" },
-            { "BPF_PinStageButton","//button[contains(@id,'stageDockModeButton')]"},
-            { "BPF_CloseStageButton","//button[contains(@id,'stageContentClose')]"},
 
             //Related Grid
             { "Related_CommandBarButton", ".//button[contains(@aria-label, '[NAME]') and contains(@id,'SubGrid')]"},
@@ -525,33 +456,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {"Field_ReadOnly",".//*[@aria-readonly]" },
             {"Field_Required", ".//*[@aria-required]"},
             {"Field_RequiredIcon", ".//div[contains(@data-id, 'required-icon') or contains(@id, 'required-icon')]"},
-
-            //Dialogs
-            //{ "AssignDialog_ToggleField" , "//label[contains(@data-id,'rdoMe_id.fieldControl-checkbox-inner-first')]" },
-            //{ "AssignDialog_UserTeamLookupResults" , "//ul[contains(@data-id,'systemuserview_id.fieldControl-LookupResultsDropdown_systemuserview_id_tab')]" },
-            //{ "AssignDialog_OKButton" , "//button[contains(@data-id, 'ok_id')]" },
-            //{ "CloseOpportunityDialog_OKButton" , "//button[contains(@data-id, 'ok_id')]" },
-            //{ "CloseOpportunityDialog_CancelButton" , "//button[contains(@data-id, 'cancel_id')]" },
-            //{ "CloseActivityDialog_CloseButton" , ".//button[contains(@data-id, 'ok_id')]" },
-            //{ "CloseActivityDialog_CancelButton" , ".//button[contains(@data-id, 'cancel_id')]" },
-            //{ "Dialog_DialogContext", "//div[contains(@role, 'dialog')]" },
-            //{ "Dialog_ActualRevenue", "//input[contains(@data-id,'actualrevenue_id')]" },
-            //{ "Dialog_CloseDate", "//input[contains(@data-id,'closedate_id')]" },
-            //{ "Dialog_DescriptionId", "//input[contains(@data-id,'description_id')]" },
-            //{ "Dialog_ConfirmButton" , "//*[@id=\"confirmButton\"]" },
-            //{ "Dialog_CancelButton" , "//*[@id=\"cancelButton\"]" },
-            //{ "Dialog_OkButton" , "//*[@id=\"okButton\"]" },
-            //{ "DuplicateDetectionDialog_IgnoreAndSaveButton" , "//button[contains(@data-id, 'ignore_save')]" },
-            //{ "DuplicateDetectionDialog_CancelButton" , "//button[contains(@data-id, 'close_dialog')]" },
-            //{ "Dialog_SetStateDialog" , "//div[@data-id=\"SetStateDialog\"]" },
-            //{ "Dialog_SetStateActionButton" , ".//button[@data-id=\"ok_id\"]" },
-            //{ "Dialog_SetStateCancelButton" , ".//button[@data-id=\"cancel_id\"]" },
-            //{ "Dialog_PublishConfirmButton" , "//*[@data-id=\"ok_id\"]" },
-            //{ "Dialog_PublishCancelButton" , "//*[@data-id=\"cancel_id\"]" },
-            //{ "Dialog_SwitchProcessContainer" , "//div[contains(@id,'switchProcess_id-FieldSectionItemContainer')]" },
-            //{ "Entity_ActiveProcessGridControlContainer"       , "//div[contains(@data-lp-id,'activeProcessGridControlContainer')]"},
-            //{ "Entity_SwitchProcessDialogOK"       , "//button[contains(@data-id,'ok_id')]"},
-            //{ "SwitchProcess_Container" , "//section[contains(@id, 'popupContainer')]" },
 			
             //QuickCreate
             { "QuickCreate_FormContext" , "//section[contains(@data-id,'quickCreateRoot')]" },

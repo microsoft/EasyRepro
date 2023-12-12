@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Security;
 using System.Text.RegularExpressions;
 using System.Web;
+using static Microsoft.Dynamics365.UIAutomation.Api.UCI.BusinessProcessFlow;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -1695,8 +1696,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (formContextType == FormContextType.BusinessProcessFlow)
             {
                 // Initialize the Business Process Flow context
-                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
-                fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.TextFieldContainer].Replace("[NAME]", field)));
+                var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext));
+                fieldContainer = formContext.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field)));
             }
             else if (formContextType == FormContextType.Header)
             {
@@ -2168,7 +2169,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (formContextType == FormContextType.BusinessProcessFlow)
             {
                 // Initialize the Business Process Flow context
-                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
+                var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext));
                 fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
                 var strExpanded = fieldContainer.GetAttribute("aria-expanded");
@@ -2292,7 +2293,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (formContextType == FormContextType.BusinessProcessFlow)
             {
                 // Initialize the Business Process Flow context
-                formContext = container.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]), new TimeSpan(0, 0, 1));
+                formContext = container.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext), new TimeSpan(0, 0, 1));
             }
             else if (formContextType == FormContextType.Header)
             {
@@ -2383,7 +2384,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else if (formContextType == FormContextType.BusinessProcessFlow)
                 {
                     // Initialize the Business Process Flow context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
+                    var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext));
                     fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
                 else if (formContextType == FormContextType.Header)
@@ -2449,7 +2450,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else if (formContextType == FormContextType.BusinessProcessFlow)
                 {
                     // Initialize the Business Process Flow context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
+                    var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext));
                     fieldContainer = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name)));
                 }
                 else if (formContextType == FormContextType.Header)
@@ -4155,343 +4156,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         #endregion
-
-        #region BusinessProcessFlow
-
-        internal BrowserCommandResult<Field> BPFGetField(string field)
-        {
-            return this.Execute(GetOptions($"Get Field"), driver =>
-            {
-
-                // Initialize the Business Process Flow context
-                var formContext = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFormContext]));
-                var fieldElement = formContext.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.FieldSectionItemContainer].Replace("[NAME]", field)));
-                Field returnField = new Field(fieldElement);
-                returnField.Name = field;
-
-                IWebElement fieldLabel = null;
-                try
-                {
-                    fieldLabel = fieldElement.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.TextFieldLabel].Replace("[NAME]", field)));
-                }
-                catch (NoSuchElementException)
-                {
-                    // Swallow
-                }
-
-                if (fieldLabel != null)
-                {
-                    returnField.Label = fieldLabel.Text;
-                }
-
-                return returnField;
-            });
-        }
-
-        /// <summary>
-        /// Set Value
-        /// </summary>
-        /// <param name="field">The field</param>
-        /// <param name="value">The value</param>
-        /// <example>xrmApp.BusinessProcessFlow.SetValue("firstname", "Test");</example>
-        internal BrowserCommandResult<bool> BPFSetValue(string field, string value)
-        {
-            return this.Execute(GetOptions($"Set BPF Value"), driver =>
-            {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.TextFieldContainer].Replace("[NAME]", field)));
-
-                if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
-                {
-                    var input = fieldContainer.FindElement(By.TagName("input"));
-                    if (input != null)
-                    {
-                        input.Click(true);
-                        input.Clear();
-                        input.SendKeys(value, true);
-                        input.SendKeys(Keys.Tab);
-                    }
-                }
-                else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
-                {
-                    var textarea = fieldContainer.FindElement(By.TagName("textarea"));
-                    textarea.Click();
-                    textarea.Clear();
-                    textarea.SendKeys(value);
-                }
-                else
-                {
-                    throw new Exception($"Field with name {field} does not exist.");
-                }
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Sets the value of a picklist.
-        /// </summary>
-        /// <param name="option">The option you want to set.</param>
-        /// <example>xrmBrowser.BusinessProcessFlow.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
-        public BrowserCommandResult<bool> BPFSetValue(OptionSet option)
-        {
-            return this.Execute(GetOptions($"Set BPF Value: {option.Name}"), driver =>
-            {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
-
-                if (fieldContainer.FindElements(By.TagName("select")).Count > 0)
-                {
-                    var select = fieldContainer.FindElement(By.TagName("select"));
-                    var options = select.FindElements(By.TagName("option"));
-
-                    foreach (var op in options)
-                    {
-                        if (op.Text != option.Value && op.GetAttribute("value") != option.Value) continue;
-                        op.Click(true);
-                        break;
-                    }
-                }
-                else
-                {
-                    throw new InvalidOperationException($"Field: {option.Name} Does not exist");
-                }
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Sets the value of a Boolean Item.
-        /// </summary>
-        /// <param name="option">The option you want to set.</param>
-        /// <example>xrmBrowser.BusinessProcessFlow.SetValue(new BooleanItem { Name = "preferredcontactmethodcode"});</example>
-        public BrowserCommandResult<bool> BPFSetValue(BooleanItem option)
-        {
-            return this.Execute(GetOptions($"Set BPF Value: {option.Name}"), driver =>
-            {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BooleanFieldContainer].Replace("[NAME]", option.Name)));
-                var existingValue = fieldContainer.GetAttribute("Title") == "Yes";
-
-                if (option.Value != existingValue)
-                {
-                    fieldContainer.Click();
-                    fieldContainer.ClickWhenAvailable(By.XPath("//option[not(@data-selected)]"));
-                }
-
-                driver.WaitForTransaction();
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Sets the value of a Date Field.
-        /// </summary>
-        /// <param name="field">The field id or name.</param>
-        /// <param name="date">DateTime value.</param>
-        /// <param name="format">DateTime format</param>
-        /// <example> xrmBrowser.BusinessProcessFlow.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
-        public BrowserCommandResult<bool> BPFSetValue(string field, DateTime date, string format = "MM dd yyyy")
-        {
-            return this.Execute(GetOptions($"Set BPF Value: {field}"), driver =>
-            {
-                var dateField = AppElements.Xpath[AppReference.BusinessProcessFlow.DateTimeFieldContainer].Replace("[FIELD]", field);
-
-                if (driver.HasElement(By.XPath(dateField)))
-                {
-                    var fieldElement = driver.ClickWhenAvailable(By.XPath(dateField));
-
-                    if (fieldElement.GetAttribute("value").Length > 0)
-                    {
-                        //fieldElement.Click();
-                        //fieldElement.SendKeys(date.ToString(format));
-                        //fieldElement.SendKeys(Keys.Enter);
-
-                        fieldElement.Click();
-                        ThinkTime(250);
-                        fieldElement.Click();
-                        ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        ThinkTime(250);
-                        fieldElement.SendKeys(date.ToString(format), true);
-                        ThinkTime(500);
-                        fieldElement.SendKeys(Keys.Tab);
-                        ThinkTime(250);
-                    }
-                    else
-                    {
-                        fieldElement.Click();
-                        ThinkTime(250);
-                        fieldElement.Click();
-                        ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        ThinkTime(250);
-                        fieldElement.SendKeys(date.ToString(format));
-                        ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Tab);
-                        ThinkTime(250);
-                    }
-                }
-                else
-                    throw new InvalidOperationException($"Field: {field} Does not exist");
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> NextStage(string stageName, Field businessProcessFlowField = null, int thinkTime = Constants.DefaultThinkTime)
-        {
-            ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Next Stage"), driver =>
-            {
-                //Find the Business Process Stages
-                var processStages = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStage_UCI]));
-
-                if (processStages.Count == 0)
-                    return true;
-
-                foreach (var processStage in processStages)
-                {
-                    var divs = processStage.FindElements(By.TagName("div"));
-
-                    //Click the Label of the Process Stage if found
-                    foreach (var div in divs)
-                    {
-                        if (div.Text.Equals(stageName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            div.Click();
-                        }
-                    }
-                }
-
-                var flyoutFooterControls = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.Flyout_UCI]));
-
-                foreach (var control in flyoutFooterControls)
-                {
-                    //If there's a field to enter, fill it out
-                    if (businessProcessFlowField != null)
-                    {
-                        var bpfField = control.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.BusinessProcessFlowFieldName].Replace("[NAME]", businessProcessFlowField.Name)));
-
-                        if (bpfField != null)
-                        {
-                            bpfField.Click();
-                            for (int i = 0; i < businessProcessFlowField.Value.Length; i++)
-                            {
-                                bpfField.SendKeys(businessProcessFlowField.Value.Substring(i, 1));
-                            }
-                        }
-                    }
-
-                    //Click the Next Stage Button
-                    var nextButton = control.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStageButton]));
-                    nextButton.Click();
-                }
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> SelectStage(string stageName, int thinkTime = Constants.DefaultThinkTime)
-        {
-            return this.Execute(GetOptions($"Select Stage: {stageName}"), driver =>
-            {
-                //Find the Business Process Stages
-                var processStages = driver.FindElements(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.NextStage_UCI]));
-
-                foreach (var processStage in processStages)
-                {
-                    var divs = processStage.FindElements(By.TagName("div"));
-
-                    //Click the Label of the Process Stage if found
-                    foreach (var div in divs)
-                    {
-                        if (div.Text.Equals(stageName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            div.Click();
-                        }
-                    }
-                }
-
-                driver.WaitForTransaction();
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> SetActive(string stageName = "", int thinkTime = Constants.DefaultThinkTime)
-        {
-            ThinkTime(thinkTime);
-
-            return this.Execute(GetOptions($"Set Active Stage: {stageName}"), driver =>
-            {
-                if (!String.IsNullOrEmpty(stageName))
-                {
-                    SelectStage(stageName);
-
-                    if (!driver.HasElement(By.XPath("//button[contains(@data-id,'setActiveButton')]")))
-                        throw new NotFoundException($"Unable to find the Set Active button. Please verify the stage name {stageName} is correct.");
-
-                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.SetActiveButton])).Click(true);
-
-                    driver.WaitForTransaction();
-                }
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> BPFPin(string stageName, int thinkTime = Constants.DefaultThinkTime)
-        {
-            return this.Execute(GetOptions($"Pin BPF: {stageName}"), driver =>
-            {
-                //Click the BPF Stage
-                SelectStage(stageName, 0);
-                driver.WaitForTransaction();
-
-                //Pin the Stage
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.PinStageButton])))
-                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.PinStageButton])).Click();
-                else
-                    throw new NotFoundException($"Pin button for stage {stageName} not found.");
-
-                driver.WaitForTransaction();
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> BPFClose(string stageName, int thinkTime = Constants.DefaultThinkTime)
-        {
-            return this.Execute(GetOptions($"Close BPF: {stageName}"), driver =>
-            {
-                //Click the BPF Stage
-                SelectStage(stageName, 0);
-                driver.WaitForTransaction();
-
-                //Pin the Stage
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.CloseStageButton])))
-                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.BusinessProcessFlow.CloseStageButton])).Click(true);
-                else
-                    throw new NotFoundException($"Close button for stage {stageName} not found.");
-
-                driver.WaitForTransaction();
-                return true;
-            });
-        }
-
-        #endregion
-
-
-
-
 
         #region PerformanceCenter
 
