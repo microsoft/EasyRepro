@@ -8,13 +8,10 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class AddActivity
+    public class AddActivity : TestsBase
     {
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
 
+        [TestCategory("Timeline")]
         [TestMethod]
         public void UCITestAccountAddAppointment()
         {
@@ -40,6 +37,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Timeline")]
         [TestMethod]
         public void UCITestAccountAddEmail()
         {
@@ -79,6 +77,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
+        [TestCategory("Timeline")]
         [TestCategory("RegressionTests")]
         public void UCITestAccountGetMultiSelectEmail()
         {
@@ -112,7 +111,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 var multiselectedItems = xrmApp.Timeline.GetEmail(
                     new MultiValueOptionSet()
                     {
-                        Name = Elements.ElementId[Reference.Timeline.EmailTo],
+                        Name = Timeline.TimelineReference.EmailTo,
                     });
 
                 xrmApp.ThinkTime(3000);
@@ -120,6 +119,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestMethod]
+        [TestCategory("Timeline")]
         [TestCategory("Fail - Bug")]
         [TestCategory("RegressionTests")]
         public void UCITestAccountRemoveMultiSelectEmail()
@@ -147,7 +147,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 var success = xrmApp.Timeline.RemoveEmail(
                     new MultiValueOptionSet()
                     {
-                        Name = Elements.ElementId[Reference.Timeline.EmailCC],
+                        Name = Timeline.TimelineReference.EmailCC,
                         Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
                     });
 
@@ -155,7 +155,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
-
+        [TestCategory("Timeline")]
         [TestMethod]
         public void UCITestAccountAddPhoneCall()
         {
@@ -180,6 +180,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Timeline")]
         [TestMethod]
         public void UCITestAccountAddTask()
         {
@@ -204,12 +205,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+
         private LookupItem[] CreateBccLookupItemsFor(params string[] lookupNames)
         {
             var lookupItemList = new List<LookupItem>();
             foreach (var lookupName in lookupNames)
             {
-                lookupItemList.Add(CreateLookupItem(Reference.Timeline.EmailBcc, lookupName));
+                lookupItemList.Add(CreateLookupItem(Timeline.TimelineReference.EmailBcc, lookupName));
             }
             return lookupItemList.ToArray();
         }
@@ -219,7 +221,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var lookupItemList = new List<LookupItem>();
             foreach (var item in v1)
             {
-                lookupItemList.Add(CreateLookupItem(Reference.Timeline.EmailCC, item));
+                lookupItemList.Add(CreateLookupItem(Timeline.TimelineReference.EmailCC, item));
             }
             return lookupItemList.ToArray();
         }

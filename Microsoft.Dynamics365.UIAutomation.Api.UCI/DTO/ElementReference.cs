@@ -120,23 +120,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Related_Common_Activities",      "//div[contains(@data-id,\"form-tab-relatedEntity-navActivities\")]" },
 
             //Timeline
-            { "Timeline_Add_Popout",               "//button[contains(@id,\"notescontrol-action_bar_add_command\")]" },
-            { "Timeline_Add_Popout_Appointment",   "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_appointment\")]" },
-            { "Timeline_Add_Popout_Email",         "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_email\")]" },
-            { "Timeline_Add_Popout_PhoneCall",     "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_phonecall\")]" },
-            { "Timeline_Add_Popout_Task",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_task\")]" },
-            { "Timeline_Add_Popout_Note",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_notes\")]" },
-            { "Timeline_Add_Popout_Post",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_post\")]" },
+            //{ "Timeline_Add_Popout",               "//button[contains(@id,\"notescontrol-action_bar_add_command\")]" },
+            //{ "Timeline_Add_Popout_Appointment",   "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_appointment\")]" },
+            //{ "Timeline_Add_Popout_Email",         "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_email\")]" },
+            //{ "Timeline_Add_Popout_PhoneCall",     "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_phonecall\")]" },
+            //{ "Timeline_Add_Popout_Task",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_task\")]" },
+            //{ "Timeline_Add_Popout_Note",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_notes\")]" },
+            //{ "Timeline_Add_Popout_Post",          "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_post\")]" },
 
-            { "Timeline_Post_Text",                "id(\"create_post_postText\")" },
-            { "Timeline_Post_Add",                 "//button[@data-id=\"notescontrol-author_post_testsave_button\"]" },
-            { "Timeline_Post_Cancel",              "id(\"create_post_cancel_btn\")" },
+            //{ "Timeline_Post_Text",                "id(\"create_post_postText\")" },
+            //{ "Timeline_Post_Add",                 "//button[@data-id=\"notescontrol-author_post_testsave_button\"]" },
+            //{ "Timeline_Post_Cancel",              "id(\"create_post_cancel_btn\")" },
 
-            { "Timeline_Note_Title",               "id(\"create_note_medium_title\")" },
-            { "Timeline_Note_Text",                "//iframe[contains(@class, \"fullPageContentEditorFrame\")]" },
-            { "Timeline_Note_TextBody",            "//body[contains(@class, 'cke_wysiwyg_frame')]" },
-            { "Timeline_Note_Add",                 "//button[contains(@id,'save_button') or contains(@id, 'create_note_add_btn')]" },
-            { "Timeline_Note_Cancel",              "id(\"create_note_cancel_btn\")" },
+            //{ "Timeline_Note_Title",               "id(\"create_note_medium_title\")" },
+            //{ "Timeline_Note_Text",                "//iframe[contains(@class, \"fullPageContentEditorFrame\")]" },
+            //{ "Timeline_Note_TextBody",            "//body[contains(@class, 'cke_wysiwyg_frame')]" },
+            //{ "Timeline_Note_Add",                 "//button[contains(@id,'save_button') or contains(@id, 'create_note_add_btn')]" },
+            //{ "Timeline_Note_Cancel",              "id(\"create_note_cancel_btn\")" },
 
 
             //Global Search
@@ -267,30 +267,30 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_TabId"       , "[NAME]_TAB_header_image_div"},
 
             //Timeline
-            { "Timeline_Task_Subject",      "subject" },
-            { "Timeline_Task_Description",  "description" },
-            { "Timeline_Task_Duration",     "actualdurationminutes" },
-            { "Timeline_Task",              "task" },
+            //{ "Timeline_Task_Subject",      "subject" },
+            //{ "Timeline_Task_Description",  "description" },
+            //{ "Timeline_Task_Duration",     "actualdurationminutes" },
+            //{ "Timeline_Task",              "task" },
 
-            { "Timeline_PhoneCall_Subject",      "subject" },
-            { "Timeline_PhoneCall_Number",       "phonenumber" },
-            { "Timeline_PhoneCall_Description",  "description" },
-            { "Timeline_PhoneCall_Duration",     "actualdurationminutes" },
-            { "Timeline_PhoneCall",              "phonecall" },
+            //{ "Timeline_PhoneCall_Subject",      "subject" },
+            //{ "Timeline_PhoneCall_Number",       "phonenumber" },
+            //{ "Timeline_PhoneCall_Description",  "description" },
+            //{ "Timeline_PhoneCall_Duration",     "actualdurationminutes" },
+            //{ "Timeline_PhoneCall",              "phonecall" },
 
-            { "Timeline_Email_Subject",      "subject" },
-            { "Timeline_Email_To",           "to" },
-            { "Timeline_Email_CC",           "cc" },
-            { "Timeline_Email_Bcc",          "bcc" },
-            { "Timeline_Email_Description",  "description" },
-            { "Timeline_Email_Duration",     "actualdurationminutes" },
-            { "Timeline_Email",              "email" },
+            //{ "Timeline_Email_Subject",      "subject" },
+            //{ "Timeline_Email_To",           "to" },
+            //{ "Timeline_Email_CC",           "cc" },
+            //{ "Timeline_Email_Bcc",          "bcc" },
+            //{ "Timeline_Email_Description",  "description" },
+            //{ "Timeline_Email_Duration",     "actualdurationminutes" },
+            //{ "Timeline_Email",              "email" },
 
-            { "Timeline_Appointment_Subject",      "subject" },
-            { "Timeline_Appointment_Location",     "location" },
-            { "Timeline_Appointment_Description",  "description" },
-            { "Timeline_Appointment_Duration",     "scheduleddurationminutes" },
-            { "Timeline_Appointment",              "appointment" },
+            //{ "Timeline_Appointment_Subject",      "subject" },
+            //{ "Timeline_Appointment_Location",     "location" },
+            //{ "Timeline_Appointment_Description",  "description" },
+            //{ "Timeline_Appointment_Duration",     "scheduleddurationminutes" },
+            //{ "Timeline_Appointment",              "appointment" },
 
 
             //GuidedHelp
@@ -586,51 +586,51 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string CommonActivities = "Related_Common_Activities";
         }
 
-        public static class Timeline
-        {
-            public static string Popout = "Timeline_Add_Popout";
-            public static string PopoutAppointment = "Timeline_Add_Popout_Appointment";
-            public static string PopoutEmail = "Timeline_Add_Popout_Email";
-            public static string PopoutPhoneCall = "Timeline_Add_Popout_PhoneCall";
-            public static string PopoutTask = "Timeline_Add_Popout_Task";
-            public static string PopoutNote = "Timeline_Add_Popout_Note";
-            public static string PopoutPost = "Timeline_Add_Popout_Post";
+        //public static class Timeline
+        //{
+        //    public static string Popout = "Timeline_Add_Popout";
+        //    public static string PopoutAppointment = "Timeline_Add_Popout_Appointment";
+        //    public static string PopoutEmail = "Timeline_Add_Popout_Email";
+        //    public static string PopoutPhoneCall = "Timeline_Add_Popout_PhoneCall";
+        //    public static string PopoutTask = "Timeline_Add_Popout_Task";
+        //    public static string PopoutNote = "Timeline_Add_Popout_Note";
+        //    public static string PopoutPost = "Timeline_Add_Popout_Post";
 
-            public static string PostText = "Timeline_Post_Text";
-            public static string PostAdd = "Timeline_Post_Add";
-            public static string PostCancel = "Timeline_Post_Cancel";
+        //    public static string PostText = "Timeline_Post_Text";
+        //    public static string PostAdd = "Timeline_Post_Add";
+        //    public static string PostCancel = "Timeline_Post_Cancel";
 
-            public static string NoteTitle = "Timeline_Note_Title";
-            public static string NoteText = "Timeline_Note_Text";
-            public static string NoteTextBody = "Timeline_Note_TextBody";
-            public static string NoteAdd = "Timeline_Note_Add";
-            public static string NoteCancel = "Timeline_Note_Cancel";
+        //    public static string NoteTitle = "Timeline_Note_Title";
+        //    public static string NoteText = "Timeline_Note_Text";
+        //    public static string NoteTextBody = "Timeline_Note_TextBody";
+        //    public static string NoteAdd = "Timeline_Note_Add";
+        //    public static string NoteCancel = "Timeline_Note_Cancel";
 
-            public static string TaskSubject = "Timeline_Task_Subject";
-            public static string TaskDescription = "Timeline_Task_Description";
-            public static string TaskDuration = "Timeline_Task_Duration";
-            public static string Task = "Timeline_Task";
+        //    public static string TaskSubject = "Timeline_Task_Subject";
+        //    public static string TaskDescription = "Timeline_Task_Description";
+        //    public static string TaskDuration = "Timeline_Task_Duration";
+        //    public static string Task = "Timeline_Task";
 
-            public static string PhoneCallSubject = "Timeline_PhoneCall_Subject";
-            public static string PhoneCallNumber = "Timeline_PhoneCall_Number";
-            public static string PhoneCallDescription = "Timeline_PhoneCall_Description";
-            public static string PhoneCallDuration = "Timeline_PhoneCall_Duration";
-            public static string PhoneCall = "Timeline_PhoneCall";
+        //    public static string PhoneCallSubject = "Timeline_PhoneCall_Subject";
+        //    public static string PhoneCallNumber = "Timeline_PhoneCall_Number";
+        //    public static string PhoneCallDescription = "Timeline_PhoneCall_Description";
+        //    public static string PhoneCallDuration = "Timeline_PhoneCall_Duration";
+        //    public static string PhoneCall = "Timeline_PhoneCall";
 
-            public static string EmailSubject = "Timeline_Email_Subject";
-            public static string EmailTo = "Timeline_Email_To";
-            public static string EmailCC = "Timeline_Email_CC";
-            public static string EmailBcc = "Timeline_Email_Bcc";
-            public static string EmailDescription = "Timeline_Email_Description";
-            public static string EmailDuration = "Timeline_Email_Duration";
-            public static string Email = "Timeline_Email";
+        //    public static string EmailSubject = "Timeline_Email_Subject";
+        //    public static string EmailTo = "Timeline_Email_To";
+        //    public static string EmailCC = "Timeline_Email_CC";
+        //    public static string EmailBcc = "Timeline_Email_Bcc";
+        //    public static string EmailDescription = "Timeline_Email_Description";
+        //    public static string EmailDuration = "Timeline_Email_Duration";
+        //    public static string Email = "Timeline_Email";
 
-            public static string AppointmentSubject = "Timeline_Appointment_Subject";
-            public static string AppointmentLocation = "Timeline_Appointment_Location";
-            public static string AppointmentDescription = "Timeline_Appointment_Description";
-            public static string AppointmentDuration = "Timeline_Appointment_Duration";
-            public static string Appointment = "Timeline_Appointment";
-        }
+        //    public static string AppointmentSubject = "Timeline_Appointment_Subject";
+        //    public static string AppointmentLocation = "Timeline_Appointment_Location";
+        //    public static string AppointmentDescription = "Timeline_Appointment_Description";
+        //    public static string AppointmentDuration = "Timeline_Appointment_Duration";
+        //    public static string Appointment = "Timeline_Appointment";
+        //}
 
         public static class GlobalSearch
         {

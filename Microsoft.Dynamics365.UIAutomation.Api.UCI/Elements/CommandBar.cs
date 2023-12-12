@@ -231,6 +231,64 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return ribbon;
         }
 
+        internal BrowserCommandResult<bool> CloseOpportunity(bool closeAsWon, int thinkTime = Constants.DefaultThinkTime)
+        {
+            _client.ThinkTime(thinkTime);
+
+            var xPathQuery = closeAsWon
+                ? AppElements.Xpath[AppReference.Entity.CloseOpportunityWin]
+                : AppElements.Xpath[AppReference.Entity.CloseOpportunityLoss];
+
+            return _client.Execute(_client.GetOptions($"Close Opportunity"), driver =>
+            {
+                var closeBtn = driver.WaitUntilAvailable(By.XPath(xPathQuery), "Opportunity Close Button is not available");
+
+                closeBtn?.Click();
+                driver.WaitUntilVisible(By.XPath(Dialogs.DialogsReference.CloseOpportunity.Ok));
+                Dialogs dialogs = new Dialogs(_client);
+                dialogs.CloseOpportunityDialog(true);
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> CloseOpportunity(double revenue, DateTime closeDate, string description, int thinkTime = Constants.DefaultThinkTime)
+        {
+            _client.ThinkTime(thinkTime);
+
+            return _client.Execute(_client.GetOptions($"Close Opportunity"), driver =>
+            {
+                //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.ActualRevenueId], revenue.ToString(CultureInfo.CurrentCulture));
+                //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.CloseDateId], closeDate);
+                //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
+
+                driver.ClickWhenAvailable(By.XPath(Dialogs.DialogsReference.CloseOpportunity.Ok),
+    TimeSpan.FromSeconds(5),
+    "The Close Opportunity dialog is not available."
+    );
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> Delete(int thinkTime = Constants.DefaultThinkTime)
+        {
+            _client.ThinkTime(thinkTime);
+
+            return _client.Execute(_client.GetOptions($"Delete Entity"), driver =>
+            {
+                var deleteBtn = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.Delete]),
+                    "Delete Button is not available");
+
+                deleteBtn?.Click();
+                Dialogs dialogs = new Dialogs(_client);
+                dialogs.ConfirmationDialog(true);
+
+                driver.WaitForTransaction();
+
+                return true;
+            });
+        }
         #endregion
         #endregion
     }

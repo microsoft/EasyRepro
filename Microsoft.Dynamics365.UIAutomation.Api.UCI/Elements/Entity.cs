@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 
@@ -31,7 +32,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="userOrTeam">Name of the user or team to assign the record to</param>
         public void Assign(string userOrTeam)
         {
-            _client.Assign(userOrTeam);
+            this.Assign(userOrTeam);
         }
 
         /// <summary>
@@ -107,7 +108,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         public void Delete()
         {
-            _client.Delete();
+            CommandBar cmd = new CommandBar(_client);
+            cmd.Delete();
         }
 
         public Field GetField(string field)
@@ -399,7 +401,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="subtabName">The name of the subtab based on the References class</param>
         public void SelectTab(string tabName, string subTabName = "")
         {
-            _client.SelectTab(tabName, subTabName);
+            this.EntitySelectTab(tabName, subTabName);
         }
 
         public void SetHeaderValue(string field, string value)
@@ -564,7 +566,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="processToSwitchTo">Name of the process to switch to</param>
         public void SwitchProcess(string processToSwitchTo)
         {
-            _client.SwitchProcess(processToSwitchTo);
+            BusinessProcessFlow bpf = new BusinessProcessFlow(_client);
+            bpf.BPFSwitchProcess(processToSwitchTo);
         }
 
         /// <summary>
@@ -596,5 +599,95 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.RemoveValues(controls);
         }
+
+        #region internals
+        internal BrowserCommandResult<bool> Assign(string userOrTeamToAssign, int thinkTime = Constants.DefaultThinkTime)
+        {
+            //Click the Assign Button on the Entity Record
+            _client.ThinkTime(thinkTime);
+
+            return _client.Execute(_client.GetOptions($"Assign Entity"), driver =>
+            {
+                var assignBtn = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.Assign]),
+                    "Assign Button is not available");
+
+                assignBtn?.Click();
+                Dialogs dialogs = new Dialogs(_client);
+                dialogs.AssignDialog(Dialogs.AssignTo.User, userOrTeamToAssign);
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Generic method to help click on any item which is clickable or uniquely discoverable with a By object.
+        /// </summary>
+        /// <param name="by">The xpath of the HTML item as a By object</param>
+        /// <returns>True on success, Exception on failure to invoke any action</returns>
+        internal BrowserCommandResult<bool> EntitySelectTab(string tabName, string subTabName = "", int thinkTime = Constants.DefaultThinkTime)
+        {
+            _client.ThinkTime(thinkTime);
+
+            return _client.Execute($"Select Tab", driver =>
+            {
+                IWebElement tabList;
+                if (driver.HasElement(By.XPath(Dialogs.DialogsReference.DialogContext)))
+                {
+                    var dialogContainer = driver.FindElement(By.XPath(Dialogs.DialogsReference.DialogContext));
+                    tabList = dialogContainer.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
+                }
+                else
+                {
+                    tabList = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TabList]));
+                }
+
+                ClickTab(tabList, AppElements.Xpath[AppReference.Entity.Tab], tabName);
+
+                //Click Sub Tab if provided
+                if (!String.IsNullOrEmpty(subTabName))
+                {
+                    this.ClickTab(tabList, AppElements.Xpath[AppReference.Entity.SubTab], subTabName);
+                }
+
+                driver.WaitForTransaction();
+                return true;
+            });
+        }
+
+        internal void ClickTab(IWebElement tabList, string xpath, string name)
+        {
+            IWebElement moreTabsButton;
+            IWebElement listItem;
+            // Look for the tab in the tab list, else in the more tabs menu
+            IWebElement searchScope = null;
+            if (tabList.HasElement(By.XPath(string.Format(xpath, name))))
+            {
+                searchScope = tabList;
+            }
+            else if (tabList.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabs]), out moreTabsButton))
+            {
+                moreTabsButton.Click();
+
+                // No tab to click - subtabs under 'Related' are automatically expanded in overflow menu
+                if (name == "Related")
+                {
+                    return;
+                }
+                else
+                {
+                    searchScope = _client.Browser.Driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.MoreTabsMenu]));
+                }
+            }
+
+            if (searchScope.TryFindElement(By.XPath(string.Format(xpath, name)), out listItem))
+            {
+                listItem.Click(true);
+            }
+            else
+            {
+                throw new Exception($"The tab with name: {name} does not exist");
+            }
+        }
+        #endregion
     }
 }

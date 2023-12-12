@@ -156,11 +156,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             }
         }
 
-        public static class Timeline
-        {
-            public static string SaveAndClose = "Timeline_SaveAndClose";
-        }
-
         public static class MultiSelect
         {
             public static string DivContainer = "MultiSelect_DivContainer";
@@ -427,9 +422,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Entity_Header_OptionSetFieldContainer", "//div[@data-id='header_[NAME]']" },
             { "Entity_Header_DateTimeFieldContainer","//div[@data-id='header_[NAME]-FieldSectionItemContainer']" },
                         
-
-            //Timeline
-            { "Timeline_SaveAndClose", "//button[contains(@data-id,\"[NAME].SaveAndClose\")]" },
 
             //MultiSelect
             { "MultiSelect_DivContainer",     ".//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]" },

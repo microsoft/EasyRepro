@@ -131,7 +131,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="closeOrCancel"></param>
         public void CloseActivity(bool closeOrCancel)
         {
-            _client.CloseActivity(closeOrCancel);
+            Timeline timeline = new Timeline(_client);
+            timeline.CloseActivity(closeOrCancel);
         }
 
         /// <summary>
@@ -140,7 +141,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="closeAsWon"></param>
         public void CloseOpportunity(bool closeAsWon)
         {
-            _client.CloseOpportunity(closeAsWon);
+            CommandBar cmd = new CommandBar(_client);
+            cmd.CloseOpportunity(closeAsWon);
         }
 
         /// <summary>
@@ -151,7 +153,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="description">Value for Description field</param>
         public void CloseOpportunity(double revenue, DateTime closeDate, string description)
         {
-            _client.CloseOpportunity(revenue, closeDate, description);
+            CommandBar cmd = new CommandBar(_client);
+            cmd.CloseOpportunity(revenue, closeDate, description);
         }
 
 
@@ -324,7 +327,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="subtabName">The name of the subtab based on the References class</param>
         public bool SelectTab(string tabName, string subtabName = null)
         {
-            return _client.SelectTab(tabName, subtabName);
+            Entity entity = new Entity(_client);
+            return entity.EntitySelectTab(tabName, subtabName);
         }
         #endregion
 

@@ -511,6 +511,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
+        internal BrowserCommandResult<bool> BPFSwitchProcess(string processToSwitchTo, int thinkTime = Constants.DefaultThinkTime)
+        {
+            _client.ThinkTime(thinkTime);
+
+            return _client.Execute(_client.GetOptions($"Switch BusinessProcessFlow"), driver =>
+            {
+                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.ProcessButton]), TimeSpan.FromSeconds(5));
+
+                driver.ClickWhenAvailable(
+                    By.XPath(AppElements.Xpath[AppReference.Entity.SwitchProcess]),
+                    TimeSpan.FromSeconds(5),
+                    "The Switch Process Button is not available."
+                );
+
+                return true;
+            });
+        }
+
         #endregion
     }
 }
