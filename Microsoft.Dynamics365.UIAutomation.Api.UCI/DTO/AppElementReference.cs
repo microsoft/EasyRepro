@@ -44,117 +44,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SubArea = "Grid_SubArea";
         }
 
-        public static class Entity
-        {
-            public static string FormContext = "Entity_FormContainer";
-            public static string FormSelector = "Entity_FormSelector";
-            public static string HeaderTitle = "Entity_HeaderTitle";
-            public static string HeaderContext = "Entity_HeaderContext";
-            public static string Save = "Entity_Save";
-            public static string TextFieldContainer = "Entity_TextFieldContainer";
-            public static string TextFieldLabel = "Entity_TextFieldLabel";
-            public static string TextFieldValue = "Entity_TextFieldValue";
-            public static string TextFieldLookup = "Entity_TextFieldLookup";
-            public static string TextFieldLookupSearchButton = "Entity_TextFieldLookupSearchButton";
-            public static string TextFieldLookupMenu = "Entity_TextFieldLookupMenu";
-            public static string LookupFieldExistingValue = "Entity_LookupFieldExistingValue";
-            public static string LookupFieldDeleteExistingValue = "Entity_LookupFieldDeleteExistingValue";
-            public static string LookupFieldExpandCollapseButton = "Entity_LookupFieldExpandCollapseButton";
-            public static string LookupFieldNoRecordsText = "Entity_LookupFieldNoRecordsText";
-            public static string LookupFieldResultList = "Entity_LookupFieldResultList";
-            public static string LookupFieldResultListItem = "Entity_LookupFieldResultListItem";
-            public static string LookupFieldHoverExistingValue = "Entity_LookupFieldHoverExistingValue";
-            public static string LookupResultsDropdown = "Entity_LookupResultsDropdown";
-            public static string OptionSetFieldContainer = "Entity_OptionSetFieldContainer";
-            public static string TextFieldLookupFieldContainer = "Entity_TextFieldLookupFieldContainer";
-            public static string RecordSetNavigator = "Entity_RecordSetNavigator";
-            public static string RecordSetNavigatorOpen = "Entity_RecordSetNavigatorOpen";
-            public static string RecordSetNavList = "Entity_RecordSetNavList";
-            public static string RecordSetNavCollapseIcon = "Entity_RecordSetNavCollapseIcon";
-            public static string RecordSetNavCollapseIconParent = "Entity_RecordSetNavCollapseIconParent";
-            public static string FieldControlDateTimeContainer = "Entity_FieldControlDateTimeContainer";
-            public static string FieldControlDateTimeInputUCI = "Entity_FieldControlDateTimeInputUCI";
-            public static string FieldControlDateTimeTimeInputUCI = "Entity_FieldControlDateTimeTimeInputUCI";
-            public static string Delete = "Entity_Delete";
-            public static string Assign = "Entity_Assign";
-            public static string SwitchProcess = "Entity_SwitchProcess";
-            public static string CloseOpportunityWin = "Entity_CloseOpportunityWin";
-            public static string CloseOpportunityLoss = "Entity_CloseOpportunityLoss";
-            public static string ProcessButton = "Entity_Process";
-            public static string SwitchProcessDialog = "Entity_SwitchProcessDialog";
-            public static string TabList = "Entity_TabList";
-            public static string Tab = "Entity_Tab";
-            public static string MoreTabs = "Entity_MoreTabs";
-            public static string MoreTabsMenu = "Entity_MoreTabsMenu";
-            public static string SubTab = "Entity_SubTab";
-            public static string SubGridTitle = "Entity_SubGridTitle";
-            public static string SubGridRow = "Entity_SubGrid_Row";
-            public static string SubGridLastRow = "Entity_SubGrid_LastRow";
-            public static string SubGridContents = "Entity_SubGridContents";
-            public static string SubGridList = "Entity_SubGridList";
-            public static string SubGridListCells = "Entity_SubGridListCells";
-            public static string SubGridViewPickerButton = "Entity_SubGridViewPickerButton";
-            public static string SubGridViewPickerFlyout = "Entity_SubGridViewPickerFlyout";
-            public static string SubGridCommandBar = "Entity_SubGridCommandBar";
-            public static string SubGridCommandLabel = "Entity_SubGridCommandLabel";
-            public static string SubGridOverflowContainer = "Entity_SubGridOverflowContainer";
-            public static string SubGridOverflowButton = "Entity_SubGridOverflowButton";
-            public static string SubGridHighDensityList = "Entity_SubGridHighDensityList";
-            public static string EditableSubGridList = "Entity_EditableSubGridList";
-            public static string EditableSubGridListCells = "Entity_EditableSubGridListCells";
-            public static string EditableSubGridListCellRows = "Entity_EditableSubGridListCellRows";
-            public static string EditableSubGridCells = "Entity_EditableSubGridCells";
-            public static string SubGridControl = "Entity_SubGridControl";
-            public static string SubGridCells = "Entity_SubGridCells";
-            public static string SubGridRows = "Entity_SubGridRows";
-            public static string SubGridRowsHighDensity = "Entity_SubGridRowsHighDensity";
-            public static string SubGridDataRowsEditable = "Entity_SubGridDataRowsEditable";
-            public static string SubGridHeaders = "Entity_SubGridHeaders";
-            public static string SubGridHeadersHighDensity = "Entity_SubGridHeadersHighDensity";
-            public static string SubGridHeadersEditable = "Entity_SubGridHeadersEditable";
-            public static string SubGridRecordCheckbox = "Entity_SubGridRecordCheckbox";
-            public static string SubGridSearchBox = "Entity_SubGridSearchBox";
-            public static string SubGridAddButton = "Entity_SubGridAddButton";
-            public static string FieldLookupButton = "Entity_FieldLookupButton";
-            public static string SearchButtonIcon = "Entity_SearchButtonIcon";
-            public static string DuplicateDetectionWindowMarker = "Entity_DuplicateDetectionWindowMarker";
-            public static string DuplicateDetectionGridRows = "Entity_DuplicateDetectionGridRows";
-            public static string DuplicateDetectionIgnoreAndSaveButton = "Entity_DuplicateDetectionIgnoreAndSaveButton";
-            public static string EntityBooleanFieldRadioContainer = "Entity_BooleanFieldRadioContainer";
-            public static string EntityBooleanFieldRadioTrue = "Entity_BooleanFieldRadioTrue";
-            public static string EntityBooleanFieldRadioFalse = "Entity_BooleanFieldRadioFalse";
-            public static string EntityBooleanFieldButtonContainer = "Entity_BooleanFieldButton";
-            public static string EntityBooleanFieldButtonTrue = "Entity_BooleanFieldButtonTrue";
-            public static string EntityBooleanFieldButtonFalse = "Entity_BooleanFieldButtonFalse";
-            public static string EntityBooleanFieldCheckboxContainer = "Entity_BooleanFieldCheckboxContainer";
-            public static string EntityBooleanFieldCheckbox = "Entity_BooleanFieldCheckbox";
-            public static string EntityBooleanFieldList = "Entity_BooleanFieldList";
-            public static string EntityBooleanFieldFlipSwitchLink = "Entity_BooleanFieldFlipSwitchLink";
-            public static string EntityBooleanFieldFlipSwitchContainer = "Entity_BooleanFieldFlipSwitchContainer";
-            public static string EntityBooleanFieldToggle = "Entity_BooleanFieldToggle";
-            public static string EntityOptionsetStatusCombo = "Entity_OptionsetStatusCombo";
-            public static string EntityOptionsetStatusComboButton = "Entity_OptionsetStatusComboButton";
-            public static string EntityOptionsetStatusComboList = "Entity_OptionsetStatusComboList";
-            public static string EntityOptionsetStatusTextValue = "Entity_OptionsetStatusTextValue";
-            public static string FormMessageBar = "Entity_FormMessageBar";
-            public static string FormMessageBarTypeIcon = "Entity_FormMessageBarTypeIcon";
-            public static string FormNotifcationBar = "Entity_FormNotifcationBar";
-            public static string FormNotifcationExpandButton = "Entity_FormNotifcationExpandButton";
-            public static string FormNotifcationFlyoutRoot = "Entity_FormNotifcationFlyoutRoot";
-            public static string FormNotifcationList = "Entity_FormNotifcationList";
-            public static string FormNotifcationTypeIcon = "Entity_FormNotifcationTypeIcon";
-
-            public static class Header
-            {
-                public static string Container = "Entity_Header";
-                public static string Flyout = "Entity_Header_Flyout";
-                public static string FlyoutButton = "Entity_Header_FlyoutButton";
-                public static string LookupFieldContainer = "Entity_Header_LookupFieldContainer";
-                public static string TextFieldContainer = "Entity_Header_TextFieldContainer";
-                public static string OptionSetFieldContainer = "Entity_Header_OptionSetFieldContainer";
-                public static string DateTimeFieldContainer = "Entity_Header_DateTimeFieldContainer";
-            }
-        }
 
         public static class MultiSelect
         {
@@ -315,112 +204,112 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             
 
             //Entity
-            { "Entity_Assign"       , "//button[contains(@data-id,'Assign')]"},
-            { "Entity_CloseOpportunityWin"       , "//button[contains(@data-id,'MarkAsWon')]"},
-            { "Entity_CloseOpportunityLoss"       , "//button[contains(@data-id,'MarkAsLost')]"},
-            { "Entity_Delete"       , "//button[contains(@data-id,'Delete')]"},
-            { "Entity_FormContainer"       , "//*[@data-id='editFormRoot']"},
-            { "Entity_FormSelector"       , "//*[@data-id='form-selector']"},
-            { "Entity_HeaderTitle"       , "//*[@data-id='header_title']"},
-            { "Entity_HeaderContext"       , ".//div[@data-id='headerFieldsFlyout']"},
-            { "Entity_Process"       , "//button[contains(@data-id,'MBPF.ConvertTo')]"},
-            { "Entity_Save"       , "//button[@role='menuitem' and .//*[text()='Save']]"},
-            { "Entity_SwitchProcess"       , "//button[contains(@data-id,'SwitchProcess')]"},
-            { "Entity_TextFieldContainer", ".//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
-            { "Entity_TextFieldLabel", ".//label[contains(@id, \'[NAME]-field-label\')]" },
-            { "Entity_TextFieldValue", ".//input[contains(@data-id, \'[NAME].fieldControl\')]" },
-            { "Entity_TextFieldLookup", ".//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
-            { "Entity_TextFieldLookupSearchButton", ".//button[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_search')]" },
-            { "Entity_TextFieldLookupMenu", "//div[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]') and contains(@data-id,'tabContainer')]" },
-            { "Entity_LookupFieldExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag') and @role='link']" },
-            { "Entity_LookupFieldDeleteExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]" },
-            { "Entity_LookupFieldExpandCollapseButton", ".//button[contains(@data-id,'[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse')]/descendant::label[not(text()='+0')]" },
-            { "Entity_LookupFieldNoRecordsText", ".//*[@data-id=\'[NAME].fieldControl-LookupResultsDropdown_[NAME]_No_Records_Text']" },
-            { "Entity_LookupFieldResultList", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
-            { "Entity_LookupFieldResultListItem", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_resultsContainer')]" },
-            { "Entity_LookupFieldHoverExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList')]" },
-            { "Entity_TextFieldLookupFieldContainer", ".//div[@data-id='[NAME].fieldControl-Lookup_[NAME]']" },
-            { "Entity_RecordSetNavigatorOpen", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
-            { "Entity_RecordSetNavigator", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
-            { "Entity_RecordSetNavList", "//ul[contains(@data-id, 'recordSetNavList')]" },
-            { "Entity_RecordSetNavCollapseIcon", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
-            { "Entity_RecordSetNavCollapseIconParent", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
-            { "Entity_TabList", ".//ul[contains(@id, \"tablist\")]" },
-            { "Entity_Tab", ".//li[@title='{0}']" },
-            { "Entity_MoreTabs", ".//div[@data-id='more_button']" },
-            { "Entity_MoreTabsMenu", "//div[@id='__flyoutRootNode']" },
-            { "Entity_SubTab", "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]" },
-            { "Entity_FieldControlDateTimeContainer","//div[@data-id='[NAME]-FieldSectionItemContainer']" },
-            { "Entity_FieldControlDateTimeInputUCI",".//*[contains(@data-id, '[FIELD].fieldControl-date-time-input')]" },
-            { "Entity_FieldControlDateTimeTimeInputUCI",".//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input" },
-            { "Entity_LookupResultsDropdown", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
-            { "Entity_SubGrid_Row"           , "//div[@data-id='[NAME]-pcf_grid_control_container']//div[@data-id='grid-container']//div[@data-list-index=\'[INDEX]\']"},
-            { "Entity_SubGrid_LastRow"           , "//div[@ref='centerContainer']//div[@role='rowgroup']//div[contains(@class, 'ag-row-last')]"},
-            { "Entity_SubGridTitle", "//div[contains(text(), '[NAME]')]" },
-            { "Entity_SubGridContents", "//div[@id=\"dataSetRoot_[NAME]\"]" },
-            { "Entity_SubGridList", "//div[@data-id='[NAME]-pcf_grid_control_container']//div[@data-id='grid-container']//div[@data-automationid='ListCell']" },
-            { "Entity_SubGridListCells", ".//div[@class='ag-center-cols-viewport']//div[@role='rowgroup']//div[@row-index]" },
-            { "Entity_SubGridViewPickerButton", ".//span[contains(@id, 'ViewSelector') and contains(@id, 'button')]" },
-            { "Entity_SubGridViewPickerFlyout", "//div[contains(@id, 'ViewSelector') and contains(@flyoutroot, 'flyoutRootNode')]" },
-            { "Entity_SubGridCommandBar", ".//ul[contains(@data-id, 'CommandBar')]" },
-            { "Entity_SubGridCommandLabel", ".//button//span[text()=\"[NAME]\"]" },
-            { "Entity_SubGridOverflowContainer", ".//div[contains(@data-id, 'flyoutRootNode')]" },
+            //{ "Entity_Assign"       , "//button[contains(@data-id,'Assign')]"},
+            //{ "Entity_CloseOpportunityWin"       , "//button[contains(@data-id,'MarkAsWon')]"},
+            //{ "Entity_CloseOpportunityLoss"       , "//button[contains(@data-id,'MarkAsLost')]"},
+            //{ "Entity_Delete"       , "//button[contains(@data-id,'Delete')]"},
+            //{ "Entity_FormContainer"       , "//*[@data-id='editFormRoot']"},
+            //{ "Entity_FormSelector"       , "//*[@data-id='form-selector']"},
+            //{ "Entity_HeaderTitle"       , "//*[@data-id='header_title']"},
+            //{ "Entity_HeaderContext"       , ".//div[@data-id='headerFieldsFlyout']"},
+            //{ "Entity_Process"       , "//button[contains(@data-id,'MBPF.ConvertTo')]"},
+            //{ "Entity_Save"       , "//button[@role='menuitem' and .//*[text()='Save']]"},
+            //{ "Entity_SwitchProcess"       , "//button[contains(@data-id,'SwitchProcess')]"},
+            //{ "Entity_TextFieldContainer", ".//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]" },
+            //{ "Entity_TextFieldLabel", ".//label[contains(@id, \'[NAME]-field-label\')]" },
+            //{ "Entity_TextFieldValue", ".//input[contains(@data-id, \'[NAME].fieldControl\')]" },
+            //{ "Entity_TextFieldLookup", ".//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]" },
+            //{ "Entity_TextFieldLookupSearchButton", ".//button[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_search')]" },
+            //{ "Entity_TextFieldLookupMenu", "//div[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]') and contains(@data-id,'tabContainer')]" },
+            //{ "Entity_LookupFieldExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag') and @role='link']" },
+            //{ "Entity_LookupFieldDeleteExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]" },
+            //{ "Entity_LookupFieldExpandCollapseButton", ".//button[contains(@data-id,'[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse')]/descendant::label[not(text()='+0')]" },
+            //{ "Entity_LookupFieldNoRecordsText", ".//*[@data-id=\'[NAME].fieldControl-LookupResultsDropdown_[NAME]_No_Records_Text']" },
+            //{ "Entity_LookupFieldResultList", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
+            //{ "Entity_LookupFieldResultListItem", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_resultsContainer')]" },
+            //{ "Entity_LookupFieldHoverExistingValue", ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList')]" },
+            //{ "Entity_TextFieldLookupFieldContainer", ".//div[@data-id='[NAME].fieldControl-Lookup_[NAME]']" },
+            //{ "Entity_RecordSetNavigatorOpen", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
+            //{ "Entity_RecordSetNavigator", "//button[contains(@data-lp-id, 'recordset-navigator')]" },
+            //{ "Entity_RecordSetNavList", "//ul[contains(@data-id, 'recordSetNavList')]" },
+            //{ "Entity_RecordSetNavCollapseIcon", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
+            //{ "Entity_RecordSetNavCollapseIconParent", "//*[contains(@data-id, 'recordSetNavCollapseIcon')]" },
+            //{ "Entity_TabList", ".//ul[contains(@id, \"tablist\")]" },
+            //{ "Entity_Tab", ".//li[@title='{0}']" },
+            //{ "Entity_MoreTabs", ".//div[@data-id='more_button']" },
+            //{ "Entity_MoreTabsMenu", "//div[@id='__flyoutRootNode']" },
+            //{ "Entity_SubTab", "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]" },
+            //{ "Entity_FieldControlDateTimeContainer","//div[@data-id='[NAME]-FieldSectionItemContainer']" },
+            //{ "Entity_FieldControlDateTimeInputUCI",".//*[contains(@data-id, '[FIELD].fieldControl-date-time-input')]" },
+            //{ "Entity_FieldControlDateTimeTimeInputUCI",".//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input" },
+            //{ "Entity_LookupResultsDropdown", "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]" },
+            //{ "Entity_SubGrid_Row"           , "//div[@data-id='[NAME]-pcf_grid_control_container']//div[@data-id='grid-container']//div[@data-list-index=\'[INDEX]\']"},
+            //{ "Entity_SubGrid_LastRow"           , "//div[@ref='centerContainer']//div[@role='rowgroup']//div[contains(@class, 'ag-row-last')]"},
+            //{ "Entity_SubGridTitle", "//div[contains(text(), '[NAME]')]" },
+            //{ "Entity_SubGridContents", "//div[@id=\"dataSetRoot_[NAME]\"]" },
+            //{ "Entity_SubGridList", "//div[@data-id='[NAME]-pcf_grid_control_container']//div[@data-id='grid-container']//div[@data-automationid='ListCell']" },
+            //{ "Entity_SubGridListCells", ".//div[@class='ag-center-cols-viewport']//div[@role='rowgroup']//div[@row-index]" },
+            //{ "Entity_SubGridViewPickerButton", ".//span[contains(@id, 'ViewSelector') and contains(@id, 'button')]" },
+            //{ "Entity_SubGridViewPickerFlyout", "//div[contains(@id, 'ViewSelector') and contains(@flyoutroot, 'flyoutRootNode')]" },
+            //{ "Entity_SubGridCommandBar", ".//ul[contains(@data-id, 'CommandBar')]" },
+            //{ "Entity_SubGridCommandLabel", ".//button//span[text()=\"[NAME]\"]" },
+            //{ "Entity_SubGridOverflowContainer", ".//div[contains(@data-id, 'flyoutRootNode')]" },
             { "Entity_SubGridCommandOverflowButton", ".//button[contains(@data-id, 'OverflowButton')]" },
-            { "Entity_SubGridOverflowButton", ".//button[contains(@aria-label, '[NAME]')]" },
-            { "Entity_SubGridHighDensityList", ".//div[contains(@data-lp-id, \"ReadOnlyGrid|[NAME]\") and contains(@class, 'editableGrid')]" },
-            { "Entity_EditableSubGridList", ".//div[contains(@data-lp-id, \"[NAME]\") and contains(@class, 'editableGrid') and not(contains(@class, 'readonly'))]" },
-            { "Entity_EditableSubGridListCells", ".//div[contains(@wj-part, 'cells') and contains(@class, 'wj-cells') and contains(@role, 'grid')]" },
-            { "Entity_EditableSubGridListCellRows", ".//div[contains(@class, 'wj-row') and contains(@role, 'row')]" },
-            { "Entity_EditableSubGridCells", ".//div[@role='gridcell']" },
-            { "Entity_SubGridControl", "//div[contains(@data-lp-id, 'MscrmControls.Grid.PCFGridControl')]" },
-            { "Entity_SubGridCells",".//div[@role='gridcell']"},
-            { "Entity_SubGridRows",".//div[@role='row' and ./div[@role='gridcell']]"},
-            { "Entity_SubGridRowsHighDensity",".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Data')]"},
-            { "Entity_SubGridDataRowsEditable",".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Data')]"},
-            { "Entity_SubGridHeaders",".//div[contains(@class,'grid-header-text')]"},
-            { "Entity_SubGridHeadersHighDensity",".//div[contains(@class, 'wj-colheaders') and contains(@wj-part, 'chcells')]/div/div"},
-            { "Entity_SubGridHeadersEditable",".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Header')]/div"},
-            { "Entity_SubGridRecordCheckbox","//div[contains(@data-id,'cell-[INDEX]-1') and contains(@data-lp-id,'[NAME]')]"},
-            { "Entity_SubGridSearchBox",".//div[contains(@data-id, 'data-set-quickFind-container')]"},
-            { "Entity_SubGridAddButton", "//button[contains(@data-id,'[NAME].AddNewStandard')]/parent::li/parent::ul[contains(@data-lp-id, 'commandbar-SubGridStandard:[NAME]')]" },
-            { "Entity_FieldLookupButton","//button[contains(@data-id,'[NAME]_search')]" },
-            { "Entity_SearchButtonIcon", "//span[contains(@data-id,'microsoftIcon_searchButton')]" },
-            { "Entity_DuplicateDetectionWindowMarker","//div[contains(@data-id,'ManageDuplicates')]"},
-            { "Entity_DuplicateDetectionGridRows", "//div[contains(@class,'data-selectable')]" },
-            { "Entity_DuplicateDetectionIgnoreAndSaveButton", "//button[contains(@data-id,'ignore_save')]"},
-            { "Entity_BooleanFieldRadioContainer", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container') and contains(@role,'radiogroup')]"},
-            { "Entity_BooleanFieldRadioTrue", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-second')]"},
-            { "Entity_BooleanFieldRadioFalse", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-first')]"},
-            { "Entity_BooleanFieldCheckboxContainer", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container')]"},
-            { "Entity_BooleanFieldCheckbox", "//input[contains(@data-id, '[NAME].fieldControl-checkbox-toggle')]"},
-            { "Entity_BooleanFieldList", "//select[contains(@data-id, '[NAME].fieldControl-checkbox-select')]"},
-            { "Entity_BooleanFieldFlipSwitchLink", "//div[contains(@data-id, '[NAME]-FieldSectionItemContainer')]"},
-            { "Entity_BooleanFieldFlipSwitchContainer", "//div[@data-id= '[NAME].fieldControl_container']"},
-            { "Entity_BooleanFieldButton", "//div[contains(@data-id, '[NAME].fieldControl_container')]"},
-            { "Entity_BooleanFieldButtonTrue", ".//label[contains(@class, 'first-child')]"},
-            { "Entity_BooleanFieldButtonFalse", ".//label[contains(@class, 'last-child')]"},
-            { "Entity_BooleanFieldToggle", "//div[contains(@data-id, '[NAME].fieldControl-toggle-container')]"},
-            { "Entity_OptionSetFieldContainer", ".//div[@data-id='[NAME].fieldControl-option-set-container']" },
-            { "Entity_OptionsetStatusCombo", "//div[contains(@data-id, '[NAME].fieldControl-pickliststatus-comboBox')]"},
-            { "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},
-            { "Entity_OptionsetStatusComboList", "//ul[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_list')]"},
-            { "Entity_OptionsetStatusTextValue", "//span[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_text-value')]"},
-            { "Entity_FormMessageBar", "//*[@id=\"notificationMessageAndButtons\"]/div/div/span" },
-            { "Entity_FormMessageBarTypeIcon", ".//span[contains(@data-id,'formReadOnlyIcon')]" },
-            { "Entity_FormNotifcationBar", "//div[contains(@data-id, 'notificationWrapper')]" },
-            { "Entity_FormNotifcationTypeIcon", ".//span[contains(@id,'notification_icon_')]" },
-            { "Entity_FormNotifcationExpandButton", ".//span[@id='notificationExpandIcon']" },
-            { "Entity_FormNotifcationFlyoutRoot", "//div[@id='__flyoutRootNode']" },
-            { "Entity_FormNotifcationList", ".//ul[@data-id='notificationList']" },
+            //{ "Entity_SubGridOverflowButton", ".//button[contains(@aria-label, '[NAME]')]" },
+            //{ "Entity_SubGridHighDensityList", ".//div[contains(@data-lp-id, \"ReadOnlyGrid|[NAME]\") and contains(@class, 'editableGrid')]" },
+            //{ "Entity_EditableSubGridList", ".//div[contains(@data-lp-id, \"[NAME]\") and contains(@class, 'editableGrid') and not(contains(@class, 'readonly'))]" },
+            //{ "Entity_EditableSubGridListCells", ".//div[contains(@wj-part, 'cells') and contains(@class, 'wj-cells') and contains(@role, 'grid')]" },
+            //{ "Entity_EditableSubGridListCellRows", ".//div[contains(@class, 'wj-row') and contains(@role, 'row')]" },
+            //{ "Entity_EditableSubGridCells", ".//div[@role='gridcell']" },
+            //{ "Entity_SubGridControl", "//div[contains(@data-lp-id, 'MscrmControls.Grid.PCFGridControl')]" },
+            //{ "Entity_SubGridCells",".//div[@role='gridcell']"},
+            //{ "Entity_SubGridRows",".//div[@role='row' and ./div[@role='gridcell']]"},
+            //{ "Entity_SubGridRowsHighDensity",".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Data')]"},
+            //{ "Entity_SubGridDataRowsEditable",".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Data')]"},
+            //{ "Entity_SubGridHeaders",".//div[contains(@class,'grid-header-text')]"},
+            //{ "Entity_SubGridHeadersHighDensity",".//div[contains(@class, 'wj-colheaders') and contains(@wj-part, 'chcells')]/div/div"},
+            //{ "Entity_SubGridHeadersEditable",".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Header')]/div"},
+            //{ "Entity_SubGridRecordCheckbox","//div[contains(@data-id,'cell-[INDEX]-1') and contains(@data-lp-id,'[NAME]')]"},
+            //{ "Entity_SubGridSearchBox",".//div[contains(@data-id, 'data-set-quickFind-container')]"},
+            //{ "Entity_SubGridAddButton", "//button[contains(@data-id,'[NAME].AddNewStandard')]/parent::li/parent::ul[contains(@data-lp-id, 'commandbar-SubGridStandard:[NAME]')]" },
+            //{ "Entity_FieldLookupButton","//button[contains(@data-id,'[NAME]_search')]" },
+            //{ "Entity_SearchButtonIcon", "//span[contains(@data-id,'microsoftIcon_searchButton')]" },
+            //{ "Entity_DuplicateDetectionWindowMarker","//div[contains(@data-id,'ManageDuplicates')]"},
+            //{ "Entity_DuplicateDetectionGridRows", "//div[contains(@class,'data-selectable')]" },
+            //{ "Entity_DuplicateDetectionIgnoreAndSaveButton", "//button[contains(@data-id,'ignore_save')]"},
+            //{ "Entity_BooleanFieldRadioContainer", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container') and contains(@role,'radiogroup')]"},
+            //{ "Entity_BooleanFieldRadioTrue", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-second')]"},
+            //{ "Entity_BooleanFieldRadioFalse", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-first')]"},
+            //{ "Entity_BooleanFieldCheckboxContainer", "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container')]"},
+            //{ "Entity_BooleanFieldCheckbox", "//input[contains(@data-id, '[NAME].fieldControl-checkbox-toggle')]"},
+            //{ "Entity_BooleanFieldList", "//select[contains(@data-id, '[NAME].fieldControl-checkbox-select')]"},
+            //{ "Entity_BooleanFieldFlipSwitchLink", "//div[contains(@data-id, '[NAME]-FieldSectionItemContainer')]"},
+            //{ "Entity_BooleanFieldFlipSwitchContainer", "//div[@data-id= '[NAME].fieldControl_container']"},
+            //{ "Entity_BooleanFieldButton", "//div[contains(@data-id, '[NAME].fieldControl_container')]"},
+            //{ "Entity_BooleanFieldButtonTrue", ".//label[contains(@class, 'first-child')]"},
+            //{ "Entity_BooleanFieldButtonFalse", ".//label[contains(@class, 'last-child')]"},
+            //{ "Entity_BooleanFieldToggle", "//div[contains(@data-id, '[NAME].fieldControl-toggle-container')]"},
+            //{ "Entity_OptionSetFieldContainer", ".//div[@data-id='[NAME].fieldControl-option-set-container']" },
+            //{ "Entity_OptionsetStatusCombo", "//div[contains(@data-id, '[NAME].fieldControl-pickliststatus-comboBox')]"},
+            //{ "Entity_OptionsetStatusComboButton", "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]"},
+            //{ "Entity_OptionsetStatusComboList", "//ul[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_list')]"},
+            //{ "Entity_OptionsetStatusTextValue", "//span[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_text-value')]"},
+            //{ "Entity_FormMessageBar", "//*[@id=\"notificationMessageAndButtons\"]/div/div/span" },
+            //{ "Entity_FormMessageBarTypeIcon", ".//span[contains(@data-id,'formReadOnlyIcon')]" },
+            //{ "Entity_FormNotifcationBar", "//div[contains(@data-id, 'notificationWrapper')]" },
+            //{ "Entity_FormNotifcationTypeIcon", ".//span[contains(@id,'notification_icon_')]" },
+            //{ "Entity_FormNotifcationExpandButton", ".//span[@id='notificationExpandIcon']" },
+            //{ "Entity_FormNotifcationFlyoutRoot", "//div[@id='__flyoutRootNode']" },
+            //{ "Entity_FormNotifcationList", ".//ul[@data-id='notificationList']" },
 
             //Entity Header
-            { "Entity_Header", "//div[contains(@data-id,'form-header')]"},
-            { "Entity_Header_Flyout","//div[@data-id='headerFieldsFlyout']" },
-            { "Entity_Header_FlyoutButton","//button[contains(@id,'headerFieldsExpandButton')]" },
-            { "Entity_Header_LookupFieldContainer", "//div[@data-id='header_[NAME].fieldControl-Lookup_[NAME]']" },
-            { "Entity_Header_TextFieldContainer", "//div[@data-id='header_[NAME].fieldControl-text-box-container']" },
-            { "Entity_Header_OptionSetFieldContainer", "//div[@data-id='header_[NAME]']" },
-            { "Entity_Header_DateTimeFieldContainer","//div[@data-id='header_[NAME]-FieldSectionItemContainer']" },
+            //{ "Entity_Header", "//div[contains(@data-id,'form-header')]"},
+            //{ "Entity_Header_Flyout","//div[@data-id='headerFieldsFlyout']" },
+            //{ "Entity_Header_FlyoutButton","//button[contains(@id,'headerFieldsExpandButton')]" },
+            //{ "Entity_Header_LookupFieldContainer", "//div[@data-id='header_[NAME].fieldControl-Lookup_[NAME]']" },
+            //{ "Entity_Header_TextFieldContainer", "//div[@data-id='header_[NAME].fieldControl-text-box-container']" },
+            //{ "Entity_Header_OptionSetFieldContainer", "//div[@data-id='header_[NAME]']" },
+            //{ "Entity_Header_DateTimeFieldContainer","//div[@data-id='header_[NAME]-FieldSectionItemContainer']" },
                         
 
             //MultiSelect

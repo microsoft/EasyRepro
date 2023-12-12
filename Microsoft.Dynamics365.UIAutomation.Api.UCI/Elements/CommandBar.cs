@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using System;
 using System.Collections.Generic;
 
@@ -81,7 +82,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 //Is the button in the ribbon?
-                if (ribbon.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", name)), out var command))
+                if (ribbon.TryFindElement(By.XPath(Entity.EntityReference.SubGridCommandLabel.Replace("[NAME]", name)), out var command))
                 {
                     command.Click(true);
                     driver.WaitForTransaction();
@@ -97,7 +98,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         //Click the button
                         var flyOutMenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarFlyoutButtonList])); ;
-                        if (flyOutMenu.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", name)), out var overflowCommand))
+                        if (flyOutMenu.TryFindElement(By.XPath(Entity.EntityReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
                         {
                             overflowCommand.Click(true);
                             driver.WaitForTransaction();
@@ -113,7 +114,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     var submenu = driver.WaitUntilAvailable(By.XPath(CommandBarReference.MoreCommandsMenu));
 
-                    submenu.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subname)), out var subbutton);
+                    submenu.TryFindElement(By.XPath(Entity.EntityReference.SubGridOverflowButton.Replace("[NAME]", subname)), out var subbutton);
 
                     if (subbutton != null)
                     {
@@ -127,7 +128,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         var subSecondmenu = driver.WaitUntilAvailable(By.XPath(CommandBarReference.MoreCommandsMenu));
 
                         subSecondmenu.TryFindElement(
-                            By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton]
+                            By.XPath(Entity.EntityReference.SubGridOverflowButton
                                 .Replace("[NAME]", subSecondName)), out var subSecondbutton);
 
                         if (subSecondbutton != null)
@@ -236,8 +237,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.ThinkTime(thinkTime);
 
             var xPathQuery = closeAsWon
-                ? AppElements.Xpath[AppReference.Entity.CloseOpportunityWin]
-                : AppElements.Xpath[AppReference.Entity.CloseOpportunityLoss];
+                ? Entity.EntityReference.CloseOpportunityWin
+                : Entity.EntityReference.CloseOpportunityLoss;
 
             return _client.Execute(_client.GetOptions($"Close Opportunity"), driver =>
             {
@@ -277,7 +278,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Delete Entity"), driver =>
             {
-                var deleteBtn = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.Delete]),
+                var deleteBtn = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.Delete),
                     "Delete Button is not available");
 
                 deleteBtn?.Click();
@@ -285,6 +286,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 dialogs.ConfirmationDialog(true);
 
                 driver.WaitForTransaction();
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Saves the entity
+        /// </summary>
+        /// <param name="thinkTime"></param>
+        internal BrowserCommandResult<bool> Save(int thinkTime = Constants.DefaultThinkTime)
+        {
+            _client.ThinkTime(thinkTime);
+
+            return _client.Execute(_client.GetOptions($"Save"), driver =>
+            {
+                Actions action = new Actions(driver);
+                action.KeyDown(Keys.Control).SendKeys("S").Perform();
 
                 return true;
             });
