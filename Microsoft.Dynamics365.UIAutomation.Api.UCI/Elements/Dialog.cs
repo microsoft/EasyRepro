@@ -165,7 +165,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">The lookup field name of the lookup.</param>
         public string GetValue(LookupItem control)
         {
-            return _client.GetValue(control);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(control);
         }
 
 
@@ -175,7 +176,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">The lookup field name of the lookup.</param>
         public DateTime? GetValue(DateTimeControl control)
         {
-            return _client.GetValue(control);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(control);
         }
 
         /// <summary>
@@ -185,7 +187,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.GetValue(new LookupItem[] { new LookupItem { Name = "to" } });</example>
         public string[] GetValue(LookupItem[] controls)
         {
-            return _client.GetValue(controls);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(controls);
         }
 
         /// <summary>
@@ -195,7 +198,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.GetValue("emailaddress1");</example>
         public string GetValue(string field)
         {
-            return _client.GetValue(field);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(field);
         }
 
         /// <summary>
@@ -204,7 +208,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The option you want to set.</param>
         public string GetValue(OptionSet optionSet)
         {
-            return _client.GetValue(optionSet);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(optionSet);
         }
 
         /// <summary>
@@ -213,7 +218,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The boolean field name.</param>
         public bool GetValue(BooleanItem option)
         {
-            return _client.GetValue(option);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(option);
         }
 
         /// <summary>
@@ -222,7 +228,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The option you want to set.</param>
         public MultiValueOptionSet GetValue(MultiValueOptionSet option)
         {
-            return _client.GetValue(option);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(option);
         }
 
 
@@ -360,7 +367,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 //Is the button in the ribbon?
-                if (ribbon.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", name)), out var command))
+                if (ribbon.TryFindElement(By.XPath(Entity.EntityReference.SubGridCommandLabel.Replace("[NAME]", name)), out var command))
                 {
                     command.Click(true);
                     driver.WaitForTransaction();
@@ -376,7 +383,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         //Click the button
                         var flyOutMenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarFlyoutButtonList])); ;
-                        if (flyOutMenu.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridCommandLabel].Replace("[NAME]", name)), out var overflowCommand))
+                        if (flyOutMenu.TryFindElement(By.XPath(Entity.EntityReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
                         {
                             overflowCommand.Click(true);
                             driver.WaitForTransaction();
@@ -392,7 +399,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     var submenu = driver.WaitUntilAvailable(By.XPath(CommandBar.CommandBarReference.MoreCommandsMenu));
 
-                    submenu.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton].Replace("[NAME]", subname)), out var subbutton);
+                    submenu.TryFindElement(By.XPath(Entity.EntityReference.SubGridOverflowButton.Replace("[NAME]", subname)), out var subbutton);
 
                     if (subbutton != null)
                     {
@@ -406,7 +413,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         var subSecondmenu = driver.WaitUntilAvailable(By.XPath(CommandBar.CommandBarReference.MoreCommandsMenu));
 
                         subSecondmenu.TryFindElement(
-                            By.XPath(AppElements.Xpath[AppReference.Entity.SubGridOverflowButton]
+                            By.XPath(Entity.EntityReference.SubGridOverflowButton
                                 .Replace("[NAME]", subSecondName)), out var subSecondbutton);
 
                         if (subSecondbutton != null)
@@ -672,7 +679,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     _client.SetValue(new OptionSet { Name = DialogsReference.Assign.AssignToId, Value = "User or team" }, FormContextType.Dialog);
 
                     //Set the User Or Team
-                    var userOrTeamField = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldLookup]), "User field unavailable");
+                    var userOrTeamField = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldLookup), "User field unavailable");
                     var input = userOrTeamField.ClickWhenAvailable(By.TagName("input"), "User field unavailable");
                     input.SendKeys(userOrTeamName, true);
 
@@ -754,15 +761,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Validate Save"), driver =>
             {
                 //Is it Duplicate Detection?
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionWindowMarker])))
+                if (driver.HasElement(By.XPath(Entity.EntityReference.DuplicateDetectionWindowMarker)))
                 {
-                    if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionGridRows])))
+                    if (driver.HasElement(By.XPath(Entity.EntityReference.DuplicateDetectionGridRows)))
                     {
                         //Select the first record in the grid
-                        driver.FindElements(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionGridRows]))[0].Click(true);
+                        driver.FindElements(By.XPath(Entity.EntityReference.DuplicateDetectionGridRows))[0].Click(true);
 
                         //Click Ignore and Save
-                        driver.FindElement(By.XPath(AppElements.Xpath[AppReference.Entity.DuplicateDetectionIgnoreAndSaveButton])).Click(true);
+                        driver.FindElement(By.XPath(Entity.EntityReference.DuplicateDetectionIgnoreAndSaveButton)).Click(true);
                         driver.WaitForTransaction();
                     }
                 }

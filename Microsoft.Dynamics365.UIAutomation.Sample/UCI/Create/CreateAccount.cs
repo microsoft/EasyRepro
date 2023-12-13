@@ -13,31 +13,9 @@ using Microsoft.VisualBasic;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class CreateAccountUCI
+    public class CreateAccountUCI : TestsBase
     {
-        // requires using Microsoft.Extensions.Configuration;
-        private readonly IConfiguration Configuration;
-
-        //[ClassInitialize]
-        public CreateAccountUCI(IConfiguration configuration)
-        {
-            var builder = new ConfigurationBuilder()
-                        .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                        .AddEnvironmentVariables();
-
-            Configuration = builder.Build();
-            _username = Configuration["OnlineUsername"].ToSecureString();
-            _password = Configuration["OnlinePassword"].ToSecureString();
-            _mfaSecretKey = Configuration["MfaSecretKey"].ToSecureString();
-            _xrmUri = new Uri(Configuration["OnlineCrmUrl"].ToString());
-        }
-
-        private readonly SecureString _username;// = ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password;// = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly SecureString _mfaSecretKey;// = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
-        private readonly Uri _xrmUri;// = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
-
+        [TestCategory("Entity")]
         [TestMethod]
         public void UCITestCreateAccount()
         {

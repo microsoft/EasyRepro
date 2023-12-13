@@ -13,6 +13,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestMethod]
         [TestCategory("RegressionTests")]
         [TestCategory("Dialogs")]
+        [TestCategory("Entity")]
         public void UCITestCreateActivity_SetDateTimes()
         {
             var client = new WebClient(TestSettings.Options);
@@ -44,6 +45,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
         
         [TestMethod]
+        [TestCategory("Entity")]
         public void UCITestCreateActivity_ClearDateTimes()
         {
             var client = new WebClient(TestSettings.Options);
@@ -87,7 +89,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
-        
+        [TestCategory("Entity")]
+        [TestCategory("EntityHeader")]
         [TestMethod]
         public void UCITestCreateActivity_ClearHeaderDateTimes()
         {

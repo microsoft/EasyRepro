@@ -20,7 +20,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         public void Cancel()
         {
-            _client.CancelQuickCreate();
+            Entity entity = new Entity(_client);
+            //return entity.GetValue(field);
+            entity.CancelQuickCreate();
         }
 
         /// <summary>
@@ -69,7 +71,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="value">Value of the field</param>
         public string GetValue(string field)
         {
-            return _client.GetValue(field);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(field);
         }
 
         /// <summary>
@@ -79,7 +82,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <returns>The value.</returns>
         public DateTime? GetValue(DateTimeControl control)
         {
-            return _client.GetValue(control);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(control);
         }
 
         /// <summary>
@@ -88,7 +92,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">LookupItem of the field to set</param>
         public string GetValue(LookupItem field)
         {
-            return _client.GetValue(field);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(field);
         }
 
         /// <summary>
@@ -97,7 +102,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The option you want to set.</param>
         public string GetValue(OptionSet field)
         {
-            return _client.GetValue(field);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(field);
         }
 
         /// <summary>
@@ -106,7 +112,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The boolean field name.</param>
         public bool GetValue(BooleanItem option)
         {
-            return _client.GetValue(option);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(option);
         }
 
         /// <summary>
@@ -116,7 +123,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
         public MultiValueOptionSet GetValue(MultiValueOptionSet field)
         {
-            return _client.GetValue(field);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(field);
         }
 
         /// <summary>
@@ -182,7 +190,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         public void Save()
         {
-            _client.SaveQuickCreate();
+            Entity entity = new Entity(_client);
+            entity.SaveQuickCreate();
         }
 
 

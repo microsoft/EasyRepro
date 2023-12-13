@@ -9,6 +9,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     [TestClass]
     public class IsFieldRequired: TestsBase
     {
+        [TestCategory("Entity")]
         [TestMethod]
         public void UCITestConfirmFieldIsNotRequired()
         {

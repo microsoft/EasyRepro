@@ -58,7 +58,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <returns></returns>
         public int GetSubGridItemsCount(string subgridName)
         {
-            return _client.GetSubGridItemsCount(subgridName);
+            Entity entity = new Entity(_client);
+            return entity.GetSubGridItemsCount(subgridName);
         }
 
         /// <summary>

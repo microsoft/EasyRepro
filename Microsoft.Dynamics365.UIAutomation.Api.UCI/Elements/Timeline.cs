@@ -149,7 +149,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <returns>MultiValueOptionSet object where the values field contains all the contact names</returns>
         public MultiValueOptionSet GetEmail(MultiValueOptionSet emailOptions)
         {
-            return _client.GetValue(emailOptions);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(emailOptions);
         }
 
         /// <summary>

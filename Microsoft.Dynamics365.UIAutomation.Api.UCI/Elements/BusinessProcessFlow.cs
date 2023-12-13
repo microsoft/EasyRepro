@@ -49,7 +49,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <returns></returns>
         public string GetValue(string field)
         {
-            return _client.GetValue(field);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(field);
         }
 
         /// <summary>
@@ -58,7 +59,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="field">LookupItem with the schema name of the field to retrieve</param>
         public string GetValue(LookupItem field)
         {
-            return _client.GetValue(field);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(field);
         }
 
         /// <summary>
@@ -67,7 +69,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="field">OptionSet with the schema name of the field to retrieve</param
         public string GetValue(OptionSet field)
         {
-            return _client.GetValue(field);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(field);
         }
 
         /// <summary>
@@ -76,7 +79,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="field">BooleanItem with the schema name of the field to retrieve.</param>
         public bool GetValue(BooleanItem field)
         {
-            return _client.GetValue(field);
+            Entity entity = new Entity(_client);
+            return entity.GetValue(field);
         }
 
         /// <summary>
@@ -260,7 +264,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Set BPF Value: {option.Name}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.TextFieldContainer].Replace("[NAME]", option.Name)));
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", option.Name)));
 
                 if (fieldContainer.FindElements(By.TagName("select")).Count > 0)
                 {
@@ -517,10 +521,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Switch BusinessProcessFlow"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.Entity.ProcessButton]), TimeSpan.FromSeconds(5));
+                driver.ClickWhenAvailable(By.XPath(Entity.EntityReference.ProcessButton), TimeSpan.FromSeconds(5));
 
                 driver.ClickWhenAvailable(
-                    By.XPath(AppElements.Xpath[AppReference.Entity.SwitchProcess]),
+                    By.XPath(Entity.EntityReference.SwitchProcess),
                     TimeSpan.FromSeconds(5),
                     "The Switch Process Button is not available."
                 );
