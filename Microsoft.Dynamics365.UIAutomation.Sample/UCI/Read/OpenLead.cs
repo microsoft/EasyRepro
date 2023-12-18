@@ -10,14 +10,10 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class OpenLeadUCI
+    public class OpenLeadUCI : TestsBase
     {
-
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
-
+        [TestCategory("Grid")]
+        [TestCategory("GridSearch")]
         [TestMethod]
         public void UCITestOpenActiveLead()
         {
@@ -40,6 +36,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             
         }
 
+        [TestCategory("Grid")]
+        [TestCategory("BusinessProcessFlow")]
         [TestMethod]
         [TestCategory("Fail - Bug")]
         public void UCITestRetrieveBPFFields()
@@ -73,6 +71,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Grid")]
+        [TestCategory("BusinessProcessFlowPin")]
         [TestMethod]
         public void UCITestPinBPFStage()
         {
@@ -97,6 +97,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("BusinessProcessFlowClose")]
         [TestMethod]
         public void UCITestCloseBPFStage()
         {

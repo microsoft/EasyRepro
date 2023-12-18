@@ -10,14 +10,10 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class OpenOpportunityUCI
+    public class OpenOpportunityUCIc: TestsBase
     {
 
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
-
+        [TestCategory("Grid")]
         [TestMethod]
         public void UCITestOpenActiveOpportunity()
         {
@@ -38,6 +34,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         }
 
+        [TestCategory("Grid")]
         [TestMethod]
         public void UCITestOpenOpportunityLookupAccount()
         {
@@ -63,6 +60,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Grid")]
         [TestMethod]
         public void UCITestOpenOpportunitySearchLookupAccount()
         {

@@ -11,14 +11,10 @@ using System.Collections.Generic;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class OpenContactUCI
+    public class OpenContactUCI : TestsBase
     {
 
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
-
+        [TestCategory("Grid")]
         [TestMethod]
         public void UCITestOpenActiveContact()
         {
@@ -39,6 +35,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         }
 
+        [TestCategory("Grid")]
+        [TestCategory("OpenRecordSetNavigator")]
+        [TestCategory("RecordSetNavigator")]
         [TestMethod]
         public void UCITestOpenRecordSetNavigator()
         {
@@ -70,6 +69,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Grid")]
         [TestMethod]
         [TestCategory("Fail - Bug")]
         public void UCITestOpenSubGridRecord()
@@ -96,6 +96,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Grid")]
         [TestMethod]
         [TestCategory("RegressionTests")]
         public void UCITestLookupSearch()
@@ -125,6 +126,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Grid")]
         [TestMethod]
         public void UCITestLookupNew()
         {
@@ -151,6 +153,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("RelatedGrid")]
         [TestMethod]
         public void UCITestOpenContactRetrieveHeaderValues()
         {
@@ -174,6 +177,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Grid")]
         [TestCategory("Fail - Bug")]
         [TestMethod]
         public void UCITestOpenContactRelatedEntity()

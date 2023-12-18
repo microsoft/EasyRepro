@@ -10,14 +10,11 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class OpenAccountUCI
+    public class OpenAccountUCI : TestsBase
     {
-
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
-
+        [TestCategory("Grid")]
+        [TestCategory("GridSwitchView")]
+        [TestCategory("GridSearch")]
         [TestMethod]
         public void UCITestOpenActiveAccount()
         {
@@ -41,6 +38,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Grid")]
+        [TestCategory("GridItems")]
+        [TestCategory("GridSort")]
         [TestMethod]
         public void UCITestGetActiveGridItems()
         {
@@ -63,6 +63,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Grid")]
         [TestMethod]
         public void UCITestOpenTabDetails()
         {
@@ -89,6 +90,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Grid")]
+        [TestCategory("EntityGetObjectId")]
         [TestMethod]
         public void UCITestGetObjectId()
         {
@@ -112,6 +115,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Grid")]
+        [TestCategory("SubGrid")]
         [TestMethod]
         public void UCITestOpenSubGridRecord()
         {

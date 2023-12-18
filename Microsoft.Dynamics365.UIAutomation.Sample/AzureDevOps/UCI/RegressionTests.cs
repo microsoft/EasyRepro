@@ -118,8 +118,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 var getGridItems = xrmApp.Grid.GetGridItems();
                 telemetry.TrackTrace("GetGridItems Completed");
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
-                Assert.IsTrue(getGridItems.Count > 0, "GetGridItems returned 0 records.");
-                Assert.IsTrue(getGridItems[0].Id != Guid.Empty, "GetGridItems returned a record but the ID is empty.");
+                Assert.IsTrue(getGridItems.Value.Count > 0, "GetGridItems returned 0 records.");
+                Assert.IsTrue(getGridItems.Value[0].Id != Guid.Empty, "GetGridItems returned a record but the ID is empty.");
 
                 telemetry.TrackTrace("Sort Started");
                 xrmApp.Grid.Sort("Main Phone", "Sort A to Z");

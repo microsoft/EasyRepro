@@ -9,6 +9,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     [TestClass]
     public class HighlightAccount: TestsBase
     {
+        [TestCategory("Grid")]
+        [TestCategory("GridSearch")]
+        [TestCategory("GridHighlightRecord")]
+        [TestCategory("CommandBar")]
         [TestMethod]
         public void UCITestHighlightActiveAccount()
         {

@@ -1,22 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
-using Microsoft.Dynamics365.UIAutomation.Browser;
-using System;
-using System.Security;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
     [TestClass]
-    public class OpenCaseUCI
+    public class OpenCaseUCI : TestsBase
     {
-        private readonly SecureString _username = System.Configuration.ConfigurationManager.AppSettings["OnlineUsername"].ToSecureString();
-        private readonly SecureString _password = System.Configuration.ConfigurationManager.AppSettings["OnlinePassword"].ToSecureString();
-        private readonly SecureString _mfaSecretKey = System.Configuration.ConfigurationManager.AppSettings["MfaSecretKey"].ToSecureString();
-        private readonly Uri _xrmUri = new Uri(System.Configuration.ConfigurationManager.AppSettings["OnlineCrmUrl"].ToString());
-
+        [TestCategory("Grid")]
         [TestMethod]
         public void UCITestOpenActiveCase()
         {
@@ -35,6 +27,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             }
         }
 
+        [TestCategory("Grid")]
         [TestMethod]
         public void UCITestOpenCase()
         {
@@ -50,9 +43,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Grid.SwitchView("Active Cases");
 
                 xrmApp.Grid.OpenRecord(0);
+                xrmApp.Entity.GetValue("");
             }
         }
 
+        [TestCategory("Grid")]
         [TestMethod]
         [TestCategory("Fail - Bug")]
         public void UCITestOpenCaseRetrieveHeaderValues()
