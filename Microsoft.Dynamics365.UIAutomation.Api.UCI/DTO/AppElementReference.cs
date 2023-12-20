@@ -63,15 +63,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string ViewDropdownListItem = "AdvancedLookup_ViewDropdownListItem";
         }
 
-        public static class Related
-        {
-            public static string CommandBarButton = "Related_CommandBarButton";
-            public static string CommandBarSubButton = "Related_CommandBarSubButton";
-            public static string CommandBarOverflowContainer = "Related_CommandBarOverflowContainer";
-            public static string CommandBarOverflowButton = "Related_CommandBarOverflowButton";
-            public static string CommandBarButtonList = "Related_CommandBarButtonList";
-            public static string CommandBarFlyoutButtonList = "Related_CommandBarFlyoutButtonList";
-        }
+
 
         public static class Field
         {

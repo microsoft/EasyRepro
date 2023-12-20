@@ -62,7 +62,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Grid.OpenRecord(1);
             }
         }
-
+        [TestCategory("SubGrid")]
         [TestMethod]
         public void UCITestOpenSubGridRecordOnAccount()
         {

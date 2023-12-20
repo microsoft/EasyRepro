@@ -38,6 +38,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             
         }
         [TestCategory("Entity")]
+        [TestCategory("RelatedGrid")]
         [TestMethod]
         public void UCITestUpdateActiveCaseSetHeaderValues()
         {

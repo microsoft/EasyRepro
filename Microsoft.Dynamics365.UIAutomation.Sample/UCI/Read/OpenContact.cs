@@ -70,6 +70,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestCategory("Grid")]
+        [TestCategory("SubGrid")]
         [TestMethod]
         [TestCategory("Fail - Bug")]
         public void UCITestOpenSubGridRecord()

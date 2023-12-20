@@ -61,34 +61,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string MoreTabs = ".//div[@data-id='more_button']";
             public static string MoreTabsMenu = "//div[@id='__flyoutRootNode']";
             public static string SubTab = "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]";
-            public static string SubGridTitle = "//div[contains(text(), '[NAME]')]";
-            public static string SubGridRow = "//div[@data-id='[NAME]-pcf_grid_control_container']//div[@data-id='grid-container']//div[@data-list-index=\'[INDEX]\']";
-            public static string SubGridLastRow = "//div[@ref='centerContainer']//div[@role='rowgroup']//div[contains(@class, 'ag-row-last')]";
-            public static string SubGridContents = "//div[@id=\"dataSetRoot_[NAME]\"]";
-            public static string SubGridList = "//div[@data-id='[NAME]-pcf_grid_control_container']//div[@data-id='grid-container']//div[@data-automationid='ListCell']";
-            public static string SubGridListCells = ".//div[@class='ag-center-cols-viewport']//div[@role='rowgroup']//div[@row-index]";
-            public static string SubGridViewPickerButton = ".//span[contains(@id, 'ViewSelector') and contains(@id, 'button')]";
-            public static string SubGridViewPickerFlyout = "//div[contains(@id, 'ViewSelector') and contains(@flyoutroot, 'flyoutRootNode')]";
-            public static string SubGridCommandBar = ".//ul[contains(@data-id, 'CommandBar')]";
-            public static string SubGridCommandLabel = ".//button//span[text()=\"[NAME]\"]";
-            public static string SubGridOverflowContainer = ".//div[contains(@data-id, 'flyoutRootNode')]";
-            public static string SubGridOverflowButton = ".//button[contains(@aria-label, '[NAME]')]";
-            public static string SubGridHighDensityList = ".//div[contains(@data-lp-id, \"ReadOnlyGrid|[NAME]\") and contains(@class, 'editableGrid')]";
-            public static string EditableSubGridList = ".//div[contains(@data-lp-id, \"[NAME]\") and contains(@class, 'editableGrid') and not(contains(@class, 'readonly'))]";
-            public static string EditableSubGridListCells = ".//div[contains(@wj-part, 'cells') and contains(@class, 'wj-cells') and contains(@role, 'grid')]";
-            public static string EditableSubGridListCellRows = ".//div[contains(@class, 'wj-row') and contains(@role, 'row')]";
-            public static string EditableSubGridCells = ".//div[@role='gridcell']";
-            public static string SubGridControl = "Entity_SubGridControl";
-            public static string SubGridCells = "Entity_SubGridCells";
-            public static string SubGridRows = ".//div[@role='row' and ./div[@role='gridcell']]";
-            public static string SubGridRowsHighDensity = ".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Data')]";
-            public static string SubGridDataRowsEditable = ".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Data')]";
-            public static string SubGridHeaders = ".//div[contains(@class,'grid-header-text')]";
-            public static string SubGridHeadersHighDensity = ".//div[contains(@class, 'wj-colheaders') and contains(@wj-part, 'chcells')]/div/div";
-            public static string SubGridHeadersEditable = ".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Header')]/div";
-            public static string SubGridRecordCheckbox = "//div[contains(@data-id,'cell-[INDEX]-1') and contains(@data-lp-id,'[NAME]')]";
-            public static string SubGridSearchBox = ".//div[contains(@data-id, 'data-set-quickFind-container')]";
-            public static string SubGridAddButton = "//button[contains(@data-id,'[NAME].AddNewStandard')]/parent::li/parent::ul[contains(@data-lp-id, 'commandbar-SubGridStandard:[NAME]')]";
+            
             public static string FieldLookupButton = "//button[contains(@data-id,'[NAME]_search')]";
             public static string SearchButtonIcon = "//span[contains(@data-id,'microsoftIcon_searchButton')]";
             public static string DuplicateDetectionWindowMarker = "//div[contains(@data-id,'ManageDuplicates')]";
@@ -367,14 +340,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.EntityGetHeaderTitle();
         }
 
-        /// <summary>
-        /// Retrieve the items from a subgrid
-        /// </summary>
-        /// <param name="subgridName">Label of the subgrid to retrieve items from</param>
-        [Obsolete("GetSubGridItems(string subgridName)is deprecated, please use the equivalent Entity.SubGrid.<Method> instead.")]
+
         public List<GridItem> GetSubGridItems(string subgridName)
         {
-            return _client.GetSubGridItems(subgridName);
+            SubGrid subgrid = new SubGrid(_client);
+            return subgrid.GetSubGridItems(subgridName);
         }
 
         /// <summary>
@@ -483,13 +453,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         [Obsolete("OpenSubGridRecord(string subgridName, int index = 0) is deprecated, please use the equivalent Entity.SubGrid.<Method> instead.")]
         public void OpenSubGridRecord(string subgridName, int index = 0)
         {
-            _client.OpenSubGridRecord(subgridName, index);
+            SubGrid subgrid = new SubGrid(_client);
+            subgrid.OpenSubGridRecord(subgridName, index);
         }
 
         [Obsolete("AddSubgridItem(string subgridName) is deprecated, please use the Entity.SubGrid.ClickCommand(string buttonName) instead.")]
         public void AddSubgridItem(string subgridName)
         {
-            _client.ClickSubgridAddButton(subgridName);
+            SubGrid subgrid = new SubGrid(_client);
+            subgrid.ClickSubgridAddButton(subgridName);
         }
 
         /// <summary>

@@ -367,7 +367,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 //Is the button in the ribbon?
-                if (ribbon.TryFindElement(By.XPath(Entity.EntityReference.SubGridCommandLabel.Replace("[NAME]", name)), out var command))
+                if (ribbon.TryFindElement(By.XPath(SubGrid.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var command))
                 {
                     command.Click(true);
                     driver.WaitForTransaction();
@@ -375,15 +375,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                 {
                     //Is the button in More Commands?
-                    if (ribbon.TryFindElement(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarOverflowButton]), out var moreCommands))
+                    if (ribbon.TryFindElement(By.XPath(RelatedGrid.RelatedReference.CommandBarOverflowButton), out var moreCommands))
                     {
                         // Click More Commands
                         moreCommands.Click(true);
                         driver.WaitForTransaction();
 
                         //Click the button
-                        var flyOutMenu = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.Related.CommandBarFlyoutButtonList])); ;
-                        if (flyOutMenu.TryFindElement(By.XPath(Entity.EntityReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
+                        var flyOutMenu = driver.WaitUntilAvailable(By.XPath(RelatedGrid.RelatedReference.CommandBarFlyoutButtonList)); ;
+                        if (flyOutMenu.TryFindElement(By.XPath(SubGrid.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
                         {
                             overflowCommand.Click(true);
                             driver.WaitForTransaction();
@@ -399,7 +399,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     var submenu = driver.WaitUntilAvailable(By.XPath(CommandBar.CommandBarReference.MoreCommandsMenu));
 
-                    submenu.TryFindElement(By.XPath(Entity.EntityReference.SubGridOverflowButton.Replace("[NAME]", subname)), out var subbutton);
+                    submenu.TryFindElement(By.XPath(SubGrid.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname)), out var subbutton);
 
                     if (subbutton != null)
                     {
@@ -413,7 +413,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         var subSecondmenu = driver.WaitUntilAvailable(By.XPath(CommandBar.CommandBarReference.MoreCommandsMenu));
 
                         subSecondmenu.TryFindElement(
-                            By.XPath(Entity.EntityReference.SubGridOverflowButton
+                            By.XPath(SubGrid.SubGridReference.SubGridOverflowButton
                                 .Replace("[NAME]", subSecondName)), out var subSecondbutton);
 
                         if (subSecondbutton != null)
