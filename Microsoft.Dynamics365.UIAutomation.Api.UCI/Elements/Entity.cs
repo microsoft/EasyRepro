@@ -236,7 +236,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public IReadOnlyList<FormNotification> GetFormNotifications()
         {
-            return _client.GetFormNotifications().Value;
+            Lookup lookup = new Lookup(_client);
+            return lookup.GetFormNotifications().Value;
         }
 
         /// <summary>

@@ -98,6 +98,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestCategory("Grid")]
+        [TestCategory("Lookup")]
+        [TestCategory("LookupSelectedRelatedEntity")]
+        [TestCategory("LookupSwitchView")]
+        [TestCategory("LookupOpenRecord")]
+        [TestCategory("LookupNew")]
         [TestMethod]
         [TestCategory("RegressionTests")]
         public void UCITestLookupSearch()

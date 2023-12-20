@@ -102,7 +102,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                 {
                     // Special Lookup Field condition (e.g. transactioncurrencyid)
-                    var lookupRecordList = containerElement.FindElement(By.XPath(AppElements.Xpath[AppReference.Lookup.RecordList]));
+                    var lookupRecordList = containerElement.FindElement(By.XPath(Lookup.LookupReference.RecordList));
                     var lookupDescription = lookupRecordList.FindElement(By.TagName("div"));
 
                     if (lookupDescription != null)

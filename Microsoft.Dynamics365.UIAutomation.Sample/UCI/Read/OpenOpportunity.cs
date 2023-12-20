@@ -61,6 +61,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestCategory("Grid")]
+        [TestCategory("Lookup")]
+        [TestCategory("LookupSearch")]
         [TestMethod]
         public void UCITestOpenOpportunitySearchLookupAccount()
         {

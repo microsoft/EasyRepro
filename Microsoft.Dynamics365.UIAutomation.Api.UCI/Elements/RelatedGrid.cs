@@ -15,12 +15,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #region DTO
         public static class RelatedReference
         {
-            public static string CommandBarButton = "Related_CommandBarButton";
-            public static string CommandBarSubButton = "Related_CommandBarSubButton";
-            public static string CommandBarOverflowContainer = "Related_CommandBarOverflowContainer";
-            public static string CommandBarOverflowButton = "Related_CommandBarOverflowButton";
-            public static string CommandBarButtonList = "Related_CommandBarButtonList";
-            public static string CommandBarFlyoutButtonList = "Related_CommandBarFlyoutButtonList";
+            public static string CommandBarButton = ".//button[contains(@aria-label, '[NAME]') and contains(@id,'SubGrid')]";
+            public static string CommandBarSubButton = ".//button[contains(., '[NAME]')]";
+            public static string CommandBarOverflowContainer = "//div[contains(@data-id, 'flyoutRootNode')]";
+            public static string CommandBarOverflowButton = ".//button[contains(@data-id, 'OverflowButton') and contains(@data-lp-id, 'Grid')]";
+            public static string CommandBarButtonList = "//ul[contains(@data-lp-id, 'commandbar-SubGridAssociated')]";
+            public static string CommandBarFlyoutButtonList = "//ul[contains(@data-id, 'OverflowFlyout')]";
         }
         #endregion
         private readonly WebClient _client;
