@@ -1319,61 +1319,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
         #endregion
 
-        #region PowerApp
-        private bool _inPowerApps = false;
-        internal IWebElement LocatePowerApp(IWebDriver driver, string appId)
-        {
-            IWebElement powerApp = null;
-            Trace.WriteLine(String.Format("Locating {0} App", appId));
-            if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.PowerApp.ModelFormContainer].Replace("[NAME]", appId))))
-            {
-                powerApp = driver.FindElement(By.XPath(AppElements.Xpath[AppReference.PowerApp.ModelFormContainer].Replace("[NAME]", appId)));
-                driver.SwitchTo().Frame(powerApp);
-                powerApp = driver.FindElement(By.XPath("//iframe[@class='publishedAppIframe']"));
-                driver.SwitchTo().Frame(powerApp);
-                _inPowerApps = true;
-            }
-            else
-            {
-                throw new NotFoundException(String.Format("PowerApp with Id {0} not found.", appId));
-            }
-            return powerApp;
-        }
-        public BrowserCommandResult<bool> PowerAppSendCommand(string appId, string command)
-        {
-            return this.Execute(GetOptions("PowerApp Send Command"), driver =>
-            {
-                LocatePowerApp(driver, appId);
-                return true;
-            });
-        }
-        public BrowserCommandResult<bool> PowerAppSelect(string appId, string control)
-        {
 
-            return this.Execute(GetOptions("PowerApp Select"), driver =>
-            {
-                if(!_inPowerApps) LocatePowerApp(driver, appId);
-                if (driver.HasElement(By.XPath(AppElements.Xpath[AppReference.PowerApp.Control].Replace("[NAME]", control))))
-                {
-                    driver.FindElement(By.XPath(AppElements.Xpath[AppReference.PowerApp.Control].Replace("[NAME]", control))).Click();
-                }
-                else
-                {
-                    throw new NotFoundException(String.Format("Control {0} not found in Power App {1}", control, appId));
-                }
-                return true;
-            });
-        }
-        public BrowserCommandResult<bool> PowerAppSetProperty(string appId, string control, string value)
-        {
-
-            return this.Execute(GetOptions("PowerApp Set Property"), driver =>
-            {
-                LocatePowerApp(driver, appId);
-                return true;
-            });
-        }
-        #endregion PowerApp
         internal void ThinkTime(int milliseconds)
         {
             Browser.ThinkTime(milliseconds);
