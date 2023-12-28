@@ -19,6 +19,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     public class Telemetry : Element
     {
         #region DTO
+        public class KeyPerformanceIndicator
+        {
+            public string Name;
+            public double Value;
+        }
         public static class PerformanceWidgetReference
         {
             public static string Container = "//div[@data-id='performance-widget']//*[text()='Page load']";

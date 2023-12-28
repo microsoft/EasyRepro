@@ -8,6 +8,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
     public class QuickCreate : Element
     {
+
+        #region DTO
+        public static class QuickCreateReference
+        {
+            public static string QuickCreateFormContext = "//section[contains(@data-id,'quickCreateRoot')]";
+            public static string SaveButton = "//button[contains(@id,'quickCreateSaveBtn')]";
+            public static string SaveAndCloseButton = "//button[contains(@id,'quickCreateSaveAndCloseBtn')]";
+            public static string CancelButton = "//button[contains(@id,'quickCreateCancelBtn')]";
+        }
+        #endregion
         private readonly WebClient _client;
 
         public QuickCreate(WebClient client) : base()

@@ -103,7 +103,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="activity">The name of the Activity, Valid Values are Appointment, Email, Task and PhoneCall</param>
         private void SaveAndClose(string activity)
         {
-            this.ClickButton(AppElements.Xpath[AppReference.QuickCreate.SaveAndCloseButton].Replace("[NAME]", activity));
+            this.ClickButton(QuickCreate.QuickCreateReference.SaveAndCloseButton.Replace("[NAME]", activity));
         }
 
         /// <summary>

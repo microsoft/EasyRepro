@@ -806,7 +806,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Cancel Quick Create"), driver =>
             {
-                var save = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.CancelButton]),
+                var save = driver.WaitUntilAvailable(By.XPath(QuickCreate.QuickCreateReference.CancelButton),
                     "Quick Create Cancel Button is not available");
                 save?.Click(true);
 
@@ -863,7 +863,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"SaveQuickCreate"), driver =>
             {
-                var save = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[AppReference.QuickCreate.SaveAndCloseButton]),
+                var save = driver.WaitUntilAvailable(By.XPath(QuickCreate.QuickCreateReference.SaveAndCloseButton),
                     "Quick Create Save Button is not available");
                 save?.Click(true);
 
@@ -1216,17 +1216,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Get Multi Select Value: {option.Name}"), driver =>
             {
-                var containerXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.DivContainer].Replace("[NAME]", option.Name));
+                var containerXPath = By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name));
                 var container = driver.WaitUntilAvailable(containerXPath, $"Multi-select option set {option.Name} not found.");
 
                 container.Hover(driver, true);
-                var expandButtonXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.ExpandCollapseButton]);
+                var expandButtonXPath = By.XPath(MultiSelect.ExpandCollapseButton);
                 if (container.TryFindElement(expandButtonXPath, out var expandButton) && expandButton.IsClickable())
                 {
                     expandButton.Click();
                 }
 
-                var selectedOptionsXPath = By.XPath(AppElements.Xpath[AppReference.MultiSelect.SelectedRecordLabel]);
+                var selectedOptionsXPath = By.XPath(MultiSelect.SelectedRecordLabel);
                 var selectedOptions = container.FindElements(selectedOptionsXPath);
 
                 return new MultiValueOptionSet

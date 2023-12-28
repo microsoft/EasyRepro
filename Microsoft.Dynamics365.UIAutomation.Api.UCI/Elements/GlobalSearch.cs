@@ -72,7 +72,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                 {
                     driver.ClickWhenAvailable(
-                        By.XPath(AppElements.Xpath[Navigation.NavigationReference.SearchButton]),
+                        By.XPath(Navigation.NavigationReference.SearchButton),
                         2.Seconds(),
                         "The Global Search (Categorized Search) button is not available.");
 

@@ -12,6 +12,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     /// </summary>
     public class Field
     {
+        public static class FieldReference
+        {
+            public static string ReadOnly = ".//*[@aria-readonly]";
+            public static string Required = ".//*[@aria-required]";
+            public static string RequiredIcon = ".//div[contains(@data-id, 'required-icon') or contains(@id, 'required-icon')]";
+        }
         //Constructors
         public Field(IWebElement containerElement)
         {
@@ -63,9 +69,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             get
             {
-                if (containerElement.HasElement(By.XPath(AppElements.Xpath[AppReference.Field.ReadOnly])))
+                if (containerElement.HasElement(By.XPath(FieldReference.ReadOnly)))
                 {
-                    var readOnly = containerElement.FindElement(By.XPath(AppElements.Xpath[AppReference.Field.ReadOnly]));
+                    var readOnly = containerElement.FindElement(By.XPath(FieldReference.ReadOnly));
 
                     if (readOnly.HasAttribute("aria-readonly"))
                     {
@@ -122,9 +128,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             get
             {
-                if (containerElement.HasElement(By.XPath(AppElements.Xpath[AppReference.Field.RequiredIcon])))
+                if (containerElement.HasElement(By.XPath(FieldReference.RequiredIcon)))
                 {
-                    var required = containerElement.FindElement(By.XPath(AppElements.Xpath[AppReference.Field.RequiredIcon]));
+                    var required = containerElement.FindElement(By.XPath(FieldReference.RequiredIcon));
 
                     if (required != null)
                         return true;

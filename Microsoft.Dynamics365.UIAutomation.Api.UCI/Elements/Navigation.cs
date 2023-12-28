@@ -11,6 +11,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     public class Navigation : Element
     {
         #region DTO
+        public static class Application
+        {
+            public static string Shell = "//*[@id=\"ApplicationShell\"]";
+        }
         public static class NavigationReference
         {
             public static string AreaButton = "//button[@id='areaSwitcherId']";
@@ -155,8 +159,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 quickCreateButton.Click(true);
 
                 //Find the entity name in the list
-                var entityMenuList = driver.FindElement(By.XPath(AppElements.Xpath[NavigationReference.QuickCreateMenuList]));
-                var entityMenuItems = entityMenuList.FindElements(By.XPath(AppElements.Xpath[NavigationReference.QuickCreateMenuItems]));
+                var entityMenuList = driver.FindElement(By.XPath(NavigationReference.QuickCreateMenuList));
+                var entityMenuItems = entityMenuList.FindElements(By.XPath(NavigationReference.QuickCreateMenuItems));
                 var entitybutton = entityMenuItems.FirstOrDefault(e => e.Text.Contains(entityName, StringComparison.OrdinalIgnoreCase));
 
                 if (entitybutton == null)
@@ -176,11 +180,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Quick Launch: {toolTip}"), driver =>
             {
-                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[NavigationReference.QuickLaunchMenu]));
+                driver.WaitUntilClickable(By.XPath(NavigationReference.QuickLaunchMenu));
 
                 //Text could be in the crumb bar.  Find the Quick launch bar buttons and click that one.
-                var buttons = driver.FindElement(By.XPath(AppElements.Xpath[NavigationReference.QuickLaunchMenu]));
-                var launchButton = buttons.FindElement(By.XPath(AppElements.Xpath[NavigationReference.QuickLaunchButton].Replace("[NAME]", toolTip)));
+                var buttons = driver.FindElement(By.XPath(NavigationReference.QuickLaunchMenu));
+                var launchButton = buttons.FindElement(By.XPath(NavigationReference.QuickLaunchButton.Replace("[NAME]", toolTip)));
                 launchButton.Click();
 
                 return true;
@@ -190,8 +194,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions("Sign out"), driver =>
             {
-                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[NavigationReference.AccountManagerButton])).Click();
-                driver.WaitUntilClickable(By.XPath(AppElements.Xpath[NavigationReference.AccountManagerSignOutButton])).Click();
+                driver.WaitUntilClickable(By.XPath(NavigationReference.AccountManagerButton)).Click();
+                driver.WaitUntilClickable(By.XPath(NavigationReference.AccountManagerSignOutButton)).Click();
 
                 return driver.WaitForPageToLoad();
             });
@@ -221,7 +225,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 _client.InitializeModes();
 
                 // Wait for app page elements to be visible (shell and sitemapLauncherButton)
-                var shell = driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
+                var shell = driver.WaitUntilVisible(By.XPath(Application.Shell));
                 var sitemapLauncherButton = driver.WaitUntilVisible(By.XPath(NavigationReference.SiteMapLauncherButton));
 
                 success = shell != null && sitemapLauncherButton != null;
@@ -276,22 +280,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions("Open Group Sub Area"), driver =>
             {
                 //Make sure the sitemap-launcher is expanded - 9.1
-                if (driver.HasElement(By.XPath(AppElements.Xpath[NavigationReference.SiteMapLauncherButton])))
+                if (driver.HasElement(By.XPath(NavigationReference.SiteMapLauncherButton)))
                 {
-                    var expanded = bool.Parse(driver.FindElement(By.XPath(AppElements.Xpath[NavigationReference.SiteMapLauncherButton])).GetAttribute("aria-expanded"));
+                    var expanded = bool.Parse(driver.FindElement(By.XPath(NavigationReference.SiteMapLauncherButton)).GetAttribute("aria-expanded"));
 
                     if (!expanded)
-                        driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[NavigationReference.SiteMapLauncherButton]));
+                        driver.ClickWhenAvailable(By.XPath(NavigationReference.SiteMapLauncherButton));
                 }
 
-                var groups = driver.FindElements(By.XPath(AppElements.Xpath[NavigationReference.SitemapMenuGroup]));
+                var groups = driver.FindElements(By.XPath(NavigationReference.SitemapMenuGroup));
                 var groupList = groups.FirstOrDefault(g => g.GetAttribute("aria-label").ToLowerString() == group.ToLowerString());
                 if (groupList == null)
                 {
                     throw new NotFoundException($"No group with the name '{group}' exists");
                 }
 
-                var subAreaItems = groupList.FindElements(By.XPath(AppElements.Xpath[NavigationReference.SitemapMenuItems]));
+                var subAreaItems = groupList.FindElements(By.XPath(NavigationReference.SitemapMenuItems));
                 var subAreaItem = subAreaItems.FirstOrDefault(a => a.GetAttribute("data-text").ToLowerString() == subarea.ToLowerString());
                 if (subAreaItem == null)
                 {
@@ -396,7 +400,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.ThinkTime(thinkTime);
             return _client.Execute(_client.GetOptions("Open Admin Portal"), driver =>
             {
-                driver.WaitUntilVisible(By.XPath(AppElements.Xpath[AppReference.Application.Shell]));
+                driver.WaitUntilVisible(By.XPath(Application.Shell));
                 driver.FindElement(By.XPath(NavigationReference.AdminPortal))?.Click();
                 driver.FindElement(By.XPath(NavigationReference.AdminPortalButton))?.Click();
                 return true;
@@ -440,7 +444,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
         internal bool OpenAppFromMenu(IWebDriver driver, string appName)
         {
-            var container = driver.WaitUntilAvailable(By.XPath(AppElements.Xpath[NavigationReference.AppMenuContainer]));
+            var container = driver.WaitUntilAvailable(By.XPath(NavigationReference.AppMenuContainer));
             var xpathToButton = "//nav[@aria-hidden='false']//button//*[text()='[TEXT]']".Replace("[TEXT]", appName);
             var button = container.ClickWhenAvailable(By.XPath(xpathToButton),
                                 TimeSpan.FromSeconds(1)
@@ -480,7 +484,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions("Open Menu"), driver =>
             {
                 //Make sure the sitemap-launcher is expanded - 9.1
-                var xpathSiteMapLauncherButton = By.XPath(AppElements.Xpath[NavigationReference.SiteMapLauncherButton]);
+                var xpathSiteMapLauncherButton = By.XPath(NavigationReference.SiteMapLauncherButton);
                 bool success = driver.TryFindElement(xpathSiteMapLauncherButton, out IWebElement launcherButton);
                 if (success)
                 {
@@ -492,7 +496,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var dictionary = new Dictionary<string, IWebElement>();
 
                 //Is this the sitemap with enableunifiedinterfaceshellrefresh?
-                var xpathSitemapSwitcherButton = By.XPath(AppElements.Xpath[NavigationReference.SitemapSwitcherButton]);
+                var xpathSitemapSwitcherButton = By.XPath(NavigationReference.SitemapSwitcherButton);
                 success = driver.TryFindElement(xpathSitemapSwitcherButton, out IWebElement switcherButton);
                 if (success)
                 {
@@ -502,7 +506,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     AddMenuItemsFrom(driver, NavigationReference.SitemapSwitcherFlyout, dictionary);
                 }
 
-                var xpathSiteMapAreaMoreButton = By.XPath(AppElements.Xpath[NavigationReference.SiteMapAreaMoreButton]);
+                var xpathSiteMapAreaMoreButton = By.XPath(NavigationReference.SiteMapAreaMoreButton);
                 success = driver.TryFindElement(xpathSiteMapAreaMoreButton, out IWebElement moreButton);
                 if (!success)
                     return dictionary;
@@ -515,7 +519,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
                 else
                 {
-                    var singleItem = driver.FindElement(By.XPath(AppElements.Xpath[NavigationReference.SiteMapSingleArea].Replace("[NAME]", area)));
+                    var singleItem = driver.FindElement(By.XPath(NavigationReference.SiteMapSingleArea.Replace("[NAME]", area)));
                     dictionary.Add(singleItem.Text.ToLowerString(), singleItem);
                 }
 

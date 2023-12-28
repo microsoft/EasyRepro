@@ -11,6 +11,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
     public class OnlineLogin : Element
     {
+        #region prop
+        public enum LoginResult
+        {
+            Success,
+            Failure,
+            Redirect
+        }
+        #endregion
         #region DTO
         public static class LoginReference
         {
