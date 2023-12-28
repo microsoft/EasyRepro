@@ -20,6 +20,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public static class EntityReference
         {
+            public static class Entity
+            {
+                public static string Form = "//*[contains(@id, \"tablist\")]";
+                public static string Close = "id(\"closeButton\")";
+                public static string Tab = "[NAME]_TAB_header_image_div";
+                public static string Save = "id(\"savefooter_statuscontrol\")";
+                public static string FormSelector = "//*[@data-id=\"form-selector\"]";
+                public static string FormSelectorFlyout = "//*[@data-id=\"form-selector-flyout\"]";
+                public static string FormSelectorItem = "//li[contains(@data-id, 'form-selector-item')]";
+                public static string LookupRender = "Lookup_RenderButton_td";
+                public static string Popout = "ms-crm-ImageStrip-popout";
+            }
             public static string FormContext = "//*[@data-id='editFormRoot']";
             public static string FormSelector = "//*[@data-id='form-selector']";
             public static string HeaderTitle = "//*[@data-id='header_title']";
@@ -143,7 +155,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.ClearValue(new LookupItem { Name = "to" });</example>
         public void ClearValue(LookupItem control)
         {
-            _client.ClearValue(control, FormContextType.Entity);
+            Lookup lookup = new Lookup(_client);
+            lookup.ClearValue(control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -586,7 +599,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         public void SetValue(LookupItem control)
         {
-            _client.SetValue(control, FormContextType.Entity);
+            Lookup lookup = new Lookup(_client);
+            lookup.SetValue(control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -596,7 +610,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.SetValue(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
         public void SetValue(LookupItem[] controls)
         {
-            _client.SetValue(controls, FormContextType.Entity);
+            Lookup lookup = new Lookup(_client);
+            lookup.SetValue(controls, FormContextType.Entity);
         }
 
         /// <summary>
@@ -678,7 +693,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.AddValues(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
         public void AddValues(LookupItem[] controls)
         {
-            _client.AddValues(controls);
+            Lookup lookup = new Lookup(_client);
+            lookup.AddValues(controls);
         }
 
         /// <summary>
@@ -688,7 +704,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.RemoveValues(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
         public void RemoveValues(LookupItem[] controls)
         {
-            _client.RemoveValues(controls);
+            Lookup lookup = new Lookup(_client);
+            lookup.RemoveValues(controls);
         }
         #endregion
         #region internals
@@ -831,7 +848,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //SwitchToContent();
                 driver.WaitForPageToLoad();
                 driver.WaitForTransaction();
-                driver.WaitUntilClickable(By.XPath(Elements.Xpath[Reference.Entity.Form]),
+                driver.WaitUntilClickable(By.XPath(EntityReference.Entity.Form),
                     TimeSpan.FromSeconds(30),
                     "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
                 );
@@ -1646,8 +1663,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver => ExecuteInHeaderContainer(driver, xpathToContainer,
                     fieldContainer =>
                     {
-                        WebClient.TryRemoveLookupValue(driver, fieldContainer, control, removeAll, isHeader);
-                        _client.TrySetValue(driver, fieldContainer, control);
+                        Lookup lookup = new Lookup(_client);
+                        lookup.TryRemoveLookupValue(driver, fieldContainer, control, removeAll, isHeader);
+                        lookup.TrySetValue(driver, fieldContainer, control);
 
                         TryCloseHeaderFlyout(driver);
                         return true;
@@ -1663,10 +1681,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver => ExecuteInHeaderContainer(driver, xpathToContainer,
                     container =>
                     {
+                        Lookup lookup = new Lookup(_client);
                         if (clearFirst)
-                            WebClient.TryRemoveLookupValue(driver, container, control);
+                            lookup.TryRemoveLookupValue(driver, container, control);
 
-                        _client.TryToSetValue(driver, container, controls);
+                        lookup.TryToSetValue(driver, container, controls);
 
                         TryCloseHeaderFlyout(driver);
                         return true;
@@ -1749,17 +1768,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForTransaction();
 
-                if (!driver.HasElement(By.XPath(Elements.Xpath[Reference.Entity.FormSelector])))
+                if (!driver.HasElement(By.XPath(EntityReference.Entity.FormSelector)))
                     throw new NotFoundException("Unable to find form selector on the form");
 
-                var formSelector = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Entity.FormSelector]));
+                var formSelector = driver.WaitUntilAvailable(By.XPath(EntityReference.Entity.FormSelector));
                 // Click didn't work with IE
                 formSelector.SendKeys(Keys.Enter);
 
-                driver.WaitUntilVisible(By.XPath(Elements.Xpath[Reference.Entity.FormSelectorFlyout]));
+                driver.WaitUntilVisible(By.XPath(EntityReference.Entity.FormSelectorFlyout));
 
-                var flyout = driver.FindElement(By.XPath(Elements.Xpath[Reference.Entity.FormSelectorFlyout]));
-                var forms = flyout.FindElements(By.XPath(Elements.Xpath[Reference.Entity.FormSelectorItem]));
+                var flyout = driver.FindElement(By.XPath(EntityReference.Entity.FormSelectorFlyout));
+                var forms = flyout.FindElements(By.XPath(EntityReference.Entity.FormSelectorItem));
 
                 var form = forms.FirstOrDefault(a => a.GetAttribute("data-text").EndsWith(formName, StringComparison.OrdinalIgnoreCase));
                 if (form == null)

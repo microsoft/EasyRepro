@@ -103,7 +103,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="activity">The name of the Activity, Valid Values are Appointment, Email, Task and PhoneCall</param>
         private void SaveAndClose(string activity)
         {
-            this.ClickButton(AppElements.Xpath[AppReference.QuickCreate.SaveAndCloseButton].Replace("[NAME]", Elements.ElementId[activity]));
+            this.ClickButton(AppElements.Xpath[AppReference.QuickCreate.SaveAndCloseButton].Replace("[NAME]", activity));
         }
 
         /// <summary>
@@ -130,7 +130,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="removeExistingValues">Remove any existing values in the To, CC, or BCC lines, if present</param>         
         public void AddEmailContacts(LookupItem[] toOptions, bool removeExistingValues = false)
         {
-            _client.SetValue(toOptions, FormContextType.Entity, removeExistingValues);
+            Lookup lookup = new Lookup(_client);
+            lookup.SetValue(toOptions, FormContextType.Entity, removeExistingValues);
         }
 
         /// <summary>
@@ -320,7 +321,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <returns>True on success, False on failure to invoke any action</returns>
         internal BrowserCommandResult<bool> OpenAndClickPopoutMenu(string popoutName, string popoutItemName, int thinkTime = Constants.DefaultThinkTime)
         {
-            return this.OpenAndClickPopoutMenu(By.XPath(Elements.Xpath[popoutName]), By.XPath(Elements.Xpath[popoutItemName]), thinkTime);
+            return this.OpenAndClickPopoutMenu(By.XPath(popoutName), By.XPath(popoutItemName), thinkTime);
         }
 
         /// <summary>
@@ -395,7 +396,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute($"SetValue (Generic)", driver =>
             {
-                var inputbox = driver.WaitUntilAvailable(By.XPath(Elements.Xpath[fieldName]));
+                var inputbox = driver.WaitUntilAvailable(By.XPath(fieldName));
                 if (expectedTagName.Equals(inputbox.TagName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     if (!inputbox.TagName.Contains("iframe", StringComparison.InvariantCultureIgnoreCase))

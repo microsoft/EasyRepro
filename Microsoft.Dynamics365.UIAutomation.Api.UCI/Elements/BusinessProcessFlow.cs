@@ -144,7 +144,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="field">LookupItem with the schema name of the field to retrieve</param>
         public void SetValue(LookupItem control)
         {
-            _client.SetValue(control, FormContextType.BusinessProcessFlow);
+            Lookup lookup = new Lookup(_client);
+            lookup.SetValue(control, FormContextType.BusinessProcessFlow);
         }
 
         /// <summary>

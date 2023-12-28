@@ -12,6 +12,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #region DTO
         public static class DialogsReference
         {
+            public static class Frames
+            {
+                public static string ContentPanel = "Frame_ContentPanel";
+                public static string ContentFrameId = "Frame_ContentFrameId";
+                public static string DialogFrame = "Frame_DialogFrame";
+                public static string DialogFrameId = "Frame_DialogFrameId";
+                public static string QuickCreateFrame = "Frame_QuickCreateFrame";
+                public static string QuickCreateFrameId = "Frame_QuickCreateFrameId";
+                public static string WizardFrame = "Frame_WizardFrame";
+                public static string WizardFrameId = "Frame_WizardFrameId";
+                public static string ViewFrameId = "Frame_ViewFrameId";
+
+            }
             public static class CloseOpportunity
             {
                 public static string Ok = "//button[contains(@data-id, 'ok_id')]";
@@ -249,7 +262,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">The lookup field name, value or index of the lookup.</param>
         public void SetValue(LookupItem control)
         {
-            _client.SetValue(control, FormContextType.Dialog);
+            Lookup lookup = new Lookup(_client);
+            lookup.SetValue(control, FormContextType.Dialog);
         }
 
         /// <summary>
@@ -259,7 +273,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.SetValue(new LookupItem[] { new LookupItem { Name = "to", Value = "A. Datum Corporation (sample)" } });</example>
         public void SetValue(LookupItem[] controls)
         {
-            _client.SetValue(controls, FormContextType.Dialog);
+            Lookup lookup = new Lookup(_client);
+            lookup.SetValue(controls, FormContextType.Dialog);
         }
 
         /// <summary>
@@ -468,13 +483,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.Browser.Driver.SwitchTo().DefaultContent();
 
             // Check to see if dialog is InlineDialog or popup
-            var inlineDialog = _client.Browser.Driver.HasElement(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)));
+            var inlineDialog = _client.Browser.Driver.HasElement(By.XPath(DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index)));
             if (inlineDialog)
             {
                 //wait for the content panel to render
-                _client.Browser.Driver.WaitUntilAvailable(By.XPath(Elements.Xpath[Reference.Frames.DialogFrame].Replace("[INDEX]", index)),
+                _client.Browser.Driver.WaitUntilAvailable(By.XPath(DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index)),
                     TimeSpan.FromSeconds(2),
-                    d => { _client.Browser.Driver.SwitchTo().Frame(Elements.ElementId[Reference.Frames.DialogFrameId].Replace("[INDEX]", index)); });
+                    d => { _client.Browser.Driver.SwitchTo().Frame(DialogsReference.Frames.DialogFrameId.Replace("[INDEX]", index)); });
                 return true;
             }
             else

@@ -4,6 +4,7 @@ using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;
+using static Microsoft.Dynamics365.UIAutomation.Api.UCI.Entity;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -90,6 +91,242 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #endregion
         #region Lookup 
 
+        internal BrowserCommandResult<bool> RemoveValues(LookupItem[] controls)
+        {
+            return _client.Execute(_client.GetOptions($"Remove values {controls.First().Name}"), driver =>
+            {
+                foreach (var control in controls)
+                    this.ClearValue(control, FormContextType.Entity, false);
+
+                return true;
+            });
+        }
+        public void TrySetValue(IWebDriver driver, IWebElement fieldContainer, LookupItem control)
+        {
+            IWebElement input;
+            bool found = fieldContainer.TryFindElement(By.TagName("input"), out input);
+            string value = control.Value?.Trim();
+            if (found)
+                _client.SetInputValue(driver, input, value);
+
+            TrySetValue(driver, control);
+        }
+
+        public void TryToSetValue(IWebDriver driver, ISearchContext fieldContainer, LookupItem[] controls)
+        {
+            IWebElement input;
+            bool found = fieldContainer.TryFindElement(By.TagName("input"), out input);
+
+            foreach (var control in controls)
+            {
+                var value = control.Value?.Trim();
+                if (found)
+                {
+                    if (string.IsNullOrWhiteSpace(value))
+                        input.Click();
+                    else
+                    {
+                        input.SendKeys(value, true);
+                        driver.WaitForTransaction();
+                        _client.ThinkTime(3.Seconds());
+                        input.SendKeys(Keys.Tab);
+                        input.SendKeys(Keys.Enter);
+                    }
+                }
+
+                TrySetValue(fieldContainer, control);
+            }
+
+            input.SendKeys(Keys.Escape); // IE wants to keep the flyout open on multi-value fields, this makes sure it closes
+        }
+
+        public void TrySetValue(ISearchContext container, LookupItem control)
+        {
+            string value = control.Value;
+            if (value == null)
+                control.Value = string.Empty;
+            // throw new InvalidOperationException($"No value has been provided for the LookupItem {control.Name}. Please provide a value or an empty string and try again.");
+
+            if (control.Value == string.Empty)
+                SetLookupByIndex(container, control);
+            else
+                SetLookUpByValue(container, control);
+        }
+        private void SetLookUpByValue(ISearchContext container, LookupItem control)
+        {
+            var controlName = control.Name;
+            var xpathToText = EntityReference.LookupFieldNoRecordsText.Replace("[NAME]", controlName);
+            var xpathToResultList = EntityReference.LookupFieldResultList.Replace("[NAME]", controlName);
+            var bypathResultList = By.XPath(xpathToText + "|" + xpathToResultList);
+
+            container.WaitUntilAvailable(bypathResultList, TimeSpan.FromSeconds(10));
+
+            var byPathToFlyout = By.XPath(EntityReference.TextFieldLookupMenu.Replace("[NAME]", controlName));
+            var flyoutDialog = container.WaitUntilClickable(byPathToFlyout);
+
+            var items = GetListItems(flyoutDialog, control);
+
+            if (items.Count == 0)
+                throw new InvalidOperationException($"List does not contain a record with the name:  {control.Value}");
+
+            int index = control.Index;
+            if (index >= items.Count)
+                throw new InvalidOperationException($"List does not contain {index + 1} records. Please provide an index value less than {items.Count} ");
+
+            var selectedItem = items.ElementAt(index);
+            selectedItem.Click(true);
+        }
+        private void SetLookupByIndex(ISearchContext container, LookupItem control)
+        {
+            var controlName = control.Name;
+            var xpathToControl = By.XPath(EntityReference.LookupResultsDropdown.Replace("[NAME]", controlName));
+            var lookupResultsDialog = container.WaitUntilVisible(xpathToControl);
+
+            var xpathFieldResultListItem = By.XPath(EntityReference.LookupFieldResultListItem.Replace("[NAME]", controlName));
+            container.WaitUntil(d => d.FindElements(xpathFieldResultListItem).Count > 0);
+
+
+            var items = GetListItems(lookupResultsDialog, control);
+            if (items.Count == 0)
+                throw new InvalidOperationException($"No results exist in the Recently Viewed flyout menu. Please provide a text value for {controlName}");
+
+            int index = control.Index;
+            if (index >= items.Count)
+                throw new InvalidOperationException($"Recently Viewed list does not contain {index} records. Please provide an index value less than {items.Count}");
+
+            var selectedItem = items.ElementAt(index);
+            selectedItem.Click(true);
+        }
+        public void TryRemoveLookupValue(IWebDriver driver, IWebElement fieldContainer, LookupItem control, bool removeAll = true, bool isHeader = false)
+        {
+            var controlName = control.Name;
+            fieldContainer.Hover(driver);
+
+            var xpathDeleteExistingValues = By.XPath(Entity.EntityReference.LookupFieldDeleteExistingValue.Replace("[NAME]", controlName));
+            var existingValues = fieldContainer.FindElements(xpathDeleteExistingValues);
+
+            var xpathToExpandButton = By.XPath(Entity.EntityReference.LookupFieldExpandCollapseButton.Replace("[NAME]", controlName));
+            bool success = fieldContainer.TryFindElement(xpathToExpandButton, out var expandButton);
+            if (success)
+            {
+                expandButton.Click(true);
+
+                var count = existingValues.Count;
+                fieldContainer.WaitUntil(x => x.FindElements(xpathDeleteExistingValues).Count > count);
+            }
+
+            fieldContainer.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldLookupSearchButton.Replace("[NAME]", controlName)));
+
+            existingValues = fieldContainer.FindElements(xpathDeleteExistingValues);
+            if (existingValues.Count == 0)
+                return;
+
+            if (removeAll)
+            {
+                // Removes all selected items
+
+                while (existingValues.Count > 0)
+                {
+                    foreach (var v in existingValues)
+                        v.Click(true);
+
+                    existingValues = fieldContainer.FindElements(xpathDeleteExistingValues);
+                }
+
+                return;
+            }
+
+            // Removes an individual item by value or index
+            var value = control.Value;
+            if (value == null)
+                throw new InvalidOperationException($"No value or index has been provided for the LookupItem {controlName}. Please provide an value or an empty string or an index and try again.");
+
+            if (value == string.Empty)
+            {
+                var index = control.Index;
+                if (index >= existingValues.Count)
+                    throw new InvalidOperationException($"Field '{controlName}' does not contain {index + 1} records. Please provide an index value less than {existingValues.Count}");
+
+                existingValues[index].Click(true);
+                return;
+            }
+
+            var existingValue = existingValues.FirstOrDefault(v => v.GetAttribute("aria-label").EndsWith(value));
+            if (existingValue == null)
+                throw new InvalidOperationException($"Field '{controlName}' does not contain a record with the name:  {value}");
+
+            existingValue.Click(true);
+            driver.WaitForTransaction();
+        }
+        /// <summary>
+        /// Sets the value of a Lookup, Customer, Owner or ActivityParty Lookup which accepts only a single value.
+        /// </summary>
+        /// <param name="control">The lookup field name, value or index of the lookup.</param>
+        /// <example>xrmApp.Entity.SetValue(new Lookup { Name = "prrimarycontactid", Value = "Rene Valdes (sample)" });</example>
+        /// The default index position is 0, which will be the first result record in the lookup results window. Suppy a value > 0 to select a different record if multiple are present.
+        internal BrowserCommandResult<bool> SetValue(LookupItem control, FormContextType formContextType)
+        {
+            return _client.Execute(_client.GetOptions($"Set Lookup Value: {control.Name}"), driver =>
+            {
+                driver.WaitForTransaction();
+
+                IWebElement fieldContainer = null;
+                fieldContainer = _client.ValidateFormContext(driver, formContextType, control.Name, fieldContainer);
+
+                TryRemoveLookupValue(driver, fieldContainer, control);
+                TrySetValue(driver, fieldContainer, control);
+
+                return true;
+            });
+        }
+        /// <summary>
+        /// Sets the value of an ActivityParty Lookup.
+        /// </summary>
+        /// <param name="controls">The lookup field name, value or index of the lookup.</param>
+        /// <example>xrmApp.Entity.SetValue(new Lookup[] { Name = "to", Value = "Rene Valdes (sample)" }, { Name = "to", Value = "Alpine Ski House (sample)" } );</example>
+        /// The default index position is 0, which will be the first result record in the lookup results window. Suppy a value > 0 to select a different record if multiple are present.
+        internal BrowserCommandResult<bool> SetValue(LookupItem[] controls, FormContextType formContextType = FormContextType.Entity, bool clearFirst = true)
+        {
+            var control = controls.First();
+            var controlName = control.Name;
+            return _client.Execute(_client.GetOptions($"Set ActivityParty Lookup Value: {controlName}"), driver =>
+            {
+                driver.WaitForTransaction();
+
+                IWebElement fieldContainer = null;
+                fieldContainer = _client.ValidateFormContext(driver, formContextType, controlName, fieldContainer);
+
+                if (clearFirst)
+                   TryRemoveLookupValue(driver, fieldContainer, control);
+
+                TryToSetValue(driver, fieldContainer, controls);
+
+                return true;
+            });
+        }
+
+        internal BrowserCommandResult<bool> AddValues(LookupItem[] controls)
+        {
+            return _client.Execute(_client.GetOptions($"Add values {controls.First().Name}"), driver =>
+            {
+                this.SetValue(controls, FormContextType.Entity, false);
+
+                return true;
+            });
+        }
+
+
+        internal BrowserCommandResult<bool> ClearValue(LookupItem control, FormContextType formContextType, bool removeAll = true)
+        {
+            var controlName = control.Name;
+            return _client.Execute(_client.GetOptions($"Clear Field {controlName}"), driver =>
+            {
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldLookupFieldContainer.Replace("[NAME]", controlName)));
+                TryRemoveLookupValue(driver, fieldContainer, control, removeAll);
+                return true;
+            });
+        }
+
         internal BrowserCommandResult<bool> OpenLookupRecord(int index)
         {
             return _client.Execute(_client.GetOptions("Select Lookup Record"), driver =>
@@ -158,7 +395,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     // Lookup
                     control.Value = searchCriteria;
-                    _client.SetValue(control, FormContextType.Entity);
+                    this.SetValue(control, FormContextType.Entity);
                 }
 
                 driver.WaitForTransaction();

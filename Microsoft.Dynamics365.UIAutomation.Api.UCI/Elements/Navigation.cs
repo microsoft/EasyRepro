@@ -46,6 +46,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string SitemapSwitcherFlyout = "//div[contains(@data-lp-id,'sitemap-area-switcher-flyout')]";
             public static string UCIAppContainer = "//div[@id='AppLandingPageContentContainer']";
             public static string UCIAppTile = "//div[@data-type='app-title' and @title='[NAME]']";
+            public static string GoBack = "//button[@title='Go back']";
+
+            public static class MenuRelated
+            {
+                public static string Related = "//li[contains(@data-id,\"tablist-tab_related\")]";
+                public static string CommonActivities = "//div[contains(@data-id,\"form-tab-relatedEntity-navActivities\")]";
+            }
         }
         #endregion
         private readonly WebClient _client;
@@ -131,7 +138,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForTransaction();
 
-                var element = driver.ClickWhenAvailable(By.XPath(Elements.Xpath[Reference.Navigation.GoBack]));
+                var element = driver.ClickWhenAvailable(By.XPath(NavigationReference.GoBack));
 
                 driver.WaitForTransaction();
                 return element != null;
@@ -429,7 +436,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <returns>True on success, False on failure to invoke any action</returns>
         internal BrowserCommandResult<bool> OpenAndClickPopoutMenu(string popoutName, string popoutItemName, int thinkTime = Constants.DefaultThinkTime)
         {
-            return this.OpenAndClickPopoutMenu(By.XPath(Elements.Xpath[popoutName]), By.XPath(Elements.Xpath[popoutItemName]), thinkTime);
+            return this.OpenAndClickPopoutMenu(By.XPath(popoutName), By.XPath(popoutItemName), thinkTime);
         }
         internal bool OpenAppFromMenu(IWebDriver driver, string appName)
         {

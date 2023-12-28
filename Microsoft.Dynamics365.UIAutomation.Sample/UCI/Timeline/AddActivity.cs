@@ -230,7 +230,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         {
             return new LookupItem
             {
-                Name = Elements.ElementId[name],
+                Name = name,
                 Value = value
             };
         }
