@@ -180,14 +180,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Notes_ActivityTaskScheduledEnd" , "id(\"quickCreateActivity4212controlId_scheduledend\")"},
             { "Notes_ActivityAddTaskDueTime"    ,"id(\"selectTable_Date\")"},
                       
-            //Login           
-            { "Login_UserId", "//input[@type='email']"},
-            { "Login_Password", "//input[@type='password']"},
-            { "Login_SignIn", "id(\"cred_sign_in_button\")"},
-            { "Login_CrmMainPage", "//*[contains(@id,'crmTopBar') or contains(@data-id,'topBar')]"},
-            { "Login_CrmUCIMainPage", "//*[contains(@data-id,'topBar')]"},
-            { "Login_StaySignedIn", "//div[@data-viewid and contains(@data-bind, 'kmsi-view')]//input[@id='idSIButton9']"},
-            { "Login_OneTimeCode", "//input[@name='otc']"},
 
 
             //Notification           
@@ -318,8 +310,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "Process_Category", "WorkflowCategory"},
             { "Process_Entity", "PrimaryEntity"},
 
-            //Login
-            { "Login_UseAnotherAccount", "otherTile" }
+
     };
 
         public static Dictionary<string, string> CssClass = new Dictionary<string, string>()
@@ -729,17 +720,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Begin = "LookUp_Begin";
 
         }
-        public static class Login
-        {
-            public static string UserId = "Login_UserId";
-            public static string LoginPassword = "Login_Password";
-            public static string SignIn = "Login_SignIn";
-            public static string CrmMainPage = "Login_CrmMainPage";
-            public static string CrmUCIMainPage = "Login_CrmUCIMainPage";
-            public static string StaySignedIn = "Login_StaySignedIn";
-            public static string OneTimeCode = "Login_OneTimeCode";
-            public static string UseAnotherAccount = "Login_UseAnotherAccount";
-        }
+
         public static class Report
         {
             public static string Close = "Report_Close";

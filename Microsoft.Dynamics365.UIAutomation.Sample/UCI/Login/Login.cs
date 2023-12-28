@@ -11,19 +11,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         [TestCleanup]
         public override void FinishTest() => base.FinishTest();
 
+        [TestCategory("Login")]
         [TestMethod]
         public void MultiFactorLogin()
         {
            trace.Log("Login success");
         }
 
+        [TestCategory("Login")]
         [TestMethod]
         public void MultiFactorLogin_NavigateToApp()
         {
             trace.Log("Login success");
             NavigateTo(UCIAppName.Sales);
         }
-        
+
+        [TestCategory("Login")]
         [TestMethod]
         public void MultiFactorLogin_NavigateToApp_CustomerService()
         {
@@ -33,6 +36,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             trace.Log("Open Customer Service Success");
         }
 
+        [TestCategory("Login")]
         [TestMethod]
         public void MultiFactorLogin_NavigateToApp_ChangeApp()
         {
