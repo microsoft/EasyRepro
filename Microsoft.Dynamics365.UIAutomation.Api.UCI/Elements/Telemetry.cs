@@ -18,19 +18,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     /// <seealso cref="Microsoft.Dynamics365.UIAutomation.Browser.Element" />
     public class Telemetry : Element
     {
+        #region DTO
+        public static class PerformanceWidgetReference
+        {
+            public static string Container = "//div[@data-id='performance-widget']//*[text()='Page load']";
+            public static string Page = "//div[@data-id='performance-widget']//span[contains(text(), '[NAME]')]";
+        }
+        #endregion
         private readonly WebClient _client;
 
         public Telemetry(WebClient client)
         {
             _client = client;
         }
-
+        #region public
         /// <summary>
         /// Enables Performance Center for UCI 
         /// </summary>
         public void EnablePerformanceCenter()
         {
-            _client.EnablePerformanceCenter();
+            _client.Browser.Driver.Navigate().GoToUrl($"{_client.Browser.Driver.Url}&perf=true");
+            _client.Browser.Driver.WaitForPageToLoad();
+            _client.Browser.Driver.WaitForTransaction();
         }
 
         public enum BrowserEventType
@@ -130,7 +139,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             if(properties.Count>0) TrackEvents(type.ToString(), properties, null);
         }
+        #endregion
 
+        #region private
         internal void TrackEvents(string eventName, Dictionary<string, string> properties, Dictionary<string, double> metrics)
         {
             if (string.IsNullOrEmpty(_client.Browser.Options.AppInsightsKey)) throw new InvalidOperationException("The Application Insights key was not specified.  Please specify an Instrumentation key in the Browser Options.");
@@ -186,16 +197,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal void ShowHidePerformanceWidget()
         {
-            _client.Browser.Driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.PerformanceWidget.Container]));
+            _client.Browser.Driver.ClickWhenAvailable(By.XPath(PerformanceWidgetReference.Container));
         }
         internal void SelectPerformanceWidgetPage(string page)
         {
-            _client.Browser.Driver.ClickWhenAvailable(By.XPath(AppElements.Xpath[AppReference.PerformanceWidget.Page].Replace("[NAME]",page)));
+            _client.Browser.Driver.ClickWhenAvailable(By.XPath(PerformanceWidgetReference.Page.Replace("[NAME]",page)));
         }
 
         internal void ClearResourceTimings()
         {
             _client.Browser.Driver.ExecuteScript("return window.performance.clearResourceTimings();");
         }
+        #endregion
+
     }
 }

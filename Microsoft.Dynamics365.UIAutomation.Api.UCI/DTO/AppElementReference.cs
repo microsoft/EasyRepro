@@ -47,11 +47,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string Required = "Field_Required";
             public static string RequiredIcon = "Field_RequiredIcon";
         }
-        public static class PerformanceWidget
-        {
-            public static string Container = "Performance_Widget";
-            public static string Page = "Performance_WidgetPage";
-        }
+
     
         public static class PowerApp
         {
@@ -100,10 +96,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             { "QuickCreate_SaveAndCloseButton", "//button[contains(@id,'quickCreateSaveAndCloseBtn')]"},
             { "QuickCreate_CancelButton", "//button[contains(@id,'quickCreateCancelBtn')]"},
 
-
-            //Performance Width
-            { "Performance_Widget","//div[@data-id='performance-widget']//*[text()='Page load']"},
-            { "Performance_WidgetPage", "//div[@data-id='performance-widget']//span[contains(text(), '[NAME]')]" }
         };
     }
 

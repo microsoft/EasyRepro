@@ -1318,21 +1318,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             }
         }
         #endregion
-        
-
-
-
-
-        #region PerformanceCenter
-
-        internal void EnablePerformanceCenter()
-        {
-            Browser.Driver.Navigate().GoToUrl($"{Browser.Driver.Url}&perf=true");
-            Browser.Driver.WaitForPageToLoad();
-            Browser.Driver.WaitForTransaction();
-        }
-
-        #endregion
 
         #region PowerApp
         private bool _inPowerApps = false;
