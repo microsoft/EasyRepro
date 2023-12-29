@@ -83,10 +83,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             this.OpenAndClickPopoutMenu(TimelineReference.Popout, TimelineReference.PopoutAppointment, 4000);
             _client.ThinkTime(4000);
-            _client.SetValue(TimelineReference.AppointmentSubject, subject, FormContextType.QuickCreate);
-            _client.SetValue(TimelineReference.AppointmentLocation, location, FormContextType.QuickCreate);
-            _client.SetValue(TimelineReference.AppointmentDescription, description, FormContextType.QuickCreate);
-            _client.SetValue(TimelineReference.AppointmentDuration, duration, FormContextType.QuickCreate);
+            Field.SetValue(_client, TimelineReference.AppointmentSubject, subject, FormContextType.QuickCreate);
+            Field.SetValue(_client,TimelineReference.AppointmentLocation, location, FormContextType.QuickCreate);
+            Field.SetValue(_client,TimelineReference.AppointmentDescription, description, FormContextType.QuickCreate);
+            Field.SetValue(_client, TimelineReference.AppointmentDuration, duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="subject">Subject of the email</param>
         public void AddEmailSubject(string subject)
         {
-            _client.SetValue(TimelineReference.EmailSubject, subject);
+            Field.SetValue(_client,TimelineReference.EmailSubject, subject);
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="duration">The duration as text</param>
         public void AddEmailDuration(string duration)
         {
-            _client.SetValue(TimelineReference.EmailDuration, duration);
+            Field.SetValue(_client, TimelineReference.EmailDuration, duration);
         }
 
         /// <summary>
@@ -188,10 +188,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             this.OpenAndClickPopoutMenu(TimelineReference.Popout, TimelineReference.PopoutPhoneCall, 4000);
             _client.ThinkTime(4000);
-            _client.SetValue(TimelineReference.PhoneCallSubject, subject, FormContextType.QuickCreate);
-            _client.SetValue(TimelineReference.PhoneCallNumber, phoneNumber, FormContextType.QuickCreate);
-            _client.SetValue(TimelineReference.PhoneCallDescription, description, FormContextType.QuickCreate);
-            _client.SetValue(TimelineReference.PhoneCallDuration, duration, FormContextType.QuickCreate);
+            Field.SetValue(_client,TimelineReference.PhoneCallSubject, subject, FormContextType.QuickCreate);
+            Field.SetValue(_client,TimelineReference.PhoneCallNumber, phoneNumber, FormContextType.QuickCreate);
+            Field.SetValue(_client,TimelineReference.PhoneCallDescription, description, FormContextType.QuickCreate);
+            Field.SetValue(_client,TimelineReference.PhoneCallDuration, duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -212,9 +212,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             this.OpenAndClickPopoutMenu(TimelineReference.Popout, TimelineReference.PopoutTask, 4000);
             _client.ThinkTime(4000);
-            _client.SetValue(TimelineReference.TaskSubject, subject, FormContextType.QuickCreate);
-            _client.SetValue(TimelineReference.TaskDescription, description, FormContextType.QuickCreate);
-            _client.SetValue(TimelineReference.TaskDuration, duration, FormContextType.QuickCreate);
+            Field.SetValue(_client,TimelineReference.TaskSubject, subject, FormContextType.QuickCreate);
+            Field.SetValue(_client,TimelineReference.TaskDescription, description, FormContextType.QuickCreate);
+            Field.SetValue(_client,TimelineReference.TaskDuration, duration, FormContextType.QuickCreate);
         }
 
         /// <summary>

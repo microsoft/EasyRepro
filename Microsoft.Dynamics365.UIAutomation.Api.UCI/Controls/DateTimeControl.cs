@@ -102,7 +102,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 driver.RepeatUntil(() =>
                 {
-                    client.ClearFieldValue(dateField);
+                    Field.ClearFieldValue(client, dateField);
                     if (date != null)
                     {
                         dateField.SendKeys(date);
@@ -130,7 +130,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             dateField.SendKeys(Keys.Escape);
                         }
 
-                        client.ClearFieldValue(dateField);
+                        Field.ClearFieldValue(client, dateField);
                         dateField.SendKeys(date);
                     }
                 },

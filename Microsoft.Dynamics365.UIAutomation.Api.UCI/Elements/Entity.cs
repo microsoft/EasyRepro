@@ -143,7 +143,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="field"></param>
         public void ClearValue(string field)
         {
-            _client.ClearValue(field, FormContextType.Entity);
+            Field.ClearValue(_client, field, FormContextType.Entity);
         }
 
         /// <summary>
@@ -590,7 +590,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="value">The value</param>
         public void SetValue(string field, string value)
         {
-            _client.SetValue(field, value, FormContextType.Entity);
+            Field.SetValue(_client, field, value, FormContextType.Entity);
         }
 
         /// <summary>
@@ -1646,7 +1646,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 TryExpandHeaderFlyout(driver);
 
-                _client.SetValue(field, value, FormContextType.Header);
+                Field.SetValue(_client, field, value, FormContextType.Header);
 
                 TryCloseHeaderFlyout(driver);
                 return true;

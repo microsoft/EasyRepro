@@ -42,8 +42,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 typeof(NoSuchElementException), typeof(StaleElementReferenceException));
         }
 
-
-
         #region PageWaits
         internal bool WaitForMainPage(TimeSpan timeout, string errorMessage)
             => WaitForMainPage(timeout, null, () => throw new InvalidOperationException(errorMessage));
@@ -64,46 +62,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var element = driver.WaitUntilAvailable(xpathToMainPage, timeout, successCallback, failureCallback);
             return element != null;
         }
-
         #endregion
 
 
         #region FormContextType
-
-        public void SetInputValue(IWebDriver driver, IWebElement input, string value, TimeSpan? thinktime = null)
-        {
-            // Repeat set value if expected value is not set
-            // Do this to ensure that the static placeholder '---' is removed 
-            driver.RepeatUntil(() =>
-            {
-                input.Clear();
-                input.Click();
-                input.SendKeys(Keys.Control + "a");
-                input.SendKeys(Keys.Control + "a");
-                input.SendKeys(Keys.Backspace);
-                input.SendKeys(value);
-                driver.WaitForTransaction();
-            },
-                d => input.GetAttribute("value").IsValueEqualsTo(value),
-                TimeSpan.FromSeconds(9), 3,
-                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {value}. Actual: {input.GetAttribute("value")}")
-            );
-
-            driver.WaitForTransaction();
-        }
-
-
-        internal BrowserCommandResult<bool> ClearValue(string fieldName, FormContextType formContextType)
-        {
-            return this.Execute(this.GetOptions($"Clear Field {fieldName}"), driver =>
-            {
-                SetValue(fieldName, string.Empty, formContextType);
-
-                return true;
-            });
-        }
-
-
 
         // Used by SetValue methods to determine the field context
         public IWebElement ValidateFormContext(IWebDriver driver, FormContextType formContextType, string field, IWebElement fieldContainer)
@@ -144,47 +106,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             }
 
             return fieldContainer;
-        }
-
-
-
-        /// <summary>
-        /// Set Value
-        /// </summary>
-        /// <param name="field">The field</param>
-        /// <param name="value">The value</param>
-        /// <example>xrmApp.Entity.SetValue("firstname", "Test");</example>
-        internal BrowserCommandResult<bool> SetValue(string field, string value, FormContextType formContextType = FormContextType.Entity)
-        {
-            return this.Execute(this.GetOptions("Set Value"), driver =>
-            {
-                IWebElement fieldContainer = null;
-                fieldContainer = ValidateFormContext(driver, formContextType, field, fieldContainer);
-
-                IWebElement input;
-                bool found = fieldContainer.TryFindElement(By.TagName("input"), out input);
-
-                if (!found)
-                    found = fieldContainer.TryFindElement(By.TagName("textarea"), out input);
-
-                if (!found)
-                    throw new NoSuchElementException($"Field with name {field} does not exist.");
-
-                SetInputValue(driver, input, value);
-
-                return true;
-            });
-        }
- 
-        public void ClearFieldValue(IWebElement field)
-        {
-            if (field.GetAttribute("value").Length > 0)
-            {
-                field.SendKeys(Keys.Control + "a");
-                field.SendKeys(Keys.Backspace);
-            }
-
-            this.ThinkTime(500);
         }
 
         #endregion

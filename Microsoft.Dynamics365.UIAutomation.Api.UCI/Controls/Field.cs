@@ -4,6 +4,7 @@
 using OpenQA.Selenium;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
+using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -157,5 +158,76 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// The value.
         /// </value>
         public string Value { get; set; }
+
+        internal static void SetInputValue(IWebDriver driver, IWebElement input, string value, TimeSpan? thinktime = null)
+        {
+            // Repeat set value if expected value is not set
+            // Do this to ensure that the static placeholder '---' is removed 
+            driver.RepeatUntil(() =>
+            {
+                input.Clear();
+                input.Click();
+                input.SendKeys(Keys.Control + "a");
+                input.SendKeys(Keys.Control + "a");
+                input.SendKeys(Keys.Backspace);
+                input.SendKeys(value);
+                driver.WaitForTransaction();
+            },
+                d => input.GetAttribute("value").IsValueEqualsTo(value),
+                TimeSpan.FromSeconds(9), 3,
+                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {value}. Actual: {input.GetAttribute("value")}")
+            );
+
+            driver.WaitForTransaction();
+        }
+
+        internal static BrowserCommandResult<bool> ClearValue(WebClient client, string fieldName, FormContextType formContextType)
+        {
+            return client.Execute(client.GetOptions($"Clear Field {fieldName}"), driver =>
+            {
+                Field.SetValue(client, fieldName, string.Empty, formContextType);
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Set Value
+        /// </summary>
+        /// <param name="field">The field</param>
+        /// <param name="value">The value</param>
+        /// <example>xrmApp.Entity.SetValue("firstname", "Test");</example>
+        internal static BrowserCommandResult<bool> SetValue(WebClient client, string field, string value, FormContextType formContextType = FormContextType.Entity)
+        {
+            return client.Execute(client.GetOptions("Set Value"), driver =>
+            {
+                IWebElement fieldContainer = null;
+                fieldContainer = client.ValidateFormContext(driver, formContextType, field, fieldContainer);
+
+                IWebElement input;
+                bool found = fieldContainer.TryFindElement(By.TagName("input"), out input);
+
+                if (!found)
+                    found = fieldContainer.TryFindElement(By.TagName("textarea"), out input);
+
+                if (!found)
+                    throw new NoSuchElementException($"Field with name {field} does not exist.");
+
+                Field.SetInputValue(driver, input, value);
+
+                return true;
+            });
+        }
+
+        internal static void ClearFieldValue(WebClient client, IWebElement field)
+        {
+            if (field.GetAttribute("value").Length > 0)
+            {
+                field.SendKeys(Keys.Control + "a");
+                field.SendKeys(Keys.Backspace);
+            }
+
+            client.ThinkTime(500);
+        }
     }
 }
