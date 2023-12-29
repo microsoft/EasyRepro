@@ -292,7 +292,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The boolean field name.</param>
         public void SetValue(BooleanItem option)
         {
-            _client.SetValue(option, FormContextType.Dialog);
+            BooleanItem.SetValue(_client, option, FormContextType.Dialog);
         }
 
         /// <summary>

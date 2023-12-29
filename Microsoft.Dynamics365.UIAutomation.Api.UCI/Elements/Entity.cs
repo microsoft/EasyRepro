@@ -629,7 +629,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The boolean field name.</param>
         public void SetValue(BooleanItem option)
         {
-            _client.SetValue(option, FormContextType.Entity);
+            BooleanItem.SetValue(_client, option, FormContextType.Entity);
         }
 
         /// <summary>
@@ -1726,7 +1726,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 TryExpandHeaderFlyout(driver);
 
-                _client.SetValue(control, FormContextType.Header);
+                BooleanItem.SetValue(_client, control, FormContextType.Header);
 
                 TryCloseHeaderFlyout(driver);
                 return true;

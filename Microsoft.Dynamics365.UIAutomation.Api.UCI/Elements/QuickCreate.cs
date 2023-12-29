@@ -173,7 +173,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The option you want to set.</param>
         public void SetValue(BooleanItem optionSet)
         {
-            _client.SetValue(optionSet, FormContextType.QuickCreate);
+            BooleanItem.SetValue(_client, optionSet, FormContextType.QuickCreate);
         }
 
         /// <summary>
