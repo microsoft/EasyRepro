@@ -63,7 +63,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control"></param>
         public void ClearValue(OptionSet control)
         {
-            _client.ClearValue(control, FormContextType.QuickCreate);
+            control.ClearValue(_client, control, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control"></param>
         public void ClearValue(MultiValueOptionSet control)
         {
-            _client.ClearValue(control, FormContextType.QuickCreate);
+            control.ClearValue(_client, control, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The option you want to set.</param>
         public void SetValue(OptionSet optionSet)
         {
-            _client.SetValue(optionSet, FormContextType.QuickCreate);
+            OptionSet.SetValue(_client, optionSet, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="format">Datetime format matching Short Date & Time formatting personal options.</param>
         public void SetValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
-            _client.SetValue(field, date, FormContextType.QuickCreate, formatDate, formatTime);
+            DateTimeControl.SetValue(_client, field, date, FormContextType.QuickCreate, formatDate, formatTime);
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
         public void SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
-            _client.SetValue(option, FormContextType.QuickCreate, removeExistingValues);
+            MultiValueOptionSet.SetValue(_client, option, FormContextType.QuickCreate, removeExistingValues);
         }
 
         /// <summary>

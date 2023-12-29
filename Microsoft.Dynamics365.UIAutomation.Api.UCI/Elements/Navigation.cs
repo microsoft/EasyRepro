@@ -222,7 +222,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!success)
                     throw new InvalidOperationException($"App Name {appName} not found.");
 
-                _client.InitializeModes();
+                OnlineLogin login = new OnlineLogin(_client);
+                login.InitializeModes();
 
                 // Wait for app page elements to be visible (shell and sitemapLauncherButton)
                 var shell = driver.WaitUntilVisible(By.XPath(Application.Shell));
@@ -241,7 +242,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions("Open Unified Interface Area"), driver =>
             {
                 var success = TryOpenArea(subarea);
-                _client.WaitForLoadArea(driver);
+                this.WaitForLoadArea(driver);
                 return success;
             });
         }
@@ -304,7 +305,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 subAreaItem.Click(true);
 
-                _client.WaitForLoadArea(driver);
+                this.WaitForLoadArea(driver);
                 return true;
             });
         }
@@ -329,7 +330,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions("Open Unified Interface Sub-Area"), driver =>
             {
                 var success = TryOpenSubArea(driver, subarea);
-                _client.WaitForLoadArea(driver);
+                this.WaitForLoadArea(driver);
                 return success;
             });
         }
@@ -350,9 +351,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         throw new InvalidOperationException($"No subarea with the name '{subarea}' exists inside of '{area}'.");
                 }
 
-                _client.WaitForLoadArea(driver);
+                this.WaitForLoadArea(driver);
                 return true;
             });
+        }
+        public void WaitForLoadArea(IWebDriver driver)
+        {
+            driver.WaitForPageToLoad();
+            driver.WaitForTransaction();
         }
         #endregion
         #region private

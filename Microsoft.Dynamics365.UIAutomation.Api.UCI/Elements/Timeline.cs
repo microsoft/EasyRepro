@@ -162,7 +162,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <returns></returns>
         public bool RemoveEmail(MultiValueOptionSet emailOptions)
         {
-            return _client.ClearValue(emailOptions, FormContextType.Entity);
+            return emailOptions.ClearValue(_client, emailOptions, FormContextType.Entity);
             //return _client.SetValue(emailOptions, FormContextType.Entity, true);
         }
 

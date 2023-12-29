@@ -29,10 +29,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public WebClient(BrowserOptions options)
         {
             Browser = new InteractiveBrowser(options);
-            OnlineDomains = Constants.Xrm.XrmDomains;
             ClientSessionId = Guid.NewGuid();
         }
-
         internal BrowserCommandOptions GetOptions(string commandName)
         {
             return new BrowserCommandOptions(Constants.DefaultTraceSource,
@@ -44,61 +42,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 typeof(NoSuchElementException), typeof(StaleElementReferenceException));
         }
 
-        internal BrowserCommandResult<bool> InitializeModes()
-        {
-            return this.Execute(GetOptions("Initialize Unified Interface Modes"), driver =>
-            {
-                driver.SwitchTo().DefaultContent();
 
-                // Wait for main page to load before attempting this. If you don't do this it might still be authenticating and the URL will be wrong
-                WaitForMainPage();
-
-                string uri = driver.Url;
-                if (string.IsNullOrEmpty(uri))
-                    return false;
-
-                var prevQuery = GetUrlQueryParams(uri);
-                bool requireRedirect = false;
-                string queryParams = "";
-                if (prevQuery.Get("flags") == null)
-                {
-                    queryParams += "&flags=easyreproautomation=true";
-                    if (Browser.Options.UCITestMode)
-                        queryParams += ",testmode=true";
-                    requireRedirect = true;
-                }
-
-                if (Browser.Options.UCIPerformanceMode && prevQuery.Get("perf") == null)
-                {
-                    queryParams += "&perf=true";
-                    requireRedirect = true;
-                }
-
-                if (!requireRedirect)
-                    return true;
-
-                var testModeUri = uri + queryParams;
-                driver.Navigate().GoToUrl(testModeUri);
-
-                // Again wait for loading
-                WaitForMainPage();
-                return true;
-            });
-        }
-
-        private NameValueCollection GetUrlQueryParams(string url)
-        {
-            if (string.IsNullOrEmpty(url))
-                return null;
-
-            Uri uri = new Uri(url);
-            var query = uri.Query.ToLower();
-            NameValueCollection result = HttpUtility.ParseQueryString(query);
-            return result;
-        }
-
-
-        public string[] OnlineDomains { get; set; }
 
         #region PageWaits
         internal bool WaitForMainPage(TimeSpan timeout, string errorMessage)
@@ -124,13 +68,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #endregion
 
 
-
-        public void WaitForLoadArea(IWebDriver driver)
-        {
-            driver.WaitForPageToLoad();
-            driver.WaitForTransaction();
-        }
-
         #region FormContextType
 
         public void SetInputValue(IWebDriver driver, IWebElement input, string value, TimeSpan? thinktime = null)
@@ -155,74 +92,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             driver.WaitForTransaction();
         }
 
-        public static DateTime? TryGetValue(IWebDriver driver, ISearchContext container, DateTimeControl control)
-        {
-            string field = control.Name;
-            driver.WaitForTransaction();
-
-            var xpathToDateField = By.XPath(EntityReference.FieldControlDateTimeInputUCI.Replace("[FIELD]", field));
-
-            var dateField = container.WaitUntilAvailable(xpathToDateField, $"Field: {field} Does not exist");
-            string strDate = dateField.GetAttribute("value");
-            if (strDate.IsEmptyValue())
-                return null;
-
-            var date = DateTime.Parse(strDate);
-
-            // Try get Time
-            var timeFieldXPath = By.XPath(EntityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", field));
-            bool success = container.TryFindElement(timeFieldXPath, out var timeField);
-            if (!success || timeField == null)
-                return date;
-
-            string strTime = timeField.GetAttribute("value");
-            if (strTime.IsEmptyValue())
-                return date;
-
-            var time = DateTime.Parse(strTime);
-
-            var result = date.AddHours(time.Hour).AddMinutes(time.Minute).AddSeconds(time.Second);
-
-            return result;
-        }
-        private static void TrySetTime(IWebDriver driver, IWebElement timeField, string time)
-        {
-            // click & wait until the time get updated after change/clear the date
-            timeField.Click();
-            driver.WaitForTransaction();
-
-            driver.RepeatUntil(() =>
-            {
-                timeField.Clear();
-                timeField.Click();
-                timeField.SendKeys(time);
-                timeField.SendKeys(Keys.Tab);
-                driver.WaitForTransaction();
-            },
-            d => timeField.GetAttribute("value").IsValueEqualsTo(time),
-            TimeSpan.FromSeconds(9), 3,
-            failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {time}. Actual: {timeField.GetAttribute("value")}")
-            );
-        }
 
         /// <summary>
         /// Sets the value of a picklist or status field.
         /// </summary>
         /// <param name="control">The option you want to set.</param>
         /// <example>xrmApp.Entity.SetValue(new OptionSet { Name = "preferredcontactmethodcode", Value = "Email" });</example>
-        public BrowserCommandResult<bool> SetValue(OptionSet control, FormContextType formContextType)
-        {
-            var controlName = control.Name;
-            return this.Execute(this.GetOptions($"Set OptionSet Value: {controlName}"), driver =>
-            {
-                IWebElement fieldContainer = null;
-                fieldContainer = ValidateFormContext(driver, formContextType, controlName, fieldContainer);
 
-                TrySetValue(fieldContainer, control);
-                driver.WaitForTransaction();
-                return true;
-            });
-        }
         internal BrowserCommandResult<bool> ClearValue(string fieldName, FormContextType formContextType)
         {
             return this.Execute(this.GetOptions($"Clear Field {fieldName}"), driver =>
@@ -389,190 +265,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
 
 
-
-
-        internal BrowserCommandResult<bool> ClearValue(OptionSet control, FormContextType formContextType)
-        {
-            return this.Execute(this.GetOptions($"Clear Field {control.Name}"), driver =>
-            {
-                control.Value = "-1";
-                SetValue(control, formContextType);
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> ClearValue(MultiValueOptionSet control, FormContextType formContextType)
-        {
-            return this.Execute(this.GetOptions($"Clear Field {control.Name}"), driver =>
-            {
-                this.RemoveMultiOptions(control, formContextType);
-
-                return true;
-            });
-        }
-
-        internal BrowserCommandResult<bool> ClearValue(DateTimeControl control, FormContextType formContextType)
-    => this.Execute(this.GetOptions($"Clear Field: {control.Name}"),
-        driver => TrySetValue(driver, container: driver, control: new DateTimeControl(control.Name), formContextType)); // Pass an empty control
-
-
-        /// <summary>
-        /// Sets/Removes the value from the multselect type control
-        /// </summary>
-        /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be set/removed</param>
-        /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
-        /// <returns>True on success</returns>
-        internal BrowserCommandResult<bool> SetValue(MultiValueOptionSet option, FormContextType formContextType = FormContextType.Entity, bool removeExistingValues = false)
-        {
-            return this.Execute(this.GetOptions($"Set MultiValueOptionSet Value: {option.Name}"), driver =>
-            {
-                if (removeExistingValues)
-                {
-                    RemoveMultiOptions(option, formContextType);
-                }
-
-
-                AddMultiOptions(option, formContextType);
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Removes the value from the multselect type control
-        /// </summary>
-        /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be removed</param>
-        /// <returns></returns>
-        private BrowserCommandResult<bool> RemoveMultiOptions(MultiValueOptionSet option, FormContextType formContextType)
-        {
-            return this.Execute(this.GetOptions($"Remove Multi Select Value: {option.Name}"), driver =>
-            {
-                IWebElement fieldContainer = null;
-
-                if (formContextType == FormContextType.QuickCreate)
-                {
-                    // Initialize the quick create form context
-                    // If this is not done -- element input will go to the main form due to new flyout design
-                    var formContext = driver.WaitUntilAvailable(By.XPath(QuickCreateReference.QuickCreateFormContext));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
-                }
-                else if (formContextType == FormContextType.Entity)
-                {
-                    // Initialize the entity form context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.FormContext));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
-                }
-                else if (formContextType == FormContextType.BusinessProcessFlow)
-                {
-                    // Initialize the Business Process Flow context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
-                }
-                else if (formContextType == FormContextType.Header)
-                {
-                    // Initialize the Header context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.HeaderContext));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
-                }
-                else if (formContextType == FormContextType.Dialog)
-                {
-                    // Initialize the Header context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
-                }
-
-                fieldContainer.Hover(driver, true);
-
-                var selectedRecordXPath = By.XPath(MultiSelect.SelectedRecord);
-                //change to .//li
-                var selectedRecords = fieldContainer.FindElements(selectedRecordXPath);
-
-                var initialCountOfSelectedOptions = selectedRecords.Count;
-                var deleteButtonXpath = By.XPath(MultiSelect.SelectedOptionDeleteButton);
-                //button[contains(@data-id, 'delete')]
-                for (int i = 0; i < initialCountOfSelectedOptions; i++)
-                {
-                    // With every click of the button, the underlying DOM changes and the
-                    // entire collection becomes stale, hence we only click the first occurance of
-                    // the button and loop back to again find the elements and anyother occurance
-                    selectedRecords[0].FindElement(deleteButtonXpath).Click(true);
-                    driver.WaitForTransaction();
-                    selectedRecords = fieldContainer.FindElements(selectedRecordXPath);
-                }
-
-                return true;
-            });
-        }
-
-        /// <summary>
-        /// Sets the value from the multselect type control
-        /// </summary>
-        /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be set</param>
-        /// <returns></returns>
-        private BrowserCommandResult<bool> AddMultiOptions(MultiValueOptionSet option, FormContextType formContextType)
-        {
-            return this.Execute(this.GetOptions($"Add Multi Select Value: {option.Name}"), driver =>
-            {
-                IWebElement fieldContainer = null;
-
-                if (formContextType == FormContextType.QuickCreate)
-                {
-                    // Initialize the quick create form context
-                    // If this is not done -- element input will go to the main form due to new flyout design
-                    var formContext = driver.WaitUntilAvailable(By.XPath(QuickCreateReference.QuickCreateFormContext));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
-                }
-                else if (formContextType == FormContextType.Entity)
-                {
-                    // Initialize the entity form context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.FormContext));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
-                }
-                else if (formContextType == FormContextType.BusinessProcessFlow)
-                {
-                    // Initialize the Business Process Flow context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
-                }
-                else if (formContextType == FormContextType.Header)
-                {
-                    // Initialize the Header context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.HeaderContext));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
-                }
-                else if (formContextType == FormContextType.Dialog)
-                {
-                    // Initialize the Header context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext));
-                    fieldContainer = formContext.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext.Replace("[NAME]", option.Name)));
-                }
-
-                var inputXPath = By.XPath(MultiSelect.InputSearch);
-                fieldContainer.FindElement(inputXPath).SendKeys(string.Empty);
-
-                var flyoutCaretXPath = By.XPath(MultiSelect.FlyoutCaret);
-                fieldContainer.FindElement(flyoutCaretXPath).Click();
-
-                foreach (var optionValue in option.Values)
-                {
-                    var flyoutOptionXPath = By.XPath(MultiSelect.FlyoutOption.Replace("[NAME]", optionValue));
-                    if (fieldContainer.TryFindElement(flyoutOptionXPath, out var flyoutOption))
-                    {
-                        var ariaSelected = flyoutOption.GetAttribute<string>("aria-selected");
-                        var selected = !string.IsNullOrEmpty(ariaSelected) && bool.Parse(ariaSelected);
-
-                        if (!selected)
-                        {
-                            flyoutOption.Click();
-                        }
-                    }
-                }
-
-                return true;
-            });
-        }
-
         /// <summary>
         /// Set Value
         /// </summary>
@@ -600,123 +292,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return true;
             });
         }
-
-        /// <summary>
-        /// Sets the value of a Date Field.
-        /// </summary>
-        /// <param name="field">Date field name.</param>
-        /// <param name="value">DateTime value.</param>
-        /// <param name="formatDate">Datetime format matching Short Date formatting personal options.</param>
-        /// <param name="formatTime">Datetime format matching Short Time formatting personal options.</param>
-        /// <example>xrmApp.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
-        /// <example>xrmApp.Entity.SetValue("new_actualclosedatetime", DateTime.Now, "MM/dd/yyyy", "hh:mm tt");</example>
-        /// <example>xrmApp.Entity.SetValue("estimatedclosedate", DateTime.Now);</example>
-        public BrowserCommandResult<bool> SetValue(string field, DateTime value, FormContextType formContext, string formatDate = null, string formatTime = null)
-        {
-            var control = new DateTimeControl(field)
-            {
-                Value = value,
-                DateFormat = formatDate,
-                TimeFormat = formatTime
-            };
-            return SetValue(control, formContext);
-        }
-
-        public BrowserCommandResult<bool> SetValue(DateTimeControl control, FormContextType formContext)
-            => this.Execute(this.GetOptions($"Set Date/Time Value: {control.Name}"),
-                driver => TrySetValue(driver, container: driver, control: control, formContext));
-
-        public bool TrySetValue(IWebDriver driver, ISearchContext container, DateTimeControl control, FormContextType formContext)
-        {
-            TrySetDateValue(driver, container, control, formContext);
-            TrySetTime(driver, container, control, formContext);
-
-            if (formContext == FormContextType.Header)
-            {
-                Entity entity = new Entity(this);
-                entity.TryCloseHeaderFlyout(driver);
-            }
-
-            return true;
-        }
-
-        private void TrySetDateValue(IWebDriver driver, ISearchContext container, DateTimeControl control, FormContextType formContextType)
-        {
-            string controlName = control.Name;
-            IWebElement fieldContainer = null;
-            var xpathToInput = By.XPath(Entity.EntityReference.FieldControlDateTimeInputUCI.Replace("[FIELD]", controlName));
-
-            if (formContextType == FormContextType.QuickCreate)
-            {
-                // Initialize the quick create form context
-                // If this is not done -- element input will go to the main form due to new flyout design
-                var formContext = container.WaitUntilAvailable(By.XPath(QuickCreateReference.QuickCreateFormContext));
-                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
-
-                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
-
-                if (strExpanded == null)
-                {
-                    fieldContainer = formContext.FindElement(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
-                }
-            }
-            else if (formContextType == FormContextType.Entity)
-            {
-                // Initialize the entity form context
-                var formContext = container.WaitUntilAvailable(By.XPath(Entity.EntityReference.FormContext));
-                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
-
-                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
-
-                if (strExpanded == null)
-                {
-                    fieldContainer = formContext.FindElement(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
-                }
-            }
-            else if (formContextType == FormContextType.BusinessProcessFlow)
-            {
-                // Initialize the Business Process Flow context
-                var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext));
-                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
-
-                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
-
-                if (strExpanded == null)
-                {
-                    fieldContainer = formContext.FindElement(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
-                }
-            }
-            else if (formContextType == FormContextType.Header)
-            {
-                // Initialize the Header context
-                var formContext = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.HeaderContext));
-                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
-
-                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
-
-                if (strExpanded == null)
-                {
-                    fieldContainer = formContext.FindElement(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
-                }
-            }
-            else if (formContextType == FormContextType.Dialog)
-            {
-                // Initialize the Dialog context
-                var formContext = driver.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext));
-                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
-
-                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
-
-                if (strExpanded == null)
-                {
-                    fieldContainer = formContext.FindElement(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
-                }
-
-            }
-
-            TrySetDateValue(driver, fieldContainer, control.DateAsString, formContextType);
-        }
-        private void ClearFieldValue(IWebElement field)
+ 
+        public void ClearFieldValue(IWebElement field)
         {
             if (field.GetAttribute("value").Length > 0)
             {
@@ -727,129 +304,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             this.ThinkTime(500);
         }
 
-        public static void TrySetValue(IWebElement fieldContainer, OptionSet control)
-        {
-            var value = control.Value;
-            bool success = fieldContainer.TryFindElement(By.TagName("select"), out IWebElement select);
-            if (success)
-            {
-                fieldContainer.WaitUntilAvailable(By.TagName("select"));
-                var options = select.FindElements(By.TagName("option"));
-                SelectOption(options, value);
-                return;
-            }
-
-            var name = control.Name;
-            var hasStatusCombo = fieldContainer.HasElement(By.XPath(EntityReference.EntityOptionsetStatusCombo.Replace("[NAME]", name)));
-            if (hasStatusCombo)
-            {
-                // This is for statuscode (type = status) that should act like an optionset doesn't doesn't follow the same pattern when rendered
-                fieldContainer.ClickWhenAvailable(By.XPath(EntityReference.EntityOptionsetStatusComboButton.Replace("[NAME]", name)));
-
-                var listBox = fieldContainer.FindElement(By.XPath(EntityReference.EntityOptionsetStatusComboList.Replace("[NAME]", name)));
-
-                var options = listBox.FindElements(By.TagName("li"));
-                SelectOption(options, value);
-                return;
-            }
-
-            throw new InvalidOperationException($"OptionSet Field: '{name}' does not exist");
-        }
-        private void TrySetDateValue(IWebDriver driver, IWebElement dateField, string date, FormContextType formContextType)
-        {
-            var strExpanded = dateField.GetAttribute("aria-expanded");
-
-            if (strExpanded != null)
-            {
-                bool success = bool.TryParse(strExpanded, out var isCalendarExpanded);
-                if (success && isCalendarExpanded)
-                    dateField.Click(); // close calendar
-
-                driver.RepeatUntil(() =>
-                {
-                    ClearFieldValue(dateField);
-                    if (date != null)
-                    {
-                        dateField.SendKeys(date);
-                        dateField.SendKeys(Keys.Tab);
-                    }
-                },
-                d => dateField.GetAttribute("value").IsValueEqualsTo(date),
-                TimeSpan.FromSeconds(9), 3,
-                failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
-                );
-            }
-            else
-            {
-                driver.RepeatUntil(() =>
-                {
-                    dateField.Click(true);
-                    if (date != null)
-                    {
-                        dateField = dateField.FindElement(By.TagName("input"));
-
-                        // Only send Keys.Escape to avoid element not interactable exceptions with calendar flyout on forms.
-                        // This can cause the Header or BPF flyouts to close unexpectedly
-                        if (formContextType == FormContextType.Entity || formContextType == FormContextType.QuickCreate)
-                        {
-                            dateField.SendKeys(Keys.Escape);
-                        }
-
-                        ClearFieldValue(dateField);
-                        dateField.SendKeys(date);
-                    }
-                },
-                    d => dateField.GetAttribute("value").IsValueEqualsTo(date),
-                    TimeSpan.FromSeconds(9), 3,
-                    failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}")
-                );
-            }
-        }
-
-
-        private static void TrySetTime(IWebDriver driver, ISearchContext container, DateTimeControl control, FormContextType formContextType)
-        {
-            By timeFieldXPath = By.XPath(Entity.EntityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", control.Name));
-
-            IWebElement formContext = null;
-
-            if (formContextType == FormContextType.QuickCreate)
-            {
-                //IWebDriver formContext;
-                // Initialize the quick create form context
-                // If this is not done -- element input will go to the main form due to new flyout design
-                formContext = container.WaitUntilAvailable(By.XPath(QuickCreateReference.QuickCreateFormContext), new TimeSpan(0, 0, 1));
-            }
-            else if (formContextType == FormContextType.Entity)
-            {
-                // Initialize the entity form context
-                formContext = container.WaitUntilAvailable(By.XPath(Entity.EntityReference.FormContext), new TimeSpan(0, 0, 1));
-            }
-            else if (formContextType == FormContextType.BusinessProcessFlow)
-            {
-                // Initialize the Business Process Flow context
-                formContext = container.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext), new TimeSpan(0, 0, 1));
-            }
-            else if (formContextType == FormContextType.Header)
-            {
-                // Initialize the Header context
-                formContext = container as IWebElement;
-            }
-            else if (formContextType == FormContextType.Dialog)
-            {
-                // Initialize the Header context
-                formContext = container.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext), new TimeSpan(0, 0, 1));
-            }
-
-            driver.WaitForTransaction();
-
-            if (formContext.TryFindElement(timeFieldXPath, out var timeField))
-            {
-                TrySetTime(driver, timeField, control.TimeAsString);
-            }
-        }
         #endregion
-
 
         internal void ThinkTime(int milliseconds)
         {

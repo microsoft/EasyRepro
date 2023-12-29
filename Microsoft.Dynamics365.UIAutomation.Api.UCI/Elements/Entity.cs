@@ -165,7 +165,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control"></param>
         public void ClearValue(OptionSet control)
         {
-            _client.ClearValue(control, FormContextType.Entity);
+            control.ClearValue(_client, control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control"></param>
         public void ClearValue(MultiValueOptionSet control)
         {
-            _client.ClearValue(control, FormContextType.Entity);
+            control.ClearValue(_client, control, FormContextType.Entity);
         }
 
 
@@ -193,7 +193,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control"></param>
         public void ClearValue(DateTimeControl control)
         {
-            _client.ClearValue(control, FormContextType.Entity);
+            control.ClearValue(_client, control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -620,7 +620,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The option you want to set.</param>
         public void SetValue(OptionSet optionSet)
         {
-            _client.SetValue(optionSet, FormContextType.Entity);
+            OptionSet.SetValue(_client, optionSet, FormContextType.Entity);
         }
 
         /// <summary>
@@ -644,7 +644,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.SetValue("estimatedclosedate", DateTime.Now);</example>
         public void SetValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
-            _client.SetValue(field, date, FormContextType.Entity, formatDate, formatTime);
+            DateTimeControl.SetValue(_client, field, date, FormContextType.Entity, formatDate, formatTime);
         }
 
         /// <summary>
@@ -653,7 +653,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">Date field control.</param>
         public void SetValue(DateTimeControl control)
         {
-            _client.SetValue(control, FormContextType.Entity);
+            control.SetValue(_client, control, FormContextType.Entity);
         }
 
         /// <summary>
@@ -663,7 +663,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
         public void SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
-            _client.SetValue(option, FormContextType.Entity, removeExistingValues);
+            MultiValueOptionSet.SetValue(_client, option, FormContextType.Entity, removeExistingValues);
         }
 
         /// <summary>
@@ -1244,7 +1244,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">The lookup field name of the lookup.</param>
         /// <example>xrmApp.Entity.GetValue(new DateTimeControl { Name = "scheduledstart" });</example>
         public BrowserCommandResult<DateTime?> EntityGetValue(DateTimeControl control)
-            => _client.Execute($"Get DateTime Value: {control.Name}", driver => WebClient.TryGetValue(driver, container: driver, control: control));
+            => _client.Execute($"Get DateTime Value: {control.Name}", driver => DateTimeControl.TryGetValue(driver, container: driver, control: control));
 
         /// <summary>
         /// Returns the ObjectId of the entity
@@ -1610,7 +1610,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var xpathToContainer = EntityReference.Header.DateTimeFieldContainer.Replace("[NAME]", control.Name);
             return _client.Execute(_client.GetOptions($"Get Header DateTime Value {control.Name}"),
                 driver => ExecuteInHeaderContainer(driver, xpathToContainer,
-                    container => WebClient.TryGetValue(driver, container, control)));
+                    container => DateTimeControl.TryGetValue(driver, container, control)));
         }
 
         internal BrowserCommandResult<string> GetStateFromForm()
@@ -1700,7 +1700,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver => ExecuteInHeaderContainer(driver, xpathToContainer,
                     container =>
                     {
-                        WebClient.TrySetValue(container, control);
+                        OptionSet.TrySetValue(_client, container, control);
 
                         TryCloseHeaderFlyout(driver);
                         return true;
@@ -1713,7 +1713,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 TryExpandHeaderFlyout(driver);
 
-                _client.SetValue(control, FormContextType.Header);
+                MultiValueOptionSet.SetValue(_client, control, FormContextType.Header);
 
                 TryCloseHeaderFlyout(driver);
                 return true;
@@ -1758,7 +1758,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             var xpathToContainer = EntityReference.Header.DateTimeFieldContainer.Replace("[NAME]", control.Name);
             return ExecuteInHeaderContainer(driver, xpathToContainer,
-                container => _client.TrySetValue(driver, container, control, FormContextType.Header));
+                container => control.TrySetValue(driver,_client, container, control, FormContextType.Header));
         }
 
 

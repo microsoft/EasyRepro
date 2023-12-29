@@ -154,16 +154,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="field">Schema name of the field to retrieve</param>
         public void SetValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
-            _client.SetValue(field, date, FormContextType.BusinessProcessFlow, formatDate, formatTime);
+            DateTimeControl.SetValue(_client, field, date, FormContextType.BusinessProcessFlow, formatDate, formatTime);
         }
 
         /// <summary>
         /// Sets the value of a MultiValueOptionSet field
         /// </summary>
         /// <param name="field">MultiValueOptionSet with the schema name of the field to retrieve</param>
-        public void SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
+        public void SetValue(WebClient client,MultiValueOptionSet option, bool removeExistingValues = false)
         {
-            _client.SetValue(option, FormContextType.BusinessProcessFlow, removeExistingValues);
+            MultiValueOptionSet.SetValue(client, option, FormContextType.BusinessProcessFlow, removeExistingValues);
         }
 
         /// <summary>

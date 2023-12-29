@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Security;
+using System.Web;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
 using OtpNet;
@@ -12,6 +14,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     public class OnlineLogin : Element
     {
         #region prop
+
+        public string[] OnlineDomains { get; set; }
         public enum LoginResult
         {
             Success,
@@ -37,6 +41,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public OnlineLogin(WebClient client) 
         {
             _client = client;
+            OnlineDomains = Constants.Xrm.XrmDomains;
         }
 
         #region public
@@ -57,7 +62,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (result == LoginResult.Failure)
                 throw new InvalidOperationException("Login Failure, please check your configuration");
 
-            _client.InitializeModes();
+            this.InitializeModes();
 
             return result;
         }
@@ -77,7 +82,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (result == LoginResult.Failure)
                 throw new InvalidOperationException("Login Failure, please check your configuration");
 
-            _client.InitializeModes();
+            this.InitializeModes();
 
             return result;
         }
@@ -95,7 +100,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if(result == LoginResult.Failure) 
                 throw new InvalidOperationException("Login Failure, please check your configuration");
             
-            _client.InitializeModes();
+            this.InitializeModes();
 
             return result;
         }
@@ -104,7 +109,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #region LoginHelpers
         private LoginResult WebLogin(IWebDriver driver, Uri uri, SecureString username, SecureString password, SecureString mfaSecretKey = null, Action<LoginRedirectEventArgs> redirectAction = null)
         {
-            bool online = !(_client.OnlineDomains != null && !_client.OnlineDomains.Any(d => uri.Host.EndsWith(d)));
+            bool online = !(this.OnlineDomains != null && !this.OnlineDomains.Any(d => uri.Host.EndsWith(d)));
             driver.Navigate().GoToUrl(uri);
 
             if (!online)
@@ -324,6 +329,63 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.WaitForMainPage(TimeSpan.FromSeconds(60), "Login page failed.");
             SwitchToMainFrame(driver);
         }
+
+        internal BrowserCommandResult<bool> InitializeModes()
+        {
+            return _client.Execute(_client.GetOptions("Initialize Unified Interface Modes"), driver =>
+            {
+                driver.SwitchTo().DefaultContent();
+
+                // Wait for main page to load before attempting this. If you don't do this it might still be authenticating and the URL will be wrong
+                _client.WaitForMainPage();
+
+                string uri = driver.Url;
+                if (string.IsNullOrEmpty(uri))
+                    return false;
+
+                var prevQuery = GetUrlQueryParams(uri);
+                bool requireRedirect = false;
+                string queryParams = "";
+                if (prevQuery.Get("flags") == null)
+                {
+                    queryParams += "&flags=easyreproautomation=true";
+                    if (_client.Browser.Options.UCITestMode)
+                        queryParams += ",testmode=true";
+                    requireRedirect = true;
+                }
+
+                if (_client.Browser.Options.UCIPerformanceMode && prevQuery.Get("perf") == null)
+                {
+                    queryParams += "&perf=true";
+                    requireRedirect = true;
+                }
+
+                if (!requireRedirect)
+                    return true;
+
+                var testModeUri = uri + queryParams;
+                driver.Navigate().GoToUrl(testModeUri);
+
+                // Again wait for loading
+                _client.WaitForMainPage();
+                return true;
+            });
+        }
+
+        private NameValueCollection GetUrlQueryParams(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return null;
+
+            Uri uri = new Uri(url);
+            var query = uri.Query.ToLower();
+            NameValueCollection result = HttpUtility.ParseQueryString(query);
+            return result;
+        }
+
+
+
+ 
 
         #endregion
     }

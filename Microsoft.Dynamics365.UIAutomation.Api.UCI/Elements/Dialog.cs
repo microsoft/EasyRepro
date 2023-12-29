@@ -283,7 +283,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The option you want to set.</param>
         public void SetValue(OptionSet optionSet)
         {
-            _client.SetValue(optionSet, FormContextType.Dialog);
+            OptionSet.SetValue(_client, optionSet, FormContextType.Dialog);
         }
 
         /// <summary>
@@ -307,7 +307,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Dialog.SetValue("estimatedclosedate", DateTime.Now);</example>
         public void SetValue(string field, DateTime date, string formatDate = null, string formatTime = null)
         {
-            _client.SetValue(field, date, FormContextType.Dialog, formatDate, formatTime);
+            DateTimeControl.SetValue(_client, field, date, FormContextType.Dialog, formatDate, formatTime);
         }
 
         /// <summary>
@@ -316,7 +316,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">Date field control.</param>
         public void SetValue(DateTimeControl control)
         {
-            _client.SetValue(control, FormContextType.Dialog);
+            control.SetValue(_client, control, FormContextType.Dialog);
         }
 
         /// <summary>
@@ -326,7 +326,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
         public void SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
-            _client.SetValue(option, FormContextType.Dialog, removeExistingValues);
+            MultiValueOptionSet.SetValue(_client, option, FormContextType.Dialog, removeExistingValues);
         }
 
 
@@ -687,11 +687,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (to == Dialogs.AssignTo.Me)
                 {
                     //SetValue(new OptionSet { Name = Elements.ElementId[Reference.Dialogs.Assign.AssignToId], Value = "Me" }, FormContextType.Dialog);
-                    _client.SetValue(new OptionSet { Name = Dialogs.DialogsReference.Assign.AssignToId, Value = "Me" }, FormContextType.Dialog);
+                    OptionSet.SetValue(_client, new OptionSet { Name = Dialogs.DialogsReference.Assign.AssignToId, Value = "Me" }, FormContextType.Dialog);
                 }
                 else
                 {
-                    _client.SetValue(new OptionSet { Name = DialogsReference.Assign.AssignToId, Value = "User or team" }, FormContextType.Dialog);
+                    OptionSet.SetValue(_client, new OptionSet { Name = DialogsReference.Assign.AssignToId, Value = "User or team" }, FormContextType.Dialog);
 
                     //Set the User Or Team
                     var userOrTeamField = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldLookup), "User field unavailable");
