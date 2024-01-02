@@ -13,11 +13,7 @@ using System.Diagnostics;
 using System.Security;
 using System.Text.RegularExpressions;
 using System.Web;
-using static Microsoft.Dynamics365.UIAutomation.Api.UCI.BusinessProcessFlow;
-using static Microsoft.Dynamics365.UIAutomation.Api.UCI.Entity;
-using static Microsoft.Dynamics365.UIAutomation.Api.UCI.Grid;
-using static Microsoft.Dynamics365.UIAutomation.Api.UCI.OnlineLogin;
-using static Microsoft.Dynamics365.UIAutomation.Api.UCI.QuickCreate;
+
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -53,12 +49,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             successCallback = successCallback ?? (
                                   _ =>
                                   {
-                                      bool isUCI = driver.HasElement(By.XPath(LoginReference.CrmUCIMainPage));
+                                      bool isUCI = driver.HasElement(By.XPath(OnlineLogin.LoginReference.CrmUCIMainPage));
                                       if (isUCI)
                                           driver.WaitForTransaction();
                                   });
 
-            var xpathToMainPage = By.XPath(LoginReference.CrmMainPage);
+            var xpathToMainPage = By.XPath(OnlineLogin.LoginReference.CrmMainPage);
             var element = driver.WaitUntilAvailable(xpathToMainPage, timeout, successCallback, failureCallback);
             return element != null;
         }
@@ -74,7 +70,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 // Initialize the quick create form context
                 // If this is not done -- element input will go to the main form due to new flyout design
-                var formContext = driver.WaitUntilAvailable(By.XPath(QuickCreateReference.QuickCreateFormContext));
+                var formContext = driver.WaitUntilAvailable(By.XPath(QuickCreate.QuickCreateReference.QuickCreateFormContext));
                 fieldContainer = formContext.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", field)));
             }
             else if (formContextType == FormContextType.Entity)
@@ -86,8 +82,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (formContextType == FormContextType.BusinessProcessFlow)
             {
                 // Initialize the Business Process Flow context
-                var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext));
-                fieldContainer = formContext.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field)));
+                var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlow.BusinessProcessFlowReference.BusinessProcessFlowFormContext));
+                fieldContainer = formContext.WaitUntilAvailable(By.XPath(BusinessProcessFlow.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field)));
             }
             else if (formContextType == FormContextType.Header)
             {

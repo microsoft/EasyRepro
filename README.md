@@ -1,6 +1,11 @@
 # Overview #
 The purpose of this library is to provide Dynamics customers the ability to facilitate automated UI testing for their projects. These API's provide an easy to use set of commands that make setting up UI testing quick and easy. The functionality provided covers the core CRM commands that end users would perform on a typical workday and working to extend that coverage to more functionality.
 
+## Breaking Change
+This version of Easy Repro uses .NET Core 6. Previous versions used .NET Framework 4.6.1. This impacts how configuration for tests are retrieved.
+All tests have been updated showing how to use the runsettings file in combination with the ClassInitialize attribute.
+[ClassInitialize(InheritanceBehavior.BeforeEachDerivedClass)]
+
 ## Software Requirements
 ### Supported Version
 #### Supported Operating System
@@ -9,9 +14,7 @@ Windows 11, Windows 10 , Windows 7, Windows 8, Windows 8.1, Windows Server 2008,
 Microsoft Visual Studio 2015, Microsoft Visual Studio 2017, Microsoft Visual Studio 2019, Microsoft Visual Studio 2022
 
 ### CRM Versions
-Easy Repro supports below CRM Versions	
-- Microsoft Dynamics 365 Online Version 9.1 (9.1.x) (DB 9.1.x) online
-- Microsoft Dynamics 365 Online Version 9.2 (9.2.x) (DB 9.2.x) online
+Easy Repro supports the latest version of Microsoft Dynamics 365 Customer Engagement.
 
 #### Selenium Webdriver & Support
 Selenium is a set of different software tools each with a different approach to supporting browser automation. These tools are highly flexible, allowing many options for locating and manipulating elements within a browser, and one of its key features is the support for automating multiple browser platforms. This package contains the .NET bindings for the newer, more concise and object-based Selenium WebDriver API, which uses native OS-level events to manipulate the browser, bypassing the JavaScript sandbox, and does not require the Selenium Server to automate the browser.
@@ -19,8 +22,8 @@ Selenium is a set of different software tools each with a different approach to 
 
 | File Name         | Version | Release date   |
 | ------------------|---------|----------------|
-| Selenium.WebDriver| v3.11.2  | April 12, 2018 |
-| Selenium.Support  | v3.11.2  | April 12, 2018 |
+| Selenium.WebDriver| v4.8  | January 23, 2023 |
+| Selenium.Support  | v4.8  | January 23, 2023 |
 
 ## Coverage #
 ### CRM Functionality Covered
@@ -53,7 +56,6 @@ Although we don't have specific commands to cover the above funcationality, we h
 
 ## Known Issues #
 - Firefox has sometimes been inconsistent with testing results.  The click command is inconsistent. This is a known issue and has been reported to that team that manages that driver. 
-- IE Driver has a 32-bit version and a 64-bit version. If you're using the 32-bit version on 64-bit windows with 64-bit IE then the driver will not work as intended.  Use the appropriate version of IE Driver with the specific version of IE. 
 
 ## Setup #
 #### Install Instructions:
@@ -99,7 +101,6 @@ You can obtain an MFA secret key for your account using these instructions - you
 | -----------|-------------------- |-----------------  | --------------    |
 | Chrome     | ChromeDriver        |[SeleniumWebDriver.ChromeDriver](https://www.nuget.org/packages/Selenium.WebDriver.ChromeDriver)         |  Found in NuGet Package  |
 | Firefox    | GeckoDriver         |v.0.16.1           |  April 27, 2017   |
-| IE         | IEDriver            |v.3.4              |  April 22, 2017   |
 | Edge       | MicrosoftWebDriver  |v.10.0.15063.0     |  April 18, 2017   |
 
 #### Browser Driver Download and install instructions
@@ -108,9 +109,6 @@ If you want to download the drivers manually you can go to the specific driver d
 #### Chrome:
 Download the Chrome Web driver from the below link
 [Download chrome driver](https://sites.google.com/a/chromium.org/chromedriver/downloads)
-#### Internet Explorer:
-Download the IE Web driver from the below link
-[Download IE driver](http://selenium-release.storage.googleapis.com/3.4/IEDriverServer_x64_3.4.0.zip) 
 #### FireFox:
 The Firefox web driver can be installed through Nuget package manager.
 - In Visual studio ,Go to Tools -> NuGet Package Manager -> Manage Nuget Packages for the solution
