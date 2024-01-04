@@ -15,104 +15,178 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
     public class Entity : Element
     {
-
+        private EntityReference _entityReference { get; set; }
         #region DTO
-
-        public static class EntityReference
+        //private EntityReference _entityReference;
+        public class EntityReference
         {
-            public static class Entity
-            {
-                public static string Form = "//*[contains(@id, \"tablist\")]";
-                public static string Close = "id(\"closeButton\")";
-                public static string Tab = "[NAME]_TAB_header_image_div";
-                public static string Save = "id(\"savefooter_statuscontrol\")";
-                public static string FormSelector = "//*[@data-id=\"form-selector\"]";
-                public static string FormSelectorFlyout = "//*[@data-id=\"form-selector-flyout\"]";
-                public static string FormSelectorItem = "//li[contains(@data-id, 'form-selector-item')]";
-                public static string LookupRender = "Lookup_RenderButton_td";
-                public static string Popout = "ms-crm-ImageStrip-popout";
-            }
-            public static string FormContext = "//*[@data-id='editFormRoot']";
-            public static string FormSelector = "//*[@data-id='form-selector']";
-            public static string HeaderTitle = "//*[@data-id='header_title']";
-            public static string HeaderContext = ".//div[@data-id='headerFieldsFlyout']";
-            public static string Save = "//button[@role='menuitem' and .//*[text()='Save']]";
-            public static string TextFieldContainer = ".//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]";
-            public static string TextFieldLabel = ".//label[contains(@id, \'[NAME]-field-label\')]";
-            public static string TextFieldValue = ".//input[contains(@data-id, \'[NAME].fieldControl\')]";
-            public static string TextFieldLookup = ".//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]";
-            public static string TextFieldLookupSearchButton = ".//button[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_search')]";
-            public static string TextFieldLookupMenu = "//div[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]') and contains(@data-id,'tabContainer')]";
-            public static string LookupFieldExistingValue = ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag') and @role='link']";
-            public static string LookupFieldDeleteExistingValue = ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]";
-            public static string LookupFieldExpandCollapseButton = ".//button[contains(@data-id,'[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse')]/descendant::label[not(text()='+0')]";
-            public static string LookupFieldNoRecordsText = ".//*[@data-id=\'[NAME].fieldControl-LookupResultsDropdown_[NAME]_No_Records_Text']";
-            public static string LookupFieldResultList = ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]";
-            public static string LookupFieldResultListItem = ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_resultsContainer')]";
-            public static string LookupFieldHoverExistingValue = ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList')]";
-            public static string LookupResultsDropdown = "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]";
-            public static string OptionSetFieldContainer = ".//div[@data-id='[NAME].fieldControl-option-set-container']";
-            public static string TextFieldLookupFieldContainer = ".//div[@data-id='[NAME].fieldControl-Lookup_[NAME]']";
-            public static string RecordSetNavigator = "//button[contains(@data-lp-id, 'recordset-navigator')]";
-            public static string RecordSetNavigatorOpen = "//button[contains(@data-lp-id, 'recordset-navigator')]";
-            public static string RecordSetNavList = "//ul[contains(@data-id, 'recordSetNavList')]";
-            public static string RecordSetNavCollapseIcon = "//*[contains(@data-id, 'recordSetNavCollapseIcon')]";
-            public static string RecordSetNavCollapseIconParent = "//*[contains(@data-id, 'recordSetNavCollapseIcon')]";
-            public static string FieldControlDateTimeContainer = "//div[@data-id='[NAME]-FieldSectionItemContainer']";
-            public static string FieldControlDateTimeInputUCI = ".//*[contains(@data-id, '[FIELD].fieldControl-date-time-input')]";
-            public static string FieldControlDateTimeTimeInputUCI = ".//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input";
-            public static string Delete = "//button[contains(@data-id,'Delete')]";
-            public static string Assign = "//button[contains(@data-id,'Assign')]";
-            public static string SwitchProcess = "//button[contains(@data-id,'SwitchProcess')]";
-            public static string CloseOpportunityWin = "//button[contains(@data-id,'MarkAsWon')]";
-            public static string CloseOpportunityLoss = "//button[contains(@data-id,'MarkAsLost')]";
-            public static string ProcessButton = "//button[contains(@data-id,'MBPF.ConvertTo')]";
-            public static string SwitchProcessDialog = "Entity_SwitchProcessDialog";
-            public static string TabList = ".//ul[contains(@id, \"tablist\")]";
-            public static string Tab = ".//li[@title='{0}']";
-            public static string MoreTabs = ".//div[@data-id='more_button']";
-            public static string MoreTabsMenu = "//div[@id='__flyoutRootNode']";
-            public static string SubTab = "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]";
-            
-            public static string FieldLookupButton = "//button[contains(@data-id,'[NAME]_search')]";
-            public static string SearchButtonIcon = "//span[contains(@data-id,'microsoftIcon_searchButton')]";
-            public static string DuplicateDetectionWindowMarker = "//div[contains(@data-id,'ManageDuplicates')]";
-            public static string DuplicateDetectionGridRows = "//div[contains(@class,'data-selectable')]";
-            public static string DuplicateDetectionIgnoreAndSaveButton = "//button[contains(@data-id,'ignore_save')]";
-            public static string EntityBooleanFieldRadioContainer = "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container') and contains(@role,'radiogroup')]";
-            public static string EntityBooleanFieldRadioTrue = "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-second')]";
-            public static string EntityBooleanFieldRadioFalse = "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-first')]";
-            public static string EntityBooleanFieldButtonContainer = "//div[contains(@data-id, '[NAME].fieldControl_container')]";
-            public static string EntityBooleanFieldButtonTrue = ".//label[contains(@class, 'first-child')]";
-            public static string EntityBooleanFieldButtonFalse = ".//label[contains(@class, 'last-child')]";
-            public static string EntityBooleanFieldCheckboxContainer = "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container')]";
-            public static string EntityBooleanFieldCheckbox = "//input[contains(@data-id, '[NAME].fieldControl-checkbox-toggle')]";
-            public static string EntityBooleanFieldList = "//select[contains(@data-id, '[NAME].fieldControl-checkbox-select')]";
-            public static string EntityBooleanFieldFlipSwitchLink = "//div[contains(@data-id, '[NAME]-FieldSectionItemContainer')]";
-            public static string EntityBooleanFieldFlipSwitchContainer = "//div[@data-id= '[NAME].fieldControl_container']";
-            public static string EntityBooleanFieldToggle = "//div[contains(@data-id, '[NAME].fieldControl-toggle-container')]";
-            public static string EntityOptionsetStatusCombo = "//div[contains(@data-id, '[NAME].fieldControl-pickliststatus-comboBox')]";
-            public static string EntityOptionsetStatusComboButton = "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]";
-            public static string EntityOptionsetStatusComboList = "//ul[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_list')]";
-            public static string EntityOptionsetStatusTextValue = "//span[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_text-value')]";
-            public static string FormMessageBar = "//*[@id=\"notificationMessageAndButtons\"]/div/div/span";
-            public static string FormMessageBarTypeIcon = ".//span[contains(@data-id,'formReadOnlyIcon')]";
-            public static string FormNotifcationBar = "//div[contains(@data-id, 'notificationWrapper')]";
-            public static string FormNotifcationExpandButton = ".//span[@id='notificationExpandIcon']";
-            public static string FormNotifcationFlyoutRoot = "//div[@id='__flyoutRootNode']";
-            public static string FormNotifcationList = ".//ul[@data-id='notificationList']";
-            public static string FormNotifcationTypeIcon = ".//span[contains(@id,'notification_icon_')]";
+            public const string Entity = "Entity";
+            #region private prop
+            private string _form = "//*[contains(@id, \"tablist\")]";
 
-            public static class Header
-            {
-                public static string Container = "//div[contains(@data-id,'form-header')]";
-                public static string Flyout = "//div[@data-id='headerFieldsFlyout']";
-                public static string FlyoutButton = "//button[contains(@id,'headerFieldsExpandButton')]";
-                public static string LookupFieldContainer = "//div[@data-id='header_[NAME].fieldControl-Lookup_[NAME]']";
-                public static string TextFieldContainer = "//div[@data-id='header_[NAME].fieldControl-text-box-container']";
-                public static string OptionSetFieldContainer = "//div[@data-id='header_[NAME]']";
-                public static string DateTimeFieldContainer = "//div[@data-id='header_[NAME]-FieldSectionItemContainer']";
-            }
+            private string _FormContext = "//*[@data-id='editFormRoot']";
+            private string _FormSelector = "//*[@data-id='form-selector']";
+            private string _FormSelectorFlyout = "//*[@data-id=\"form-selector-flyout\"]";
+            private string _FormSelectorItem = "//li[contains(@data-id, 'form-selector-item')]";
+            private string _HeaderTitle = "//*[@data-id='header_title']";
+            private string _HeaderContext = ".//div[@data-id='headerFieldsFlyout']";
+            private string _Save = "//button[@role='menuitem' and .//*[text()='Save']]";
+            private string _TextFieldContainer = ".//*[contains(@id, \'[NAME]-FieldSectionItemContainer\')]";
+            private string _TextFieldLabel = ".//label[contains(@id, \'[NAME]-field-label\')]";
+            private string _TextFieldValue = ".//input[contains(@data-id, \'[NAME].fieldControl\')]";
+            private string _TextFieldLookup = ".//*[contains(@id, \'systemuserview_id.fieldControl-LookupResultsDropdown')]";
+            private string _TextFieldLookupSearchButton = ".//button[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_search')]";
+            private string _TextFieldLookupMenu = "//div[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]') and contains(@data-id,'tabContainer')]";
+            private string _LookupFieldExistingValue = ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag') and @role='link']";
+            private string _LookupFieldDeleteExistingValue = ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag_delete')]";
+            private string _LookupFieldExpandCollapseButton = ".//button[contains(@data-id,'[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse')]/descendant::label[not(text()='+0')]";
+            private string _LookupFieldNoRecordsText = ".//*[@data-id=\'[NAME].fieldControl-LookupResultsDropdown_[NAME]_No_Records_Text']";
+            private string _LookupFieldResultList = ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]";
+            private string _LookupFieldResultListItem = ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_resultsContainer')]";
+            private string _LookupFieldHoverExistingValue = ".//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_SelectedRecordList')]";
+            private string _LookupResultsDropdown = "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_tab')]";
+            private string _OptionSetFieldContainer = ".//div[@data-id='[NAME].fieldControl-option-set-container']";
+            private string _TextFieldLookupFieldContainer = ".//div[@data-id='[NAME].fieldControl-Lookup_[NAME]']";
+            private string _RecordSetNavigator = "//button[contains(@data-lp-id, 'recordset-navigator')]";
+            private string _RecordSetNavigatorOpen = "//button[contains(@data-lp-id, 'recordset-navigator')]";
+            private string _RecordSetNavList = "//ul[contains(@data-id, 'recordSetNavList')]";
+            private string _RecordSetNavCollapseIcon = "//*[contains(@data-id, 'recordSetNavCollapseIcon')]";
+            private string _RecordSetNavCollapseIconParent = "//*[contains(@data-id, 'recordSetNavCollapseIcon')]";
+            private string _FieldControlDateTimeContainer = "//div[@data-id='[NAME]-FieldSectionItemContainer']";
+            private string _FieldControlDateTimeInputUCI = ".//*[contains(@data-id, '[FIELD].fieldControl-date-time-input')]";
+            private string _FieldControlDateTimeTimeInputUCI = ".//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input";
+            private string _Delete = "//button[contains(@data-id,'Delete')]";
+            private string _Assign = "//button[contains(@data-id,'Assign')]";
+            private string _SwitchProcess = "//button[contains(@data-id,'SwitchProcess')]";
+            private string _CloseOpportunityWin = "//button[contains(@data-id,'MarkAsWon')]";
+            private string _CloseOpportunityLoss = "//button[contains(@data-id,'MarkAsLost')]";
+            private string _ProcessButton = "//button[contains(@data-id,'MBPF.ConvertTo')]";
+            private string _SwitchProcessDialog = "Entity_SwitchProcessDialog";
+            private string _TabList = ".//ul[contains(@id, \"tablist\")]";
+            private string _Tab = ".//li[@title='{0}']";
+            private string _MoreTabs = ".//div[@data-id='more_button']";
+            private string _MoreTabsMenu = "//div[@id='__flyoutRootNode']";
+            private string _SubTab = "//div[@id=\"__flyoutRootNode\"]//span[text()=\"{0}\"]";
+            private string _FieldLookupButton = "//button[contains(@data-id,'[NAME]_search')]";
+            private string _SearchButtonIcon = "//span[contains(@data-id,'microsoftIcon_searchButton')]";
+            private string _DuplicateDetectionWindowMarker { get; set; }
+            private string _DuplicateDetectionGridRows = "//div[contains(@class,'data-selectable')]";
+            private string _DuplicateDetectionIgnoreAndSaveButton = "//button[contains(@data-id,'ignore_save')]";
+            private string _EntityBooleanFieldRadioContainer = "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container') and contains(@role,'radiogroup')]";
+            private string _EntityBooleanFieldRadioTrue = "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-second')]";
+            private string _EntityBooleanFieldRadioFalse = "//div[contains(@data-id, '[NAME].fieldControl-checkbox-containercheckbox-inner-first')]";
+            private string _EntityBooleanFieldButtonContainer = "//div[contains(@data-id, '[NAME].fieldControl_container')]";
+            private string _EntityBooleanFieldButtonTrue = ".//label[contains(@class, 'first-child')]";
+            private string _EntityBooleanFieldButtonFalse = ".//label[contains(@class, 'last-child')]";
+            private string _EntityBooleanFieldCheckboxContainer = "//div[contains(@data-id, '[NAME].fieldControl-checkbox-container')]";
+            private string _EntityBooleanFieldCheckbox = "//input[contains(@data-id, '[NAME].fieldControl-checkbox-toggle')]";
+            private string _EntityBooleanFieldList = "//select[contains(@data-id, '[NAME].fieldControl-checkbox-select')]";
+            private string _EntityBooleanFieldFlipSwitchLink = "//div[contains(@data-id, '[NAME]-FieldSectionItemContainer')]";
+            private string _EntityBooleanFieldFlipSwitchContainer = "//div[@data-id= '[NAME].fieldControl_container']";
+            private string _EntityBooleanFieldToggle = "//div[contains(@data-id, '[NAME].fieldControl-toggle-container')]";
+            private string _EntityOptionsetStatusCombo = "//div[contains(@data-id, '[NAME].fieldControl-pickliststatus-comboBox')]";
+            private string _EntityOptionsetStatusComboButton = "//div[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_button')]";
+            private string _EntityOptionsetStatusComboList = "//ul[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_list')]";
+            private string _EntityOptionsetStatusTextValue = "//span[contains(@id, '[NAME].fieldControl-pickliststatus-comboBox_text-value')]";
+            private string _FormMessageBar = "//*[@id=\"notificationMessageAndButtons\"]/div/div/span";
+            private string _FormMessageBarTypeIcon = ".//span[contains(@data-id,'formReadOnlyIcon')]";
+            private string _FormNotifcationBar = "//div[contains(@data-id, 'notificationWrapper')]";
+            private string _FormNotifcationExpandButton = ".//span[@id='notificationExpandIcon']";
+            private string _FormNotifcationFlyoutRoot = "//div[@id='__flyoutRootNode']";
+            private string _FormNotifcationList = ".//ul[@data-id='notificationList']";
+            private string _FormNotifcationTypeIcon = ".//span[contains(@id,'notification_icon_')]";
+            private string _HeaderContainer = "//div[contains(@data-id,'form-header')]";
+            private string _HeaderFlyout = "//div[@data-id='headerFieldsFlyout']";
+            private string _HeaderFlyoutButton = "//button[contains(@id,'headerFieldsExpandButton')]";
+            private string _HeaderLookupFieldContainer = "//div[@data-id='header_[NAME].fieldControl-Lookup_[NAME]']";
+            private string _HeaderTextFieldContainer = "//div[@data-id='header_[NAME].fieldControl-text-box-container']";
+            private string _HeaderOptionSetFieldContainer = "//div[@data-id='header_[NAME]']";
+            private string _HeaderDateTimeFieldContainer = "//div[@data-id='header_[NAME]-FieldSectionItemContainer']";
+            #endregion
+            #region prop
+            public string Form { get => _form; set { _form = value; } }
+            public string FormContext { get => _FormContext; set { _FormContext = value; } }
+            public string FormSelector { get => _FormSelector; set { _FormSelector = value; } }
+            public string FormSelectorFlyout { get => _FormSelectorFlyout; set { _FormSelectorFlyout = value; } }
+            public string FormSelectorItem { get => _FormSelectorItem; set { _FormSelectorItem = value; } }
+            public string HeaderTitle { get => _HeaderTitle; set { _HeaderTitle = value; } }
+            public string HeaderContext { get => _HeaderContext; set { _HeaderContext = value; } }
+            public string Save { get => _Save; set { _Save = value; } }
+            public string TextFieldContainer { get => _TextFieldContainer; set { _TextFieldContainer = value; } }
+            public string TextFieldLabel { get => _TextFieldLabel; set { _TextFieldLabel = value; } }
+            public string TextFieldValue { get => _TextFieldValue; set { _TextFieldValue = value; } }
+            public string TextFieldLookup { get => _TextFieldLookup; set { _TextFieldLookup = value; } }
+            public string TextFieldLookupSearchButton { get => _TextFieldLookupSearchButton; set { _TextFieldLookupSearchButton = value; } }
+            public string TextFieldLookupMenu { get => _TextFieldLookupMenu; set { _TextFieldLookupMenu = value; } }
+            public string LookupFieldExistingValue { get => _LookupFieldExistingValue; set { _LookupFieldExistingValue = value; } }
+            public string LookupFieldDeleteExistingValue { get => _LookupFieldDeleteExistingValue; set { _LookupFieldDeleteExistingValue = value; } }
+            public string LookupFieldExpandCollapseButton { get => _LookupFieldExpandCollapseButton; set { _LookupFieldExpandCollapseButton = value; } }
+            public string LookupFieldNoRecordsText { get => _LookupFieldNoRecordsText; set { _LookupFieldNoRecordsText = value; } }
+            public string LookupFieldResultList { get => _LookupFieldResultList; set { _LookupFieldResultList = value; } }
+            public string LookupFieldResultListItem { get => _LookupFieldResultListItem; set { _LookupFieldResultListItem = value; } }
+            public string LookupFieldHoverExistingValue { get => _LookupFieldHoverExistingValue; set { _LookupFieldHoverExistingValue = value; } }
+            public string LookupResultsDropdown { get => _LookupResultsDropdown; set { _LookupResultsDropdown = value; } }
+            public string OptionSetFieldContainer { get => _OptionSetFieldContainer; set { _OptionSetFieldContainer = value; } }
+            public string TextFieldLookupFieldContainer { get => _TextFieldLookupFieldContainer; set { _TextFieldLookupFieldContainer = value; } }
+            public string RecordSetNavigator { get => _RecordSetNavigator; set { _RecordSetNavigator = value; } }
+            public string RecordSetNavigatorOpen { get => _RecordSetNavigatorOpen; set { _RecordSetNavigatorOpen = value; } }
+            public string RecordSetNavList { get => _RecordSetNavList; set { _RecordSetNavList = value; } }
+            public string RecordSetNavCollapseIcon { get => _RecordSetNavCollapseIcon; set { _RecordSetNavCollapseIcon = value; } }
+            public string RecordSetNavCollapseIconParent { get => _RecordSetNavCollapseIconParent; set { _RecordSetNavCollapseIconParent = value; } }
+            public string FieldControlDateTimeContainer { get => _FieldControlDateTimeContainer; set { _FieldControlDateTimeContainer = value; } }
+            public string FieldControlDateTimeInputUCI { get => _FieldControlDateTimeInputUCI; set { _FieldControlDateTimeInputUCI = value; } }
+            public string FieldControlDateTimeTimeInputUCI { get => _FieldControlDateTimeTimeInputUCI; set { _FieldControlDateTimeTimeInputUCI = value; } }
+            public string Delete { get => _Delete; set { _Delete = value; } }
+            public string Assign { get => _Assign; set { _Assign = value; } }
+            public string SwitchProcess { get => _SwitchProcess; set { _SwitchProcess = value; } }
+            public string CloseOpportunityWin { get => _CloseOpportunityWin; set { _CloseOpportunityWin = value; } }
+            public string CloseOpportunityLoss { get => _CloseOpportunityLoss; set { _CloseOpportunityLoss = value; } }
+            public string ProcessButton { get => _ProcessButton; set { _ProcessButton = value; } }
+            public string SwitchProcessDialog { get => _SwitchProcessDialog; set { _SwitchProcessDialog = value; } }
+            public string TabList { get => _TabList; set { _TabList = value; } }
+            public string Tab { get => _Tab; set { _Tab = value; } }
+            public string MoreTabs { get => _MoreTabs; set { _MoreTabs = value; } }
+            public string MoreTabsMenu { get => _MoreTabsMenu; set { _MoreTabsMenu = value; } }
+            public string SubTab { get => _SubTab; set { _SubTab = value; } }
+
+            public string FieldLookupButton { get => _FieldLookupButton; set { _FieldLookupButton = value; } }
+            public string SearchButtonIcon { get => _SearchButtonIcon; set { _SearchButtonIcon = value; } }
+            public string DuplicateDetectionWindowMarker { get => _DuplicateDetectionWindowMarker; set { _DuplicateDetectionWindowMarker = value; } }
+            public string DuplicateDetectionGridRows { get => _DuplicateDetectionGridRows; set { _DuplicateDetectionGridRows = value; } }
+            public string DuplicateDetectionIgnoreAndSaveButton { get => _DuplicateDetectionIgnoreAndSaveButton; set { _DuplicateDetectionIgnoreAndSaveButton = value; } }
+            public string EntityBooleanFieldRadioContainer { get => _EntityBooleanFieldRadioContainer; set { _EntityBooleanFieldRadioContainer = value; } }
+            public string EntityBooleanFieldRadioTrue { get => _EntityBooleanFieldRadioTrue; set { _EntityBooleanFieldRadioTrue = value; } }
+            public string EntityBooleanFieldRadioFalse { get => _EntityBooleanFieldRadioFalse; set { _EntityBooleanFieldRadioFalse = value; } }
+            public string EntityBooleanFieldButtonContainer { get => _EntityBooleanFieldButtonContainer; set { _EntityBooleanFieldButtonContainer = value; } }
+            public string EntityBooleanFieldButtonTrue { get => _EntityBooleanFieldButtonTrue; set { _EntityBooleanFieldButtonTrue = value; } }
+            public string EntityBooleanFieldButtonFalse { get => _EntityBooleanFieldButtonFalse; set { _EntityBooleanFieldButtonFalse = value; } }
+            public string EntityBooleanFieldCheckboxContainer { get => _EntityBooleanFieldCheckboxContainer; set { _EntityBooleanFieldCheckboxContainer = value; } }
+            public string EntityBooleanFieldCheckbox { get => _EntityBooleanFieldCheckbox; set { _EntityBooleanFieldCheckbox = value; } }
+            public string EntityBooleanFieldList { get => _EntityBooleanFieldList; set { _EntityBooleanFieldList = value; } }
+            public string EntityBooleanFieldFlipSwitchLink { get => _EntityBooleanFieldFlipSwitchLink; set { _EntityBooleanFieldFlipSwitchLink = value; } }
+            public string EntityBooleanFieldFlipSwitchContainer { get => _EntityBooleanFieldFlipSwitchContainer; set { _EntityBooleanFieldFlipSwitchContainer = value; } }
+            public string EntityBooleanFieldToggle { get => _EntityBooleanFieldToggle; set { _EntityBooleanFieldToggle = value; } }
+            public string EntityOptionsetStatusCombo { get => _EntityOptionsetStatusCombo; set { _EntityOptionsetStatusCombo = value; } }
+            public string EntityOptionsetStatusComboButton { get => _EntityOptionsetStatusComboButton; set { _EntityOptionsetStatusComboButton = value; } }
+            public string EntityOptionsetStatusComboList { get => _EntityOptionsetStatusComboList; set { _EntityOptionsetStatusComboList = value; } }
+            public string EntityOptionsetStatusTextValue { get => _EntityOptionsetStatusTextValue; set { _EntityOptionsetStatusTextValue = value; } }
+            public string FormMessageBar { get => _FormMessageBar; set { _FormMessageBar = value; } }
+            public string FormMessageBarTypeIcon { get => _FormMessageBarTypeIcon; set { _FormMessageBarTypeIcon = value; } }
+            public string FormNotifcationBar { get => _FormNotifcationBar; set { _FormNotifcationBar = value; } }
+            public string FormNotifcationExpandButton { get => _FormNotifcationExpandButton; set { _FormNotifcationExpandButton = value; } }
+            public string FormNotifcationFlyoutRoot { get => _FormNotifcationFlyoutRoot; set { _FormNotifcationFlyoutRoot = value; } }
+            public string FormNotifcationList { get => _FormNotifcationList; set { _FormNotifcationList = value; } }
+            public string FormNotifcationTypeIcon { get => _FormNotifcationTypeIcon; set { _FormNotifcationTypeIcon = value; } }
+            public string HeaderContainer { get => _HeaderContainer; set { _HeaderContainer = value; } }
+            public string HeaderFlyout { get => _HeaderFlyout; set { _HeaderFlyout = value; } }
+            public string HeaderFlyoutButton { get => _HeaderFlyoutButton; set { _HeaderFlyoutButton = value; } }
+            public string HeaderLookupFieldContainer { get => _HeaderLookupFieldContainer; set { _HeaderLookupFieldContainer = value; } }
+            public string HeaderTextFieldContainer { get => _HeaderTextFieldContainer; set { _HeaderTextFieldContainer = value; } }
+            public string HeaderOptionSetFieldContainer { get => _HeaderOptionSetFieldContainer; set { _HeaderOptionSetFieldContainer = value; } }
+            public string HeaderDateTimeFieldContainer { get => _HeaderDateTimeFieldContainer; set { _HeaderDateTimeFieldContainer = value; } }
+            #endregion
+
+
         }
         #endregion
         private readonly WebClient _client;
@@ -123,6 +197,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public Entity(WebClient client) : base()
         {
             _client = client;
+            _entityReference = new EntityReference();
         }
 
         #region public
@@ -144,6 +219,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public void ClearValue(string field)
         {
             Field.ClearValue(_client, field, FormContextType.Entity);
+            _entityReference.ToString();
         }
 
         /// <summary>
@@ -184,7 +260,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control"></param>
         public void ClearHeaderValue(DateTimeControl control)
         {
-            this.EntityClearHeaderValue(control);
+            control.EntityClearHeaderValue(_client,this, control);
         }
 
         /// <summary>
@@ -479,17 +555,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
-        /// Saves the entity
-        /// </summary>
-        public void Save()
-        {
-            this.Save();
-            Dialogs dialogs = new Dialogs(_client);
-            dialogs.HandleSaveDialog();
-            _client.Browser.Driver.WaitForTransaction();
-        }
-
-        /// <summary>
         /// Selects a Lookup Field
         /// </summary>
         /// <param name="control">LookupItem with the schema name of the field</param>
@@ -580,7 +645,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">The boolean field you want to set.</param>
         public void SetHeaderValue(DateTimeControl control)
         {
-            this.EntitySetHeaderValue(control);
+            control.EntitySetHeaderValue(_client,this, control);
         }
 
         /// <summary>
@@ -716,7 +781,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Assign Entity"), driver =>
             {
-                var assignBtn = driver.WaitUntilAvailable(By.XPath(EntityReference.Assign),
+                var assignBtn = driver.WaitUntilAvailable(By.XPath(this._entityReference.Assign),
                     "Assign Button is not available");
 
                 assignBtn?.Click();
@@ -742,19 +807,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (driver.HasElement(By.XPath(Dialogs.DialogsReference.DialogContext)))
                 {
                     var dialogContainer = driver.FindElement(By.XPath(Dialogs.DialogsReference.DialogContext));
-                    tabList = dialogContainer.WaitUntilAvailable(By.XPath(EntityReference.TabList));
+                    tabList = dialogContainer.WaitUntilAvailable(By.XPath(this._entityReference.TabList));
                 }
                 else
                 {
-                    tabList = driver.WaitUntilAvailable(By.XPath(EntityReference.TabList));
+                    tabList = driver.WaitUntilAvailable(By.XPath(this._entityReference.TabList));
                 }
 
-                ClickTab(tabList, EntityReference.Tab, tabName);
+                ClickTab(tabList, this._entityReference.Tab, tabName);
 
                 //Click Sub Tab if provided
                 if (!String.IsNullOrEmpty(subTabName))
                 {
-                    this.ClickTab(tabList, EntityReference.SubTab, subTabName);
+                    this.ClickTab(tabList, this._entityReference.SubTab, subTabName);
                 }
 
                 driver.WaitForTransaction();
@@ -772,7 +837,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 searchScope = tabList;
             }
-            else if (tabList.TryFindElement(By.XPath(EntityReference.MoreTabs), out moreTabsButton))
+            else if (tabList.TryFindElement(By.XPath(this._entityReference.MoreTabs), out moreTabsButton))
             {
                 moreTabsButton.Click();
 
@@ -783,7 +848,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
                 else
                 {
-                    searchScope = _client.Browser.Driver.FindElement(By.XPath(EntityReference.MoreTabsMenu));
+                    searchScope = _client.Browser.Driver.FindElement(By.XPath(this._entityReference.MoreTabsMenu));
                 }
             }
 
@@ -842,16 +907,37 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     link += "&perf=true";
                 }
-
                 driver.Navigate().GoToUrl(link);
-
                 //SwitchToContent();
                 driver.WaitForPageToLoad();
                 driver.WaitForTransaction();
-                driver.WaitUntilClickable(By.XPath(EntityReference.Entity.Form),
+                driver.WaitUntilClickable(By.XPath(this._entityReference.Form),
                     TimeSpan.FromSeconds(30),
                     "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
                 );
+
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Saves the entity
+        /// </summary>
+        /// <param name="thinkTime"></param>
+        public BrowserCommandResult<bool> Save(int thinkTime = Constants.DefaultThinkTime)
+        {
+            _client.ThinkTime(thinkTime);
+
+            return _client.Execute(_client.GetOptions($"Save"), driver =>
+            {
+                Actions action = new Actions(driver);
+                action.KeyDown(Keys.Control).SendKeys("S").Perform();
+
+                
+
+                Dialogs dialogs = new Dialogs(_client);
+                dialogs.HandleSaveDialog();
+                _client.Browser.Driver.WaitForTransaction();
 
                 return true;
             });
@@ -889,11 +975,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // check if record set navigator parent div is set to open
                 driver.WaitForTransaction();
 
-                if (!driver.TryFindElement(By.XPath(EntityReference.RecordSetNavList), out var navList))
+                if (!driver.TryFindElement(By.XPath(this._entityReference.RecordSetNavList), out var navList))
                 {
-                    driver.FindElement(By.XPath(EntityReference.RecordSetNavigator)).Click();
+                    driver.FindElement(By.XPath(this._entityReference.RecordSetNavigator)).Click();
                     driver.WaitForTransaction();
-                    navList = driver.FindElement(By.XPath(EntityReference.RecordSetNavList));
+                    navList = driver.FindElement(By.XPath(this._entityReference.RecordSetNavList));
                 }
 
                 var links = navList.FindElements(By.TagName("li"));
@@ -924,10 +1010,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Close Record Set Navigator"), driver =>
             {
-                var closeSpan = driver.HasElement(By.XPath(EntityReference.RecordSetNavCollapseIcon));
+                var closeSpan = driver.HasElement(By.XPath(this._entityReference.RecordSetNavCollapseIcon));
                 if (closeSpan)
                 {
-                    driver.FindElement(By.XPath(EntityReference.RecordSetNavCollapseIconParent)).Click();
+                    driver.FindElement(By.XPath(this._entityReference.RecordSetNavCollapseIconParent)).Click();
                 }
 
                 return true;
@@ -937,20 +1023,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
 
 
-        internal static ICollection<IWebElement> GetListItems(IWebElement container, LookupItem control)
-        {
-            var name = control.Name;
-            var xpathToItems = By.XPath(EntityReference.LookupFieldResultListItem.Replace("[NAME]", name));
 
-            //wait for complete the search
-            container.WaitUntil(d => d.FindVisible(xpathToItems)?.Text?.Contains(control.Value, StringComparison.OrdinalIgnoreCase) == true);
-
-            ICollection<IWebElement> result = container.WaitUntil(
-                d => d.FindElements(xpathToItems),
-                failureCallback: () => throw new InvalidOperationException($"No Results Matching {control.Value} Were Found.")
-                );
-            return result;
-        }
 
 
 
@@ -967,14 +1040,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Get Field"), driver =>
             {
-                var fieldElement = driver.WaitUntilAvailable(By.XPath(EntityReference.TextFieldContainer.Replace("[NAME]", field)));
+                var fieldElement = driver.WaitUntilAvailable(By.XPath(this._entityReference.TextFieldContainer.Replace("[NAME]", field)));
                 Field returnField = new Field(fieldElement);
                 returnField.Name = field;
 
                 IWebElement fieldLabel = null;
                 try
                 {
-                    fieldLabel = fieldElement.FindElement(By.XPath(EntityReference.TextFieldLabel.Replace("[NAME]", field)));
+                    fieldLabel = fieldElement.FindElement(By.XPath(this._entityReference.TextFieldLabel.Replace("[NAME]", field)));
                 }
                 catch (NoSuchElementException)
                 {
@@ -995,7 +1068,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Get Value"), driver =>
             {
                 string text = string.Empty;
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(EntityReference.TextFieldContainer.Replace("[NAME]", field)));
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(this._entityReference.TextFieldContainer.Replace("[NAME]", field)));
 
                 if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
                 {
@@ -1006,7 +1079,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         text = input.GetAttribute("value").ToString();
 
                         // Needed if getting a date field which also displays time as there isn't a date specifc GetValue method
-                        var timefields = driver.FindElements(By.XPath(EntityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", field)));
+                        var timefields = driver.FindElements(By.XPath(this._entityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", field)));
                         if (timefields.Any())
                         {
                             text += $" {timefields.First().GetAttribute("value")}";
@@ -1036,7 +1109,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var controlName = control.Name;
             return _client.Execute($"Get Lookup Value: {controlName}", driver =>
             {
-                var xpathToContainer = EntityReference.TextFieldLookupFieldContainer.Replace("[NAME]", controlName);
+                var xpathToContainer = this._entityReference.TextFieldLookupFieldContainer.Replace("[NAME]", controlName);
                 IWebElement fieldContainer = driver.WaitUntilAvailable(By.XPath(xpathToContainer));
                 string lookupValue = TryGetValue(fieldContainer, control);
 
@@ -1060,7 +1133,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var controlName = controls.First().Name;
             return _client.Execute($"Get ActivityParty Lookup Value: {controlName}", driver =>
             {
-                var xpathToContainer = By.XPath(EntityReference.TextFieldLookupFieldContainer.Replace("[NAME]", controlName));
+                var xpathToContainer = By.XPath(this._entityReference.TextFieldLookupFieldContainer.Replace("[NAME]", controlName));
                 var fieldContainer = driver.WaitUntilAvailable(xpathToContainer);
                 string[] result = TryGetValue(fieldContainer, controls);
 
@@ -1071,10 +1144,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         private string[] TryGetValue(IWebElement fieldContainer, LookupItem[] controls)
         {
             var controlName = controls.First().Name;
-            var xpathToExistingValues = By.XPath(EntityReference.LookupFieldExistingValue.Replace("[NAME]", controlName));
+            var xpathToExistingValues = By.XPath(this._entityReference.LookupFieldExistingValue.Replace("[NAME]", controlName));
             var existingValues = fieldContainer.FindElements(xpathToExistingValues);
 
-            var xpathToExpandButton = By.XPath(EntityReference.LookupFieldExpandCollapseButton.Replace("[NAME]", controlName));
+            var xpathToExpandButton = By.XPath(this._entityReference.LookupFieldExpandCollapseButton.Replace("[NAME]", controlName));
             bool expandButtonFound = fieldContainer.TryFindElement(xpathToExpandButton, out var expandButton);
             if (expandButtonFound)
             {
@@ -1116,7 +1189,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var controlName = control.Name;
             return _client.Execute($"Get OptionSet Value: {controlName}", driver =>
             {
-                var xpathToFieldContainer = EntityReference.OptionSetFieldContainer.Replace("[NAME]", controlName);
+                var xpathToFieldContainer = this._entityReference.OptionSetFieldContainer.Replace("[NAME]", controlName);
                 var fieldContainer = driver.WaitUntilAvailable(By.XPath(xpathToFieldContainer));
                 string result = TryGetValue(fieldContainer, control);
 
@@ -1124,7 +1197,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        private static string TryGetValue(IWebElement fieldContainer, OptionSet control)
+        private string TryGetValue(IWebElement fieldContainer, OptionSet control)
         {
             bool success = fieldContainer.TryFindElement(By.TagName("select"), out IWebElement select);
             if (success)
@@ -1135,11 +1208,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             }
 
             var name = control.Name;
-            var hasStatusCombo = fieldContainer.HasElement(By.XPath(EntityReference.EntityOptionsetStatusCombo.Replace("[NAME]", name)));
+            var hasStatusCombo = fieldContainer.HasElement(By.XPath(this._entityReference.EntityOptionsetStatusCombo.Replace("[NAME]", name)));
             if (hasStatusCombo)
             {
                 // This is for statuscode (type = status) that should act like an optionset doesn't doesn't follow the same pattern when rendered
-                var valueSpan = fieldContainer.FindElement(By.XPath(EntityReference.EntityOptionsetStatusTextValue.Replace("[NAME]", name)));
+                var valueSpan = fieldContainer.FindElement(By.XPath(this._entityReference.EntityOptionsetStatusTextValue.Replace("[NAME]", name)));
                 return valueSpan.Text;
             }
 
@@ -1163,28 +1236,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var check = false;
 
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(EntityReference.TextFieldContainer.Replace("[NAME]", option.Name)));
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(this._entityReference.TextFieldContainer.Replace("[NAME]", option.Name)));
 
-                var hasRadio = fieldContainer.HasElement(By.XPath(EntityReference.EntityBooleanFieldRadioContainer.Replace("[NAME]", option.Name)));
-                var hasCheckbox = fieldContainer.HasElement(By.XPath(EntityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name)));
-                var hasList = fieldContainer.HasElement(By.XPath(EntityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name)));
-                var hasToggle = fieldContainer.HasElement(By.XPath(EntityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name)));
+                var hasRadio = fieldContainer.HasElement(By.XPath(this._entityReference.EntityBooleanFieldRadioContainer.Replace("[NAME]", option.Name)));
+                var hasCheckbox = fieldContainer.HasElement(By.XPath(this._entityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name)));
+                var hasList = fieldContainer.HasElement(By.XPath(this._entityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name)));
+                var hasToggle = fieldContainer.HasElement(By.XPath(this._entityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name)));
 
                 if (hasRadio)
                 {
-                    var trueRadio = fieldContainer.FindElement(By.XPath(EntityReference.EntityBooleanFieldRadioTrue.Replace("[NAME]", option.Name)));
+                    var trueRadio = fieldContainer.FindElement(By.XPath(this._entityReference.EntityBooleanFieldRadioTrue.Replace("[NAME]", option.Name)));
 
                     check = bool.Parse(trueRadio.GetAttribute("aria-checked"));
                 }
                 else if (hasCheckbox)
                 {
-                    var checkbox = fieldContainer.FindElement(By.XPath(EntityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name)));
+                    var checkbox = fieldContainer.FindElement(By.XPath(this._entityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name)));
 
                     check = bool.Parse(checkbox.GetAttribute("aria-checked"));
                 }
                 else if (hasList)
                 {
-                    var list = fieldContainer.FindElement(By.XPath(EntityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name)));
+                    var list = fieldContainer.FindElement(By.XPath(this._entityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name)));
                     var options = list.FindElements(By.TagName("option"));
                     var selectedOption = options.FirstOrDefault(a => a.HasAttribute("data-selected") && bool.Parse(a.GetAttribute("data-selected")));
 
@@ -1195,7 +1268,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
                 else if (hasToggle)
                 {
-                    var toggle = fieldContainer.FindElement(By.XPath(EntityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name)));
+                    var toggle = fieldContainer.FindElement(By.XPath(this._entityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name)));
                     var link = toggle.FindElement(By.TagName("button"));
 
                     check = bool.Parse(link.GetAttribute("aria-checked"));
@@ -1244,7 +1317,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">The lookup field name of the lookup.</param>
         /// <example>xrmApp.Entity.GetValue(new DateTimeControl { Name = "scheduledstart" });</example>
         public BrowserCommandResult<DateTime?> EntityGetValue(DateTimeControl control)
-            => _client.Execute($"Get DateTime Value: {control.Name}", driver => DateTimeControl.TryGetValue(driver, container: driver, control: control));
+            => _client.Execute($"Get DateTime Value: {control.Name}", driver => DateTimeControl.TryGetValue(_client, container: driver, control: control));
 
         /// <summary>
         /// Returns the ObjectId of the entity
@@ -1292,7 +1365,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Get Form Name"), driver =>
             {
                 // Wait for form selector visible
-                driver.WaitUntilVisible(By.XPath(EntityReference.FormSelector));
+                driver.WaitUntilVisible(By.XPath(this._entityReference.FormSelector));
 
                 string formName = driver.ExecuteScript("return Xrm.Page.ui.formContext.ui.formSelector.getCurrentItem().getLabel();").ToString();
 
@@ -1314,7 +1387,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Get Header Title"), driver =>
             {
                 // Wait for form selector visible
-                var headerTitle = driver.WaitUntilVisible(By.XPath(EntityReference.HeaderTitle), new TimeSpan(0, 0, 5));
+                var headerTitle = driver.WaitUntilVisible(By.XPath(this._entityReference.HeaderTitle), new TimeSpan(0, 0, 5));
 
                 var headerTitleName = headerTitle?.GetAttribute("title");
 
@@ -1523,15 +1596,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Select Lookup Field {control.Name}"), driver =>
             {
-                if (driver.HasElement(By.XPath(EntityReference.FieldLookupButton.Replace("[NAME]", control.Name))))
+                if (driver.HasElement(By.XPath(this._entityReference.FieldLookupButton.Replace("[NAME]", control.Name))))
                 {
-                    var lookupButton = driver.FindElement(By.XPath(EntityReference.FieldLookupButton.Replace("[NAME]", control.Name)));
+                    var lookupButton = driver.FindElement(By.XPath(this._entityReference.FieldLookupButton.Replace("[NAME]", control.Name)));
 
                     lookupButton.Hover(driver);
 
                     driver.WaitForTransaction();
 
-                    driver.FindElement(By.XPath(EntityReference.SearchButtonIcon)).Click(true);
+                    driver.FindElement(By.XPath(this._entityReference.SearchButtonIcon)).Click(true);
                 }
                 else
                     throw new NotFoundException($"Lookup field {control.Name} not found");
@@ -1547,7 +1620,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var controlName = control.Name;
             return _client.Execute(_client.GetOptions($"Get Header LookupItem Value {controlName}"), driver =>
             {
-                var xpathToContainer = EntityReference.Header.LookupFieldContainer.Replace("[NAME]", controlName);
+                var xpathToContainer = this._entityReference.HeaderLookupFieldContainer.Replace("[NAME]", controlName);
                 string lookupValue = ExecuteInHeaderContainer(driver, xpathToContainer, container => TryGetValue(container, control));
 
                 return lookupValue;
@@ -1557,7 +1630,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         internal BrowserCommandResult<string[]> EntityGetHeaderValue(LookupItem[] controls)
         {
             var controlName = controls.First().Name;
-            var xpathToContainer = EntityReference.Header.LookupFieldContainer.Replace("[NAME]", controlName);
+            var xpathToContainer = this._entityReference.HeaderLookupFieldContainer.Replace("[NAME]", controlName);
             return _client.Execute(_client.GetOptions($"Get Header Activityparty LookupItem Value {controlName}"), driver =>
             {
                 string[] lookupValues = ExecuteInHeaderContainer(driver, xpathToContainer, container => TryGetValue(container, controls));
@@ -1589,7 +1662,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         internal BrowserCommandResult<string> EntityGetHeaderValue(OptionSet control)
         {
             var controlName = control.Name;
-            var xpathToContainer = EntityReference.Header.OptionSetFieldContainer.Replace("[NAME]", controlName);
+            var xpathToContainer = this._entityReference.HeaderOptionSetFieldContainer.Replace("[NAME]", controlName);
             return _client.Execute(_client.GetOptions($"Get Header OptionSet Value {controlName}"),
                 driver => ExecuteInHeaderContainer(driver, xpathToContainer, container => TryGetValue(container, control))
             );
@@ -1607,10 +1680,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal BrowserCommandResult<DateTime?> EntityGetHeaderValue(DateTimeControl control)
         {
-            var xpathToContainer = EntityReference.Header.DateTimeFieldContainer.Replace("[NAME]", control.Name);
+            var xpathToContainer = this._entityReference.HeaderDateTimeFieldContainer.Replace("[NAME]", control.Name);
             return _client.Execute(_client.GetOptions($"Get Header DateTime Value {control.Name}"),
                 driver => ExecuteInHeaderContainer(driver, xpathToContainer,
-                    container => DateTimeControl.TryGetValue(driver, container, control)));
+                    container => DateTimeControl.TryGetValue(_client, container, control)));
         }
 
         internal BrowserCommandResult<string> GetStateFromForm()
@@ -1658,7 +1731,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var controlName = control.Name;
             bool isHeader = true;
             bool removeAll = true;
-            var xpathToContainer = EntityReference.Header.LookupFieldContainer.Replace("[NAME]", controlName);
+            var xpathToContainer = this._entityReference.HeaderLookupFieldContainer.Replace("[NAME]", controlName);
             return _client.Execute(_client.GetOptions($"Set Header LookupItem Value {controlName}"),
                 driver => ExecuteInHeaderContainer(driver, xpathToContainer,
                     fieldContainer =>
@@ -1676,7 +1749,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             var control = controls.First();
             var controlName = control.Name;
-            var xpathToContainer = EntityReference.Header.LookupFieldContainer.Replace("[NAME]", controlName);
+            var xpathToContainer = this._entityReference.HeaderLookupFieldContainer.Replace("[NAME]", controlName);
             return _client.Execute(_client.GetOptions($"Set Header Activityparty LookupItem Value {controlName}"),
                 driver => ExecuteInHeaderContainer(driver, xpathToContainer,
                     container =>
@@ -1695,7 +1768,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         internal BrowserCommandResult<bool> EntitySetHeaderValue(OptionSet control)
         {
             var controlName = control.Name;
-            var xpathToContainer = EntityReference.Header.OptionSetFieldContainer.Replace("[NAME]", controlName);
+            var xpathToContainer = this._entityReference.HeaderOptionSetFieldContainer.Replace("[NAME]", controlName);
             return _client.Execute(_client.GetOptions($"Set Header OptionSet Value {controlName}"),
                 driver => ExecuteInHeaderContainer(driver, xpathToContainer,
                     container =>
@@ -1741,25 +1814,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 DateFormat = formatDate,
                 TimeFormat = formatTime
             };
-            return EntitySetHeaderValue(control);
+            return control.EntitySetHeaderValue(_client,this,control);
         }
 
-        internal BrowserCommandResult<bool> EntitySetHeaderValue(DateTimeControl control)
-            => _client.Execute(_client.GetOptions($"Set Header Date/Time Value: {control.Name}"), driver => TrySetHeaderValue(driver, control));
 
-        internal BrowserCommandResult<bool> EntityClearHeaderValue(DateTimeControl control)
-        {
-            var controlName = control.Name;
-            return _client.Execute(_client.GetOptions($"Clear Header Date/Time Value: {controlName}"),
-                driver => TrySetHeaderValue(driver, new DateTimeControl(controlName)));
-        }
-
-        private bool TrySetHeaderValue(IWebDriver driver, DateTimeControl control)
-        {
-            var xpathToContainer = EntityReference.Header.DateTimeFieldContainer.Replace("[NAME]", control.Name);
-            return ExecuteInHeaderContainer(driver, xpathToContainer,
-                container => control.TrySetValue(driver,_client, container, control, FormContextType.Header));
-        }
 
 
         internal BrowserCommandResult<bool> EntitySelectForm(string formName)
@@ -1768,17 +1826,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForTransaction();
 
-                if (!driver.HasElement(By.XPath(EntityReference.Entity.FormSelector)))
+                if (!driver.HasElement(By.XPath(this._entityReference.FormSelector)))
                     throw new NotFoundException("Unable to find form selector on the form");
 
-                var formSelector = driver.WaitUntilAvailable(By.XPath(EntityReference.Entity.FormSelector));
+                var formSelector = driver.WaitUntilAvailable(By.XPath(this._entityReference.FormSelector));
                 // Click didn't work with IE
                 formSelector.SendKeys(Keys.Enter);
 
-                driver.WaitUntilVisible(By.XPath(EntityReference.Entity.FormSelectorFlyout));
+                driver.WaitUntilVisible(By.XPath(this._entityReference.FormSelectorFlyout));
 
-                var flyout = driver.FindElement(By.XPath(EntityReference.Entity.FormSelectorFlyout));
-                var forms = flyout.FindElements(By.XPath(EntityReference.Entity.FormSelectorItem));
+                var flyout = driver.FindElement(By.XPath(this._entityReference.FormSelectorFlyout));
+                var forms = flyout.FindElements(By.XPath(this._entityReference.FormSelectorItem));
 
                 var form = forms.FirstOrDefault(a => a.GetAttribute("data-text").EndsWith(formName, StringComparison.OrdinalIgnoreCase));
                 if (form == null)
@@ -1799,7 +1857,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             TryExpandHeaderFlyout(driver);
 
-            var xpathToFlyout = EntityReference.Header.Flyout;
+            var xpathToFlyout = this._entityReference.HeaderFlyout;
             driver.WaitUntilVisible(By.XPath(xpathToFlyout), TimeSpan.FromSeconds(5),
                 flyout =>
                 {
@@ -1813,10 +1871,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         internal void TryExpandHeaderFlyout(IWebDriver driver)
         {
             driver.WaitUntilAvailable(
-                By.XPath(EntityReference.Header.Container),
+                By.XPath(this._entityReference.HeaderContainer),
                 "Unable to find header on the form");
 
-            var xPath = By.XPath(EntityReference.Header.FlyoutButton);
+            var xPath = By.XPath(this._entityReference.HeaderFlyoutButton);
             var headerFlyoutButton = driver.FindElement(xPath);
             bool expanded = bool.Parse(headerFlyoutButton.GetAttribute("aria-expanded"));
 
@@ -1826,11 +1884,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal void TryCloseHeaderFlyout(IWebDriver driver)
         {
-            bool hasHeader = driver.HasElement(By.XPath(EntityReference.Header.Container));
+            bool hasHeader = driver.HasElement(By.XPath(this._entityReference.HeaderContainer));
             if (!hasHeader)
                 throw new NotFoundException("Unable to find header on the form");
 
-            var xPath = By.XPath(EntityReference.Header.FlyoutButton);
+            var xPath = By.XPath(this._entityReference.HeaderFlyoutButton);
             var headerFlyoutButton = driver.FindElement(xPath);
             bool expanded = bool.Parse(headerFlyoutButton.GetAttribute("aria-expanded"));
 

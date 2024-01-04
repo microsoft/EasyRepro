@@ -3,7 +3,9 @@
 
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OtpNet;
@@ -17,16 +19,32 @@ using System.Web;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
+    public class ElementMapper
+    {
+        public Entity.EntityReference EntityReference;
+        public ElementMapper(IConfiguration config) {
+            EntityReference = new Entity.EntityReference();
+            config.GetSection(Entity.EntityReference.Entity).Bind(EntityReference);
+        }
+    }
     public class WebClient : BrowserPage, IDisposable
     {
         public List<ICommandResult> CommandResults => Browser.CommandResults;
         public Guid ClientSessionId;
-
+        public ElementMapper ElementMapper;
+        private Entity.EntityReference _entityReference;
         public WebClient(BrowserOptions options)
         {
+            ConfigurationBuilder builder = new ConfigurationBuilder();
+            builder.AddJsonFile(options.ConfigPath);
             Browser = new InteractiveBrowser(options);
             ClientSessionId = Guid.NewGuid();
+            ElementMapper = new ElementMapper(builder.Build());
+            _entityReference = new Entity.EntityReference();
         }
+
+
+
         internal BrowserCommandOptions GetOptions(string commandName)
         {
             return new BrowserCommandOptions(Constants.DefaultTraceSource,
@@ -60,6 +78,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
         #endregion
 
+        internal void ClickIfVisible(string elementLocator)
+        {
+
+        }
+
+        internal Element WaitUntilAvailable(string elementLocator, TimeSpan timeToWait)
+        {
+            if (this.Browser.Options.BrowserFramework == BrowserFramework.Selenium)
+                return new Element();
+            else if (this.Browser.Options.BrowserFramework == BrowserFramework.Playwright)
+                return new Element();
+            else return new Element();
+        }
 
         #region FormContextType
 
@@ -71,13 +102,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Initialize the quick create form context
                 // If this is not done -- element input will go to the main form due to new flyout design
                 var formContext = driver.WaitUntilAvailable(By.XPath(QuickCreate.QuickCreateReference.QuickCreateFormContext));
-                fieldContainer = formContext.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", field)));
+                fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
             }
             else if (formContextType == FormContextType.Entity)
             {
                 // Initialize the entity form context
-                var formContext = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.FormContext));
-                fieldContainer = formContext.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", field)));
+                var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.FormContext));
+                fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
             }
             else if (formContextType == FormContextType.BusinessProcessFlow)
             {
@@ -88,8 +119,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (formContextType == FormContextType.Header)
             {
                 // Initialize the Header context
-                var formContext = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.HeaderContext));
-                fieldContainer = formContext.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", field)));
+                var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.HeaderContext));
+                fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
             }
             else if (formContextType == FormContextType.Dialog)
             {
@@ -98,7 +129,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var formContext = driver
                     .FindElements(By.XPath(Dialogs.DialogsReference.DialogContext))
                     .LastOrDefault() ?? throw new NotFoundException("Unable to find a dialog.");
-                fieldContainer = formContext.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", field)));
+                fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
             }
 
             return fieldContainer;

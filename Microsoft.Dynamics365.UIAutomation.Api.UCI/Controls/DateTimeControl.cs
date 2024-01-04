@@ -40,12 +40,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             set => _timeAsString = value;
         }
 
-        public static DateTime? TryGetValue(IWebDriver driver, ISearchContext container, DateTimeControl control)
+        public static DateTime? TryGetValue(WebClient client, ISearchContext container, DateTimeControl control)
         {
             string field = control.Name;
-            driver.WaitForTransaction();
-
-            var xpathToDateField = By.XPath(EntityReference.FieldControlDateTimeInputUCI.Replace("[FIELD]", field));
+            client.Browser.Driver.WaitForTransaction();
+            var xpathToDateField = By.XPath(client.ElementMapper.EntityReference.FieldControlDateTimeInputUCI.Replace("[FIELD]", field));
 
             var dateField = container.WaitUntilAvailable(xpathToDateField, $"Field: {field} Does not exist");
             string strDate = dateField.GetAttribute("value");
@@ -55,7 +54,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var date = DateTime.Parse(strDate);
 
             // Try get Time
-            var timeFieldXPath = By.XPath(EntityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", field));
+            var timeFieldXPath = By.XPath(client.ElementMapper.EntityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", field));
             bool success = container.TryFindElement(timeFieldXPath, out var timeField);
             if (!success || timeField == null)
                 return date;
@@ -70,8 +69,48 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return result;
         }
+        internal static void TrySetTime(WebClient client, ISearchContext container, DateTimeControl control, FormContextType formContextType)
+        {
+            By timeFieldXPath = By.XPath(client.ElementMapper.EntityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", control.Name));
 
-        internal static void TrySetTime(IWebDriver driver, IWebElement timeField, string time)
+            IWebElement formContext = null;
+
+            if (formContextType == FormContextType.QuickCreate)
+            {
+                //IWebDriver formContext;
+                // Initialize the quick create form context
+                // If this is not done -- element input will go to the main form due to new flyout design
+                formContext = container.WaitUntilAvailable(By.XPath(QuickCreateReference.QuickCreateFormContext), new TimeSpan(0, 0, 1));
+            }
+            else if (formContextType == FormContextType.Entity)
+            {
+                // Initialize the entity form context
+                formContext = container.WaitUntilAvailable(By.XPath(client.ElementMapper.EntityReference.FormContext), new TimeSpan(0, 0, 1));
+            }
+            else if (formContextType == FormContextType.BusinessProcessFlow)
+            {
+                // Initialize the Business Process Flow context
+                formContext = container.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext), new TimeSpan(0, 0, 1));
+            }
+            else if (formContextType == FormContextType.Header)
+            {
+                // Initialize the Header context
+                formContext = container as IWebElement;
+            }
+            else if (formContextType == FormContextType.Dialog)
+            {
+                // Initialize the Header context
+                formContext = container.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext), new TimeSpan(0, 0, 1));
+            }
+
+            client.Browser.Driver.WaitForTransaction();
+
+            if (formContext.TryFindElement(timeFieldXPath, out var timeField))
+            {
+                TrySetTime(client.Browser.Driver,container, timeField, control.TimeAsString);
+            }
+        }
+        internal static void TrySetTime(IWebDriver driver,ISearchContext container, IWebElement timeField, string time)
         {
             // click & wait until the time get updated after change/clear the date
             timeField.Click();
@@ -145,7 +184,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             string controlName = control.Name;
             IWebElement fieldContainer = null;
-            var xpathToInput = By.XPath(Entity.EntityReference.FieldControlDateTimeInputUCI.Replace("[FIELD]", controlName));
+            var xpathToInput = By.XPath(client.ElementMapper.EntityReference.FieldControlDateTimeInputUCI.Replace("[FIELD]", controlName));
 
             if (formContextType == FormContextType.QuickCreate)
             {
@@ -158,20 +197,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (strExpanded == null)
                 {
-                    fieldContainer = formContext.FindElement(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
+                    fieldContainer = formContext.FindElement(By.XPath(client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
                 }
             }
             else if (formContextType == FormContextType.Entity)
             {
                 // Initialize the entity form context
-                var formContext = container.WaitUntilAvailable(By.XPath(Entity.EntityReference.FormContext));
+                var formContext = container.WaitUntilAvailable(By.XPath(client.ElementMapper.EntityReference.FormContext));
                 fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
                 var strExpanded = fieldContainer.GetAttribute("aria-expanded");
 
                 if (strExpanded == null)
                 {
-                    fieldContainer = formContext.FindElement(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
+                    fieldContainer = formContext.FindElement(By.XPath(client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
                 }
             }
             else if (formContextType == FormContextType.BusinessProcessFlow)
@@ -184,20 +223,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (strExpanded == null)
                 {
-                    fieldContainer = formContext.FindElement(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
+                    fieldContainer = formContext.FindElement(By.XPath(client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
                 }
             }
             else if (formContextType == FormContextType.Header)
             {
                 // Initialize the Header context
-                var formContext = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.HeaderContext));
+                var formContext = driver.WaitUntilAvailable(By.XPath(client.ElementMapper.EntityReference.HeaderContext));
                 fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
                 var strExpanded = fieldContainer.GetAttribute("aria-expanded");
 
                 if (strExpanded == null)
                 {
-                    fieldContainer = formContext.FindElement(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
+                    fieldContainer = formContext.FindElement(By.XPath(client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
                 }
             }
             else if (formContextType == FormContextType.Dialog)
@@ -210,7 +249,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (strExpanded == null)
                 {
-                    fieldContainer = formContext.FindElement(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
+                    fieldContainer = formContext.FindElement(By.XPath(client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName)));
                 }
 
             }
@@ -219,7 +258,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
         internal BrowserCommandResult<bool> ClearValue(WebClient client, DateTimeControl control, FormContextType formContextType)
             => client.Execute(client.GetOptions($"Clear Field: {control.Name}"),
-             driver => TrySetValue(driver, client, container: driver, control: new DateTimeControl(control.Name), formContextType)); // Pass an empty control
+             driver => TrySetValue(client, container: driver, control: new DateTimeControl(control.Name), formContextType)); // Pass an empty control
 
         /// <summary>
         /// Sets the value of a Date Field.
@@ -244,60 +283,38 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public BrowserCommandResult<bool> SetValue(WebClient client, DateTimeControl control, FormContextType formContext)
             => client.Execute(client.GetOptions($"Set Date/Time Value: {control.Name}"),
-                driver => TrySetValue(driver,client, container: driver, control: control, formContext));
-        internal bool TrySetValue(IWebDriver driver,WebClient client, ISearchContext container, DateTimeControl control, FormContextType formContext)
+                driver => TrySetValue(client, container: driver, control: control, formContext));
+        internal bool TrySetValue(WebClient client, ISearchContext container, DateTimeControl control, FormContextType formContext)
         {
-            this.TrySetDateValue(driver,client, container, control, formContext);
-            DateTimeControl.TrySetTime(driver, container, control, formContext);
+            this.TrySetDateValue(client.Browser.Driver,client, container, control, formContext);
+            DateTimeControl.TrySetTime(client, container, control, formContext);
 
             if (formContext == FormContextType.Header)
             {
                 Entity entity = new Entity(client);
-                entity.TryCloseHeaderFlyout(driver);
+                entity.TryCloseHeaderFlyout(client.Browser.Driver);
             }
 
             return true;
         }
-        internal static void TrySetTime(IWebDriver driver, ISearchContext container, DateTimeControl control, FormContextType formContextType)
+
+        internal BrowserCommandResult<bool> EntitySetHeaderValue(WebClient client,Entity entity, DateTimeControl control)
         {
-            By timeFieldXPath = By.XPath(Entity.EntityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", control.Name));
+            return client.Execute(client.GetOptions($"Set Header Date/Time Value: {control.Name}"), driver => TrySetHeaderValue(client,entity, control));
+        }
 
-            IWebElement formContext = null;
+        internal BrowserCommandResult<bool> EntityClearHeaderValue(WebClient client, Entity entity, DateTimeControl control)
+        {
+            var controlName = control.Name;
+            return client.Execute(client.GetOptions($"Clear Header Date/Time Value: {controlName}"),
+                driver => TrySetHeaderValue(client,entity, new DateTimeControl(controlName)));
+        }
 
-            if (formContextType == FormContextType.QuickCreate)
-            {
-                //IWebDriver formContext;
-                // Initialize the quick create form context
-                // If this is not done -- element input will go to the main form due to new flyout design
-                formContext = container.WaitUntilAvailable(By.XPath(QuickCreateReference.QuickCreateFormContext), new TimeSpan(0, 0, 1));
-            }
-            else if (formContextType == FormContextType.Entity)
-            {
-                // Initialize the entity form context
-                formContext = container.WaitUntilAvailable(By.XPath(Entity.EntityReference.FormContext), new TimeSpan(0, 0, 1));
-            }
-            else if (formContextType == FormContextType.BusinessProcessFlow)
-            {
-                // Initialize the Business Process Flow context
-                formContext = container.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext), new TimeSpan(0, 0, 1));
-            }
-            else if (formContextType == FormContextType.Header)
-            {
-                // Initialize the Header context
-                formContext = container as IWebElement;
-            }
-            else if (formContextType == FormContextType.Dialog)
-            {
-                // Initialize the Header context
-                formContext = container.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext), new TimeSpan(0, 0, 1));
-            }
-
-            driver.WaitForTransaction();
-
-            if (formContext.TryFindElement(timeFieldXPath, out var timeField))
-            {
-                DateTimeControl.TrySetTime(driver, timeField, control.TimeAsString);
-            }
+        private bool TrySetHeaderValue(WebClient client,Entity entity, DateTimeControl control)
+        {
+            var xpathToContainer = client.ElementMapper.EntityReference.HeaderDateTimeFieldContainer.Replace("[NAME]", control.Name);
+            return entity.ExecuteInHeaderContainer(client.Browser.Driver, xpathToContainer,
+                container => control.TrySetValue(client, container, control, FormContextType.Header));
         }
     }
 }

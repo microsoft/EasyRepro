@@ -9,9 +9,14 @@ using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Remote;
 using System;
+using Microsoft.Playwright;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
+    //public interface IWebDriver : OpenQA.Selenium.IWebDriver
+    //{
+
+    //}
     public static class BrowserDriverFactory
     {
         public static IWebDriver CreateWebDriver(BrowserOptions options)
@@ -72,6 +77,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 // Wrap the newly created driver.
                 driver = new EventFiringWebDriver(driver);
             }
+
+            return driver;
+        }
+
+        public static IPlaywright CreatePlaywright(BrowserOptions options)
+        {
+            IPlaywright driver;
+            driver = Microsoft.Playwright.Playwright.CreateAsync().Result;
+
+            
 
             return driver;
         }

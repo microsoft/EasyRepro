@@ -15,7 +15,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     {
         public string Name { get; set; }
         public string Value { get; set; }
-
+        private static EntityReference _entityReference;
+        public OptionSet() {
+            _entityReference = new EntityReference();
+        }
         internal static BrowserCommandResult<bool> SetValue(WebClient client, OptionSet control, FormContextType formContextType)
         {
             var controlName = control.Name;
@@ -53,13 +56,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             }
 
             var name = control.Name;
-            var hasStatusCombo = fieldContainer.HasElement(By.XPath(EntityReference.EntityOptionsetStatusCombo.Replace("[NAME]", name)));
+            var hasStatusCombo = fieldContainer.HasElement(By.XPath(_entityReference.EntityOptionsetStatusCombo.Replace("[NAME]", name)));
             if (hasStatusCombo)
             {
                 // This is for statuscode (type = status) that should act like an optionset doesn't doesn't follow the same pattern when rendered
-                fieldContainer.ClickWhenAvailable(By.XPath(EntityReference.EntityOptionsetStatusComboButton.Replace("[NAME]", name)));
+                fieldContainer.ClickWhenAvailable(By.XPath(_entityReference.EntityOptionsetStatusComboButton.Replace("[NAME]", name)));
 
-                var listBox = fieldContainer.FindElement(By.XPath(EntityReference.EntityOptionsetStatusComboList.Replace("[NAME]", name)));
+                var listBox = fieldContainer.FindElement(By.XPath(_entityReference.EntityOptionsetStatusComboList.Replace("[NAME]", name)));
 
                 var options = listBox.FindElements(By.TagName("li"));
                 SelectOption(options, value);

@@ -20,10 +20,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
         #endregion
         private readonly WebClient _client;
+        private Entity.EntityReference _entityReference;
         #region ctor
         public CommandBar(WebClient client) : base()
         {
             _client = client;
+            _entityReference = new Entity.EntityReference();
         }
         #endregion
 
@@ -237,8 +239,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.ThinkTime(thinkTime);
 
             var xPathQuery = closeAsWon
-                ? Entity.EntityReference.CloseOpportunityWin
-                : Entity.EntityReference.CloseOpportunityLoss;
+                ? _entityReference.CloseOpportunityWin
+                : _entityReference.CloseOpportunityLoss;
 
             return _client.Execute(_client.GetOptions($"Close Opportunity"), driver =>
             {
@@ -278,7 +280,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Delete Entity"), driver =>
             {
-                var deleteBtn = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.Delete),
+                var deleteBtn = driver.WaitUntilAvailable(By.XPath(_entityReference.Delete),
                     "Delete Button is not available");
 
                 deleteBtn?.Click();

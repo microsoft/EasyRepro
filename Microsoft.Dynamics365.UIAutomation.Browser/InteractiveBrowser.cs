@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using Microsoft.Playwright;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.Events;
 using System;
@@ -63,6 +64,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         private readonly bool disposeOfDriver = true;
         private bool disposing = false;
         private IWebDriver driver;
+        private IPage playwrightDriver;
         private readonly object syncRoot = new object();
 
         #endregion Private Members
@@ -121,7 +123,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 return driver;
             }
         }
+        //public IPage PlaywrightDriver {
+        //    get {
+        //        if (this.playwrightDriver == null)
+        //        {
+        //            this.playwrightDriver = BrowserDriverFactory.CreatePlaywright(this.Options);
 
+        //            if (this.Options.FireEvents || this.Options.EnableRecording)
+        //            {
+
+        //                var chrome = this.playwrightDriver.Chromium.LaunchAsync().GetAwaiter().GetResult();
+        //                playwrightDriver = chrome.NewPageAsync().GetAwaiter().GetResult();
+        //                OnBrowserInitialized(new BrowserInitializeEventArgs(BrowserInitiationSource.NewBrowser));
+        //            }
+
+        //            return playwrightDriver;
+        //        }
+        //        else { return this.playwrightDriver; }
+        //    }
+        //}
         public bool IsRecording => this.recorder != null;
         protected TraceSource Trace { get; }
         public List<ICommandResult> CommandResults = new List<ICommandResult>();
@@ -134,7 +154,74 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         #endregion Properties
 
         #region Methods
+        public void SwitchToFrame(int frame)
+        {
+            //if (this.Options.BrowserFramework == BrowserFramework.Selenium)
+            //    return this.Driver.SwitchTo().Frame(frame);
+            //else if (this.Options.BrowserFramework == BrowserFramework.Playwright)
+            //{
+            //    var locator = frame.FrameLocator("#my-iframe").GetByText("Submit");
+            //    locator.ClickAsync();
 
+            //}
+        }
+        public void SwitchToMainFrame()
+        {
+
+        }
+        public void SwitchToDefaultContent()
+        {
+
+        }
+        public void WaitForPageToLoad()
+        {
+
+        }
+        public void WaitForMainPage(TimeSpan timespan)
+        {
+
+        }
+        public void RepeatUntil(Action action, Predicate<InteractiveBrowser> predicate,
+            TimeSpan? timeout = null,
+            int attemps = Constants.DefaultRetryAttempts,
+            Action successCallback = null, Action failureCallback = null)
+        {
+            //Predicate<IWebDriver> seleniumPredicate = new Predicate<IWebDriver>(this.Driver);
+            //SeleniumExtensions.RepeatUntil(this.Driver, action, seleniumPredicate, timeout, Constants.DefaultRetryAttempts, successCallback, failureCallback);
+        }
+        public void WaitForTransaction()
+        {
+
+        }
+        public void WaitUntilVisible(string elementLocator)
+        {
+            //return new Element();
+        }
+        public Element ClickIfVisible(string elementLocator, TimeSpan seconds)
+        {
+            return new Element();
+        }
+        public Element ClickWhenAvailable(string elementLocator, TimeSpan seconds)
+        {
+            return new Element();
+        }
+        public Element FindElement(string elementLocator)
+        {
+            if (this.Options.BrowserFramework == BrowserFramework.Selenium)
+                return this.Driver.FindElement(By.XPath(elementLocator)) as Element;
+            else if (this.Options.BrowserFramework == BrowserFramework.Playwright)
+                return new Element();
+            else return new Element();
+        }
+
+        public Element WaitUntilAvailable(string elementLocator, TimeSpan timeToWait)
+        {
+            if (this.Options.BrowserFramework == BrowserFramework.Selenium)
+                return this.Driver.WaitUntilAvailable(By.XPath(elementLocator), timeToWait) as Element;
+            else if (this.Options.BrowserFramework == BrowserFramework.Playwright)
+                return new Element();
+            else return new Element();
+        }
         public void ThinkTime(int milliseconds)
         {
             if(!CommandThinkTimes.ContainsKey((Depth)))

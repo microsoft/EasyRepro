@@ -9,15 +9,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
     public class LoginRedirectEventArgs : EventArgs
     {
-        protected internal LoginRedirectEventArgs(SecureString username, SecureString password, IWebDriver driver)
+        protected internal LoginRedirectEventArgs(SecureString username, SecureString password)
         {
             this.Username = username;
             this.Password = password;
-            this.Driver = driver;
+            ///this.Driver = driver;
         }
 
         public SecureString Username { get; private set; }
         public SecureString Password { get; private set; }
-        public IWebDriver Driver { get; private set; }
+       // public IWebDriver Driver { get; private set; }
     }
 }

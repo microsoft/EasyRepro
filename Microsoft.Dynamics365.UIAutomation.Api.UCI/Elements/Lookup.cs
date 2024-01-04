@@ -38,10 +38,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
         #endregion
         private readonly WebClient _client;
-
+        private Entity.EntityReference _entityReference;
         public Lookup(WebClient client) : base()
         {
             _client = client;
+            _entityReference = new Entity.EntityReference();
         }
         #region public
         /// <summary>
@@ -155,13 +156,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         private void SetLookUpByValue(ISearchContext container, LookupItem control)
         {
             var controlName = control.Name;
-            var xpathToText = EntityReference.LookupFieldNoRecordsText.Replace("[NAME]", controlName);
-            var xpathToResultList = EntityReference.LookupFieldResultList.Replace("[NAME]", controlName);
+            var xpathToText = _entityReference.LookupFieldNoRecordsText.Replace("[NAME]", controlName);
+            var xpathToResultList = _entityReference.LookupFieldResultList.Replace("[NAME]", controlName);
             var bypathResultList = By.XPath(xpathToText + "|" + xpathToResultList);
 
             container.WaitUntilAvailable(bypathResultList, TimeSpan.FromSeconds(10));
 
-            var byPathToFlyout = By.XPath(EntityReference.TextFieldLookupMenu.Replace("[NAME]", controlName));
+            var byPathToFlyout = By.XPath(_entityReference.TextFieldLookupMenu.Replace("[NAME]", controlName));
             var flyoutDialog = container.WaitUntilClickable(byPathToFlyout);
 
             var items = GetListItems(flyoutDialog, control);
@@ -176,13 +177,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var selectedItem = items.ElementAt(index);
             selectedItem.Click(true);
         }
+        internal ICollection<IWebElement> GetListItems(IWebElement container, LookupItem control)
+        {
+            var name = control.Name;
+            var xpathToItems = By.XPath(this._entityReference.LookupFieldResultListItem.Replace("[NAME]", name));
+
+            //wait for complete the search
+            container.WaitUntil(d => d.FindVisible(xpathToItems)?.Text?.Contains(control.Value, StringComparison.OrdinalIgnoreCase) == true);
+
+            ICollection<IWebElement> result = container.WaitUntil(
+                d => d.FindElements(xpathToItems),
+                failureCallback: () => throw new InvalidOperationException($"No Results Matching {control.Value} Were Found.")
+                );
+            return result;
+        }
         private void SetLookupByIndex(ISearchContext container, LookupItem control)
         {
             var controlName = control.Name;
-            var xpathToControl = By.XPath(EntityReference.LookupResultsDropdown.Replace("[NAME]", controlName));
+            var xpathToControl = By.XPath(_entityReference.LookupResultsDropdown.Replace("[NAME]", controlName));
             var lookupResultsDialog = container.WaitUntilVisible(xpathToControl);
 
-            var xpathFieldResultListItem = By.XPath(EntityReference.LookupFieldResultListItem.Replace("[NAME]", controlName));
+            var xpathFieldResultListItem = By.XPath(_entityReference.LookupFieldResultListItem.Replace("[NAME]", controlName));
             container.WaitUntil(d => d.FindElements(xpathFieldResultListItem).Count > 0);
 
 
@@ -202,10 +217,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var controlName = control.Name;
             fieldContainer.Hover(driver);
 
-            var xpathDeleteExistingValues = By.XPath(Entity.EntityReference.LookupFieldDeleteExistingValue.Replace("[NAME]", controlName));
+            var xpathDeleteExistingValues = By.XPath(_entityReference.LookupFieldDeleteExistingValue.Replace("[NAME]", controlName));
             var existingValues = fieldContainer.FindElements(xpathDeleteExistingValues);
 
-            var xpathToExpandButton = By.XPath(Entity.EntityReference.LookupFieldExpandCollapseButton.Replace("[NAME]", controlName));
+            var xpathToExpandButton = By.XPath(_entityReference.LookupFieldExpandCollapseButton.Replace("[NAME]", controlName));
             bool success = fieldContainer.TryFindElement(xpathToExpandButton, out var expandButton);
             if (success)
             {
@@ -215,7 +230,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 fieldContainer.WaitUntil(x => x.FindElements(xpathDeleteExistingValues).Count > count);
             }
 
-            fieldContainer.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldLookupSearchButton.Replace("[NAME]", controlName)));
+            fieldContainer.WaitUntilAvailable(By.XPath(_entityReference.TextFieldLookupSearchButton.Replace("[NAME]", controlName)));
 
             existingValues = fieldContainer.FindElements(xpathDeleteExistingValues);
             if (existingValues.Count == 0)
@@ -321,7 +336,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var controlName = control.Name;
             return _client.Execute(_client.GetOptions($"Clear Field {controlName}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldLookupFieldContainer.Replace("[NAME]", controlName)));
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(_entityReference.TextFieldLookupFieldContainer.Replace("[NAME]", controlName)));
                 TryRemoveLookupValue(driver, fieldContainer, control, removeAll);
                 return true;
             });
@@ -544,7 +559,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 List<FormNotification> notifications = new List<FormNotification>();
 
                 // Look for notificationMessageAndButtons bar
-                var notificationMessage = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.FormMessageBar), TimeSpan.FromSeconds(2));
+                var notificationMessage = driver.WaitUntilAvailable(By.XPath(_entityReference.FormMessageBar), TimeSpan.FromSeconds(2));
 
                 if (notificationMessage != null)
                 {
@@ -552,7 +567,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     try
                     {
-                        icon = driver.FindElement(By.XPath(Entity.EntityReference.FormMessageBarTypeIcon));
+                        icon = driver.FindElement(By.XPath(_entityReference.FormMessageBarTypeIcon));
                     }
                     catch (NoSuchElementException)
                     {
@@ -572,27 +587,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 // Look for the notification wrapper, if it doesn't exist there are no notificatios
-                var notificationBar = driver.WaitUntilVisible(By.XPath(Entity.EntityReference.FormNotifcationBar), TimeSpan.FromSeconds(2));
+                var notificationBar = driver.WaitUntilVisible(By.XPath(_entityReference.FormNotifcationBar), TimeSpan.FromSeconds(2));
                 if (notificationBar == null)
                     return notifications;
                 else
                 {
                     // If there are multiple notifications, the notifications must be expanded first.
-                    if (notificationBar.TryFindElement(By.XPath(Entity.EntityReference.FormNotifcationExpandButton), out var expandButton))
+                    if (notificationBar.TryFindElement(By.XPath(_entityReference.FormNotifcationExpandButton), out var expandButton))
                     {
                         if (!Convert.ToBoolean(notificationBar.GetAttribute("aria-expanded")))
                             expandButton.Click();
 
                         // After expansion the list of notifications are now in a different element
-                        notificationBar = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.FormNotifcationFlyoutRoot), TimeSpan.FromSeconds(2), "Failed to open the form notifications");
+                        notificationBar = driver.WaitUntilAvailable(By.XPath(_entityReference.FormNotifcationFlyoutRoot), TimeSpan.FromSeconds(2), "Failed to open the form notifications");
                     }
 
-                    var notificationList = notificationBar.FindElement(By.XPath(Entity.EntityReference.FormNotifcationList));
+                    var notificationList = notificationBar.FindElement(By.XPath(_entityReference.FormNotifcationList));
                     var notificationListItems = notificationList.FindElements(By.TagName("li"));
 
                     foreach (var item in notificationListItems)
                     {
-                        var icon = item.FindElement(By.XPath(Entity.EntityReference.FormNotifcationTypeIcon));
+                        var icon = item.FindElement(By.XPath(_entityReference.FormNotifcationTypeIcon));
 
                         var notification = new FormNotification
                         {
@@ -605,7 +620,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     if (notificationBar != null)
                     {
-                        notificationBar = driver.WaitUntilVisible(By.XPath(Entity.EntityReference.FormNotifcationBar), TimeSpan.FromSeconds(2));
+                        notificationBar = driver.WaitUntilVisible(By.XPath(_entityReference.FormNotifcationBar), TimeSpan.FromSeconds(2));
                         notificationBar.Click(true); // Collapse the notification bar
                     }
                     return notifications;

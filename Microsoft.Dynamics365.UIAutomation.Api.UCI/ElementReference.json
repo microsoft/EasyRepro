@@ -1,0 +1,12 @@
+{
+  "Entity": {
+    "Form": "//*[contains(@id, \"tablist\")]",
+    "EntityForm": {
+      "Form": "//*[contains(@id, \"tablist111111\")]"
+    },
+    "DuplicateDetectionWindowMarker": "//div[contains(@data-id,'ManageDuplicates')]"
+  },
+  "Lookup": {
+
+  }
+}

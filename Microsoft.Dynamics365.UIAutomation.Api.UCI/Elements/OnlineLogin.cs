@@ -7,6 +7,7 @@ using System.Security;
 using System.Web;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
+using OpenQA.Selenium;
 using OtpNet;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
@@ -78,7 +79,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             //return _client.Execute(_client.GetOptions("Login"), Login, orgUri, username, password, mfaSecretKey, redirectAction);
 
-            LoginResult result = this.WebLogin(_client.Browser.Driver, orgUri, username, password, mfaSecretKey);
+            LoginResult result = this.WebLogin(orgUri, username, password, mfaSecretKey);
             if (result == LoginResult.Failure)
                 throw new InvalidOperationException("Login Failure, please check your configuration");
 
@@ -96,7 +97,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="redirectAction">Actions required during redirect</param>
         public BrowserCommandResult<LoginResult> Login(Uri orgUrl, SecureString username, SecureString password, SecureString mfaSecretKey, Action<LoginRedirectEventArgs> redirectAction)
         {
-            LoginResult result = this.WebLogin(_client.Browser.Driver,orgUrl, username, password, mfaSecretKey, redirectAction);
+            LoginResult result = this.WebLogin(orgUrl, username, password, mfaSecretKey, redirectAction);
             if(result == LoginResult.Failure) 
                 throw new InvalidOperationException("Login Failure, please check your configuration");
             
@@ -107,29 +108,30 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         #endregion
         #region LoginHelpers
-        private LoginResult WebLogin(IWebDriver driver, Uri uri, SecureString username, SecureString password, SecureString mfaSecretKey = null, Action<LoginRedirectEventArgs> redirectAction = null)
+        private LoginResult WebLogin(Uri uri, SecureString username, SecureString password, SecureString mfaSecretKey = null, Action<LoginRedirectEventArgs> redirectAction = null)
         {
             bool online = !(this.OnlineDomains != null && !this.OnlineDomains.Any(d => uri.Host.EndsWith(d)));
-            driver.Navigate().GoToUrl(uri);
-
+            //driver.Navigate().GoToUrl(uri);
+            _client.Browser.Navigate(uri);
             if (!online)
                 return LoginResult.Success;
 
-            driver.ClickIfVisible(By.Id(LoginReference.UseAnotherAccount));
+            //driver.ClickIfVisible(By.Id(LoginReference.UseAnotherAccount));
+            _client.ClickIfVisible(LoginReference.UseAnotherAccount);
 
             bool waitingForOtc = false;
-            bool success = EnterUserName(driver, username);
+            bool success = EnterUserName(username);
             if (!success)
             {
                 var isUserAlreadyLogged = IsUserAlreadyLogged();
                 if (isUserAlreadyLogged)
                 {
-                    SwitchToDefaultContent(driver);
+                    SwitchToDefaultContent();
                     return LoginResult.Success;
                 }
 
                 _client.ThinkTime(1000);
-                waitingForOtc = GetOtcInput(driver) != null;
+                waitingForOtc = GetOtcInput() != null;
 
                 if (!waitingForOtc)
                     throw new Exception($"Login page failed. {LoginReference.UserId} not found.");
@@ -137,7 +139,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             if (!waitingForOtc)
             {
-                driver.ClickIfVisible(By.Id("aadTile"));
+                //driver.ClickIfVisible(By.Id("aadTile"));
+                _client.ClickIfVisible("aadTile");
                 _client.ThinkTime(1000);
 
                 //If expecting redirect then wait for redirect to trigger
@@ -146,11 +149,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     //Wait for redirect to occur.
                     _client.ThinkTime(3000);
 
-                    redirectAction.Invoke(new LoginRedirectEventArgs(username, password, driver));
+                    redirectAction.Invoke(new LoginRedirectEventArgs(username, password));
                     return LoginResult.Redirect;
                 }
 
-                EnterPassword(driver, password);
+                EnterPassword(password);
                 _client.ThinkTime(1000);
             }
 
@@ -158,8 +161,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             bool entered;
             do
             {
-                entered = EnterOneTimeCode(driver, mfaSecretKey);
-                success = ClickStaySignedIn(driver) || IsUserAlreadyLogged();
+                entered = EnterOneTimeCode(mfaSecretKey);
+                success = ClickStaySignedIn() || IsUserAlreadyLogged();
                 attempts++;
             }
             while (!success && attempts <= Constants.DefaultRetryAttempts); // retry to enter the otc-code, if its fail & it is requested again 
@@ -169,6 +172,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return success ? LoginResult.Success : LoginResult.Failure;
         }
+
 
         private bool IsUserAlreadyLogged() => _client.WaitForMainPage(2.Seconds());
 
@@ -184,9 +188,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return result;
         }
 
-        private bool EnterUserName(IWebDriver driver, SecureString username)
+        private bool EnterUserName(SecureString username)
         {
-            var input = driver.WaitUntilAvailable(By.XPath(LoginReference.UserId), new TimeSpan(0, 0, 30));
+            //var input = driver.WaitUntilAvailable(By.XPath(LoginReference.UserId), new TimeSpan(0, 0, 30));
+            var input = _client.Browser.Driver.WaitUntilAvailable(By.XPath(LoginReference.UserId), new TimeSpan(0, 0, 30));
             if (input == null)
                 return false;
 
@@ -195,18 +200,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return true;
         }
 
-        private static void EnterPassword(IWebDriver driver, SecureString password)
+        private void EnterPassword(SecureString password)
         {
-            var input = driver.FindElement(By.XPath(LoginReference.LoginPassword));
+            var input = _client.Browser.Driver.FindElement(By.XPath(LoginReference.LoginPassword));
             input.SendKeys(password.ToUnsecureString());
             input.Submit();
         }
 
-        private bool EnterOneTimeCode(IWebDriver driver, SecureString mfaSecretKey)
+        private bool EnterOneTimeCode(SecureString mfaSecretKey)
         {
             try
             {
-                IWebElement input = GetOtcInput(driver); // wait for the dialog, even if key is null, to print the right error
+                IWebElement input = GetOtcInput(); // wait for the dialog, even if key is null, to print the right error
                 if (input == null)
                     return true;
 
@@ -215,7 +220,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new InvalidOperationException("The application is wait for the OTC but your MFA-SecretKey is not set. Please check your configuration.");
 
                 var oneTimeCode = GenerateOneTimeCode(key);
-                Field.SetInputValue(driver, input, oneTimeCode, 1.Seconds());
+                Field.SetInputValue(_client.Browser.Driver, input, oneTimeCode, 1.Seconds());
                 input.Submit();
                 return true; // input found & code was entered
             }
@@ -228,29 +233,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
 
-        private static IWebElement GetOtcInput(IWebDriver driver)
-            => driver.WaitUntilAvailable(By.XPath(LoginReference.OneTimeCode), TimeSpan.FromSeconds(2));
+        private IWebElement GetOtcInput()
+            => _client.Browser.Driver.WaitUntilAvailable(By.XPath(LoginReference.OneTimeCode), TimeSpan.FromSeconds(2));
 
-        private static bool ClickStaySignedIn(IWebDriver driver)
+        private bool ClickStaySignedIn()
         {
             var xpath = By.XPath(LoginReference.StaySignedIn);
-            var element = driver.ClickIfVisible(xpath, 2.Seconds());
+            var element = _client.Browser.Driver.ClickIfVisible(By.XPath(LoginReference.StaySignedIn), 2.Seconds());
             return element != null;
         }
 
-        private static void SwitchToDefaultContent(IWebDriver driver)
+        private void SwitchToDefaultContent()
         {
-            SwitchToMainFrame(driver);
+            SwitchToMainFrame();
 
             //Switch Back to Default Content for Navigation Steps
-            driver.SwitchTo().DefaultContent();
+            //driver.SwitchTo().DefaultContent();
+            _client.Browser.SwitchToDefaultContent();
         }
 
-        private static void SwitchToMainFrame(IWebDriver driver)
+        private void SwitchToMainFrame()
         {
-            driver.WaitForPageToLoad();
-            driver.SwitchTo().Frame(0);
-            driver.WaitForPageToLoad();
+            //driver.WaitForPageToLoad();
+            //driver.SwitchTo().Frame(0);
+            //driver.WaitForPageToLoad();
+            _client.Browser.WaitForPageToLoad();
+            _client.Browser.SwitchToFrame(0);
+            _client.Browser.WaitForPageToLoad();
+
         }
 
         internal BrowserCommandResult<LoginResult> PassThroughLogin(Uri uri)
@@ -271,7 +281,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         }
                         else
                             //else we landed on the Web Client main page or app picker page
-                            SwitchToDefaultContent(driver);
+                            SwitchToDefaultContent();
                     },
                     () => throw new InvalidOperationException("Load Main Page Fail.")
                 );
@@ -288,16 +298,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //You will also need to add a reference to the Selenium Webdriver to use the base driver. 
             //Example
 
-            var driver = args.Driver;
+            //var driver = args.Driver;
 
-            driver.FindElement(By.Id("passwordInput")).SendKeys(args.Password.ToUnsecureString());
-            driver.ClickWhenAvailable(By.Id("submitButton"), TimeSpan.FromSeconds(2));
-
+            //driver.FindElement(By.Id("passwordInput")).SendKeys(args.Password.ToUnsecureString());
+            //driver.ClickWhenAvailable(By.Id("submitButton"), TimeSpan.FromSeconds(2));
+            _client.Browser.FindElement("passwordInput").SendKeys(args.Password.ToUnsecureString());
+            _client.Browser.ClickWhenAvailable("submitButton", TimeSpan.FromSeconds(2));
             //Insert any additional code as required for the SSO scenario
 
             //Wait for CRM Page to load
             _client.WaitForMainPage(TimeSpan.FromSeconds(60), "Login page failed.");
-            SwitchToMainFrame(driver);
+            _client.Browser.SwitchToMainFrame();
         }
 
         public void MSFTLoginAction(LoginRedirectEventArgs args)
@@ -307,7 +318,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //You will also need to add a reference to the Selenium Webdriver to use the base driver. 
             //Example
 
-            var driver = args.Driver;
+            //var driver = args.Driver;
 
             //d.FindElement(By.Id("passwordInput")).SendKeys(args.Password.ToUnsecureString());
             //d.ClickWhenAvailable(By.Id("submitButton"), TimeSpan.FromSeconds(2));
@@ -316,9 +327,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             _client.ThinkTime(5000);
 
-            driver.WaitUntilVisible(By.XPath("//div[@id=\"mfaGreetingDescription\"]"));
+            _client.Browser.WaitUntilVisible("//div[@id=\"mfaGreetingDescription\"]");
 
-            var azureMFA = driver.FindElement(By.XPath("//a[@id=\"WindowsAzureMultiFactorAuthentication\"]"));
+            var azureMFA = _client.Browser.FindElement("//a[@id=\"WindowsAzureMultiFactorAuthentication\"]");
             azureMFA.Click(true);
 
             Thread.Sleep(20000);
@@ -327,7 +338,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             //Wait for CRM Page to load
             _client.WaitForMainPage(TimeSpan.FromSeconds(60), "Login page failed.");
-            SwitchToMainFrame(driver);
+            SwitchToMainFrame();
         }
 
         internal BrowserCommandResult<bool> InitializeModes()

@@ -29,6 +29,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         protected TraceSource Trace { get; }
 
+        //[DebuggerNonUserCode]
+        //public BrowserCommandResult<TReturn> Execute(Playwright.IPage driver)
+        //{
+        //    return ExecutePlaywright(driver, default(object), default(object), default(object), default(object), default(object), default(object), default(object), default(object), default(object));
+        //}
+
         [DebuggerNonUserCode]
         public BrowserCommandResult<TReturn> Execute(IWebDriver driver)
         {
@@ -82,6 +88,61 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             return Execute(driver, p1, p2, p3, p4, p5, p6, p7, p8, default(object));
         }
+        //public BrowserCommandResult<TReturn> ExecutePlaywright<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Playwright.IPage driver, T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9)
+        //{
+        //    int retries = 1;
+        //    int maxRetryAttempts = Options.RetryAttempts;
+        //    int maxRetryAttemptsNotIgnoredExceptions = Options.RetryAttemptsNotIgnoredExceptions;
+
+        //    var result = new BrowserCommandResult<TReturn> { CommandName = Options.CommandName };
+
+        //    System.Diagnostics.Trace.CorrelationManager.StartLogicalOperation();
+
+        //    result.Start();
+        //    TraceExecutionStart(retries, maxRetryAttempts);
+        //    while (true)
+        //    {
+        //        try
+        //        {
+        //                result.Value = ExecuteCommand(driver, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+        //            result.Success = true;
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            bool canRetry = false;
+        //            if (retries < maxRetryAttempts)
+        //                if (retries < maxRetryAttemptsNotIgnoredExceptions)
+        //                    canRetry = true;
+        //                else
+        //                    canRetry = Options.ExceptionTypes?.Any(t => t.IsInstanceOfType(e)) ?? false;
+
+        //            if (canRetry)
+        //            {
+        //                retries++;
+        //                TraceExecutionRetry(e, retries, maxRetryAttempts);
+        //                Options.ExceptionAction?.Invoke(e);
+
+        //                if (Options.RetryDelay > 0)
+        //                    Thread.Sleep(Options.RetryDelay);
+
+        //                continue;
+        //            }
+        //            result.Exception = e;
+        //            result.Success = false;
+        //        }
+        //        break;
+        //    }
+        //    result.ExecutionAttempts = retries;
+        //    result.Stop();
+        //    TraceFinish(result);
+
+        //    System.Diagnostics.Trace.CorrelationManager.StopLogicalOperation();
+
+        //    if (result.Success == false && Options.ThrowExceptions)
+        //        throw result.Exception;
+
+        //    return result;
+        //}
 
         //[DebuggerNonUserCode()]
         public BrowserCommandResult<TReturn> Execute<T1, T2, T3, T4, T5, T6, T7, T8, T9>(IWebDriver driver, T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9)
@@ -178,5 +239,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
 
         protected abstract TReturn ExecuteCommand(IWebDriver driver, params object[] @params);
+
+        //protected abstract TReturn ExecuteCommand(Playwright.IPage driver, params object[] @params);
     }
 }

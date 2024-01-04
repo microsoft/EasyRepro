@@ -13,7 +13,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     {
         public string Name { get; set; }
         public string[] Values { get; set; }
-
+        private static Entity.EntityReference _entityReference;
+        public MultiValueOptionSet() {
+            _entityReference = new Entity.EntityReference();
+        }
         internal BrowserCommandResult<bool> ClearValue(WebClient client, MultiValueOptionSet control, FormContextType formContextType)
         {
             return client.Execute(client.GetOptions($"Clear Field {control.Name}"), driver =>
@@ -67,7 +70,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else if (formContextType == FormContextType.Entity)
                 {
                     // Initialize the entity form context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.FormContext));
+                    var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.FormContext));
                     fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
                 }
                 else if (formContextType == FormContextType.BusinessProcessFlow)
@@ -79,7 +82,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else if (formContextType == FormContextType.Header)
                 {
                     // Initialize the Header context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.HeaderContext));
+                    var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.HeaderContext));
                     fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
                 }
                 else if (formContextType == FormContextType.Dialog)
@@ -132,7 +135,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else if (formContextType == FormContextType.Entity)
                     {
                         // Initialize the entity form context
-                        var formContext = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.FormContext));
+                        var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.FormContext));
                         fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
                     }
                     else if (formContextType == FormContextType.BusinessProcessFlow)
@@ -144,7 +147,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else if (formContextType == FormContextType.Header)
                     {
                         // Initialize the Header context
-                        var formContext = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.HeaderContext));
+                        var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.HeaderContext));
                         fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
                     }
                     else if (formContextType == FormContextType.Dialog)

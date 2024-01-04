@@ -30,10 +30,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
         #endregion
         private readonly WebClient _client;
-
+        private Entity.EntityReference _entityReference;
         public BusinessProcessFlow(WebClient client)
         {
             _client = client;
+            _entityReference = new Entity.EntityReference();
         }
 
         #region public
@@ -265,7 +266,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Set BPF Value: {option.Name}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldContainer.Replace("[NAME]", option.Name)));
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", option.Name)));
 
                 if (fieldContainer.FindElements(By.TagName("select")).Count > 0)
                 {
@@ -522,10 +523,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Switch BusinessProcessFlow"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(Entity.EntityReference.ProcessButton), TimeSpan.FromSeconds(5));
+                driver.ClickWhenAvailable(By.XPath(_entityReference.ProcessButton), TimeSpan.FromSeconds(5));
 
                 driver.ClickWhenAvailable(
-                    By.XPath(Entity.EntityReference.SwitchProcess),
+                    By.XPath(_entityReference.SwitchProcess),
                     TimeSpan.FromSeconds(5),
                     "The Switch Process Button is not available."
                 );

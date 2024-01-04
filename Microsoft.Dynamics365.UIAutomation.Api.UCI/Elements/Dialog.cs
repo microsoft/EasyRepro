@@ -680,6 +680,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Assign to User or Team Dialog"), driver =>
             {
+                Entity.EntityReference entityReference = new Entity.EntityReference();
                 var inlineDialog = this.SwitchToDialog();
                 if (!inlineDialog)
                     return false;
@@ -694,7 +695,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     OptionSet.SetValue(_client, new OptionSet { Name = DialogsReference.Assign.AssignToId, Value = "User or team" }, FormContextType.Dialog);
 
                     //Set the User Or Team
-                    var userOrTeamField = driver.WaitUntilAvailable(By.XPath(Entity.EntityReference.TextFieldLookup), "User field unavailable");
+                    var userOrTeamField = driver.WaitUntilAvailable(By.XPath(entityReference.TextFieldLookup), "User field unavailable");
                     var input = userOrTeamField.ClickWhenAvailable(By.TagName("input"), "User field unavailable");
                     input.SendKeys(userOrTeamName, true);
 
@@ -776,15 +777,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Validate Save"), driver =>
             {
                 //Is it Duplicate Detection?
-                if (driver.HasElement(By.XPath(Entity.EntityReference.DuplicateDetectionWindowMarker)))
+                if (driver.HasElement(By.XPath(_client.ElementMapper.EntityReference.DuplicateDetectionWindowMarker)))
                 {
-                    if (driver.HasElement(By.XPath(Entity.EntityReference.DuplicateDetectionGridRows)))
+                    if (driver.HasElement(By.XPath(_client.ElementMapper.EntityReference.DuplicateDetectionGridRows)))
                     {
                         //Select the first record in the grid
-                        driver.FindElements(By.XPath(Entity.EntityReference.DuplicateDetectionGridRows))[0].Click(true);
+                        driver.FindElements(By.XPath(_client.ElementMapper.EntityReference.DuplicateDetectionGridRows))[0].Click(true);
 
                         //Click Ignore and Save
-                        driver.FindElement(By.XPath(Entity.EntityReference.DuplicateDetectionIgnoreAndSaveButton)).Click(true);
+                        driver.FindElement(By.XPath(_client.ElementMapper.EntityReference.DuplicateDetectionIgnoreAndSaveButton)).Click(true);
                         driver.WaitForTransaction();
                     }
                 }

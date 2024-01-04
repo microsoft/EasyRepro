@@ -14,7 +14,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     {
         public string Name { get; set; }
         public bool Value { get; set; }
-
+        public BooleanItem()
+        {
+        }
         /// <summary>
         /// Sets the value of a Boolean Item.
         /// </summary>
@@ -30,41 +32,41 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 IWebElement fieldContainer = null;
                 fieldContainer = client.ValidateFormContext(driver, formContextType, option.Name, fieldContainer);
 
-                var hasRadio = fieldContainer.HasElement(By.XPath(Entity.EntityReference.EntityBooleanFieldRadioContainer.Replace("[NAME]", option.Name)));
-                var hasCheckbox = fieldContainer.HasElement(By.XPath(Entity.EntityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name)));
-                var hasList = fieldContainer.HasElement(By.XPath(Entity.EntityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name)));
-                var hasToggle = fieldContainer.HasElement(By.XPath(Entity.EntityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name)));
-                var hasFlipSwitch = fieldContainer.HasElement(By.XPath(Entity.EntityReference.EntityBooleanFieldFlipSwitchLink.Replace("[NAME]", option.Name)));
+                var hasRadio = fieldContainer.HasElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldRadioContainer.Replace("[NAME]", option.Name)));
+                var hasCheckbox = fieldContainer.HasElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name)));
+                var hasList = fieldContainer.HasElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name)));
+                var hasToggle = fieldContainer.HasElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name)));
+                var hasFlipSwitch = fieldContainer.HasElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldFlipSwitchLink.Replace("[NAME]", option.Name)));
 
                 // Need to validate whether control is FlipSwitch or Button
                 IWebElement flipSwitchContainer = null;
-                var flipSwitch = hasFlipSwitch ? fieldContainer.TryFindElement(By.XPath(Entity.EntityReference.EntityBooleanFieldFlipSwitchContainer.Replace("[NAME]", option.Name)), out flipSwitchContainer) : false;
-                var hasButton = flipSwitchContainer != null ? flipSwitchContainer.HasElement(By.XPath(Entity.EntityReference.EntityBooleanFieldButtonTrue)) : false;
+                var flipSwitch = hasFlipSwitch ? fieldContainer.TryFindElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldFlipSwitchContainer.Replace("[NAME]", option.Name)), out flipSwitchContainer) : false;
+                var hasButton = flipSwitchContainer != null ? flipSwitchContainer.HasElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldButtonTrue)) : false;
                 hasFlipSwitch = hasButton ? false : hasFlipSwitch; //flipSwitch and button have the same container reference, so if it has a button it is not a flipSwitch
                 hasFlipSwitch = hasToggle ? false : hasFlipSwitch; //flipSwitch and Toggle have the same container reference, so if it has a Toggle it is not a flipSwitch
 
                 if (hasRadio)
                 {
-                    var trueRadio = fieldContainer.FindElement(By.XPath(Entity.EntityReference.EntityBooleanFieldRadioTrue.Replace("[NAME]", option.Name)));
-                    var falseRadio = fieldContainer.FindElement(By.XPath(Entity.EntityReference.EntityBooleanFieldRadioFalse.Replace("[NAME]", option.Name)));
+                    var trueRadio = fieldContainer.FindElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldRadioTrue.Replace("[NAME]", option.Name)));
+                    var falseRadio = fieldContainer.FindElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldRadioFalse.Replace("[NAME]", option.Name)));
 
                     if (option.Value && bool.Parse(falseRadio.GetAttribute("aria-checked")) || !option.Value && bool.Parse(trueRadio.GetAttribute("aria-checked")))
                     {
-                        driver.ClickWhenAvailable(By.XPath(Entity.EntityReference.EntityBooleanFieldRadioContainer.Replace("[NAME]", option.Name)));
+                        driver.ClickWhenAvailable(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldRadioContainer.Replace("[NAME]", option.Name)));
                     }
                 }
                 else if (hasCheckbox)
                 {
-                    var checkbox = fieldContainer.FindElement(By.XPath(Entity.EntityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name)));
+                    var checkbox = fieldContainer.FindElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name)));
 
                     if (option.Value && !checkbox.Selected || !option.Value && checkbox.Selected)
                     {
-                        driver.ClickWhenAvailable(By.XPath(Entity.EntityReference.EntityBooleanFieldCheckboxContainer.Replace("[NAME]", option.Name)));
+                        driver.ClickWhenAvailable(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldCheckboxContainer.Replace("[NAME]", option.Name)));
                     }
                 }
                 else if (hasList)
                 {
-                    var list = fieldContainer.FindElement(By.XPath(Entity.EntityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name)));
+                    var list = fieldContainer.FindElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name)));
                     var options = list.FindElements(By.TagName("option"));
                     var selectedOption = options.FirstOrDefault(a => a.HasAttribute("data-selected") && bool.Parse(a.GetAttribute("data-selected")));
                     var unselectedOption = options.FirstOrDefault(a => !a.HasAttribute("data-selected"));
@@ -85,7 +87,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
                 else if (hasToggle)
                 {
-                    var toggle = fieldContainer.FindElement(By.XPath(Entity.EntityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name)));
+                    var toggle = fieldContainer.FindElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name)));
                     var link = toggle.FindElement(By.TagName("button"));
                     var value = bool.Parse(link.GetAttribute("aria-checked"));
 
@@ -107,9 +109,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
                 else if (hasButton)
                 {
-                    var container = fieldContainer.FindElement(By.XPath(Entity.EntityReference.EntityBooleanFieldButtonContainer.Replace("[NAME]", option.Name)));
-                    var trueButton = container.FindElement(By.XPath(Entity.EntityReference.EntityBooleanFieldButtonTrue));
-                    var falseButton = container.FindElement(By.XPath(Entity.EntityReference.EntityBooleanFieldButtonFalse));
+                    var container = fieldContainer.FindElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldButtonContainer.Replace("[NAME]", option.Name)));
+                    var trueButton = container.FindElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldButtonTrue));
+                    var falseButton = container.FindElement(By.XPath(client.ElementMapper.EntityReference.EntityBooleanFieldButtonFalse));
 
                     if (option.Value)
                     {

@@ -17,6 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public BrowserOptions()
         {
             this.DriversPath = Path.Combine(Directory.GetCurrentDirectory()); //, @"Drivers\");
+            this.ConfigPath = Path.Combine(Directory.GetCurrentDirectory() + "\\ElementReference.json"); //, @"Drivers\");
             this.DownloadsPath = null;
             this.BrowserType = BrowserType.IE;
             this.BrowserFramework = BrowserFramework.Playwright;
@@ -58,6 +59,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public BrowserType BrowserType { get; set; }
         public BrowserCredentials Credentials { get; set; }
         public string DriversPath { get; set; }
+        public string ConfigPath { get; set; }
         public string DownloadsPath { get; set; }
         public bool PrivateMode { get; set; }
         public bool CleanSession { get; set; }
