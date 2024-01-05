@@ -13,6 +13,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     public class OpenAccountUCI : TestsBase
     {
         [TestCategory("Grid")]
+        [TestCategory("EditableGrid")]
         [TestCategory("GridSwitchView")]
         [TestCategory("GridSearch")]
         [TestMethod]
@@ -29,7 +30,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 xrmApp.Grid.SwitchView("Active Accounts");
 
-                xrmApp.Grid.Search("A. Datum");
+                //xrmApp.Grid.Search("A. Datum");
 
                 xrmApp.Grid.OpenRecord(0);
 

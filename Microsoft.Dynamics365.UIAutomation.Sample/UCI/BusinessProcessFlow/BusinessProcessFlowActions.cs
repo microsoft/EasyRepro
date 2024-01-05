@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
+using OpenQA.Selenium.DevTools.V109.Storage;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
@@ -20,7 +21,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             using (var xrmApp = new XrmApp(client))
             {
                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
-
+                
                 xrmApp.ThinkTime(3000);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.CustomerService);

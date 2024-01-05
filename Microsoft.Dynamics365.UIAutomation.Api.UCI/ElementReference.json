@@ -1,10 +1,17 @@
 {
+  "BusinessProcessFlow": {
+
+  },
+  "CommandBar": {
+
+  },
   "Entity": {
     "Form": "//*[contains(@id, \"tablist\")]",
-    "EntityForm": {
-      "Form": "//*[contains(@id, \"tablist111111\")]"
-    },
+    "TextFieldLookupFieldContainer": ".//div[contains(@data-id,'[NAME].fieldControl-Lookup_[NAME]')]",
     "DuplicateDetectionWindowMarker": "//div[contains(@data-id,'ManageDuplicates')]"
+  },
+  "Grid": {
+    "ViewContainer": "//ul[contains(@aria-label,'Views')]"
   },
   "Lookup": {
 

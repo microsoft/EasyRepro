@@ -10,31 +10,49 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     public class BusinessProcessFlow : Element
     {
         #region DTO
-        public static class BusinessProcessFlowReference
+        public class BusinessProcessFlowReference
         {
-            public static string NextStage_UCI = "//li[contains(@id,'processHeaderStage')]";
-            public static string Flyout_UCI = "//div[contains(@id,'businessProcessFlowFlyoutHeaderContainer')]";
-            public static string NextStageButton = "//button[contains(@data-id,'nextButtonContainer')]";
-            public static string SetActiveButton = "//button[contains(@data-id,'setActiveButton')]";
-            public static string BusinessProcessFlowFieldName = "//input[contains(@id,'[NAME]')]";
-            public static string BusinessProcessFlowFormContext = "//div[contains(@id, \'ProcessStageControl-processHeaderStageFlyoutInnerContainer\')]";
-            public static string TextFieldContainer = ".//div[contains(@data-lp-id, \'header_process_[NAME]\')]";
-            public static string FieldSectionItemContainer = ".//div[contains(@id, \'header_process_[NAME]-FieldSectionItemContainer\')]";
-            public static string TextFieldLabel = "//label[contains(@id, \'header_process_[NAME]-field-label\')]";
-            public static string BooleanFieldContainer = ".//div[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-container\')]";
-            public static string BooleanFieldSelectedOption = "//div[contains(@data-id, 'header_process_[NAME].fieldControl-checkbox-container')]//option[@data-selected='true']";
-            public static string DateTimeFieldContainer = ".//input[contains(@data-id, \'[NAME].fieldControl-date-time-input\')]";
-            public static string FieldControlDateTimeInputUCI = ".//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]";
-            public static string PinStageButton = "//button[contains(@id,'stageDockModeButton')]";
-            public static string CloseStageButton = "//button[contains(@id,'stageContentClose')]";
+            public const string BusinessProcessFlow = "BusinessProcessFlow";
+            #region private prop
+            private string _NextStage_UCI = "//li[contains(@id,'processHeaderStage')]";
+            private string _Flyout_UCI = "//div[contains(@id,'businessProcessFlowFlyoutHeaderContainer')]";
+            private string _NextStageButton = "//button[contains(@data-id,'nextButtonContainer')]";
+            private string _SetActiveButton = "//button[contains(@data-id,'setActiveButton')]";
+            private string _BusinessProcessFlowFieldName = "//input[contains(@id,'[NAME]')]";
+            private string _BusinessProcessFlowFormContext = "//div[contains(@id, \'ProcessStageControl-processHeaderStageFlyoutInnerContainer\')]";
+            private string _TextFieldContainer = ".//div[contains(@data-lp-id, \'header_process_[NAME]\')]";
+            private string _FieldSectionItemContainer = ".//div[contains(@id, \'header_process_[NAME]-FieldSectionItemContainer\')]";
+            private string _TextFieldLabel = "//label[contains(@id, \'header_process_[NAME]-field-label\')]";
+            private string _BooleanFieldContainer = ".//div[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-container\')]";
+            private string _BooleanFieldSelectedOption = "//div[contains(@data-id, 'header_process_[NAME].fieldControl-checkbox-container')]//option[@data-selected='true']";
+            private string _DateTimeFieldContainer = ".//input[contains(@data-id, \'[NAME].fieldControl-date-time-input\')]";
+            private string _FieldControlDateTimeInputUCI = ".//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]";
+            private string _PinStageButton = "//button[contains(@id,'stageDockModeButton')]";
+            private string _CloseStageButton = "//button[contains(@id,'stageContentClose')]";
+            #endregion
+            #region prop
+            public string NextStage_UCI { get => _NextStage_UCI; set { _NextStage_UCI = value; } }
+            public string Flyout_UCI { get => _Flyout_UCI; set { _Flyout_UCI = value; } }
+            public string NextStageButton { get => _NextStageButton; set { _NextStageButton = value; } }
+            public string SetActiveButton { get => _SetActiveButton; set { _SetActiveButton = value; } }
+            public string BusinessProcessFlowFieldName { get => _BusinessProcessFlowFieldName; set { _BusinessProcessFlowFieldName = value; } }
+            public string BusinessProcessFlowFormContext { get => _BusinessProcessFlowFormContext; set { _BusinessProcessFlowFormContext = value; } }
+            public string TextFieldContainer { get => _TextFieldContainer; set { _TextFieldContainer = value; } }
+            public string FieldSectionItemContainer { get => _FieldSectionItemContainer; set { _FieldSectionItemContainer = value; } }
+            public string TextFieldLabel { get => _TextFieldLabel; set { _TextFieldLabel = value; } }
+            public string BooleanFieldContainer { get => _BooleanFieldContainer; set { _BooleanFieldContainer = value; } }
+            public string BooleanFieldSelectedOption { get => _BooleanFieldSelectedOption; set { _BooleanFieldSelectedOption = value; } }
+            public string DateTimeFieldContainer { get => _DateTimeFieldContainer; set { _DateTimeFieldContainer = value; } }
+            public string FieldControlDateTimeInputUCI { get => _FieldControlDateTimeInputUCI; set { _FieldControlDateTimeInputUCI = value; } }
+            public string PinStageButton { get => _PinStageButton; set { _PinStageButton = value; } }
+            public string CloseStageButton { get => _CloseStageButton; set { _CloseStageButton = value; } }
+            #endregion
         }
         #endregion
         private readonly WebClient _client;
-        private Entity.EntityReference _entityReference;
         public BusinessProcessFlow(WebClient client)
         {
             _client = client;
-            _entityReference = new Entity.EntityReference();
         }
 
         #region public
@@ -194,15 +212,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
 
                 // Initialize the Business Process Flow context
-                var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext));
-                var fieldElement = formContext.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.FieldSectionItemContainer.Replace("[NAME]", field)));
+                var formContext = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext));
+                var fieldElement = formContext.WaitUntilAvailable(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.FieldSectionItemContainer.Replace("[NAME]", field)));
                 Field returnField = new Field(fieldElement);
                 returnField.Name = field;
 
                 IWebElement fieldLabel = null;
                 try
                 {
-                    fieldLabel = fieldElement.FindElement(By.XPath(BusinessProcessFlowReference.TextFieldLabel.Replace("[NAME]", field)));
+                    fieldLabel = fieldElement.FindElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.TextFieldLabel.Replace("[NAME]", field)));
                 }
                 catch (NoSuchElementException)
                 {
@@ -228,7 +246,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Set BPF Value"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field)));
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field)));
 
                 if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
                 {
@@ -266,7 +284,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Set BPF Value: {option.Name}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", option.Name)));
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", option.Name)));
 
                 if (fieldContainer.FindElements(By.TagName("select")).Count > 0)
                 {
@@ -298,7 +316,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Set BPF Value: {option.Name}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BooleanFieldContainer.Replace("[NAME]", option.Name)));
+                var fieldContainer = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.BooleanFieldContainer.Replace("[NAME]", option.Name)));
                 var existingValue = fieldContainer.GetAttribute("Title") == "Yes";
 
                 if (option.Value != existingValue)
@@ -324,7 +342,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Set BPF Value: {field}"), driver =>
             {
-                var dateField = BusinessProcessFlowReference.DateTimeFieldContainer.Replace("[FIELD]", field);
+                var dateField = _client.ElementMapper.BusinessProcessFlowReference.DateTimeFieldContainer.Replace("[FIELD]", field);
 
                 if (driver.HasElement(By.XPath(dateField)))
                 {
@@ -383,7 +401,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Next Stage"), driver =>
             {
                 //Find the Business Process Stages
-                var processStages = driver.FindElements(By.XPath(BusinessProcessFlowReference.NextStage_UCI));
+                var processStages = driver.FindElements(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.NextStage_UCI));
 
                 if (processStages.Count == 0)
                     return true;
@@ -402,14 +420,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                 }
 
-                var flyoutFooterControls = driver.FindElements(By.XPath(BusinessProcessFlowReference.Flyout_UCI));
+                var flyoutFooterControls = driver.FindElements(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.Flyout_UCI));
 
                 foreach (var control in flyoutFooterControls)
                 {
                     //If there's a field to enter, fill it out
                     if (businessProcessFlowField != null)
                     {
-                        var bpfField = control.FindElement(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFieldName.Replace("[NAME]", businessProcessFlowField.Name)));
+                        var bpfField = control.FindElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFieldName.Replace("[NAME]", businessProcessFlowField.Name)));
 
                         if (bpfField != null)
                         {
@@ -422,7 +440,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
 
                     //Click the Next Stage Button
-                    var nextButton = control.FindElement(By.XPath(BusinessProcessFlowReference.NextStageButton));
+                    var nextButton = control.FindElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.NextStageButton));
                     nextButton.Click();
                 }
 
@@ -435,7 +453,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Select Stage: {stageName}"), driver =>
             {
                 //Find the Business Process Stages
-                var processStages = driver.FindElements(By.XPath(BusinessProcessFlowReference.NextStage_UCI));
+                var processStages = driver.FindElements(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.NextStage_UCI));
 
                 foreach (var processStage in processStages)
                 {
@@ -470,7 +488,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (!driver.HasElement(By.XPath("//button[contains(@data-id,'setActiveButton')]")))
                         throw new NotFoundException($"Unable to find the Set Active button. Please verify the stage name {stageName} is correct.");
 
-                    driver.FindElement(By.XPath(BusinessProcessFlowReference.SetActiveButton)).Click(true);
+                    driver.FindElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.SetActiveButton)).Click(true);
 
                     driver.WaitForTransaction();
                 }
@@ -488,8 +506,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.WaitForTransaction();
 
                 //Pin the Stage
-                if (driver.HasElement(By.XPath(BusinessProcessFlowReference.PinStageButton)))
-                    driver.FindElement(By.XPath(BusinessProcessFlowReference.PinStageButton)).Click();
+                if (driver.HasElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.PinStageButton)))
+                    driver.FindElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.PinStageButton)).Click();
                 else
                     throw new NotFoundException($"Pin button for stage {stageName} not found.");
 
@@ -507,8 +525,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver.WaitForTransaction();
 
                 //Pin the Stage
-                if (driver.HasElement(By.XPath(BusinessProcessFlowReference.CloseStageButton)))
-                    driver.FindElement(By.XPath(BusinessProcessFlowReference.CloseStageButton)).Click(true);
+                if (driver.HasElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.CloseStageButton)))
+                    driver.FindElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.CloseStageButton)).Click(true);
                 else
                     throw new NotFoundException($"Close button for stage {stageName} not found.");
 
@@ -523,10 +541,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Switch BusinessProcessFlow"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(_entityReference.ProcessButton), TimeSpan.FromSeconds(5));
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.EntityReference.ProcessButton), TimeSpan.FromSeconds(5));
 
                 driver.ClickWhenAvailable(
-                    By.XPath(_entityReference.SwitchProcess),
+                    By.XPath(_client.ElementMapper.EntityReference.SwitchProcess),
                     TimeSpan.FromSeconds(5),
                     "The Switch Process Button is not available."
                 );

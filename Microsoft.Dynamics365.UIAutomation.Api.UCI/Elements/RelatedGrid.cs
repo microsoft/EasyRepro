@@ -62,10 +62,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Open Grid Item"), driver =>
             {
-                var grid = driver.FindElement(By.XPath(Grid.GridReference.Container));
+                var grid = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.Container));
                 var rows = grid
-                    .FindElement(By.XPath(Grid.GridReference.CellContainer))
-                    .FindElements(By.XPath(Grid.GridReference.Rows));
+                    .FindElement(By.XPath(_client.ElementMapper.GridReference.CellContainer))
+                    .FindElements(By.XPath(_client.ElementMapper.GridReference.Rows));
 
                 if (rows.Count <= 0)
                 {

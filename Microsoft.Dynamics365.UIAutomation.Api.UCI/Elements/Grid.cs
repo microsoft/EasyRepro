@@ -13,40 +13,79 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     public class Grid : Element
     {
         #region DTO
-        public static class GridReference
+        public  class GridReference
         {
-            public static string Container = "//div[@data-id='data-set-body-container']";
-            public static string PcfContainer = "//div[@ref='eViewport']";
-            public static string QuickFind = "//*[contains(@id, \'quickFind_text\')]";
-            public static string FirstPage = "//button[contains(@data-id,'loadFirstPage')]";
-            public static string NextPage = "//button[contains(@data-id,'moveToNextPage')]";
-            public static string PreviousPage = "//button[contains(@data-id,'moveToPreviousPage')]";
-            public static string SelectAll = "//button[contains(@title,'Select All')]";
-            public static string ShowChart = "//button[contains(@aria-label,'Show Chart')]";
-            public static string HideChart = "Grid_HideChart";
-            public static string JumpBar = "//*[@id=\"JumpBarItemsList\"]";
-            public static string FilterByAll = "//*[@id=\"All_link\"]";
-            public static string RowsContainerCheckbox = "//div[@role='checkbox']";
-            public static string RowsContainer = "//div[contains(@role,'grid')]";
-            public static string LegacyReadOnlyRows = "//div[@data-id='grid-container']//div[@class='ag-center-cols-container']//div[@role='row']";
-            public static string Rows = "//div[@data-id='entity_control-powerapps_onegrid_control_container']//div[@class='ag-center-cols-container']//div[@role='row']";
-            public static string Row = "//div[@class='ag-center-cols-container']//div[@row-index=\'[INDEX]\']";
-            public static string LastRow = "//div[@data-id='entity_control-pcf_grid_control_container']//div[@ref='centerContainer']//div[@role='rowgroup']//div[contains(@class, 'ag last-row')]";
-            public static string Columns = "//div[contains(@ref,'gridHeader')]";
-            public static string Control = "//div[contains(@data-lp-id, 'MscrmControls.Grid.PCFGridControl')]";
-            public static string ChartSelector = "//span[contains(@id,'ChartSelector')]";
-            public static string ChartViewList = "//ul[contains(@role,'listbox')]";
-            public static string GridSortColumn = "//div[contains(@role,'columnheader')]//label[@title='[COLNAME]']";
-            public static string Cells = ".//div[@role='gridcell']";
-            public static string CellContainer = "//div[@role='grid'][@data-id='grid-cell-container']";
-            public static string ViewSelector = "//button[contains(@id,'ViewSelector')]";
-            public static string ViewContainer = "//div[contains(@aria-label,'Views')]";
-            public static string ViewSelectorMenuItem = ".//li[contains(@class, 'ms-ContextualMenu-item')]";
-            public static string SubArea = "//*[contains(@data-id,'[NAME]')]";
+            public const string Grid = "Grid";
+            #region private
+            private string _Container = "//div[@data-id='data-set-body-container']";
+            private string _GridContainer = "//div[translate(@data-type, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='grid']";
+            private string _PowerAppsGridControlClickableCell = "//div[@aria-readonly = 'true']//a";
+            private string _EditableGrid = "//div[@aria-label='Editable Grid']";
+            private string _EditableGridRows = "//div[@wj-part='cells' and @role='grid']";
+            private string _QuickFind = "//*[contains(@id, \'quickFind_text\')]";
+            private string _FirstPage = "//button[contains(@data-id,'loadFirstPage')]";
+            private string _NextPage = "//button[contains(@data-id,'moveToNextPage')]";
+            private string _PreviousPage = "//button[contains(@data-id,'moveToPreviousPage')]";
+            private string _SelectAll = "//button[contains(@title,'Select All')]";
+            private string _ShowChart = "//button[contains(@aria-label,'Show Chart')]";
+            private string _HideChart = "Grid_HideChart";
+            private string _JumpBar = "//*[@id=\"JumpBarItemsList\"]";
+            private string _FilterByAll = "//*[@id=\"All_link\"]";
+            private string _RowsContainerCheckbox = "//div[@role='checkbox']";
+            private string _RowsContainer = "//div[contains(@role,'grid')]";
+            private string _LegacyReadOnlyRows = "//div[@data-id='grid-container']//div[@class='ag-center-cols-container']//div[@role='row']";
+            private string _Rows = "//div[@data-id='entity_control-powerapps_onegrid_control_container']//div[@class='ag-center-cols-container']//div[@role='row']";
+            private string _Row = "//div[@class='ag-center-cols-container']//div[@row-index=\'[INDEX]\']";
+            private string _LastRow = "//div[@data-id='entity_control-pcf_grid_control_container']//div[@ref='centerContainer']//div[@role='rowgroup']//div[contains(@class, 'ag last-row')]";
+            private string _Columns = "//div[contains(@ref,'gridHeader')]";
+            private string _Control = "//div[contains(@data-lp-id, 'MscrmControls.Grid.PCFGridControl')]";
+            private string _ChartSelector = "//span[contains(@id,'ChartSelector')]";
+            private string _ChartViewList = "//ul[contains(@role,'listbox')]";
+            private string _GridSortColumn = "//div[contains(@role,'columnheader')]//label[@title='[COLNAME]']";
+            private string _Cells = ".//div[@role='gridcell']";
+            private string _CellContainer = "//div[@role='grid'][@data-id='grid-cell-container']";
+            private string _ViewSelector = "//button[contains(@id,'ViewSelector')]";
+            private string _ViewContainer = "//div[contains(@aria-label,'Views')]";
+            private string _ViewSelectorMenuItem = ".//li[contains(@class, 'ms-ContextualMenu-item')]";
+            private string _SubArea = "//*[contains(@data-id,'[NAME]')]";
+            #endregion
+            #region prop
+            public string Container { get => _Container; set { _Container = value; } }
+            public string GridContainer { get => _GridContainer; set { _GridContainer = value; } }
+            public string PowerAppsGridControlClickableCell { get => _PowerAppsGridControlClickableCell; set { _PowerAppsGridControlClickableCell = value; } }
+            public string EditableGrid { get => _EditableGrid; set { _EditableGrid = value; } }
+            public string EditableGridRows { get => _EditableGridRows; set { _EditableGridRows = value; } }
+            public string QuickFind { get => _QuickFind; set { _QuickFind = value; } }
+            public string FirstPage { get => _FirstPage; set { _FirstPage = value; } }
+            public string NextPage { get => _NextPage; set { _NextPage = value; } }
+            public string PreviousPage { get => _PreviousPage; set { _PreviousPage = value; } }
+            public string SelectAll { get => _SelectAll; set { _SelectAll = value; } }
+            public string ShowChart { get => _ShowChart; set { _ShowChart = value; } }
+            public string HideChart { get => _HideChart; set { _HideChart = value; } }
+            public string JumpBar { get => _JumpBar; set { _JumpBar = value; } }
+            public string FilterByAll { get => _FilterByAll; set { _FilterByAll = value; } }
+            public string RowsContainerCheckbox { get => _RowsContainerCheckbox; set { _RowsContainerCheckbox = value; } }
+            public string RowsContainer { get => _RowsContainer; set { _RowsContainer = value; } }
+            public string LegacyReadOnlyRows { get => _LegacyReadOnlyRows; set { _LegacyReadOnlyRows = value; } }
+            public string Rows { get => _Rows; set { _Rows = value; } }
+            public string Row { get => _Row; set { _Row = value; } }
+            public string LastRow { get => _LastRow; set { _LastRow = value; } }
+            public string Columns { get => _Columns; set { _Columns = value; } }
+            public string Control { get => _Control; set { _Control = value; } }
+            public string ChartSelector { get => _ChartSelector; set { _ChartSelector = value; } }
+            public string ChartViewList { get => _ChartViewList; set { _ChartViewList = value; } }
+            public string GridSortColumn { get => _GridSortColumn; set { _GridSortColumn = value; } }
+            public string Cells { get => _Cells; set { _Cells = value; } }
+            public string CellContainer { get => _CellContainer; set { _CellContainer = value; } }
+            public string ViewSelector { get => _ViewSelector; set { _ViewSelector = value; } }
+            public string ViewContainer { get => _ViewContainer; set { _ViewContainer = value; } }
+            public string ViewSelectorMenuItem { get => _ViewSelectorMenuItem; set { _ViewSelectorMenuItem = value; } }
+            public string SubArea { get => _SubArea; set { _SubArea = value; } }
+            #endregion
         }
         #endregion
         private readonly WebClient _client;
-        public enum GridType { PowerAppsGridControl, LegacyReadOnlyGrid, ReadOnlyGrid }
+        public enum GridType { PowerAppsGridControl, LegacyReadOnlyGrid, ReadOnlyGrid, EditableGrid }
         public Grid(WebClient client) : base()
         {
             _client = client;
@@ -85,12 +124,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Open View Picker"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(GridReference.ViewSelector),
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.ViewSelector),
                     TimeSpan.FromSeconds(20),
                     "Unable to click the View Picker"
                 );
 
-                var viewContainer = driver.FindElement(By.XPath(GridReference.ViewContainer));
+                var viewContainer = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.ViewContainer));
                 var viewItems = viewContainer.FindElements(By.TagName("li"));
 
                 var result = new Dictionary<string, IWebElement>();
@@ -100,9 +139,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     if (role != "presentation")
                         continue;
-
-                    //var key = viewItem.FindElement(By.XPath(GridReference.ViewSelectorMenuItem])).Text.ToLowerString();
-                    var key = viewItem.Text.ToLowerString();
+                    if (!viewItem.HasElement(By.TagName("label"))) continue;
+                    var key = viewItem.FindElement(By.TagName("label")).Text.ToLowerString();
                     if (string.IsNullOrWhiteSpace(key))
                         continue;
 
@@ -151,42 +189,56 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.ThinkTime(thinkTime);
             return _client.Execute(_client.GetOptions("Open Grid Record"), driver =>
             {
-                var grid = driver.FindElement(By.XPath(GridReference.PcfContainer));
+                //Generic Grid = //div[@data-type='Grid']
+                //Editable Grid = //div[@aria-label='Editable Grid']
+
+                var grid = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.GridContainer));
                 bool lastRow = false;
                 IWebElement gridRow = null;
                 Grid.GridType gridType = Grid.GridType.PowerAppsGridControl;
                 int lastRowInCurrentView = 0;
+                string lastRowXPathLocator = _client.ElementMapper.GridReference.Row.Replace("[INDEX]", (index).ToString());
                 while (!lastRow)
                 {
                     //determine which grid
-                    if (driver.HasElement(By.XPath(GridReference.Rows)))
+                    if (driver.HasElement(By.XPath(_client.ElementMapper.GridReference.Rows))) //Contacts
                     {
                         gridType = Grid.GridType.PowerAppsGridControl;
                         Trace.WriteLine("Found Power Apps Grid.");
                     }
-                    else if (driver.HasElement(By.XPath(GridReference.LegacyReadOnlyRows)))
+                    else if (driver.HasElement(By.XPath(_client.ElementMapper.GridReference.LegacyReadOnlyRows)))//Lead
                     {
                         gridType = Grid.GridType.LegacyReadOnlyGrid;
                         Trace.WriteLine("Found Legacy Read Only Grid.");
                     }
+                    else if (driver.HasElement(By.XPath(_client.ElementMapper.GridReference.EditableGrid))) //Account
+                    {
+                        gridType = Grid.GridType.EditableGrid;
+                        Trace.WriteLine("Found Editable Grid.");
+                        lastRowXPathLocator = _client.ElementMapper.GridReference.EditableGridRows + "//div[@row-index='[INDEX]']".Replace("[INDEX]", (index).ToString());
+                        //if (!grid.HasElement(By.XPath("//div[@role='row' and @aria-rowindex='[INDEX]']".Replace("[INDEX]", (index).ToString()))))
+                        //{
+                        //    lastRowInCurrentView = ClickGridAndPageDown(driver, grid, lastRowInCurrentView, gridType);
+                        //}
+                    }
 
 
-                    if (!driver.HasElement(By.XPath(GridReference.Row.Replace("[INDEX]", (index).ToString()))))
+                    if (!driver.HasElement(By.XPath(lastRowXPathLocator)))
                     {
                         lastRowInCurrentView = ClickGridAndPageDown(driver, grid, lastRowInCurrentView, gridType);
                     }
                     else
                     {
-                        gridRow = driver.FindElement(By.XPath(GridReference.Row.Replace("[INDEX]", index.ToString())));
+                        gridRow = driver.FindElement(By.XPath(lastRowXPathLocator));
                         lastRow = true;
                     }
-                    if (driver.HasElement(By.XPath(GridReference.LastRow)))
+                    if (driver.HasElement(By.XPath(_client.ElementMapper.GridReference.LastRow)))
                     {
                         lastRow = true;
                     }
                 }
                 if (gridRow == null) throw new NotFoundException($"Grid Row {index} not found.");
-                var xpathToGrid = By.XPath("//div[contains(@data-id,'DataSetHostContainer')]");
+                var xpathToGrid = By.XPath("//div[contains(@data-id,'DataSetHostContainer')]");//works for: PowerAppsGridControl, LegacyReadOnlyControl, 
                 IWebElement control = driver.WaitUntilAvailable(xpathToGrid);
 
                 Func<Actions, Actions> action;
@@ -194,20 +246,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     action = e => e.Click();
                 else
                     action = e => e.DoubleClick();
-                var xpathToCell = By.XPath(GridReference.Row.Replace("[INDEX]", index.ToString()));
+                ////div[@class='ag-center-cols-container']//div[@row-index='[INDEX]']
+                var xpathToCell = By.XPath(_client.ElementMapper.GridReference.Row.Replace("[INDEX]", index.ToString()));
                 control.WaitUntilClickable(xpathToCell,
                     cell =>
                     {
                         var emptyDiv = cell.FindElement(By.TagName("div"));
                         switch (gridType)
                         {
-                            case Grid.GridType.LegacyReadOnlyGrid:
+                            case Grid.GridType.LegacyReadOnlyGrid: //Lead
                                 driver.Perform(action, emptyDiv, null);
                                 break;
                             case Grid.GridType.ReadOnlyGrid:
                                 driver.Perform(action, emptyDiv, null);
                                 break;
                             case Grid.GridType.PowerAppsGridControl:
+                                cell.FindElement(By.XPath(_client.ElementMapper.GridReference.PowerAppsGridControlClickableCell)).Click();//Contacts
+                                break;
+                            case Grid.GridType.EditableGrid:
                                 cell.FindElement(By.XPath("//a[contains(@aria-label,'Read only')]")).Click();
                                 break;
                             default: throw new InvalidSelectorException("Did not find Read Only or Power Apps Grid.");
@@ -233,15 +289,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Search"), driver =>
             {
-                driver.WaitUntilClickable(By.XPath(GridReference.QuickFind));
+                driver.WaitUntilClickable(By.XPath(_client.ElementMapper.GridReference.QuickFind));
 
                 if (clearByDefault)
                 {
-                    driver.FindElement(By.XPath(GridReference.QuickFind)).Clear();
+                    driver.FindElement(By.XPath(_client.ElementMapper.GridReference.QuickFind)).Clear();
                 }
 
-                driver.FindElement(By.XPath(GridReference.QuickFind)).SendKeys(searchCriteria);
-                driver.FindElement(By.XPath(GridReference.QuickFind)).SendKeys(Keys.Enter);
+                driver.FindElement(By.XPath(_client.ElementMapper.GridReference.QuickFind)).SendKeys(searchCriteria);
+                driver.FindElement(By.XPath(_client.ElementMapper.GridReference.QuickFind)).SendKeys(Keys.Enter);
 
                 //driver.WaitForTransaction();
 
@@ -257,9 +313,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Clear Search"), driver =>
             {
-                driver.WaitUntilClickable(By.XPath(GridReference.QuickFind));
+                driver.WaitUntilClickable(By.XPath(_client.ElementMapper.GridReference.QuickFind));
 
-                driver.FindElement(By.XPath(GridReference.QuickFind)).Clear();
+                driver.FindElement(By.XPath(_client.ElementMapper.GridReference.QuickFind)).Clear();
 
                 return true;
             });
@@ -271,9 +327,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Show Chart"), driver =>
             {
-                if (driver.HasElement(By.XPath(GridReference.ShowChart)))
+                if (driver.HasElement(By.XPath(_client.ElementMapper.GridReference.ShowChart)))
                 {
-                    driver.ClickWhenAvailable(By.XPath(GridReference.ShowChart));
+                    driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.ShowChart));
 
                     driver.WaitForTransaction();
                 }
@@ -292,9 +348,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Hide Chart"), driver =>
             {
-                if (driver.HasElement(By.XPath(GridReference.HideChart)))
+                if (driver.HasElement(By.XPath(_client.ElementMapper.GridReference.HideChart)))
                 {
-                    driver.ClickWhenAvailable(By.XPath(GridReference.HideChart));
+                    driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.HideChart));
 
                     driver.WaitForTransaction();
                 }
@@ -319,7 +375,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Filter by Letter"), driver =>
             {
-                var jumpBar = driver.FindElement(By.XPath(GridReference.JumpBar));
+                var jumpBar = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.JumpBar));
                 var link = jumpBar.FindElement(By.Id(filter + "_link"));
 
                 if (link != null)
@@ -343,8 +399,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Filter by All Records"), driver =>
             {
-                var jumpBar = driver.FindElement(By.XPath(GridReference.JumpBar));
-                var link = jumpBar.FindElement(By.XPath(GridReference.FilterByAll));
+                var jumpBar = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.JumpBar));
+                var link = jumpBar.FindElement(By.XPath(_client.ElementMapper.GridReference.FilterByAll));
 
                 if (link != null)
                 {
@@ -367,7 +423,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Select Grid Record"), driver =>
             {
-                var container = driver.WaitUntilAvailable(By.XPath(GridReference.RowsContainer), "Grid Container does not exist.");
+                var container = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.GridReference.RowsContainer), "Grid Container does not exist.");
 
                 var row = container.FindElement(By.Id("id-cell-" + index + "-1"));
                 if (row == null)
@@ -382,16 +438,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.ThinkTime(thinkTime);
 
-            if (!_client.Browser.Driver.IsVisible(By.XPath(GridReference.ChartSelector)))
+            if (!_client.Browser.Driver.IsVisible(By.XPath(_client.ElementMapper.GridReference.ChartSelector)))
                 ShowChart();
 
             _client.ThinkTime(1000);
 
             return _client.Execute(_client.GetOptions("Switch Chart"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(GridReference.ChartSelector));
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.ChartSelector));
 
-                var list = driver.FindElement(By.XPath(GridReference.ChartViewList));
+                var list = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.ChartViewList));
 
                 driver.ClickWhenAvailable(By.XPath("//li[contains(@title,'" + chartName + "')]"));
 
@@ -409,7 +465,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Sort by {columnName}"), driver =>
             {
-                var sortCol = driver.FindElement(By.XPath(GridReference.GridSortColumn.Replace("[COLNAME]", columnName)));
+                var sortCol = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.GridSortColumn.Replace("[COLNAME]", columnName)));
 
                 if (sortCol == null)
                     throw new InvalidOperationException($"Column: {columnName} Does not exist");
@@ -426,7 +482,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         #endregion
         #region Private
-        private static int ClickGridAndPageDown(IWebDriver driver, IWebElement grid, int lastKnownFloor, Grid.GridType gridType)
+        private int ClickGridAndPageDown(IWebDriver driver, IWebElement grid, int lastKnownFloor, Grid.GridType gridType)
         {
             Actions actions = new Actions(driver);
             By rowGroupLocator = null;
@@ -434,16 +490,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             switch (gridType)
             {
                 case Grid.GridType.LegacyReadOnlyGrid:
-                    rowGroupLocator = By.XPath(GridReference.LegacyReadOnlyRows);
-                    topRowLocator = By.XPath(GridReference.Rows);
+                    rowGroupLocator = By.XPath(_client.ElementMapper.GridReference.LegacyReadOnlyRows);
+                    topRowLocator = By.XPath(_client.ElementMapper.GridReference.Rows);
                     break;
                 case Grid.GridType.ReadOnlyGrid:
-                    rowGroupLocator = By.XPath(GridReference.Rows);
-                    topRowLocator = By.XPath(GridReference.Rows);
+                    rowGroupLocator = By.XPath(_client.ElementMapper.GridReference.Rows);
+                    topRowLocator = By.XPath(_client.ElementMapper.GridReference.Rows);
                     break;
                 case Grid.GridType.PowerAppsGridControl:
-                    rowGroupLocator = By.XPath(GridReference.Rows);
-                    topRowLocator = By.XPath(GridReference.Rows);
+                    rowGroupLocator = By.XPath(_client.ElementMapper.GridReference.Rows);
+                    topRowLocator = By.XPath(_client.ElementMapper.GridReference.Rows);
+                    break;
+                case Grid.GridType.EditableGrid:
+                    rowGroupLocator = By.XPath(_client.ElementMapper.GridReference.EditableGridRows);
+                    topRowLocator = By.XPath(_client.ElementMapper.GridReference.EditableGridRows + "//div[@role='row']");
                     break;
                 default:
                     break;
@@ -571,7 +631,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Next Page"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(GridReference.NextPage));
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.NextPage));
 
                 driver.WaitForTransaction();
 
@@ -585,7 +645,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Previous Page"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(GridReference.PreviousPage));
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.PreviousPage));
 
                 driver.WaitForTransaction();
 
@@ -599,7 +659,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"First Page"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(GridReference.FirstPage));
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.FirstPage));
 
                 driver.WaitForTransaction();
 
@@ -613,7 +673,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Select All"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(GridReference.SelectAll));
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.SelectAll));
 
                 driver.WaitForTransaction();
 

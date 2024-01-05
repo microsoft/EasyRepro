@@ -76,7 +76,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else if (formContextType == FormContextType.BusinessProcessFlow)
                 {
                     // Initialize the Business Process Flow context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext));
+                    var formContext = driver.WaitUntilAvailable(By.XPath(client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext));
                     fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
                 }
                 else if (formContextType == FormContextType.Header)
@@ -141,7 +141,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else if (formContextType == FormContextType.BusinessProcessFlow)
                     {
                         // Initialize the Business Process Flow context
-                        var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext));
+                        var formContext = driver.WaitUntilAvailable(By.XPath(client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext));
                         fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
                     }
                     else if (formContextType == FormContextType.Header)

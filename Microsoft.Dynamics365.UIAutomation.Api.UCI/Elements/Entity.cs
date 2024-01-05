@@ -1109,7 +1109,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var controlName = control.Name;
             return _client.Execute($"Get Lookup Value: {controlName}", driver =>
             {
-                var xpathToContainer = this._entityReference.TextFieldLookupFieldContainer.Replace("[NAME]", controlName);
+                var xpathToContainer = _client.ElementMapper.EntityReference.TextFieldLookupFieldContainer.Replace("[NAME]", controlName);
                 IWebElement fieldContainer = driver.WaitUntilAvailable(By.XPath(xpathToContainer));
                 string lookupValue = TryGetValue(fieldContainer, control);
 
@@ -1144,7 +1144,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         private string[] TryGetValue(IWebElement fieldContainer, LookupItem[] controls)
         {
             var controlName = controls.First().Name;
-            var xpathToExistingValues = By.XPath(this._entityReference.LookupFieldExistingValue.Replace("[NAME]", controlName));
+            var xpathToExistingValues = By.XPath(_client.ElementMapper.EntityReference.LookupFieldExistingValue.Replace("[NAME]", controlName));
             var existingValues = fieldContainer.FindElements(xpathToExistingValues);
 
             var xpathToExpandButton = By.XPath(this._entityReference.LookupFieldExpandCollapseButton.Replace("[NAME]", controlName));

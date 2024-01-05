@@ -21,17 +21,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
     public class ElementMapper
     {
+        public BusinessProcessFlow.BusinessProcessFlowReference BusinessProcessFlowReference;
+        public CommandBar.CommandBarReference CommandBarReference;
         public Entity.EntityReference EntityReference;
+        public Grid.GridReference GridReference;
         public ElementMapper(IConfiguration config) {
+
+            BusinessProcessFlowReference = new BusinessProcessFlow.BusinessProcessFlowReference();
+            config.GetSection(BusinessProcessFlow.BusinessProcessFlowReference.BusinessProcessFlow).Bind(BusinessProcessFlowReference);
+            CommandBarReference = new CommandBar.CommandBarReference();
+            config.GetSection(CommandBar.CommandBarReference.CommandBar).Bind(CommandBarReference);
             EntityReference = new Entity.EntityReference();
             config.GetSection(Entity.EntityReference.Entity).Bind(EntityReference);
+            GridReference = new Grid.GridReference();
+            config.GetSection(Grid.GridReference.Grid).Bind(GridReference);
         }
     }
     public class WebClient : BrowserPage, IDisposable
     {
         public List<ICommandResult> CommandResults => Browser.CommandResults;
         public Guid ClientSessionId;
-        public ElementMapper ElementMapper;
+        internal ElementMapper ElementMapper;
         private Entity.EntityReference _entityReference;
         public WebClient(BrowserOptions options)
         {
@@ -113,8 +123,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (formContextType == FormContextType.BusinessProcessFlow)
             {
                 // Initialize the Business Process Flow context
-                var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlow.BusinessProcessFlowReference.BusinessProcessFlowFormContext));
-                fieldContainer = formContext.WaitUntilAvailable(By.XPath(BusinessProcessFlow.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field)));
+                var formContext = driver.WaitUntilAvailable(By.XPath(this.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext));
+                fieldContainer = formContext.WaitUntilAvailable(By.XPath(this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field)));
             }
             else if (formContextType == FormContextType.Header)
             {

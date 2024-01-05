@@ -11,12 +11,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     public class CommandBar : Element
     {
         #region DTO
-        public static class CommandBarReference
+        public class CommandBarReference
         {
-            public static string Container = ".//ul[contains(@data-lp-id,\"commandbar-Form\")]";
-            public static string ContainerGrid = "//ul[contains(@data-lp-id,\"commandbar-HomePageGrid\")]";
-            public static string MoreCommandsMenu = "//*[@id=\"__flyoutRootNode\"]";
-            public static string Button = "//*[contains(text(),'[NAME]')]";
+            public const string CommandBar = "CommandBar";
+            #region private
+            private string _Container = ".//ul[contains(@data-lp-id,\"commandbar-Form\")]";
+            private string _ContainerGrid = "//ul[contains(@data-lp-id,\"commandbar-HomePageGrid\")]";
+            private string _MoreCommandsMenu = "//*[@id=\"__flyoutRootNode\"]";
+            private string _Button = "//*[contains(text(),'[NAME]')]";
+            #endregion
+            #region prop
+            public string Container { get => _Container; set { _Container = value; } }
+            public string ContainerGrid { get => _ContainerGrid; set { _ContainerGrid = value; } }
+            public string MoreCommandsMenu { get => _MoreCommandsMenu; set { _MoreCommandsMenu = value; } }
+            public string Button { get => _Button; set { _Button = value; } }
+            #endregion
         }
         #endregion
         private readonly WebClient _client;
@@ -68,17 +77,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (driver.HasElement(By.XPath(string.Format(Dialogs.DialogsReference.DialogContext))))
                 {
                     var dialogContainer = driver.FindElement(By.XPath(string.Format(Dialogs.DialogsReference.DialogContext)));
-                    ribbon = dialogContainer.WaitUntilAvailable(By.XPath(string.Format(CommandBarReference.Container)));
+                    ribbon = dialogContainer.WaitUntilAvailable(By.XPath(string.Format(_client.ElementMapper.CommandBarReference.Container)));
                 }
                 else
                 {
-                    ribbon = driver.WaitUntilAvailable(By.XPath(CommandBarReference.Container));
+                    ribbon = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.Container));
                 }
 
 
                 if (ribbon == null)
                 {
-                    ribbon = driver.WaitUntilAvailable(By.XPath(CommandBarReference.ContainerGrid),
+                    ribbon = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.ContainerGrid),
                         TimeSpan.FromSeconds(5),
                         "Unable to find the ribbon.");
                 }
@@ -114,7 +123,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (!string.IsNullOrEmpty(subname))
                 {
-                    var submenu = driver.WaitUntilAvailable(By.XPath(CommandBarReference.MoreCommandsMenu));
+                    var submenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.MoreCommandsMenu));
 
                     submenu.TryFindElement(By.XPath(SubGrid.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname)), out var subbutton);
 
@@ -127,7 +136,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     if (!string.IsNullOrEmpty(subSecondName))
                     {
-                        var subSecondmenu = driver.WaitUntilAvailable(By.XPath(CommandBarReference.MoreCommandsMenu));
+                        var subSecondmenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.MoreCommandsMenu));
 
                         subSecondmenu.TryFindElement(
                             By.XPath(SubGrid.SubGridReference.SubGridOverflowButton
@@ -162,7 +171,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this._client.Execute(_client.GetOptions("Get CommandBar Command Count"), driver => TryGetCommandValues(includeMoreCommandsValues, driver));
         }
 
-        private static List<string> TryGetCommandValues(bool includeMoreCommandsValues, IWebDriver driver)
+        private List<string> TryGetCommandValues(bool includeMoreCommandsValues, IWebDriver driver)
         {
             const string moreCommandsLabel = "more commands";
 
@@ -176,7 +185,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 moreCommandsButton.Click(true);
 
-                driver.WaitUntilVisible(By.XPath(CommandBarReference.MoreCommandsMenu),
+                driver.WaitUntilVisible(By.XPath(_client.ElementMapper.CommandBarReference.MoreCommandsMenu),
                     menu => AddMenuItems(menu, commandBarItems),
                     "Unable to locate the 'More Commands' menu"
                     );
@@ -221,10 +230,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return result;
         }
 
-        private static IWebElement GetRibbon(IWebDriver driver)
+        private IWebElement GetRibbon(IWebDriver driver)
         {
-            var xpathCommandBarContainer = By.XPath(CommandBarReference.Container);
-            var xpathCommandBarGrid = By.XPath(CommandBarReference.ContainerGrid);
+            var xpathCommandBarContainer = By.XPath(_client.ElementMapper.CommandBarReference.Container);
+            var xpathCommandBarGrid = By.XPath(_client.ElementMapper.CommandBarReference.ContainerGrid);
 
             IWebElement ribbon =
                 driver.WaitUntilAvailable(xpathCommandBarContainer, 5.Seconds()) ??

@@ -37,6 +37,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestCategory("Grid")]
+        [TestCategory("LegacyReadOnlyGrid")]
         [TestCategory("BusinessProcessFlow")]
         [TestMethod]
         [TestCategory("Fail - Bug")]

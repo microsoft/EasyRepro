@@ -46,6 +46,7 @@
     <!-- 0=Selenium,1=Playwright-->
     <Parameter name="Framework" value="Playwright" />
     <Parameter name="BrowserType" value="Chrome" />
+    <Parameter name="ConfigPath" value="" />
     <Parameter name="DriversPath" value="" />
     <Parameter name="AzureKey" value="" />
     <Parameter name="SessionId" value="" />

@@ -98,6 +98,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestCategory("Grid")]
+        [TestCategory("PowerAppsGridControl")]
         [TestCategory("Lookup")]
         [TestCategory("LookupSelectedRelatedEntity")]
         [TestCategory("LookupSwitchView")]

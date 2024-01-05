@@ -504,11 +504,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        private static Actions ClickSubGridAndPageDown(IWebDriver driver, IWebElement grid)
+        private Actions ClickSubGridAndPageDown(IWebDriver driver, IWebElement grid)
         {
             Actions actions = new Actions(driver);
             //var topRow = driver.FindElement(By.XPath("//div[@data-id='entity_control-pcf_grid_control_container']//div[@ref='centerContainer']//div[@role='rowgroup']//div[@role='row']"));
-            var topRow = driver.FindElement(By.XPath(GridReference.Rows));
+            var topRow = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.Rows));
             //topRow.Click();
             //actions.SendKeys(OpenQA.Selenium.Keys.PageDown).Perform();
 

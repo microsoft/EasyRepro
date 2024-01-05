@@ -366,17 +366,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (driver.HasElement(By.XPath(string.Format(DialogsReference.DialogContext))))
                 {
                     var dialogContainer = driver.FindElement(By.XPath(string.Format(DialogsReference.DialogContext)));
-                    ribbon = dialogContainer.WaitUntilAvailable(By.XPath(string.Format(CommandBar.CommandBarReference.Container)));
+                    ribbon = dialogContainer.WaitUntilAvailable(By.XPath(string.Format(_client.ElementMapper.CommandBarReference.Container)));
                 }
                 else
                 {
-                    ribbon = driver.WaitUntilAvailable(By.XPath(CommandBar.CommandBarReference.Container));
+                    ribbon = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.Container));
                 }
 
 
                 if (ribbon == null)
                 {
-                    ribbon = driver.WaitUntilAvailable(By.XPath(CommandBar.CommandBarReference.ContainerGrid),
+                    ribbon = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.ContainerGrid),
                         TimeSpan.FromSeconds(5),
                         "Unable to find the ribbon.");
                 }
@@ -412,7 +412,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (!string.IsNullOrEmpty(subname))
                 {
-                    var submenu = driver.WaitUntilAvailable(By.XPath(CommandBar.CommandBarReference.MoreCommandsMenu));
+                    var submenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.MoreCommandsMenu));
 
                     submenu.TryFindElement(By.XPath(SubGrid.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname)), out var subbutton);
 
@@ -425,7 +425,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     if (!string.IsNullOrEmpty(subSecondName))
                     {
-                        var subSecondmenu = driver.WaitUntilAvailable(By.XPath(CommandBar.CommandBarReference.MoreCommandsMenu));
+                        var subSecondmenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.MoreCommandsMenu));
 
                         subSecondmenu.TryFindElement(
                             By.XPath(SubGrid.SubGridReference.SubGridOverflowButton

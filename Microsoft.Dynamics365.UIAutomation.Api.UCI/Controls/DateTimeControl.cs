@@ -90,7 +90,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (formContextType == FormContextType.BusinessProcessFlow)
             {
                 // Initialize the Business Process Flow context
-                formContext = container.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext), new TimeSpan(0, 0, 1));
+                formContext = container.WaitUntilAvailable(By.XPath(client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext), new TimeSpan(0, 0, 1));
             }
             else if (formContextType == FormContextType.Header)
             {
@@ -216,7 +216,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (formContextType == FormContextType.BusinessProcessFlow)
             {
                 // Initialize the Business Process Flow context
-                var formContext = driver.WaitUntilAvailable(By.XPath(BusinessProcessFlowReference.BusinessProcessFlowFormContext));
+                var formContext = driver.WaitUntilAvailable(By.XPath(client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext));
                 fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
                 var strExpanded = fieldContainer.GetAttribute("aria-expanded");
