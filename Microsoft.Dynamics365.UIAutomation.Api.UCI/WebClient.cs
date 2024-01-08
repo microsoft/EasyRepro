@@ -28,6 +28,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public Entity.EntityReference EntityReference;
         public GlobalSearch.GlobalSearchReference GlobalSearchReference;
         public Grid.GridReference GridReference;
+        public Lookup.LookupReference LookupReference;
         public ElementMapper(IConfiguration config) {
 
             BusinessProcessFlowReference = new BusinessProcessFlow.BusinessProcessFlowReference();
@@ -40,9 +41,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             config.GetSection(Dialogs.DialogsReference.Dialogs).Bind(DialogsReference);
             EntityReference = new Entity.EntityReference();
             config.GetSection(Entity.EntityReference.Entity).Bind(EntityReference);
-
             GlobalSearchReference = new GlobalSearch.GlobalSearchReference();
-            config.GetSection(Entity.EntityReference.Entity).Bind(EntityReference);
+            config.GetSection(GlobalSearch.GlobalSearchReference.GlobalSearch).Bind(GlobalSearchReference);
 
             GridReference = new Grid.GridReference();
             config.GetSection(Grid.GridReference.Grid).Bind(GridReference);
