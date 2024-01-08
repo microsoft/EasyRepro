@@ -26,6 +26,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public Dashboard.DashboardReference DashboardReference;
         public Dialogs.DialogsReference DialogsReference;
         public Entity.EntityReference EntityReference;
+        public GlobalSearch.GlobalSearchReference GlobalSearchReference;
         public Grid.GridReference GridReference;
         public ElementMapper(IConfiguration config) {
 
@@ -39,6 +40,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             config.GetSection(Dialogs.DialogsReference.Dialogs).Bind(DialogsReference);
             EntityReference = new Entity.EntityReference();
             config.GetSection(Entity.EntityReference.Entity).Bind(EntityReference);
+
+            GlobalSearchReference = new GlobalSearch.GlobalSearchReference();
+            config.GetSection(Entity.EntityReference.Entity).Bind(EntityReference);
+
             GridReference = new Grid.GridReference();
             config.GetSection(Grid.GridReference.Grid).Bind(GridReference);
         }

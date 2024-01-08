@@ -43,6 +43,8 @@
     "TextFieldLookupFieldContainer": ".//div[contains(@data-id,'[NAME].fieldControl-Lookup_[NAME]')]",
     "DuplicateDetectionWindowMarker": "//div[contains(@data-id,'ManageDuplicates')]"
   },
+  "GlobalSearch": {
+  },
   "Grid": {
     "ViewContainer": "//ul[contains(@aria-label,'Views')]"
   },

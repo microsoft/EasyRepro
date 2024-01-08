@@ -9,23 +9,43 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     public class GlobalSearch : Element
     {
         #region DTO
-        public static class GlobalSearchReference
+        public class GlobalSearchReference
         {
-            public static string CategorizedSearchButton = "//button[contains(@data-id,'search-submit-button')]";
-            public static string RelevanceSearchButton = "//div[@aria-label=\"Search box\"]//button";
-            public static string Text = "//input[@aria-label=\"Search box\"]";
-            public static string Filter = "//select[@aria-label=\"Filter with\"]";
-            public static string Results = "id(\"entityDiv_1\")";
-            public static string Container = "//div[@id=\"searchResultList\"]";
-            public static string EntityContainer = "//div[@id=\"View[NAME]\"]";
-            public static string Records = "//li[@role=\"row\"]";
-            public static string GroupContainer = "//label[contains(text(), '[NAME]')]/parent::div";
-            public static string FilterValue = "//label[contains(text(), '[NAME]')]";
-            public static string CategorizedResultsContainer = "//div[@id=\"searchResultList\"]";
-            public static string CategorizedResults = "//ul[@aria-label='[ENTITY]']/li";
-            public static string RelevanceSearchResultsSelectedTab = "//button[@aria-selected='true' and @role='tab']";
-            public static string RelevanceSearchResultsTab = "//section[@id='searchComponent']//button[@name='[NAME]' and @role='tab']";
-            public static string RelevanceSearchResultLinks = "//div[@role='rowgroup']/div[@role='row']/div[1]";
+            public const string GlobalSearch = "GlobalSearch";
+            #region private
+            private string _CategorizedSearchButton = "//button[contains(@data-id,'search-submit-button')]";
+            private string _RelevanceSearchButton = "//div[@aria-label=\"Search box\"]//button";
+            private string _Text = "//input[@aria-label=\"Search box\"]";
+            private string _Filter = "//select[@aria-label=\"Filter with\"]";
+            private string _Results = "id(\"entityDiv_1\")";
+            private string _Container = "//div[@id=\"searchResultList\"]";
+            private string _EntityContainer = "//div[@id=\"View[NAME]\"]";
+            private string _Records = "//li[@role=\"row\"]";
+            private string _GroupContainer = "//label[contains(text(), '[NAME]')]/parent::div";
+            private string _FilterValue = "//label[contains(text(), '[NAME]')]";
+            private string _CategorizedResultsContainer = "//div[@id=\"searchResultList\"]";
+            private string _CategorizedResults = "//ul[@aria-label='[ENTITY]']/li";
+            private string _RelevanceSearchResultsSelectedTab = "//button[@aria-selected='true' and @role='tab']";
+            private string _RelevanceSearchResultsTab = "//section[@id='searchComponent']//button[@name='[NAME]' and @role='tab']";
+            private string _RelevanceSearchResultLinks = "//div[@role='rowgroup']/div[@role='row']/div[1]";
+            #endregion
+            #region prop
+            public string CategorizedSearchButton { get => _CategorizedSearchButton; set { _CategorizedSearchButton = value; } }
+            public string RelevanceSearchButton { get => _RelevanceSearchButton; set { _RelevanceSearchButton = value; } }
+            public string Text { get => _Text; set { _Text = value; } }
+            public string Filter { get => _Filter; set { _Filter = value; } }
+            public string Results { get => _Results; set { _Results = value; } }
+            public string Container { get => _Container; set { _Container = value; } }
+            public string EntityContainer { get => _EntityContainer; set { _EntityContainer = value; } }
+            public string Records { get => _Records; set { _Records = value; } }
+            public string GroupContainer { get => _GroupContainer; set { _GroupContainer = value; } }
+            public string FilterValue { get => _FilterValue; set { _FilterValue = value; } }
+            public string CategorizedResultsContainer { get => _CategorizedResultsContainer; set { _CategorizedResultsContainer = value; } }
+            public string CategorizedResults { get => _CategorizedResults; set { _CategorizedResults = value; } }
+            public string RelevanceSearchResultsSelectedTab { get => _RelevanceSearchResultsSelectedTab; set { _RelevanceSearchResultsSelectedTab = value; } }
+            public string RelevanceSearchResultsTab { get => _RelevanceSearchResultsTab; set { _RelevanceSearchResultsTab = value; } }
+            public string RelevanceSearchResultLinks { get => _RelevanceSearchResultLinks; set { _RelevanceSearchResultLinks = value; } }
+            #endregion
         }
         #endregion
         private readonly WebClient _client;
@@ -77,7 +97,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         "The Global Search (Categorized Search) button is not available.");
 
                     input = driver.WaitUntilVisible(
-                        By.XPath(GlobalSearchReference.Text),
+                        By.XPath(_client.ElementMapper.GlobalSearchReference.Text),
                         2.Seconds(),
                         "The Categorized Search text field is not available.");
                 }
@@ -105,7 +125,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForTransaction();
 
-                if (driver.TryFindElement(By.XPath(GlobalSearchReference.Filter), out var filter))
+                if (driver.TryFindElement(By.XPath(_client.ElementMapper.GlobalSearchReference.Filter), out var filter))
                 {
                     // Categorized Search
                     var option = filter
@@ -120,7 +140,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     filter.Click();
                     option.Click();
                 }
-                else if (driver.TryFindElement(By.XPath(GlobalSearchReference.RelevanceSearchResultsTab.Replace("[NAME]", entity)), out var entityTab))
+                else if (driver.TryFindElement(By.XPath(_client.ElementMapper.GlobalSearchReference.RelevanceSearchResultsTab.Replace("[NAME]", entity)), out var entityTab))
                 {
                     // Relevance Search
                     entityTab.Click();
@@ -148,14 +168,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForTransaction();
 
-                if (driver.TryFindElement(By.XPath(GlobalSearchReference.GroupContainer.Replace("[NAME]", filterBy)), out var entityPicker))
+                if (driver.TryFindElement(By.XPath(_client.ElementMapper.GlobalSearchReference.GroupContainer.Replace("[NAME]", filterBy)), out var entityPicker))
                 {
                     // Categorized Search
                     entityPicker.ClickWhenAvailable(
-                    By.XPath(GlobalSearchReference.FilterValue.Replace("[NAME]", value)),
+                    By.XPath(_client.ElementMapper.GlobalSearchReference.FilterValue.Replace("[NAME]", value)),
                     $"Filter By Value '{value}' does not exist in the Filter options.");
                 }
-                else if (filterBy == "Record Type" && driver.TryFindElement(By.XPath(GlobalSearchReference.RelevanceSearchResultsTab.Replace("[NAME]", value)), out var entityTab))
+                else if (filterBy == "Record Type" && driver.TryFindElement(By.XPath(_client.ElementMapper.GlobalSearchReference.RelevanceSearchResultsTab.Replace("[NAME]", value)), out var entityTab))
                 {
                     // Relevance Search
                     entityTab.Click();
@@ -185,10 +205,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForTransaction();
 
-                if (driver.TryFindElement(By.XPath(GlobalSearchReference.CategorizedResultsContainer), out var categorizedContainer))
+                if (driver.TryFindElement(By.XPath(_client.ElementMapper.GlobalSearchReference.CategorizedResultsContainer), out var categorizedContainer))
                 {
                     // Categorized Search
-                    var records = categorizedContainer.FindElements(By.XPath(GlobalSearchReference.CategorizedResults.Replace("[ENTITY]", entity)));
+                    var records = categorizedContainer.FindElements(By.XPath(_client.ElementMapper.GlobalSearchReference.CategorizedResults.Replace("[ENTITY]", entity)));
                     if (index >= records.Count)
                     {
                         throw new InvalidOperationException($"There was less than {index + 1} records in the search result.");
@@ -199,13 +219,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else if (driver.TryFindElement(By.Id("resultsContainer-view"), out var relevanceContainer))
                 {
                     // Relevance Search
-                    var selectedTab = relevanceContainer.FindElement(By.XPath(GlobalSearchReference.RelevanceSearchResultsSelectedTab));
+                    var selectedTab = relevanceContainer.FindElement(By.XPath(_client.ElementMapper.GlobalSearchReference.RelevanceSearchResultsSelectedTab));
                     if (selectedTab.GetAttribute("name") != entity)
                     {
                         this.FilterWith(entity);
                     }
 
-                    var links = relevanceContainer.FindElements(By.XPath(GlobalSearchReference.RelevanceSearchResultLinks));
+                    var links = relevanceContainer.FindElements(By.XPath(_client.ElementMapper.GlobalSearchReference.RelevanceSearchResultLinks));
                     if (index >= links.Count)
                     {
                         throw new InvalidOperationException($"There was less than {index + 1} records in the search result.");
