@@ -24,6 +24,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public BusinessProcessFlow.BusinessProcessFlowReference BusinessProcessFlowReference;
         public CommandBar.CommandBarReference CommandBarReference;
         public Dashboard.DashboardReference DashboardReference;
+        public Dialogs.DialogsReference DialogsReference;
         public Entity.EntityReference EntityReference;
         public Grid.GridReference GridReference;
         public ElementMapper(IConfiguration config) {
@@ -34,6 +35,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             config.GetSection(CommandBar.CommandBarReference.CommandBar).Bind(CommandBarReference);
             DashboardReference = new Dashboard.DashboardReference();
             config.GetSection(Dashboard.DashboardReference.Dashboard).Bind(DashboardReference);
+            DialogsReference = new Dialogs.DialogsReference();
+            config.GetSection(Dialogs.DialogsReference.Dialogs).Bind(DialogsReference);
             EntityReference = new Entity.EntityReference();
             config.GetSection(Entity.EntityReference.Entity).Bind(EntityReference);
             GridReference = new Grid.GridReference();
@@ -140,7 +143,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Initialize the Dialog context
                 driver.WaitForTransaction();
                 var formContext = driver
-                    .FindElements(By.XPath(Dialogs.DialogsReference.DialogContext))
+                    .FindElements(By.XPath(this.ElementMapper.DialogsReference.DialogContext))
                     .LastOrDefault() ?? throw new NotFoundException("Unable to find a dialog.");
                 fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
             }

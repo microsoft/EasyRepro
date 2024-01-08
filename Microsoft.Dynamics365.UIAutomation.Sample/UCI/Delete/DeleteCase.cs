@@ -14,6 +14,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     {
 
         [TestCategory("Dialogs")]
+        [TestCategory("DialogsDelete")]
+        [TestCategory("DialogsConfirmation")]
         [TestMethod]
         public void UCITestDeleteCase()
         {

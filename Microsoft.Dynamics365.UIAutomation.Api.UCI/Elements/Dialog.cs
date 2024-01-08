@@ -4,112 +4,205 @@ using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
 using System;
+using System.ComponentModel.DataAnnotations;
+using static Microsoft.Dynamics365.UIAutomation.Api.UCI.Dialogs;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
     public class Dialogs : Element
     {
-        #region DTO
-        public static class DialogsReference
+        public class AddConnectionReference
         {
-            public static class Frames
-            {
-                public static string ContentPanel = "Frame_ContentPanel";
-                public static string ContentFrameId = "Frame_ContentFrameId";
-                public static string DialogFrame = "Frame_DialogFrame";
-                public static string DialogFrameId = "Frame_DialogFrameId";
-                public static string QuickCreateFrame = "Frame_QuickCreateFrame";
-                public static string QuickCreateFrameId = "Frame_QuickCreateFrameId";
-                public static string WizardFrame = "Frame_WizardFrame";
-                public static string WizardFrameId = "Frame_WizardFrameId";
-                public static string ViewFrameId = "Frame_ViewFrameId";
+            public const string AddConnection = "AddConnection";
+            private string _DescriptionId = "description";
+            private string _Save = "id(\"connection|NoRelationship|Form|Mscrm.Form.connection.SaveAndClose-Large\")";
+            private string _RoleLookupButton = "id(\"record2roleid\")";
+            private string _RoleLookupTable = "id(\"record2roleid_IMenu\")";
+            public string DescriptionId { get => _DescriptionId; set { _DescriptionId = value; } }
+            public string Save { get => _Save; set { _Save = value; } }
+            public string RoleLookupButton { get => _RoleLookupButton; set { _RoleLookupButton = value; } }
+            public string RoleLookupTable { get => _RoleLookupTable; set { _RoleLookupTable = value; } }
+        }
+        public class AddUserReference
+        {
+            public const string AddUser = "AddUser";
+            private string _header = "id(\"addUserDescription\")";
+            private string _add = "id(\"buttonNext\")";
+            public string Header { get => _header; set { _header = value; } }
+            public string Add { get => _add; set { _add = value; } }
+        }
+        public class AssignReference
+        {
+            public const string Assign = "Assign";
+            private string _ok = "id(\"ok_id\")";
+            private string _userOrTeamLookupId = "systemuserview_id";
+            private string _assignToId = "rdoMe_id";
+            public string Ok { get => _ok; set { _ok = value; } }
+            public string UserOrTeamLookupId { get => _userOrTeamLookupId; set { _userOrTeamLookupId = value; } }
+            public string AssignToId { get => _assignToId; set { _assignToId = value; } }
 
-            }
-            public static class CloseOpportunity
-            {
-                public static string Ok = "//button[contains(@data-id, 'ok_id')]";
-                public static string Cancel = "//button[contains(@data-id, 'cancel_id')]";
-                public static string ActualRevenueId = "actualrevenue_id";
-                public static string CloseDateId = "closedate_id";
-                public static string DescriptionId = "description_id";
-            }
-            public static class CloseActivity
-            {
-                public static string Close = ".//button[contains(@data-id, 'ok_id')]";
-                public static string Cancel = ".//button[contains(@data-id, 'cancel_id')]";
-            }
-            public static class AddConnection
-            {
-                public static string DescriptionId = "description";
-                public static string Save = "id(\"connection|NoRelationship|Form|Mscrm.Form.connection.SaveAndClose-Large\")";
-                public static string RoleLookupButton = "id(\"record2roleid\")";
-                public static string RoleLookupTable = "id(\"record2roleid_IMenu\")";
-            }
-            public static class Assign
-            {
-                public static string Ok = "id(\"ok_id\")";
-                public static string UserOrTeamLookupId = "systemuserview_id";
-                public static string AssignToId = "rdoMe_id";
-            }
-            public static class Delete
-            {
-                public static string Ok = "id(\"butBegin\")";
-            }
-            public static class SwitchProcess
-            {
-                public static string Process = "ms-crm-ProcessSwitcher-ProcessTitle";
-                public static string SelectedRadioButton = "ms-crm-ProcessSwitcher-Process-Selected";
-            }
-            public static class DuplicateDetection
-            {
-                public static string Save = "id(\"butBegin\")";
-                public static string Cancel = "id(\"cmdDialogCancel\")";
+        }
+        public class CloseActivityReference
+        {
+            public const string CloseActivity = "CloseActivity";
+            private string _close = ".//button[contains(@data-id, 'ok_id')]";
+            private string _cancel = ".//button[contains(@data-id, 'cancel_id')]";
 
-            }
-            public static class RunWorkflow
-            {
-                public static string Confirm = "id(\"butBegin\")";
-            }
-            public static class RunReport
-            {
-                public static string Header = "crmDialog";
-                public static string Confirm = "id(\"butBegin\")";
-                public static string Default = "id(\"reportDefault\")";
-                public static string Selected = "id(\"reportSelected\")";
-                public static string View = "id(\"reportView\")";
-            }
-            public static class AddUser
-            {
-                public static string Header = "id(\"addUserDescription\")";
-                public static string Add = "id(\"buttonNext\")";
-            }
-            public static string AssignDialogUserTeamLookupResults = "//ul[contains(@data-id,'systemuserview_id.fieldControl-LookupResultsDropdown_systemuserview_id_tab')]";
-            public static string AssignDialogOKButton = "//button[contains(@data-id, 'ok_id')]";
-            public static string AssignDialogToggle = "//label[contains(@data-id,'rdoMe_id.fieldControl-checkbox-inner-first')]";
-            public static string ConfirmButton = "//*[@data-id=\"confirmButton\"]";
-            public static string CancelButton = "//*[@data-id=\"cancelButton\"]";
-            public static string OkButton = "//*[@id=\"okButton\"]";
-            public static string DuplicateDetectionIgnoreSaveButton = "//button[contains(@data-id, 'ignore_save')]";
-            public static string DuplicateDetectionCancelButton = "//button[contains(@data-id, 'close_dialog')]";
-            public static string PublishConfirmButton = "//*[@data-id=\"ok_id\"]";
-            public static string PublishCancelButton = "//*[@data-id=\"cancel_id\"]";
-            public static string SetStateDialog = "//div[@data-id=\"SetStateDialog\"]";
-            public static string SetStateActionButton = ".//button[@data-id=\"ok_id\"]";
-            public static string SetStateCancelButton = ".//button[@data-id=\"cancel_id\"]";
-            public static string SwitchProcessDialog = "Entity_SwitchProcessDialog";
-            public static string SwitchProcessDialogOK = "//button[contains(@data-id,'ok_id')]";
-            public static string ActiveProcessGridControlContainer = "//div[contains(@data-lp-id,'activeProcessGridControlContainer')]";
-            //public static string DialogContext = "//div[contains(@role, 'dialog') and @aria-hidden != 'true']";
-            public static string DialogContext = "//div[contains(@role, 'dialog') and @aria-modal = 'true']";
-            public static string SwitchProcessContainer = "//div[contains(@id,'switchProcess_id-FieldSectionItemContainer')]";
+            public string Close { get => _close; set { _close = value; } }
+            public string Cancel { get => _cancel; set { _cancel = value; } }
+        }
+        public class CloseOpportunityReference
+        {
+            public const string CloseOpportunity = "CloseOpportunity";
+            private string _ok = "//button[contains(@data-id, 'ok_id')]";
+            private string _cancel = "//button[contains(@data-id, 'cancel_id')]";
+            private string _actualRevenueId = "actualrevenue_id";
+            private string _closeDateId = "closedate_id";
+            private string _descriptionId = "description_id";
 
-            public static string Header = "id(\"dialogHeaderTitle\")";
-            public static string DeleteHeader = "id(\"tdDialogHeader\")";
-            public static string WorkflowHeader = "id(\"DlgHdContainer\")";
-            public static string ProcessFlowHeader = "id(\"processSwitcherFlyout\")";
-            public static string AddConnectionHeader = "id(\"EntityTemplateTab.connection.NoRelationship.Form.Mscrm.Form.connection.MainTab-title\")";
-            public static string WarningFooter = "//*[@id=\"crmDialogFooter\"]";
-            public static string WarningCloseButton = "//*[@id=\"butBegin\"]";
+            public string Ok { get => _ok; set { _ok = value; } }
+            public string Cancel { get => _cancel; set { _cancel = value; } }
+            public string ActualRevenueId { get => _actualRevenueId; set { _actualRevenueId = value; } }
+            public string CloseDateId { get => _closeDateId; set { _closeDateId = value; } }
+            public string DescriptionId { get => _descriptionId; set { _descriptionId = value; } }
+        }
+        public class DeleteReference
+        {
+            public const string Delete = "Delete";
+            private string _ok = "id(\"butBegin\")";
+            public string Ok { get => _ok; set { _ok = value; } }
+        }
+        public class DuplicateDetectionReference
+        {
+            public const string DuplicateDetection = "DuplicateDetection";
+            private string _save = "id(\"butBegin\")";
+            private string _cancel = "id(\"cmdDialogCancel\")";
+            public string Save { get => _save; set { _save = value; } }
+            public string Cancel { get => _cancel; set { _cancel = value; } }
+        }
+        public class FramesReference
+        {
+            #region private
+            private string _ContentPanel = "Frame_ContentPanel";
+            private string _ContentFrameId = "Frame_ContentFrameId";
+            private string _DialogFrame = "Frame_DialogFrame";
+            private string _DialogFrameId = "Frame_DialogFrameId";
+            private string _QuickCreateFrame = "Frame_QuickCreateFrame";
+            private string _QuickCreateFrameId = "Frame_QuickCreateFrameId";
+            private string _WizardFrame = "Frame_WizardFrame";
+            private string _WizardFrameId = "Frame_WizardFrameId";
+            private string _ViewFrameId = "Frame_ViewFrameId";
+            #endregion
+            #region prop
+            public string ContentPanel { get => _ContentPanel; set { _ContentPanel = value; } }
+            public string ContentFrameId { get => _ContentFrameId; set { _ContentFrameId = value; } }
+            public string DialogFrame { get => _DialogFrame; set { _DialogFrame = value; } }
+            public string DialogFrameId { get => _DialogFrameId; set { _DialogFrameId = value; } }
+            public string QuickCreateFrame { get => _QuickCreateFrame; set { _QuickCreateFrame = value; } }
+            public string QuickCreateFrameId { get => _QuickCreateFrameId; set { _QuickCreateFrameId = value; } }
+            public string WizardFrame { get => _WizardFrame; set { _WizardFrame = value; } }
+            public string WizardFrameId { get => _WizardFrameId; set { _WizardFrameId = value; } }
+            public string ViewFrameId { get => _ViewFrameId; set { _ViewFrameId = value; } }
+            #endregion
+
+        }
+        public class RunReportReference
+        {
+            public const string RunReport = "RunReport";
+            private string _header = "crmDialog";
+            private string _confirm = "id(\"butBegin\")";
+            private string _default = "id(\"reportDefault\")";
+            private string _selected = "id(\"reportSelected\")";
+            private string _view = "id(\"reportView\")";
+            public string Header { get => _header; set { _header = value; } }
+            public string Confirm { get => _confirm; set { _confirm = value; } }
+            public string Default { get => _default; set { _default = value; } }
+            public string Selected { get => _selected; set { _selected = value; } }
+            public string View { get => _view; set { _view = value; } }
+        }
+        public class RunWorkflowReference
+        {
+            public const string RunWorkflow = "RunWorkflow";
+            private string _confirm = "id(\"butBegin\")";
+            public string Confirm { get => _confirm; set { _confirm = value; } }
+        }
+        public class SwitchProcessReference
+        {
+            public const string SwitchProcess = "SwitchProcess";
+            private string _process = "ms-crm-ProcessSwitcher-ProcessTitle";
+            private string _selectedRadioButton = "ms-crm-ProcessSwitcher-Process-Selected";
+            public string Process { get => _process; set { _process = value; } }
+            public string SelectedRadioButton { get => _selectedRadioButton; set { _selectedRadioButton = value; } }
+        }
+        #region DTO
+        public class DialogsReference
+        {
+            public const string Dialogs = "Dialogs";
+            public const string AddConnectionReference = "AddConnection";
+            public const string AddUserReference = "AddUser";
+            public const string AssignReference = "Assign";
+            public const string CloseActivityReference = "CloseActivity";
+            public const string CloseOpportunityReference = "CloseOpportunity";
+            public const string DeleteReference = "Delete";
+            public const string DuplicateDetectionReference = "DuplicateDetection";
+            public const string FramesReference = "Frames";
+            public const string RunReportReference = "RunReport";
+            public const string RunWorkflowReference = "RunWorkflow";
+            public const string SwitchProcessReference = "SwitchProcess";
+            #region private
+            private AddConnectionReference _addConnection = new AddConnectionReference();
+            private AddUserReference _addUser = new AddUserReference();
+            private AssignReference _assign = new AssignReference();
+            private CloseActivityReference _closeActivity = new CloseActivityReference();
+            private CloseOpportunityReference _closeOpportunityReference = new CloseOpportunityReference();
+            private DeleteReference _deleteReference = new DeleteReference();
+            private DuplicateDetectionReference _duplicateDetectionReference = new DuplicateDetectionReference();
+            private FramesReference _frames = new FramesReference();
+            private RunReportReference _runReport = new RunReportReference();
+            private RunWorkflowReference _runWorkflow = new RunWorkflowReference();
+            private SwitchProcessReference _switchProcess = new SwitchProcessReference();
+            #endregion
+            #region prop
+            public AddConnectionReference AddConnection { get => _addConnection; set { _addConnection = value; } }
+            public AddUserReference AddUser { get => _addUser; set { _addUser = value; } }
+            public AssignReference Assign { get => _assign; set { _assign = value; } }
+            public CloseActivityReference CloseActivity { get => _closeActivity; set { _closeActivity = value; } }
+            public CloseOpportunityReference CloseOpportunity { get => _closeOpportunityReference; set { _closeOpportunityReference = value; } }
+            public DeleteReference Delete { get => _deleteReference; set { _deleteReference = value; } }
+            public DuplicateDetectionReference DuplicateDetection{ get => _duplicateDetectionReference; set { _duplicateDetectionReference = value; } }
+            public FramesReference Frames { get => _frames; set { _frames = value; } }
+            public RunReportReference RunReport { get => _runReport; set { _runReport = value; } }
+            public RunWorkflowReference RunWorkflow { get => _runWorkflow; set { _runWorkflow = value; } }
+            public SwitchProcessReference SwitchProcess { get => _switchProcess; set { _switchProcess = value; } }
+            #endregion
+ 
+            public string AssignDialogUserTeamLookupResults = "//ul[contains(@data-id,'systemuserview_id.fieldControl-LookupResultsDropdown_systemuserview_id_tab')]";
+            public string AssignDialogOKButton = "//button[contains(@data-id, 'ok_id')]";
+            public string AssignDialogToggle = "//label[contains(@data-id,'rdoMe_id.fieldControl-checkbox-inner-first')]";
+            public string ConfirmButton = "//*[@data-id=\"confirmButton\"]";
+            public string CancelButton = "//*[@data-id=\"cancelButton\"]";
+            public string OkButton = "//*[@id=\"okButton\"]";
+            public string DuplicateDetectionIgnoreSaveButton = "//button[contains(@data-id, 'ignore_save')]";
+            public string DuplicateDetectionCancelButton = "//button[contains(@data-id, 'close_dialog')]";
+            public string PublishConfirmButton = "//*[@data-id=\"ok_id\"]";
+            public string PublishCancelButton = "//*[@data-id=\"cancel_id\"]";
+            public string SetStateDialog = "//div[@data-id=\"SetStateDialog\"]";
+            public string SetStateActionButton = ".//button[@data-id=\"ok_id\"]";
+            public string SetStateCancelButton = ".//button[@data-id=\"cancel_id\"]";
+            public string SwitchProcessDialog = "Entity_SwitchProcessDialog";
+            public string SwitchProcessDialogOK = "//button[contains(@data-id,'ok_id')]";
+            public string ActiveProcessGridControlContainer = "//div[contains(@data-lp-id,'activeProcessGridControlContainer')]";
+            //public string DialogContext = "//div[contains(@role, 'dialog') and @aria-hidden != 'true']";
+            public string DialogContext = "//div[contains(@role, 'dialog') and @aria-modal = 'true']";
+            public string SwitchProcessContainer = "//div[contains(@id,'switchProcess_id-FieldSectionItemContainer')]";
+
+            public string Header = "id(\"dialogHeaderTitle\")";
+            public string DeleteHeader = "id(\"tdDialogHeader\")";
+            public string WorkflowHeader = "id(\"DlgHdContainer\")";
+            public string ProcessFlowHeader = "id(\"processSwitcherFlyout\")";
+            public string AddConnectionHeader = "id(\"EntityTemplateTab.connection.NoRelationship.Form.Mscrm.Form.connection.MainTab-title\")";
+            public string WarningFooter = "//*[@id=\"crmDialogFooter\"]";
+            public string WarningCloseButton = "//*[@id=\"butBegin\"]";
         }
         #endregion
         #region prop
@@ -363,9 +456,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Find the button in the CommandBar
                 IWebElement ribbon;
                 // Checking if any dialog is active
-                if (driver.HasElement(By.XPath(string.Format(DialogsReference.DialogContext))))
+                if (driver.HasElement(By.XPath(string.Format(_client.ElementMapper.DialogsReference.DialogContext))))
                 {
-                    var dialogContainer = driver.FindElement(By.XPath(string.Format(DialogsReference.DialogContext)));
+                    var dialogContainer = driver.FindElement(By.XPath(string.Format(_client.ElementMapper.DialogsReference.DialogContext)));
                     ribbon = dialogContainer.WaitUntilAvailable(By.XPath(string.Format(_client.ElementMapper.CommandBarReference.Container)));
                 }
                 else
@@ -459,15 +552,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (inlineDialog)
                 {
                     //Wait until the buttons are available to click
-                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(DialogsReference.OkButton));
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.DialogsReference.OkButton));
 
                     if (
-                        !(dialogFooter?.FindElements(By.XPath(DialogsReference.OkButton)).Count >
+                        !(dialogFooter?.FindElements(By.XPath(_client.ElementMapper.DialogsReference.OkButton)).Count >
                           0)) return true;
 
                     //Click the Confirm or Cancel button
                     IWebElement buttonToClick;
-                    buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.OkButton));
+                    buttonToClick = dialogFooter.FindElement(By.XPath(_client.ElementMapper.DialogsReference.OkButton));
                     buttonToClick.Click();
                 }
 
@@ -483,13 +576,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.Browser.Driver.SwitchTo().DefaultContent();
 
             // Check to see if dialog is InlineDialog or popup
-            var inlineDialog = _client.Browser.Driver.HasElement(By.XPath(DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index)));
+            var inlineDialog = _client.Browser.Driver.HasElement(By.XPath(_client.ElementMapper.DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index)));
             if (inlineDialog)
             {
                 //wait for the content panel to render
-                _client.Browser.Driver.WaitUntilAvailable(By.XPath(DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index)),
+                _client.Browser.Driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index)),
                     TimeSpan.FromSeconds(2),
-                    d => { _client.Browser.Driver.SwitchTo().Frame(DialogsReference.Frames.DialogFrameId.Replace("[INDEX]", index)); });
+                    d => { _client.Browser.Driver.SwitchTo().Frame(_client.ElementMapper.DialogsReference.Frames.DialogFrameId.Replace("[INDEX]", index)); });
                 return true;
             }
             else
@@ -511,12 +604,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var inlineDialog = this.SwitchToDialog();
                 if (inlineDialog)
                 {
-                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(DialogsReference.WarningFooter));
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.DialogsReference.WarningFooter));
 
                     if (
-                        !(dialogFooter?.FindElements(By.XPath(DialogsReference.WarningCloseButton)).Count >
+                        !(dialogFooter?.FindElements(By.XPath(_client.ElementMapper.DialogsReference.WarningCloseButton)).Count >
                           0)) return true;
-                    var closeBtn = dialogFooter.FindElement(By.XPath(DialogsReference.WarningCloseButton));
+                    var closeBtn = dialogFooter.FindElement(By.XPath(_client.ElementMapper.DialogsReference.WarningCloseButton));
                     closeBtn.Click();
                 }
 
@@ -537,18 +630,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (inlineDialog)
                 {
                     //Wait until the buttons are available to click
-                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(DialogsReference.ConfirmButton));
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.DialogsReference.ConfirmButton));
 
                     if (
-                        !(dialogFooter?.FindElements(By.XPath(DialogsReference.ConfirmButton)).Count >
+                        !(dialogFooter?.FindElements(By.XPath(_client.ElementMapper.DialogsReference.ConfirmButton)).Count >
                           0)) return true;
 
                     //Click the Confirm or Cancel button
                     IWebElement buttonToClick;
                     if (ClickConfirmButton)
-                        buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.ConfirmButton));
+                        buttonToClick = dialogFooter.FindElement(By.XPath(_client.ElementMapper.DialogsReference.ConfirmButton));
                     else
-                        buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.CancelButton));
+                        buttonToClick = dialogFooter.FindElement(By.XPath(_client.ElementMapper.DialogsReference.CancelButton));
 
                     buttonToClick.Click();
                 }
@@ -579,18 +672,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (inlineDialog)
                 {
                     //Wait until the buttons are available to click
-                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(DialogsReference.DuplicateDetectionIgnoreSaveButton));
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.DialogsReference.DuplicateDetectionIgnoreSaveButton));
 
                     if (
-                        !(dialogFooter?.FindElements(By.XPath(DialogsReference.DuplicateDetectionIgnoreSaveButton)).Count >
+                        !(dialogFooter?.FindElements(By.XPath(_client.ElementMapper.DialogsReference.DuplicateDetectionIgnoreSaveButton)).Count >
                           0)) return true;
 
                     //Click the Confirm or Cancel button
                     IWebElement buttonToClick;
                     if (clickSaveOrCancel)
-                        buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.DuplicateDetectionIgnoreSaveButton));
+                        buttonToClick = dialogFooter.FindElement(By.XPath(_client.ElementMapper.DialogsReference.DuplicateDetectionIgnoreSaveButton));
                     else
-                        buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.DuplicateDetectionCancelButton));
+                        buttonToClick = dialogFooter.FindElement(By.XPath(_client.ElementMapper.DialogsReference.DuplicateDetectionCancelButton));
 
                     buttonToClick.Click();
                 }
@@ -618,7 +711,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (inlineDialog)
                 {
                     //Wait until the buttons are available to click
-                    var dialog = driver.WaitUntilAvailable(By.XPath(DialogsReference.SetStateDialog));
+                    var dialog = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.DialogsReference.SetStateDialog));
 
                     if (
                         !(dialog?.FindElements(By.TagName("button")).Count >
@@ -627,9 +720,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     //Click the Activate/Deactivate or Cancel button
                     IWebElement buttonToClick;
                     if (clickOkButton)
-                        buttonToClick = dialog.FindElement(By.XPath(DialogsReference.SetStateActionButton));
+                        buttonToClick = dialog.FindElement(By.XPath(_client.ElementMapper.DialogsReference.SetStateActionButton));
                     else
-                        buttonToClick = dialog.FindElement(By.XPath(DialogsReference.SetStateCancelButton));
+                        buttonToClick = dialog.FindElement(By.XPath(_client.ElementMapper.DialogsReference.SetStateCancelButton));
 
                     buttonToClick.Click();
                 }
@@ -651,18 +744,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (inlineDialog)
                 {
                     //Wait until the buttons are available to click
-                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(DialogsReference.PublishConfirmButton));
+                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.DialogsReference.PublishConfirmButton));
 
                     if (
-                        !(dialogFooter?.FindElements(By.XPath(DialogsReference.PublishConfirmButton)).Count >
+                        !(dialogFooter?.FindElements(By.XPath(_client.ElementMapper.DialogsReference.PublishConfirmButton)).Count >
                           0)) return true;
 
                     //Click the Confirm or Cancel button
                     IWebElement buttonToClick;
                     if (ClickConfirmButton)
-                        buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.PublishConfirmButton));
+                        buttonToClick = dialogFooter.FindElement(By.XPath(_client.ElementMapper.DialogsReference.PublishConfirmButton));
                     else
-                        buttonToClick = dialogFooter.FindElement(By.XPath(DialogsReference.PublishCancelButton));
+                        buttonToClick = dialogFooter.FindElement(By.XPath(_client.ElementMapper.DialogsReference.PublishCancelButton));
 
                     buttonToClick.Click();
                 }
@@ -688,11 +781,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (to == Dialogs.AssignTo.Me)
                 {
                     //SetValue(new OptionSet { Name = Elements.ElementId[Reference.Dialogs.Assign.AssignToId], Value = "Me" }, FormContextType.Dialog);
-                    OptionSet.SetValue(_client, new OptionSet { Name = Dialogs.DialogsReference.Assign.AssignToId, Value = "Me" }, FormContextType.Dialog);
+                    OptionSet.SetValue(_client, new OptionSet { Name = _client.ElementMapper.DialogsReference.Assign.AssignToId, Value = "Me" }, FormContextType.Dialog);
                 }
                 else
                 {
-                    OptionSet.SetValue(_client, new OptionSet { Name = DialogsReference.Assign.AssignToId, Value = "User or team" }, FormContextType.Dialog);
+                    OptionSet.SetValue(_client, new OptionSet { Name = _client.ElementMapper.DialogsReference.Assign.AssignToId, Value = "User or team" }, FormContextType.Dialog);
 
                     //Set the User Or Team
                     var userOrTeamField = driver.WaitUntilAvailable(By.XPath(entityReference.TextFieldLookup), "User field unavailable");
@@ -702,7 +795,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     _client.ThinkTime(2000);
 
                     //Pick the User from the list
-                    var container = driver.WaitUntilVisible(By.XPath(DialogsReference.AssignDialogUserTeamLookupResults));
+                    var container = driver.WaitUntilVisible(By.XPath(_client.ElementMapper.DialogsReference.AssignDialogUserTeamLookupResults));
                     container.WaitUntil(
                         c => c.FindElements(By.TagName("li")).FirstOrDefault(r => r.Text.StartsWith(userOrTeamName, StringComparison.OrdinalIgnoreCase)),
                         successCallback: e => e.Click(true),
@@ -710,7 +803,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 //Click Assign
-                driver.ClickWhenAvailable(By.XPath(DialogsReference.AssignDialogOKButton), TimeSpan.FromSeconds(5),
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.DialogsReference.AssignDialogOKButton), TimeSpan.FromSeconds(5),
                     "Unable to click the OK button in the assign dialog");
 
                 return true;
@@ -722,10 +815,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Switch Process Dialog"), driver =>
             {
                 //Wait for the Grid to load
-                driver.WaitUntilVisible(By.XPath(DialogsReference.ActiveProcessGridControlContainer));
+                driver.WaitUntilVisible(By.XPath(_client.ElementMapper.DialogsReference.ActiveProcessGridControlContainer));
 
                 //Select the Process
-                var popup = driver.FindElement(By.XPath(DialogsReference.SwitchProcessContainer));
+                var popup = driver.FindElement(By.XPath(_client.ElementMapper.DialogsReference.SwitchProcessContainer));
                 var labels = popup.FindElements(By.TagName("label"));
                 foreach (var label in labels)
                 {
@@ -737,7 +830,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 //Click the OK button
-                var okBtn = driver.FindElement(By.XPath(DialogsReference.SwitchProcessDialogOK));
+                var okBtn = driver.FindElement(By.XPath(_client.ElementMapper.DialogsReference.SwitchProcessDialogOK));
                 okBtn.Click();
 
                 return true;
@@ -753,11 +846,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (inlineDialog)
                 {
                     //Close Opportunity
-                    var xPath = DialogsReference.CloseOpportunity.Ok;
+                    var xPath = _client.ElementMapper.DialogsReference.CloseOpportunity.Ok;
 
                     //Cancel
                     if (!clickOK)
-                        xPath = DialogsReference.CloseOpportunity.Ok;
+                        xPath = _client.ElementMapper.DialogsReference.CloseOpportunity.Ok;
 
                     driver.ClickWhenAvailable(By.XPath(xPath), TimeSpan.FromSeconds(5), "The Close Opportunity dialog is not available.");
                 }

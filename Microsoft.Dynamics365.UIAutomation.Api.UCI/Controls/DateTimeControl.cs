@@ -100,7 +100,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (formContextType == FormContextType.Dialog)
             {
                 // Initialize the Header context
-                formContext = container.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext), new TimeSpan(0, 0, 1));
+                formContext = container.WaitUntilAvailable(By.XPath(client.ElementMapper.DialogsReference.DialogContext), new TimeSpan(0, 0, 1));
             }
 
             client.Browser.Driver.WaitForTransaction();
@@ -242,7 +242,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             else if (formContextType == FormContextType.Dialog)
             {
                 // Initialize the Dialog context
-                var formContext = driver.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext));
+                var formContext = driver.WaitUntilAvailable(By.XPath(client.ElementMapper.DialogsReference.DialogContext));
                 fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
                 var strExpanded = fieldContainer.GetAttribute("aria-expanded");

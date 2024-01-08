@@ -291,14 +291,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.ThinkTime(thinkTime);
 
             var xPathQuery = closeOrCancel
-                ? Dialogs.DialogsReference.CloseActivity.Close
-                : Dialogs.DialogsReference.CloseActivity.Cancel;
+                ? _client.ElementMapper.DialogsReference.CloseActivity.Close
+                : _client.ElementMapper.DialogsReference.CloseActivity.Cancel;
 
             var action = closeOrCancel ? "Close" : "Cancel";
 
             return _client.Execute(_client.GetOptions($"{action} Activity"), driver =>
             {
-                var dialog = driver.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext));
+                var dialog = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.DialogsReference.DialogContext));
 
                 var actionButton = dialog.FindElement(By.XPath(xPathQuery));
 

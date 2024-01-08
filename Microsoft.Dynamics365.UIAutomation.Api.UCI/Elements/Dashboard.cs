@@ -14,9 +14,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             public const string Dashboard = "Dashboard";
             #region private
-            public string _DashboardSelector = "//span[contains(@id, 'Dashboard_Selector')]";
-            public string _DashboardItem = "//li[contains(@title, '[NAME]')]";
-            public string _DashboardItemUCI = "//li[contains(@data-text, '[NAME]')]";
+            private string _DashboardSelector = "//span[contains(@id, 'Dashboard_Selector')]";
+            private string _DashboardItem = "//li[contains(@title, '[NAME]')]";
+            private string _DashboardItemUCI = "//li[contains(@data-text, '[NAME]')]";
             #endregion
             #region prop
             public string DashboardSelector { get => _DashboardSelector; set { _DashboardSelector = value; } }

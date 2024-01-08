@@ -5,8 +5,41 @@
   "CommandBar": {
 
   },
+  "Dashboard": {
+  },
+  "Dialogs": {
+    "AddConnection": {
+    },
+    "AddUser": {
+
+    },
+    "Assign": {
+
+    },
+    "CloseOpportunity": {
+
+    },
+    "Delete": {
+
+    },
+    "DuplicateDetection" {
+
+    },
+    "Frames": {
+
+    },
+    "RunReport": {
+
+    },
+    "RunWorkflow": {
+
+    },
+    "SwitchProcess": {
+
+    }
+  },
   "Entity": {
-    "Form": "//*[contains(@id, \"tablist\")]",
+    "Form": "//*[contains(@id, \"tablist1\")]",
     "TextFieldLookupFieldContainer": ".//div[contains(@data-id,'[NAME].fieldControl-Lookup_[NAME]')]",
     "DuplicateDetectionWindowMarker": "//div[contains(@data-id,'ManageDuplicates')]"
   },

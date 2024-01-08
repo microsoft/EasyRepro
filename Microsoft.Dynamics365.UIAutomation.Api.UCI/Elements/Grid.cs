@@ -275,6 +275,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 driver.WaitForTransaction();
                 Trace.WriteLine("Click Record transaction complete.");
+                if (driver.HasElement(By.XPath("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']"))){
+                    Trace.WriteLine(String.Format("Found {0} Clickable Teaching Bubbles.", driver.FindElements(By.XPath("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']")).Count));
+                    foreach (var item in driver.FindElements(By.XPath("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']")))
+                    {
+                        item.Click();
+                    }
+                }
                 return true;
             });
         }

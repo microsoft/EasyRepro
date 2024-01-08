@@ -57,6 +57,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             private string _FieldControlDateTimeTimeInputUCI = ".//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input";
             private string _Delete = "//button[contains(@data-id,'Delete')]";
             private string _Assign = "//button[contains(@data-id,'Assign')]";
+            private string _MoreCommands = ".//button[contains(@data-id, 'OverflowButton') and contains(@data-lp-id, 'Form')]";
             private string _SwitchProcess = "//button[contains(@data-id,'SwitchProcess')]";
             private string _CloseOpportunityWin = "//button[contains(@data-id,'MarkAsWon')]";
             private string _CloseOpportunityLoss = "//button[contains(@data-id,'MarkAsLost')]";
@@ -138,6 +139,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public string FieldControlDateTimeTimeInputUCI { get => _FieldControlDateTimeTimeInputUCI; set { _FieldControlDateTimeTimeInputUCI = value; } }
             public string Delete { get => _Delete; set { _Delete = value; } }
             public string Assign { get => _Assign; set { _Assign = value; } }
+            public string MoreCommands { get => _MoreCommands; set { _MoreCommands = value; } }
             public string SwitchProcess { get => _SwitchProcess; set { _SwitchProcess = value; } }
             public string CloseOpportunityWin { get => _CloseOpportunityWin; set { _CloseOpportunityWin = value; } }
             public string CloseOpportunityLoss { get => _CloseOpportunityLoss; set { _CloseOpportunityLoss = value; } }
@@ -804,9 +806,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute($"Select Tab", driver =>
             {
                 IWebElement tabList;
-                if (driver.HasElement(By.XPath(Dialogs.DialogsReference.DialogContext)))
+                if (driver.HasElement(By.XPath(_client.ElementMapper.DialogsReference.DialogContext)))
                 {
-                    var dialogContainer = driver.FindElement(By.XPath(Dialogs.DialogsReference.DialogContext));
+                    var dialogContainer = driver.FindElement(By.XPath(_client.ElementMapper.DialogsReference.DialogContext));
                     tabList = dialogContainer.WaitUntilAvailable(By.XPath(this._entityReference.TabList));
                 }
                 else

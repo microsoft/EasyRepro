@@ -74,9 +74,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Find the button in the CommandBar
                 IWebElement ribbon;
                 // Checking if any dialog is active
-                if (driver.HasElement(By.XPath(string.Format(Dialogs.DialogsReference.DialogContext))))
+                if (driver.HasElement(By.XPath(string.Format(_client.ElementMapper.DialogsReference.DialogContext))))
                 {
-                    var dialogContainer = driver.FindElement(By.XPath(string.Format(Dialogs.DialogsReference.DialogContext)));
+                    var dialogContainer = driver.FindElement(By.XPath(string.Format(_client.ElementMapper.DialogsReference.DialogContext)));
                     ribbon = dialogContainer.WaitUntilAvailable(By.XPath(string.Format(_client.ElementMapper.CommandBarReference.Container)));
                 }
                 else
@@ -104,6 +104,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (ribbon.TryFindElement(By.XPath(RelatedGrid.RelatedReference.CommandBarOverflowButton), out var moreCommands))
                     {
                         // Click More Commands
+                        moreCommands.Click(true);
+                        driver.WaitForTransaction();
+
+                        //Click the button
+                        var flyOutMenu = driver.WaitUntilAvailable(By.XPath(RelatedGrid.RelatedReference.CommandBarFlyoutButtonList)); ;
+                        if (flyOutMenu.TryFindElement(By.XPath(SubGrid.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
+                        {
+                            overflowCommand.Click(true);
+                            driver.WaitForTransaction();
+                        }
+                        else
+                            throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar or the flyout menu.");
+                    }
+                    else if (ribbon.TryFindElement(By.XPath(_client.ElementMapper.EntityReference.MoreCommands), out moreCommands))
+                    {
                         moreCommands.Click(true);
                         driver.WaitForTransaction();
 
@@ -256,7 +271,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var closeBtn = driver.WaitUntilAvailable(By.XPath(xPathQuery), "Opportunity Close Button is not available");
 
                 closeBtn?.Click();
-                driver.WaitUntilVisible(By.XPath(Dialogs.DialogsReference.CloseOpportunity.Ok));
+                driver.WaitUntilVisible(By.XPath(_client.ElementMapper.DialogsReference.CloseOpportunity.Ok));
                 Dialogs dialogs = new Dialogs(_client);
                 dialogs.CloseOpportunityDialog(true);
 
@@ -274,7 +289,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.CloseDateId], closeDate);
                 //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
 
-                driver.ClickWhenAvailable(By.XPath(Dialogs.DialogsReference.CloseOpportunity.Ok),
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.DialogsReference.CloseOpportunity.Ok),
     TimeSpan.FromSeconds(5),
     "The Close Opportunity dialog is not available."
     );

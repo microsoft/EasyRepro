@@ -88,7 +88,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else if (formContextType == FormContextType.Dialog)
                 {
                     // Initialize the Header context
-                    var formContext = driver.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext));
+                    var formContext = driver.WaitUntilAvailable(By.XPath(client.ElementMapper.DialogsReference.DialogContext));
                     fieldContainer = formContext.WaitUntilAvailable(By.XPath(MultiSelect.DivContainer.Replace("[NAME]", option.Name)));
                 }
 
@@ -153,8 +153,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else if (formContextType == FormContextType.Dialog)
                     {
                         // Initialize the Header context
-                        var formContext = driver.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext));
-                        fieldContainer = formContext.WaitUntilAvailable(By.XPath(Dialogs.DialogsReference.DialogContext.Replace("[NAME]", option.Name)));
+                        var formContext = driver.WaitUntilAvailable(By.XPath(client.ElementMapper.DialogsReference.DialogContext));
+                        fieldContainer = formContext.WaitUntilAvailable(By.XPath(client.ElementMapper.DialogsReference.DialogContext.Replace("[NAME]", option.Name)));
                     }
 
                     var inputXPath = By.XPath(MultiSelect.InputSearch);
