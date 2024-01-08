@@ -21,6 +21,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
     public class ElementMapper
     {
+        public Lookup.AdvancedLookupReference AdvancedLookupReference;
         public BusinessProcessFlow.BusinessProcessFlowReference BusinessProcessFlowReference;
         public CommandBar.CommandBarReference CommandBarReference;
         public Dashboard.DashboardReference DashboardReference;
@@ -30,7 +31,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public Grid.GridReference GridReference;
         public Lookup.LookupReference LookupReference;
         public ElementMapper(IConfiguration config) {
-
+            AdvancedLookupReference = new Lookup.AdvancedLookupReference();
+            config.GetSection(Lookup.AdvancedLookupReference.AdvancedLookup).Bind(AdvancedLookupReference);
             BusinessProcessFlowReference = new BusinessProcessFlow.BusinessProcessFlowReference();
             config.GetSection(BusinessProcessFlow.BusinessProcessFlowReference.BusinessProcessFlow).Bind(BusinessProcessFlowReference);
             CommandBarReference = new CommandBar.CommandBarReference();
@@ -43,7 +45,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             config.GetSection(Entity.EntityReference.Entity).Bind(EntityReference);
             GlobalSearchReference = new GlobalSearch.GlobalSearchReference();
             config.GetSection(GlobalSearch.GlobalSearchReference.GlobalSearch).Bind(GlobalSearchReference);
-
+            LookupReference = new Lookup.LookupReference();
+            config.GetSection(GlobalSearch.GlobalSearchReference.GlobalSearch).Bind(GlobalSearchReference);
             GridReference = new Grid.GridReference();
             config.GetSection(Grid.GridReference.Grid).Bind(GridReference);
         }
