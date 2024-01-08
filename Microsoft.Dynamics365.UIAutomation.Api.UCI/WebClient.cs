@@ -34,6 +34,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public Lookup.LookupReference LookupReference;
         public Navigation.NavigationReference NavigationReference;
         public PowerApp.PowerAppReference PowerAppReference;
+        public QuickCreate.QuickCreateReference QuickCreateReference;
+        public RelatedGrid.RelatedReference RelatedGridReference;
         public ElementMapper(IConfiguration config) {
             ApplicationReference = new Navigation.ApplicationReference();
             config.GetSection(Navigation.ApplicationReference.Application).Bind(ApplicationReference);
@@ -61,6 +63,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             config.GetSection(Navigation.NavigationReference.Navigation).Bind(NavigationReference);
             PowerAppReference = new PowerApp.PowerAppReference();
             config.GetSection(PowerApp.PowerAppReference.PowerApp).Bind(PowerAppReference);
+            QuickCreateReference = new QuickCreate.QuickCreateReference();
+            config.GetSection(QuickCreate.QuickCreateReference.QuickCreate).Bind(QuickCreateReference);
+            RelatedGridReference = new RelatedGrid.RelatedReference();
+            config.GetSection(RelatedGrid.RelatedReference.RelatedGrid).Bind(RelatedGridReference);
         }
     }
     public class WebClient : BrowserPage, IDisposable
@@ -68,6 +74,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public List<ICommandResult> CommandResults => Browser.CommandResults;
         public Guid ClientSessionId;
         internal ElementMapper ElementMapper;
+        internal IConfiguration Configuration;
         private Entity.EntityReference _entityReference;
         public WebClient(BrowserOptions options)
         {
@@ -75,7 +82,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             builder.AddJsonFile(options.ConfigPath);
             Browser = new InteractiveBrowser(options);
             ClientSessionId = Guid.NewGuid();
-            ElementMapper = new ElementMapper(builder.Build());
+            Configuration = builder.Build();
+            ElementMapper = new ElementMapper(Configuration);
             _entityReference = new Entity.EntityReference();
         }
 
@@ -137,7 +145,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 // Initialize the quick create form context
                 // If this is not done -- element input will go to the main form due to new flyout design
-                var formContext = driver.WaitUntilAvailable(By.XPath(QuickCreate.QuickCreateReference.QuickCreateFormContext));
+                var formContext = driver.WaitUntilAvailable(By.XPath(this.ElementMapper.QuickCreateReference.QuickCreateFormContext));
                 fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
             }
             else if (formContextType == FormContextType.Entity)

@@ -80,7 +80,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //IWebDriver formContext;
                 // Initialize the quick create form context
                 // If this is not done -- element input will go to the main form due to new flyout design
-                formContext = container.WaitUntilAvailable(By.XPath(QuickCreateReference.QuickCreateFormContext), new TimeSpan(0, 0, 1));
+                formContext = container.WaitUntilAvailable(By.XPath(client.ElementMapper.QuickCreateReference.QuickCreateFormContext), new TimeSpan(0, 0, 1));
             }
             else if (formContextType == FormContextType.Entity)
             {
@@ -190,7 +190,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 // Initialize the quick create form context
                 // If this is not done -- element input will go to the main form due to new flyout design
-                var formContext = container.WaitUntilAvailable(By.XPath(QuickCreateReference.QuickCreateFormContext));
+                var formContext = container.WaitUntilAvailable(By.XPath(client.ElementMapper.QuickCreateReference.QuickCreateFormContext));
                 fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
                 var strExpanded = fieldContainer.GetAttribute("aria-expanded");

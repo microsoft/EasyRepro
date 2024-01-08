@@ -101,14 +101,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                 {
                     //Is the button in More Commands?
-                    if (ribbon.TryFindElement(By.XPath(RelatedGrid.RelatedReference.CommandBarOverflowButton), out var moreCommands))
+                    if (ribbon.TryFindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton), out var moreCommands))
                     {
                         // Click More Commands
                         moreCommands.Click(true);
                         driver.WaitForTransaction();
 
                         //Click the button
-                        var flyOutMenu = driver.WaitUntilAvailable(By.XPath(RelatedGrid.RelatedReference.CommandBarFlyoutButtonList)); ;
+                        var flyOutMenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList)); ;
                         if (flyOutMenu.TryFindElement(By.XPath(SubGrid.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
                         {
                             overflowCommand.Click(true);
@@ -123,7 +123,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         driver.WaitForTransaction();
 
                         //Click the button
-                        var flyOutMenu = driver.WaitUntilAvailable(By.XPath(RelatedGrid.RelatedReference.CommandBarFlyoutButtonList)); ;
+                        var flyOutMenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList)); ;
                         if (flyOutMenu.TryFindElement(By.XPath(SubGrid.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
                         {
                             overflowCommand.Click(true);

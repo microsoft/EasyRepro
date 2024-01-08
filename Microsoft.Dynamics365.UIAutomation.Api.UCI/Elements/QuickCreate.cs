@@ -10,12 +10,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     {
 
         #region DTO
-        public static class QuickCreateReference
+        public class QuickCreateReference
         {
-            public static string QuickCreateFormContext = "//section[contains(@data-id,'quickCreateRoot')]";
-            public static string SaveButton = "//button[contains(@id,'quickCreateSaveBtn')]";
-            public static string SaveAndCloseButton = "//button[contains(@id,'quickCreateSaveAndCloseBtn')]";
-            public static string CancelButton = "//button[contains(@id,'quickCreateCancelBtn')]";
+            public const string QuickCreate = "QuickCreate";
+            private string _quickCreateFormContext = "//section[contains(@data-id,'quickCreateRoot')]";
+            private string _saveButton = "//button[contains(@id,'quickCreateSaveBtn')]";
+            private string _saveAndCloseButton = "//button[contains(@id,'quickCreateSaveAndCloseBtn')]";
+            private string _cancelButton = "//button[contains(@id,'quickCreateCancelBtn')]";
+
+            public string QuickCreateFormContext { get => _quickCreateFormContext; set { _quickCreateFormContext = value; } }
+            public string SaveButton { get => _saveButton; set { _saveButton = value; } }
+            public string SaveAndCloseButton { get => _saveAndCloseButton; set { _saveAndCloseButton = value; } }
+            public string CancelButton { get => _cancelButton; set { _cancelButton = value; } }
         }
         #endregion
         private readonly WebClient _client;
