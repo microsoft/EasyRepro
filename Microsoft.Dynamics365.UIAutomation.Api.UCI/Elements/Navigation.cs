@@ -4,6 +4,7 @@ using Microsoft.Dynamics365.UIAutomation.Browser;
 using OpenQA.Selenium;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Web;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
@@ -11,51 +12,93 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     public class Navigation : Element
     {
         #region DTO
-        public static class Application
+        public class ApplicationReference
         {
-            public static string Shell = "//*[@id=\"ApplicationShell\"]";
+            public const string Application = "Application";
+            private string _shell = "//*[@id=\"ApplicationShell\"]";
+            public string Shell { get => _shell; set { _shell = value; } }
         }
-        public static class NavigationReference
+        public class NavigationReference
         {
-            public static string AreaButton = "//button[@id='areaSwitcherId']";
-            public static string AreaMenu = "//*[@data-lp-id='sitemap-area-switcher-flyout']";
-            public static string AreaMoreMenu = "//ul[@role=\"menubar\"]";
-            public static string SubAreaContainer = "//*[@data-id=\"navbar-container\"]/div/ul";
-            public static string WebAppMenuButton = "//*[@id=\"TabArrowDivider\"]/a";
-            public static string UCIAppMenuButton = "//a[@data-id=\"appBreadCrumb\"]";
-            public static string SiteMapLauncherButton = "//button[@data-lp-id=\"sitemap-launcher\"]";
-            public static string SiteMapLauncherCloseButton = "//button[@data-id='navbutton']";
-            public static string SiteMapAreaMoreButton = "//li[translate(@data-text,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = '[NAME]']";
-            public static string SiteMapSingleArea = "//*[@id=\"taskpane-scroll-container\"]";
-            public static string AppMenuContainer = "//button[@data-id='[NAME]Launcher']";
-            public static string SettingsLauncherBar = "//button[@data-id='[NAME]Launcher']";
-            public static string SettingsLauncher = "//ul[@data-id='[NAME]Launcher']";
-            //public static string SettingsLauncher = "//button[@data-id='[NAME]Launcher']";
-            public static string AccountManagerButton = "//*[@id=\"mectrl_main_trigger\"]";
-            public static string AccountManagerSignOutButton = "//*[@id=\"mectrl_body_signOut\"]";
-            public static string GuidedHelp = "//*[@id=\"helpLauncher\"]/button";
-            public static string AdminPortal = "//*[contains(@data-id,'officewaffle')]";
-            public static string AdminPortalButton = "//*[@id=(\"O365_AppTile_Admin\")]";
-            public static string SearchButton = "//*[@id=\"searchLauncher\"]/button";
-            public static string Search = "//*[@id=\"categorizedSearchInputAndButton\"]";
-            public static string QuickLaunchMenu = "//div[contains(@data-id,'quick-launch-bar')]";
-            public static string QuickLaunchButton = "//li[contains(@title, '[NAME]')]";
-            public static string QuickCreateButton = "//button[contains(@data-id,'quickCreateLauncher')]";
-            public static string QuickCreateMenuList = "//ul[contains(@id,'MenuSectionItemsquickCreate')]";
-            public static string QuickCreateMenuItems = "//button[@role='menuitem']";
-            public static string PinnedSitemapEntity = "//li[contains(@data-id,'sitemap-entity-Pinned') and contains(@role,'treeitem')]";
-            public static string SitemapMenuGroup = "//ul[@role=\"group\"]";
-            public static string SitemapMenuItems = "//li[contains(@data-id,'sitemap-entity')]";
-            public static string SitemapSwitcherButton = "//button[contains(@data-id,'sitemap-areaSwitcher-expand-btn')]";
-            public static string SitemapSwitcherFlyout = "//div[contains(@data-lp-id,'sitemap-area-switcher-flyout')]";
-            public static string UCIAppContainer = "//div[@id='AppLandingPageContentContainer']";
-            public static string UCIAppTile = "//div[@data-type='app-title' and @title='[NAME]']";
-            public static string GoBack = "//button[@title='Go back']";
+            public const string Navigation = "Navigation";
+            #region private
+            private string _AreaButton = "//button[@id='areaSwitcherId']";
+            private string _AreaMenu = "//*[@data-lp-id='sitemap-area-switcher-flyout']";
+            private string _AreaMoreMenu = "//ul[@role=\"menubar\"]";
+            private string _SubAreaContainer = "//*[@data-id=\"navbar-container\"]/div/ul";
+            private string _WebAppMenuButton = "//*[@id=\"TabArrowDivider\"]/a";
+            private string _UCIAppMenuButton = "//a[@data-id=\"appBreadCrumb\"]";
+            private string _SiteMapLauncherButton = "//button[@data-lp-id=\"sitemap-launcher\"]";
+            private string _SiteMapLauncherCloseButton = "//button[@data-id='navbutton']";
+            private string _SiteMapAreaMoreButton = "//li[translate(@data-text,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = '[NAME]']";
+            private string _SiteMapSingleArea = "//*[@id=\"taskpane-scroll-container\"]";
+            private string _AppMenuContainer = "//button[@data-id='[NAME]Launcher']";
+            private string _SettingsLauncherBar = "//button[@data-id='[NAME]Launcher']";
+            private string _SettingsLauncher = "//ul[@data-id='[NAME]Launcher']";
+            //private string SettingsLauncher = "//button[@data-id='[NAME]Launcher']";
+            private string _AccountManagerButton = "//*[@id=\"mectrl_main_trigger\"]";
+            private string _AccountManagerSignOutButton = "//*[@id=\"mectrl_body_signOut\"]";
+            private string _GuidedHelp = "//*[@id=\"helpLauncher\"]/button";
+            private string _AdminPortal = "//*[contains(@data-id,'officewaffle')]";
+            private string _AdminPortalButton = "//*[@id=(\"O365_AppTile_Admin\")]";
+            private string _SearchButton = "//*[@id=\"searchLauncher\"]/button";
+            private string _Search = "//*[@id=\"categorizedSearchInputAndButton\"]";
+            private string _QuickLaunchMenu = "//div[contains(@data-id,'quick-launch-bar')]";
+            private string _QuickLaunchButton = "//li[contains(@title, '[NAME]')]";
+            private string _QuickCreateButton = "//button[contains(@data-id,'quickCreateLauncher')]";
+            private string _QuickCreateMenuList = "//ul[contains(@id,'MenuSectionItemsquickCreate')]";
+            private string _QuickCreateMenuItems = "//button[@role='menuitem']";
+            private string _PinnedSitemapEntity = "//li[contains(@data-id,'sitemap-entity-Pinned') and contains(@role,'treeitem')]";
+            private string _SitemapMenuGroup = "//ul[@role=\"group\"]";
+            private string _SitemapMenuItems = "//li[contains(@data-id,'sitemap-entity')]";
+            private string _SitemapSwitcherButton = "//button[contains(@data-id,'sitemap-areaSwitcher-expand-btn')]";
+            private string _SitemapSwitcherFlyout = "//div[contains(@data-lp-id,'sitemap-area-switcher-flyout')]";
+            private string _UCIAppContainer = "//div[@id='AppLandingPageContentContainer']";
+            private string _UCIAppTile = "//div[@data-type='app-title' and @title='[NAME]']";
+            private string _GoBack = "//button[@title='Go back']";
+            #endregion
+            public string AreaButton { get => _AreaButton; set { _AreaButton = value; } }
+            public string AreaMenu { get => _AreaMenu; set { _AreaMenu = value; } }
+            public string AreaMoreMenu { get => _AreaMoreMenu; set { _AreaMoreMenu = value; } }
+            public string SubAreaContainer { get => _SubAreaContainer; set { _SubAreaContainer = value; } }
+            public string WebAppMenuButton { get => _WebAppMenuButton; set { _WebAppMenuButton = value; } }
+            public string UCIAppMenuButton { get => _UCIAppMenuButton; set { _UCIAppMenuButton = value; } }
+            public string SiteMapLauncherButton { get => _SiteMapLauncherButton; set { _SiteMapLauncherButton = value; } }
+            public string SiteMapLauncherCloseButton { get => _SiteMapLauncherCloseButton; set { _SiteMapLauncherCloseButton = value; } }
+            public string SiteMapAreaMoreButton { get => _SiteMapAreaMoreButton; set { _SiteMapAreaMoreButton = value; } }
+            public string SiteMapSingleArea { get => _SiteMapSingleArea; set { _SiteMapSingleArea = value; } }
+            public string AppMenuContainer { get => _AppMenuContainer; set { _AppMenuContainer = value; } }
+            public string SettingsLauncherBar { get => _SettingsLauncherBar; set { _SettingsLauncherBar = value; } }
+            public string SettingsLauncher { get => _SettingsLauncher; set { _SettingsLauncher = value; } }
+            //public string SettingsLauncher = "//button[@data-id='[NAME]Launcher']";
+            public string AccountManagerButton { get => _AccountManagerButton; set { _AccountManagerButton = value; } }
+            public string AccountManagerSignOutButton { get => _AccountManagerSignOutButton; set { _AccountManagerSignOutButton = value; } }
+            public string GuidedHelp { get => _GuidedHelp; set { _GuidedHelp = value; } }
+            public string AdminPortal { get => _AdminPortal; set { _AdminPortal = value; } }
+            public string AdminPortalButton { get => _AdminPortalButton; set { _AdminPortalButton = value; } }
+            public string SearchButton { get => _SearchButton; set { _SearchButton = value; } }
+            public string Search { get => _Search; set { _Search = value; } }
+            public string QuickLaunchMenu { get => _QuickLaunchMenu; set { _QuickLaunchMenu = value; } }
+            public string QuickLaunchButton { get => _QuickLaunchButton; set { _QuickLaunchButton = value; } }
+            public string QuickCreateButton { get => _QuickCreateButton; set { _QuickCreateButton = value; } }
+            public string QuickCreateMenuList { get => _QuickCreateMenuList; set { _QuickCreateMenuList = value; } }
+            public string QuickCreateMenuItems { get => _QuickCreateMenuItems; set { _QuickCreateMenuItems = value; } }
+            public string PinnedSitemapEntity { get => _PinnedSitemapEntity; set { _PinnedSitemapEntity = value; } }
+            public string SitemapMenuGroup { get => _SitemapMenuGroup; set { _SitemapMenuGroup = value; } }
+            public string SitemapMenuItems { get => _SitemapMenuItems; set { _SitemapMenuItems = value; } }
+            public string SitemapSwitcherButton { get => _SitemapSwitcherButton; set { _SitemapSwitcherButton = value; } }
+            public string SitemapSwitcherFlyout { get => _SitemapSwitcherFlyout; set { _SitemapSwitcherFlyout = value; } }
+            public string UCIAppContainer { get => _UCIAppContainer; set { _UCIAppContainer = value; } }
+            public string UCIAppTile { get => _UCIAppTile; set { _UCIAppTile = value; } }
+            public string GoBack { get => _GoBack; set { _GoBack = value; } }
 
-            public static class MenuRelated
+            public class MenuRelatedReference
             {
-                public static string Related = "//li[contains(@data-id,\"tablist-tab_related\")]";
-                public static string CommonActivities = "//div[contains(@data-id,\"form-tab-relatedEntity-navActivities\")]";
+                public const string MenuRelated = "MenuRelated";
+                private string _Related = "//li[contains(@data-id,\"tablist-tab_related\")]";
+                private string _CommonActivities = "//div[contains(@data-id,\"form-tab-relatedEntity-navActivities\")]";
+                public string Related { get => _Related; set { _Related = value; } }
+                public string CommonActivities { get => _CommonActivities; set { _CommonActivities = value; } }
             }
         }
         #endregion
@@ -142,7 +185,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 driver.WaitForTransaction();
 
-                var element = driver.ClickWhenAvailable(By.XPath(NavigationReference.GoBack));
+                var element = driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.NavigationReference.GoBack));
 
                 driver.WaitForTransaction();
                 return element != null;
@@ -155,12 +198,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Quick Create: {entityName}"), driver =>
             {
                 //Click the + button in the ribbon
-                var quickCreateButton = driver.FindElement(By.XPath(NavigationReference.QuickCreateButton));
+                var quickCreateButton = driver.FindElement(By.XPath(_client.ElementMapper.NavigationReference.QuickCreateButton));
                 quickCreateButton.Click(true);
 
                 //Find the entity name in the list
-                var entityMenuList = driver.FindElement(By.XPath(NavigationReference.QuickCreateMenuList));
-                var entityMenuItems = entityMenuList.FindElements(By.XPath(NavigationReference.QuickCreateMenuItems));
+                var entityMenuList = driver.FindElement(By.XPath(_client.ElementMapper.NavigationReference.QuickCreateMenuList));
+                var entityMenuItems = entityMenuList.FindElements(By.XPath(_client.ElementMapper.NavigationReference.QuickCreateMenuItems));
                 var entitybutton = entityMenuItems.FirstOrDefault(e => e.Text.Contains(entityName, StringComparison.OrdinalIgnoreCase));
 
                 if (entitybutton == null)
@@ -180,11 +223,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Quick Launch: {toolTip}"), driver =>
             {
-                driver.WaitUntilClickable(By.XPath(NavigationReference.QuickLaunchMenu));
+                driver.WaitUntilClickable(By.XPath(_client.ElementMapper.NavigationReference.QuickLaunchMenu));
 
                 //Text could be in the crumb bar.  Find the Quick launch bar buttons and click that one.
-                var buttons = driver.FindElement(By.XPath(NavigationReference.QuickLaunchMenu));
-                var launchButton = buttons.FindElement(By.XPath(NavigationReference.QuickLaunchButton.Replace("[NAME]", toolTip)));
+                var buttons = driver.FindElement(By.XPath(_client.ElementMapper.NavigationReference.QuickLaunchMenu));
+                var launchButton = buttons.FindElement(By.XPath(_client.ElementMapper.NavigationReference.QuickLaunchButton.Replace("[NAME]", toolTip)));
                 launchButton.Click();
 
                 return true;
@@ -194,8 +237,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions("Sign out"), driver =>
             {
-                driver.WaitUntilClickable(By.XPath(NavigationReference.AccountManagerButton)).Click();
-                driver.WaitUntilClickable(By.XPath(NavigationReference.AccountManagerSignOutButton)).Click();
+                driver.WaitUntilClickable(By.XPath(_client.ElementMapper.NavigationReference.AccountManagerButton)).Click();
+                driver.WaitUntilClickable(By.XPath(_client.ElementMapper.NavigationReference.AccountManagerSignOutButton)).Click();
 
                 return driver.WaitForPageToLoad();
             });
@@ -216,8 +259,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!isSomeAppOpen)
                     success = TryToClickInAppTile(appName, driver);
                 else
-                    success = TryOpenAppFromMenu(driver, appName, NavigationReference.UCIAppMenuButton) ||
-                              TryOpenAppFromMenu(driver, appName, NavigationReference.WebAppMenuButton);
+                    success = TryOpenAppFromMenu(driver, appName, _client.ElementMapper.NavigationReference.UCIAppMenuButton) ||
+                              TryOpenAppFromMenu(driver, appName, _client.ElementMapper.NavigationReference.WebAppMenuButton);
 
                 if (!success)
                     throw new InvalidOperationException($"App Name {appName} not found.");
@@ -226,8 +269,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 login.InitializeModes();
 
                 // Wait for app page elements to be visible (shell and sitemapLauncherButton)
-                var shell = driver.WaitUntilVisible(By.XPath(Application.Shell));
-                var sitemapLauncherButton = driver.WaitUntilVisible(By.XPath(NavigationReference.SiteMapLauncherButton));
+                var shell = driver.WaitUntilVisible(By.XPath(_client.ElementMapper.ApplicationReference.Shell));
+                var sitemapLauncherButton = driver.WaitUntilVisible(By.XPath(_client.ElementMapper.NavigationReference.SiteMapLauncherButton));
 
                 success = shell != null && sitemapLauncherButton != null;
 
@@ -265,7 +308,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 driver.ClickWhenAvailable(
-                    By.XPath(NavigationReference.SearchButton),
+                    By.XPath(_client.ElementMapper.NavigationReference.SearchButton),
                     5.Seconds(),
                     "The Global Search button is not available.");
 
@@ -281,22 +324,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions("Open Group Sub Area"), driver =>
             {
                 //Make sure the sitemap-launcher is expanded - 9.1
-                if (driver.HasElement(By.XPath(NavigationReference.SiteMapLauncherButton)))
+                if (driver.HasElement(By.XPath(_client.ElementMapper.NavigationReference.SiteMapLauncherButton)))
                 {
-                    var expanded = bool.Parse(driver.FindElement(By.XPath(NavigationReference.SiteMapLauncherButton)).GetAttribute("aria-expanded"));
+                    var expanded = bool.Parse(driver.FindElement(By.XPath(_client.ElementMapper.NavigationReference.SiteMapLauncherButton)).GetAttribute("aria-expanded"));
 
                     if (!expanded)
-                        driver.ClickWhenAvailable(By.XPath(NavigationReference.SiteMapLauncherButton));
+                        driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.NavigationReference.SiteMapLauncherButton));
                 }
 
-                var groups = driver.FindElements(By.XPath(NavigationReference.SitemapMenuGroup));
+                var groups = driver.FindElements(By.XPath(_client.ElementMapper.NavigationReference.SitemapMenuGroup));
                 var groupList = groups.FirstOrDefault(g => g.GetAttribute("aria-label").ToLowerString() == group.ToLowerString());
                 if (groupList == null)
                 {
                     throw new NotFoundException($"No group with the name '{group}' exists");
                 }
 
-                var subAreaItems = groupList.FindElements(By.XPath(NavigationReference.SitemapMenuItems));
+                var subAreaItems = groupList.FindElements(By.XPath(_client.ElementMapper.NavigationReference.SitemapMenuItems));
                 var subAreaItem = subAreaItems.FirstOrDefault(a => a.GetAttribute("data-text").ToLowerString() == subarea.ToLowerString());
                 if (subAreaItem == null)
                 {
@@ -320,7 +363,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Open Guided Help"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(NavigationReference.GuidedHelp));
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.NavigationReference.GuidedHelp));
 
                 return true;
             });
@@ -406,9 +449,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.ThinkTime(thinkTime);
             return _client.Execute(_client.GetOptions("Open Admin Portal"), driver =>
             {
-                driver.WaitUntilVisible(By.XPath(Application.Shell));
-                driver.FindElement(By.XPath(NavigationReference.AdminPortal))?.Click();
-                driver.FindElement(By.XPath(NavigationReference.AdminPortalButton))?.Click();
+                driver.WaitUntilVisible(By.XPath(_client.ElementMapper.ApplicationReference.Shell));
+                driver.FindElement(By.XPath(_client.ElementMapper.NavigationReference.AdminPortal))?.Click();
+                driver.FindElement(By.XPath(_client.ElementMapper.NavigationReference.AdminPortalButton))?.Click();
                 return true;
             });
         }
@@ -450,7 +493,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
         internal bool OpenAppFromMenu(IWebDriver driver, string appName)
         {
-            var container = driver.WaitUntilAvailable(By.XPath(NavigationReference.AppMenuContainer));
+            var container = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.NavigationReference.AppMenuContainer));
             var xpathToButton = "//nav[@aria-hidden='false']//button//*[text()='[TEXT]']".Replace("[TEXT]", appName);
             var button = container.ClickWhenAvailable(By.XPath(xpathToButton),
                                 TimeSpan.FromSeconds(1)
@@ -479,9 +522,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions("Open Menu"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(NavigationReference.AreaButton));
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.NavigationReference.AreaButton));
 
-                var result = GetMenuItemsFrom(driver, NavigationReference.AreaMenu);
+                var result = GetMenuItemsFrom(driver, _client.ElementMapper.NavigationReference.AreaMenu);
                 return result;
             });
         }
@@ -490,7 +533,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions("Open Menu"), driver =>
             {
                 //Make sure the sitemap-launcher is expanded - 9.1
-                var xpathSiteMapLauncherButton = By.XPath(NavigationReference.SiteMapLauncherButton);
+                var xpathSiteMapLauncherButton = By.XPath(_client.ElementMapper.NavigationReference.SiteMapLauncherButton);
                 bool success = driver.TryFindElement(xpathSiteMapLauncherButton, out IWebElement launcherButton);
                 if (success)
                 {
@@ -502,17 +545,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var dictionary = new Dictionary<string, IWebElement>();
 
                 //Is this the sitemap with enableunifiedinterfaceshellrefresh?
-                var xpathSitemapSwitcherButton = By.XPath(NavigationReference.SitemapSwitcherButton);
+                var xpathSitemapSwitcherButton = By.XPath(_client.ElementMapper.NavigationReference.SitemapSwitcherButton);
                 success = driver.TryFindElement(xpathSitemapSwitcherButton, out IWebElement switcherButton);
                 if (success)
                 {
                     switcherButton.Click(true);
                     driver.WaitForTransaction();
 
-                    AddMenuItemsFrom(driver, NavigationReference.SitemapSwitcherFlyout, dictionary);
+                    AddMenuItemsFrom(driver, _client.ElementMapper.NavigationReference.SitemapSwitcherFlyout, dictionary);
                 }
 
-                var xpathSiteMapAreaMoreButton = By.XPath(NavigationReference.SiteMapAreaMoreButton);
+                var xpathSiteMapAreaMoreButton = By.XPath(_client.ElementMapper.NavigationReference.SiteMapAreaMoreButton);
                 success = driver.TryFindElement(xpathSiteMapAreaMoreButton, out IWebElement moreButton);
                 if (!success)
                     return dictionary;
@@ -521,11 +564,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (isVisible)
                 {
                     moreButton.Click();
-                    AddMenuItemsFrom(driver, NavigationReference.AreaMoreMenu, dictionary);
+                    AddMenuItemsFrom(driver, _client.ElementMapper.NavigationReference.AreaMoreMenu, dictionary);
                 }
                 else
                 {
-                    var singleItem = driver.FindElement(By.XPath(NavigationReference.SiteMapSingleArea.Replace("[NAME]", area)));
+                    var singleItem = driver.FindElement(By.XPath(_client.ElementMapper.NavigationReference.SiteMapSingleArea.Replace("[NAME]", area)));
                     dictionary.Add(singleItem.Text.ToLowerString(), singleItem);
                 }
 
@@ -536,8 +579,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Open " + command + " " + dataId), driver =>
             {
-                var xpathFlyout = By.XPath(NavigationReference.SettingsLauncher.Replace("[NAME]", command));
-                var xpathToFlyoutButton = By.XPath(NavigationReference.SettingsLauncherBar.Replace("[NAME]", command));
+                var xpathFlyout = By.XPath(_client.ElementMapper.NavigationReference.SettingsLauncher.Replace("[NAME]", command));
+                var xpathToFlyoutButton = By.XPath(_client.ElementMapper.NavigationReference.SettingsLauncherBar.Replace("[NAME]", command));
         //                    public static string SettingsLauncherBar = "//button[@data-id='[NAME]Launcher']";
         //public static string SettingsLauncher = "//ul[@data-id='[NAME]Launcher']";
                 IWebElement flyout;
@@ -582,16 +625,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var dictionary = new Dictionary<string, IWebElement>();
 
             //Sitemap without enableunifiedinterfaceshellrefresh
-            var hasPinnedSitemapEntity = driver.HasElement(By.XPath(NavigationReference.PinnedSitemapEntity));
+            var hasPinnedSitemapEntity = driver.HasElement(By.XPath(_client.ElementMapper.NavigationReference.PinnedSitemapEntity));
             if (!hasPinnedSitemapEntity)
             {
                 // Close SiteMap launcher since it is open
-                var xpathToLauncherCloseButton = By.XPath(NavigationReference.SiteMapLauncherCloseButton);
+                var xpathToLauncherCloseButton = By.XPath(_client.ElementMapper.NavigationReference.SiteMapLauncherCloseButton);
                 driver.ClickWhenAvailable(xpathToLauncherCloseButton);
 
-                driver.ClickWhenAvailable(By.XPath(NavigationReference.SiteMapLauncherButton));
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.NavigationReference.SiteMapLauncherButton));
 
-                var menuContainer = driver.WaitUntilAvailable(By.XPath(NavigationReference.SubAreaContainer));
+                var menuContainer = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.NavigationReference.SubAreaContainer));
 
                 var subItems = menuContainer.FindElements(By.TagName("li"));
 
@@ -612,12 +655,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             }
 
             //Sitemap with enableunifiedinterfaceshellrefresh enabled
-            var menuShell = driver.FindElements(By.XPath(NavigationReference.SubAreaContainer));
+            var menuShell = driver.FindElements(By.XPath(_client.ElementMapper.NavigationReference.SubAreaContainer));
 
             //The menu is broke into multiple sections. Gather all items.
             foreach (IWebElement menuSection in menuShell)
             {
-                var menuItems = menuSection.FindElements(By.XPath(NavigationReference.SitemapMenuItems));
+                var menuItems = menuSection.FindElements(By.XPath(_client.ElementMapper.NavigationReference.SitemapMenuItems));
 
                 foreach (var menuItem in menuItems)
                 {
@@ -645,7 +688,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         private bool TryOpenAppFromMenu(IWebDriver driver, string appName, string appMenuButton)
         {
             bool found = false;
-            var xpathToAppMenu = By.XPath(NavigationReference.UCIAppMenuButton);
+            var xpathToAppMenu = By.XPath(_client.ElementMapper.NavigationReference.UCIAppMenuButton);
             driver.WaitUntilClickable(xpathToAppMenu, 5.Seconds(),
                         appMenu =>
                         {
@@ -678,7 +721,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             }
             return found;
         }
-        private static bool TryToClickInAppTile(string appName, IWebDriver driver)
+        private bool TryToClickInAppTile(string appName, IWebDriver driver)
         {
             string message = "Frame AppLandingPage is not loaded.";
             driver.WaitUntil(
@@ -699,8 +742,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 5.Seconds()
                 );
 
-            var xpathToAppContainer = By.XPath(NavigationReference.UCIAppContainer);
-            var xpathToappTile = By.XPath(NavigationReference.UCIAppTile.Replace("[NAME]", appName));
+            var xpathToAppContainer = By.XPath(_client.ElementMapper.NavigationReference.UCIAppContainer);
+            var xpathToappTile = By.XPath(_client.ElementMapper.NavigationReference.UCIAppTile.Replace("[NAME]", appName));
 
             bool success = false;
             driver.WaitUntilVisible(xpathToAppContainer, TimeSpan.FromSeconds(5),

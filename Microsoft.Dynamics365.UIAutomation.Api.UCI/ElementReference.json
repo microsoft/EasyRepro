@@ -1,7 +1,10 @@
 {
   "AdvancedLookup": {
 
-  }
+  },
+  "Application": {
+
+  },
   "BusinessProcessFlow": {
 
   },
@@ -53,5 +56,8 @@
   },
   "Lookup": {
 
+  },
+  "Navigation": {
+    "MenuRelated": {}
   }
 }

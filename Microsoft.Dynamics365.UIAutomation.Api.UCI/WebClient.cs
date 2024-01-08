@@ -22,6 +22,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     public class ElementMapper
     {
         public Lookup.AdvancedLookupReference AdvancedLookupReference;
+        public Navigation.ApplicationReference ApplicationReference;
         public BusinessProcessFlow.BusinessProcessFlowReference BusinessProcessFlowReference;
         public CommandBar.CommandBarReference CommandBarReference;
         public Dashboard.DashboardReference DashboardReference;
@@ -30,7 +31,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public GlobalSearch.GlobalSearchReference GlobalSearchReference;
         public Grid.GridReference GridReference;
         public Lookup.LookupReference LookupReference;
+        public Navigation.NavigationReference NavigationReference;
         public ElementMapper(IConfiguration config) {
+            ApplicationReference = new Navigation.ApplicationReference();
+            config.GetSection(Navigation.ApplicationReference.Application).Bind(ApplicationReference);
             AdvancedLookupReference = new Lookup.AdvancedLookupReference();
             config.GetSection(Lookup.AdvancedLookupReference.AdvancedLookup).Bind(AdvancedLookupReference);
             BusinessProcessFlowReference = new BusinessProcessFlow.BusinessProcessFlowReference();
@@ -45,10 +49,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             config.GetSection(Entity.EntityReference.Entity).Bind(EntityReference);
             GlobalSearchReference = new GlobalSearch.GlobalSearchReference();
             config.GetSection(GlobalSearch.GlobalSearchReference.GlobalSearch).Bind(GlobalSearchReference);
-            LookupReference = new Lookup.LookupReference();
-            config.GetSection(GlobalSearch.GlobalSearchReference.GlobalSearch).Bind(GlobalSearchReference);
             GridReference = new Grid.GridReference();
             config.GetSection(Grid.GridReference.Grid).Bind(GridReference);
+            LookupReference = new Lookup.LookupReference();
+            config.GetSection(Lookup.LookupReference.Lookup).Bind(LookupReference);
+            NavigationReference = new Navigation.NavigationReference();
+            config.GetSection(Navigation.NavigationReference.Navigation).Bind(NavigationReference);
         }
     }
     public class WebClient : BrowserPage, IDisposable
