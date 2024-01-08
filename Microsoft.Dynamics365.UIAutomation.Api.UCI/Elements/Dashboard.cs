@@ -10,11 +10,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     {
 
         #region DTO
-        public static class DashboardReference
+        public class DashboardReference
         {
-            public static string DashboardSelector = "//span[contains(@id, 'Dashboard_Selector')]";
-            public static string DashboardItem = "//li[contains(@title, '[NAME]')]";
-            public static string DashboardItemUCI = "//li[contains(@data-text, '[NAME]')]";
+            public const string Dashboard = "Dashboard";
+            #region private
+            public string _DashboardSelector = "//span[contains(@id, 'Dashboard_Selector')]";
+            public string _DashboardItem = "//li[contains(@title, '[NAME]')]";
+            public string _DashboardItemUCI = "//li[contains(@data-text, '[NAME]')]";
+            #endregion
+            #region prop
+            public string DashboardSelector { get => _DashboardSelector; set { _DashboardSelector = value; } }
+            public string DashboardItem { get => _DashboardItem; set { _DashboardItem = value; } }
+            public string DashboardItemUCI { get => _DashboardItemUCI; set { _DashboardItemUCI = value; } }
+            #endregion
         }
         #endregion
 
@@ -53,9 +61,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Select Dashboard"), driver =>
             {
                 //Click the drop-down arrow
-                driver.ClickWhenAvailable(By.XPath(DashboardReference.DashboardSelector));
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.DashboardReference.DashboardSelector));
                 //Select the dashboard
-                driver.ClickWhenAvailable(By.XPath(DashboardReference.DashboardItemUCI.Replace("[NAME]", dashboardName)));
+                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.DashboardReference.DashboardItemUCI.Replace("[NAME]", dashboardName)));
 
                 // Wait for Dashboard to load
                 driver.WaitForTransaction();

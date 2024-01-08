@@ -23,6 +23,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     {
         public BusinessProcessFlow.BusinessProcessFlowReference BusinessProcessFlowReference;
         public CommandBar.CommandBarReference CommandBarReference;
+        public Dashboard.DashboardReference DashboardReference;
         public Entity.EntityReference EntityReference;
         public Grid.GridReference GridReference;
         public ElementMapper(IConfiguration config) {
@@ -31,6 +32,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             config.GetSection(BusinessProcessFlow.BusinessProcessFlowReference.BusinessProcessFlow).Bind(BusinessProcessFlowReference);
             CommandBarReference = new CommandBar.CommandBarReference();
             config.GetSection(CommandBar.CommandBarReference.CommandBar).Bind(CommandBarReference);
+            DashboardReference = new Dashboard.DashboardReference();
+            config.GetSection(Dashboard.DashboardReference.Dashboard).Bind(DashboardReference);
             EntityReference = new Entity.EntityReference();
             config.GetSection(Entity.EntityReference.Entity).Bind(EntityReference);
             GridReference = new Grid.GridReference();
