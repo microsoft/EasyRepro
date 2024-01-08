@@ -92,13 +92,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public string UCIAppTile { get => _UCIAppTile; set { _UCIAppTile = value; } }
             public string GoBack { get => _GoBack; set { _GoBack = value; } }
 
-            public class MenuRelatedReference
+            public static class MenuRelatedReference
             {
                 public const string MenuRelated = "MenuRelated";
-                private string _Related = "//li[contains(@data-id,\"tablist-tab_related\")]";
-                private string _CommonActivities = "//div[contains(@data-id,\"form-tab-relatedEntity-navActivities\")]";
-                public string Related { get => _Related; set { _Related = value; } }
-                public string CommonActivities { get => _CommonActivities; set { _CommonActivities = value; } }
+                private static string _Related = "//li[contains(@data-id,\"tablist-tab_related\")]";
+                private static string _CommonActivities = "//div[contains(@data-id,\"form-tab-relatedEntity-navActivities\")]";
+                public static string Related { get => _Related; set { _Related = value; } }
+                public static string CommonActivities { get => _CommonActivities; set { _CommonActivities = value; } }
             }
         }
         #endregion

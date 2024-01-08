@@ -12,11 +12,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     {
 
         #region DTO
-        public static class PowerAppReference
+        public class PowerAppReference
         {
-            public static string ModelFormContainer = "//iframe[contains(@src,\'[NAME]\')]";
-            public static string Control = "//div[@data-control-name=\'[NAME]\']";
-            public static string PublishedAppIFrame = "//iframe[@class='publishedAppIframe']";
+            public const string PowerApp = "PowerApp";
+            private string _modelFormContainer = "//iframe[contains(@src,\'[NAME]\')]";
+            private string _control = "//div[@data-control-name=\'[NAME]\']";
+            private string _publishedAppIFrame = "//iframe[@class='publishedAppIframe']";
+            public string ModelFormContainer { get => _modelFormContainer; set { _modelFormContainer = value; } }
+            public string Control { get => _control; set { _control = value; } }
+            public string PublishedAppIFrame { get => _publishedAppIFrame; set { _publishedAppIFrame = value; } }
 
         }
         #endregion
@@ -54,11 +58,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             IWebElement powerApp = null;
             Trace.WriteLine(String.Format("Locating {0} App", appId));
-            if (driver.HasElement(By.XPath(PowerAppReference.ModelFormContainer.Replace("[NAME]", appId))))
+            if (driver.HasElement(By.XPath(this._client.ElementMapper.PowerAppReference.ModelFormContainer.Replace("[NAME]", appId))))
             {
-                powerApp = driver.FindElement(By.XPath(PowerAppReference.ModelFormContainer.Replace("[NAME]", appId)));
+                powerApp = driver.FindElement(By.XPath(this._client.ElementMapper.PowerAppReference.ModelFormContainer.Replace("[NAME]", appId)));
                 driver.SwitchTo().Frame(powerApp);
-                powerApp = driver.FindElement(By.XPath(PowerAppReference.PublishedAppIFrame));
+                powerApp = driver.FindElement(By.XPath(this._client.ElementMapper.PowerAppReference.PublishedAppIFrame));
                 driver.SwitchTo().Frame(powerApp);
                 _inPowerApps = true;
             }
@@ -82,9 +86,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions("PowerApp Select"), driver =>
             {
                 if (!_inPowerApps) LocatePowerApp(driver, appId);
-                if (driver.HasElement(By.XPath(PowerAppReference.Control.Replace("[NAME]", control))))
+                if (driver.HasElement(By.XPath(this._client.ElementMapper.PowerAppReference.Control.Replace("[NAME]", control))))
                 {
-                    driver.FindElement(By.XPath(PowerAppReference.Control.Replace("[NAME]", control))).Click();
+                    driver.FindElement(By.XPath(this._client.ElementMapper.PowerAppReference.Control.Replace("[NAME]", control))).Click();
                 }
                 else
                 {

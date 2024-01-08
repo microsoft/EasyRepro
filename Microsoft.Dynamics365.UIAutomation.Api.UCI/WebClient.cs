@@ -30,8 +30,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public Entity.EntityReference EntityReference;
         public GlobalSearch.GlobalSearchReference GlobalSearchReference;
         public Grid.GridReference GridReference;
+        public OnlineLogin.LoginReference LoginReference;
         public Lookup.LookupReference LookupReference;
         public Navigation.NavigationReference NavigationReference;
+        public PowerApp.PowerAppReference PowerAppReference;
         public ElementMapper(IConfiguration config) {
             ApplicationReference = new Navigation.ApplicationReference();
             config.GetSection(Navigation.ApplicationReference.Application).Bind(ApplicationReference);
@@ -51,10 +53,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             config.GetSection(GlobalSearch.GlobalSearchReference.GlobalSearch).Bind(GlobalSearchReference);
             GridReference = new Grid.GridReference();
             config.GetSection(Grid.GridReference.Grid).Bind(GridReference);
+            LoginReference = new OnlineLogin.LoginReference();
+            config.GetSection(OnlineLogin.LoginReference.Login).Bind(LoginReference);
             LookupReference = new Lookup.LookupReference();
             config.GetSection(Lookup.LookupReference.Lookup).Bind(LookupReference);
             NavigationReference = new Navigation.NavigationReference();
             config.GetSection(Navigation.NavigationReference.Navigation).Bind(NavigationReference);
+            PowerAppReference = new PowerApp.PowerAppReference();
+            config.GetSection(PowerApp.PowerAppReference.PowerApp).Bind(PowerAppReference);
         }
     }
     public class WebClient : BrowserPage, IDisposable
@@ -97,12 +103,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             successCallback = successCallback ?? (
                                   _ =>
                                   {
-                                      bool isUCI = driver.HasElement(By.XPath(OnlineLogin.LoginReference.CrmUCIMainPage));
+                                      bool isUCI = driver.HasElement(By.XPath(this.ElementMapper.LoginReference.CrmUCIMainPage));
                                       if (isUCI)
                                           driver.WaitForTransaction();
                                   });
 
-            var xpathToMainPage = By.XPath(OnlineLogin.LoginReference.CrmMainPage);
+            var xpathToMainPage = By.XPath(this.ElementMapper.LoginReference.CrmMainPage);
             var element = driver.WaitUntilAvailable(xpathToMainPage, timeout, successCallback, failureCallback);
             return element != null;
         }

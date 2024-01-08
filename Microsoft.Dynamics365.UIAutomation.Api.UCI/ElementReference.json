@@ -54,6 +54,9 @@
   "Grid": {
     "ViewContainer": "//ul[contains(@aria-label,'Views')]"
   },
+  "Login": {
+
+  },
   "Lookup": {
 
   },

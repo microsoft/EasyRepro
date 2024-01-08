@@ -125,7 +125,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
 
                 xrmApp.Grid.OpenRecord(0);
-                xrmApp.Navigation.OpenMenu(Navigation.NavigationReference.MenuRelated.Related, Navigation.NavigationReference.MenuRelated.CommonActivities);
+                xrmApp.Navigation.OpenMenu(Navigation.NavigationReference.MenuRelatedReference.Related, Navigation.NavigationReference.MenuRelatedReference.CommonActivities);
             }
         }
     }

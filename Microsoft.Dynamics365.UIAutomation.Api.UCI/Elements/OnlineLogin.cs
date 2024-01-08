@@ -25,16 +25,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
         #endregion
         #region DTO
-        public static class LoginReference
+        public class LoginReference
         {
-            public static string UserId = "//input[@type='email']";
-            public static string LoginPassword = "//input[@type='password']";
-            public static string SignIn = "id(\"cred_sign_in_button\")";
-            public static string CrmMainPage = "//*[contains(@id,'crmTopBar') or contains(@data-id,'topBar')]";
-            public static string CrmUCIMainPage = "//*[contains(@data-id,'topBar')]";
-            public static string StaySignedIn = "//div[@data-viewid and contains(@data-bind, 'kmsi-view')]//input[@id='idSIButton9']";
-            public static string OneTimeCode = "//input[@name='otc']";
-            public static string UseAnotherAccount = "otherTile";
+            public const string Login = "Login";
+            private string _userId = "//input[@type='email']";
+            private string _loginPassword = "//input[@type='password']";
+            private string _signIn = "id(\"cred_sign_in_button\")";
+            private string _crmMainPage = "//*[contains(@id,'crmTopBar') or contains(@data-id,'topBar')]";
+            private string _crmUCIMainPage = "//*[contains(@data-id,'topBar')]";
+            private string _staySignedIn = "//div[@data-viewid and contains(@data-bind, 'kmsi-view')]//input[@id='idSIButton9']";
+            private string _oneTimeCode = "//input[@name='otc']";
+            private string _useAnotherAccount = "otherTile";
+
+            public string UserId { get => _userId; set { _userId = value; } }
+            public string LoginPassword { get => _loginPassword; set { _loginPassword = value; } }
+            public string SignIn { get => _signIn; set { _signIn = value; } }
+            public string CrmMainPage { get => _crmMainPage; set { _crmMainPage = value; } }
+            public string CrmUCIMainPage { get => _crmUCIMainPage; set { _crmUCIMainPage = value; } }
+            public string StaySignedIn { get => _staySignedIn; set { _staySignedIn = value; } }
+            public string OneTimeCode { get => _oneTimeCode; set { _oneTimeCode = value; } }
+            public string UseAnotherAccount { get => _useAnotherAccount; set { _useAnotherAccount = value; } }
         }
         #endregion
         private readonly WebClient _client;
@@ -117,7 +127,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return LoginResult.Success;
 
             //driver.ClickIfVisible(By.Id(LoginReference.UseAnotherAccount));
-            _client.ClickIfVisible(LoginReference.UseAnotherAccount);
+            _client.ClickIfVisible(_client.ElementMapper.LoginReference.UseAnotherAccount);
 
             bool waitingForOtc = false;
             bool success = EnterUserName(username);
@@ -134,7 +144,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 waitingForOtc = GetOtcInput() != null;
 
                 if (!waitingForOtc)
-                    throw new Exception($"Login page failed. {LoginReference.UserId} not found.");
+                    throw new Exception($"Login page failed. {_client.ElementMapper.LoginReference.UserId} not found.");
             }
 
             if (!waitingForOtc)
@@ -191,7 +201,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         private bool EnterUserName(SecureString username)
         {
             //var input = driver.WaitUntilAvailable(By.XPath(LoginReference.UserId), new TimeSpan(0, 0, 30));
-            var input = _client.Browser.Driver.WaitUntilAvailable(By.XPath(LoginReference.UserId), new TimeSpan(0, 0, 30));
+            var input = _client.Browser.Driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.LoginReference.UserId), new TimeSpan(0, 0, 30));
             if (input == null)
                 return false;
 
@@ -202,7 +212,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         private void EnterPassword(SecureString password)
         {
-            var input = _client.Browser.Driver.FindElement(By.XPath(LoginReference.LoginPassword));
+            var input = _client.Browser.Driver.FindElement(By.XPath(_client.ElementMapper.LoginReference.LoginPassword));
             input.SendKeys(password.ToUnsecureString());
             input.Submit();
         }
@@ -234,12 +244,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
 
         private IWebElement GetOtcInput()
-            => _client.Browser.Driver.WaitUntilAvailable(By.XPath(LoginReference.OneTimeCode), TimeSpan.FromSeconds(2));
+            => _client.Browser.Driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.LoginReference.OneTimeCode), TimeSpan.FromSeconds(2));
 
         private bool ClickStaySignedIn()
         {
-            var xpath = By.XPath(LoginReference.StaySignedIn);
-            var element = _client.Browser.Driver.ClickIfVisible(By.XPath(LoginReference.StaySignedIn), 2.Seconds());
+            var xpath = By.XPath(_client.ElementMapper.LoginReference.StaySignedIn);
+            var element = _client.Browser.Driver.ClickIfVisible(By.XPath(_client.ElementMapper.LoginReference.StaySignedIn), 2.Seconds());
             return element != null;
         }
 
@@ -273,7 +283,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     _ =>
                     {
                         //determine if we landed on the Unified Client Main page
-                        var isUCI = driver.HasElement(By.XPath(LoginReference.CrmUCIMainPage));
+                        var isUCI = driver.HasElement(By.XPath(_client.ElementMapper.LoginReference.CrmUCIMainPage));
                         if (isUCI)
                         {
                             driver.WaitForPageToLoad();
