@@ -12,6 +12,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
     {
 
         [TestCategory("Timeline")]
+        [TestCategory("Appointment")]
         [TestMethod]
         public void UCITestAccountAddAppointment()
         {
@@ -38,6 +39,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestCategory("Timeline")]
+        [TestCategory("Email")]
         [TestMethod]
         public void UCITestAccountAddEmail()
         {
@@ -78,6 +80,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         [TestMethod]
         [TestCategory("Timeline")]
+        [TestCategory("Email")]
         [TestCategory("RegressionTests")]
         public void UCITestAccountGetMultiSelectEmail()
         {
@@ -120,6 +123,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         [TestMethod]
         [TestCategory("Timeline")]
+        [TestCategory("Email")]
         [TestCategory("Fail - Bug")]
         [TestCategory("RegressionTests")]
         public void UCITestAccountRemoveMultiSelectEmail()
@@ -156,6 +160,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestCategory("Timeline")]
+        [TestCategory("PhoneCall")]
         [TestMethod]
         public void UCITestAccountAddPhoneCall()
         {
@@ -181,6 +186,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         }
 
         [TestCategory("Timeline")]
+        [TestCategory("Task")]
         [TestMethod]
         public void UCITestAccountAddTask()
         {

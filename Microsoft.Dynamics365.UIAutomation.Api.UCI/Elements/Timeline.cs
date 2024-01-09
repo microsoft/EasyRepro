@@ -16,52 +16,101 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     {
 
         #region DTO
-        public static class TimelineReference
+        public class TimelineReference
         {
-            public static string SaveAndClose = "//button[contains(@data-id,\"[NAME].SaveAndClose\")]";
+            public const string Timeline = "Timeline";
+            #region private
+            private string _SaveAndClose = "//button[contains(@data-id,\"[NAME].SaveAndClose\")]";
 
-            public static string Popout = "//button[contains(@id,\"notescontrol-action_bar_add_command\")]";
-            public static string PopoutAppointment = "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_appointment\")]";
-            public static string PopoutEmail = "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_email\")]";
-            public static string PopoutPhoneCall = "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_phonecall\")]";
-            public static string PopoutTask = "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_task\")]";
-            public static string PopoutNote = "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_notes\")]";
-            public static string PopoutPost = "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_post\")]";
+            private string _Popout = "//button[contains(@id,\"notescontrol-action_bar_add_command\")]";
+            private string _PopoutAppointment = "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_appointment\")]";
+            private string _PopoutEmail = "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_email\")]";
+            private string _PopoutPhoneCall = "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_phonecall\")]";
+            private string _PopoutTask = "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_task\")]";
+            private string _PopoutNote = "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_notes\")]";
+            private string _PopoutPost = "//li[contains(@id,\"notescontrol-createNewRecord_flyoutMenuItem_post\")]";
 
-            public static string PostText = "id(\"create_post_postText\")";
-            public static string PostAdd = "//button[@data-id=\"notescontrol-author_post_testsave_button\"]";
-            public static string PostCancel = "id(\"create_post_cancel_btn\")";
+            private string _PostText = "id(\"create_post_postText\")";
+            private string _PostAdd = "//button[@data-id=\"notescontrol-author_post_testsave_button\"]";
+            private string _PostCancel = "id(\"create_post_cancel_btn\")";
 
-            public static string NoteTitle = "id(\"create_note_medium_title\")";
-            public static string NoteText = "//iframe[contains(@class, \"fullPageContentEditorFrame\")]";
-            public static string NoteTextBody = "//body[contains(@class, 'cke_wysiwyg_frame')]";
-            public static string NoteAdd = "//button[contains(@id,'save_button') or contains(@id, 'create_note_add_btn')]";
-            public static string NoteCancel = "id(\"create_note_cancel_btn\")";
+            private string _NoteTitle = "id(\"create_note_medium_title\")";
+            private string _NoteText = "//iframe[contains(@class, \"fullPageContentEditorFrame\")]";
+            private string _NoteTextBody = "//body[contains(@class, 'cke_wysiwyg_frame')]";
+            private string _NoteAdd = "//button[contains(@id,'save_button') or contains(@id, 'create_note_add_btn')]";
+            private string _NoteCancel = "id(\"create_note_cancel_btn\")";
 
-            public static string TaskSubject = "subject";
-            public static string TaskDescription = "description";
-            public static string TaskDuration = "actualdurationminutes";
-            public static string Task = "task";
+            private string _TaskSubject = "subject";
+            private string _TaskDescription = "description";
+            private string _TaskDuration = "actualdurationminutes";
+            private string _Task = "task";
 
-            public static string PhoneCallSubject = "subject";
-            public static string PhoneCallNumber = "phonenumber";
-            public static string PhoneCallDescription = "description";
-            public static string PhoneCallDuration = "actualdurationminutes";
-            public static string PhoneCall = "phonecall";
+            private string _PhoneCallSubject = "subject";
+            private string _PhoneCallNumber = "phonenumber";
+            private string _PhoneCallDescription = "description";
+            private string _PhoneCallDuration = "actualdurationminutes";
+            private string _PhoneCall = "phonecall";
 
-            public static string EmailSubject = "subject";
-            public static string EmailTo = "to";
-            public static string EmailCC = "cc";
-            public static string EmailBcc = "bcc";
-            public static string EmailDescription = "description";
-            public static string EmailDuration = "actualdurationminutes";
-            public static string Email = "email";
+            private string _EmailSubject = "subject";
+            private string _EmailTo = "to";
+            private string _EmailCC = "cc";
+            private string _EmailBcc = "bcc";
+            private string _EmailDescription = "description";
+            private string _EmailDuration = "actualdurationminutes";
+            private string _Email = "email";
 
-            public static string AppointmentSubject = "subject";
-            public static string AppointmentLocation = "location";
-            public static string AppointmentDescription = "description";
-            public static string AppointmentDuration = "scheduleddurationminutes";
-            public static string Appointment = "appointment";
+            private string _AppointmentSubject = "subject";
+            private string _AppointmentLocation = "location";
+            private string _AppointmentDescription = "description";
+            private string _AppointmentDuration = "scheduleddurationminutes";
+            private string _Appointment = "appointment";
+            #endregion
+            #region prop
+            public string SaveAndClose { get => _SaveAndClose; set { _SaveAndClose = value; } }
+
+            public string Popout { get => _Popout; set { _Popout = value; } }
+            public string PopoutAppointment { get => _PopoutAppointment; set { _PopoutAppointment = value; } }
+            public string PopoutEmail { get => _PopoutEmail; set { _PopoutEmail = value; } }
+            public string PopoutPhoneCall { get => _PopoutPhoneCall; set { _PopoutPhoneCall = value; } }
+            public string PopoutTask { get => _PopoutTask; set { _PopoutTask = value; } }
+            public string PopoutNote { get => _PopoutNote; set { _PopoutNote = value; } }
+            public string PopoutPost { get => _PopoutPost; set { _PopoutPost = value; } }
+
+            public string PostText { get => _PostText; set { _PostText = value; } }
+            public string PostAdd { get => _PostAdd; set { _PostAdd = value; } }
+            public string PostCancel { get => _PostCancel; set { _PostCancel = value; } }
+
+            public string NoteTitle { get => _NoteTitle; set { _NoteTitle = value; } }
+            public string NoteText { get => _NoteText; set { _NoteText = value; } }
+            public string NoteTextBody { get => _NoteTextBody; set { _NoteTextBody = value; } }
+            public string NoteAdd { get => _NoteAdd; set { _NoteAdd = value; } }
+            public string NoteCancel { get => _NoteCancel; set { _NoteCancel = value; } }
+
+            public string TaskSubject { get => _TaskSubject; set { _TaskSubject = value; } }
+            public string TaskDescription { get => _TaskDescription; set { _TaskDescription = value; } }
+            public string TaskDuration { get => _TaskDuration; set { _TaskDuration = value; } }
+            public string Task { get => _Task; set { _Task = value; } }
+
+            public string PhoneCallSubject { get => _PhoneCallSubject; set { _PhoneCallSubject = value; } }
+            public string PhoneCallNumber { get => _PhoneCallNumber; set { _PhoneCallNumber = value; } }
+            public string PhoneCallDescription { get => _PhoneCallDescription; set { _PhoneCallDescription = value; } }
+            public string PhoneCallDuration { get => _PhoneCallDuration; set { _PhoneCallDuration = value; } }
+            public string PhoneCall { get => _PhoneCall; set { _PhoneCall = value; } }
+
+            public string EmailSubject { get => _EmailSubject; set { _EmailSubject = value; } }
+            public string EmailTo { get => _EmailTo; set { _EmailTo = value; } }
+            public string EmailCC { get => _EmailCC; set { _EmailCC = value; } }
+            public string EmailBcc { get => _EmailBcc; set { _EmailBcc = value; } }
+            public string EmailDescription { get => _EmailDescription; set { _EmailDescription = value; } }
+            public string EmailDuration { get => _EmailDuration; set { _EmailDuration = value; } }
+            public string Email { get => _Email; set { _Email = value; } }
+
+            public string AppointmentSubject { get => _AppointmentSubject; set { _AppointmentSubject = value; } }
+            public string AppointmentLocation { get => _AppointmentLocation; set { _AppointmentLocation = value; } }
+            public string AppointmentDescription { get => _AppointmentDescription; set { _AppointmentDescription = value; } }
+            public string AppointmentDuration { get => _AppointmentDuration; set { _AppointmentDuration = value; } }
+            public string Appointment { get => _Appointment; set { _Appointment = value; } }
+            #endregion
         }
 
         #endregion
@@ -81,12 +130,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="description">Description</param>
         public void AddAppointment(string subject, string location, string duration, string description)
         {
-            this.OpenAndClickPopoutMenu(TimelineReference.Popout, TimelineReference.PopoutAppointment, 4000);
+            this.OpenAndClickPopoutMenu(_client.ElementMapper.TimelineReference.Popout, _client.ElementMapper.TimelineReference.PopoutAppointment, 4000);
             _client.ThinkTime(4000);
-            Field.SetValue(_client, TimelineReference.AppointmentSubject, subject, FormContextType.QuickCreate);
-            Field.SetValue(_client,TimelineReference.AppointmentLocation, location, FormContextType.QuickCreate);
-            Field.SetValue(_client,TimelineReference.AppointmentDescription, description, FormContextType.QuickCreate);
-            Field.SetValue(_client, TimelineReference.AppointmentDuration, duration, FormContextType.QuickCreate);
+            Field.SetValue(_client, _client.ElementMapper.TimelineReference.AppointmentSubject, subject, FormContextType.QuickCreate);
+            Field.SetValue(_client, _client.ElementMapper.TimelineReference.AppointmentLocation, location, FormContextType.QuickCreate);
+            Field.SetValue(_client, _client.ElementMapper.TimelineReference.AppointmentDescription, description, FormContextType.QuickCreate);
+            Field.SetValue(_client, _client.ElementMapper.TimelineReference.AppointmentDuration, duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -94,7 +143,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         public void SaveAndCloseAppointment()
         {
-            SaveAndClose(TimelineReference.Appointment);
+            SaveAndClose(_client.ElementMapper.TimelineReference.Appointment);
         }
 
         /// <summary>
@@ -111,7 +160,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         public void ClickEmailMenuItem()
         {
-            this.OpenAndClickPopoutMenu(TimelineReference.Popout, TimelineReference.PopoutEmail, 4000);
+            this.OpenAndClickPopoutMenu(_client.ElementMapper.TimelineReference.Popout, _client.ElementMapper.TimelineReference.PopoutEmail, 4000);
         }
 
         /// <summary>
@@ -120,7 +169,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="subject">Subject of the email</param>
         public void AddEmailSubject(string subject)
         {
-            Field.SetValue(_client,TimelineReference.EmailSubject, subject);
+            Field.SetValue(_client,_client.ElementMapper.TimelineReference.EmailSubject, subject);
         }
 
         /// <summary>
@@ -140,7 +189,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="duration">The duration as text</param>
         public void AddEmailDuration(string duration)
         {
-            Field.SetValue(_client, TimelineReference.EmailDuration, duration);
+            Field.SetValue(_client, _client.ElementMapper.TimelineReference.EmailDuration, duration);
         }
 
         /// <summary>
@@ -186,12 +235,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="duration">Duration of Activity</param>
         public void AddPhoneCall(string subject, string phoneNumber, string description, string duration)
         {
-            this.OpenAndClickPopoutMenu(TimelineReference.Popout, TimelineReference.PopoutPhoneCall, 4000);
+            this.OpenAndClickPopoutMenu(_client.ElementMapper.TimelineReference.Popout, _client.ElementMapper.TimelineReference.PopoutPhoneCall, 4000);
             _client.ThinkTime(4000);
-            Field.SetValue(_client,TimelineReference.PhoneCallSubject, subject, FormContextType.QuickCreate);
-            Field.SetValue(_client,TimelineReference.PhoneCallNumber, phoneNumber, FormContextType.QuickCreate);
-            Field.SetValue(_client,TimelineReference.PhoneCallDescription, description, FormContextType.QuickCreate);
-            Field.SetValue(_client,TimelineReference.PhoneCallDuration, duration, FormContextType.QuickCreate);
+            Field.SetValue(_client, _client.ElementMapper.TimelineReference.PhoneCallSubject, subject, FormContextType.QuickCreate);
+            Field.SetValue(_client, _client.ElementMapper.TimelineReference.PhoneCallNumber, phoneNumber, FormContextType.QuickCreate);
+            Field.SetValue(_client, _client.ElementMapper.TimelineReference.PhoneCallDescription, description, FormContextType.QuickCreate);
+            Field.SetValue(_client, _client.ElementMapper.TimelineReference.PhoneCallDuration, duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -199,7 +248,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         public void SaveAndClosePhoneCall()
         {
-            SaveAndClose(TimelineReference.PhoneCall);
+            SaveAndClose(_client.ElementMapper.TimelineReference.PhoneCall);
         }
 
         /// <summary>
@@ -210,11 +259,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="duration">Duration of Activity</param>
         public void AddTask(string subject, string description, string duration)
         {
-            this.OpenAndClickPopoutMenu(TimelineReference.Popout, TimelineReference.PopoutTask, 4000);
+            this.OpenAndClickPopoutMenu(_client.ElementMapper.TimelineReference.Popout, _client.ElementMapper.TimelineReference.PopoutTask, 4000);
             _client.ThinkTime(4000);
-            Field.SetValue(_client,TimelineReference.TaskSubject, subject, FormContextType.QuickCreate);
-            Field.SetValue(_client,TimelineReference.TaskDescription, description, FormContextType.QuickCreate);
-            Field.SetValue(_client,TimelineReference.TaskDuration, duration, FormContextType.QuickCreate);
+            Field.SetValue(_client, _client.ElementMapper.TimelineReference.TaskSubject, subject, FormContextType.QuickCreate);
+            Field.SetValue(_client, _client.ElementMapper.TimelineReference.TaskDescription, description, FormContextType.QuickCreate);
+            Field.SetValue(_client, _client.ElementMapper.TimelineReference.TaskDuration, duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -222,7 +271,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         public void SaveAndCloseTask()
         {
-            SaveAndClose(TimelineReference.Task);
+            SaveAndClose(_client.ElementMapper.TimelineReference.Task);
         }
 
         /// <summary>
@@ -231,9 +280,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="text">The string value for the Post</param>
         public void AddPost(string text)
         {
-            this.OpenAndClickPopoutMenu(TimelineReference.Popout, TimelineReference.PopoutPost, 4000);
-            this.SetValue(TimelineReference.PostText, text, "textarea");
-            this.ClickButton(TimelineReference.PostAdd);
+            this.OpenAndClickPopoutMenu(_client.ElementMapper.TimelineReference.Popout, _client.ElementMapper.TimelineReference.PopoutPost, 4000);
+            this.SetValue(_client.ElementMapper.TimelineReference.PostText, text, "textarea");
+            this.ClickButton(_client.ElementMapper.TimelineReference.PostAdd);
         }
 
         /// <summary>
@@ -243,10 +292,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="note">The string value for the Note</param>
         public void AddNote(string title, string note)
         {
-            this.OpenAndClickPopoutMenu(TimelineReference.Popout, TimelineReference.PopoutNote, 4000);
-            this.SetValue(TimelineReference.NoteTitle, title, "input");
-            this.SetValue(TimelineReference.NoteText, note, "iframe");
-            this.ClickButton(TimelineReference.NoteAdd);
+            this.OpenAndClickPopoutMenu(_client.ElementMapper.TimelineReference.Popout, _client.ElementMapper.TimelineReference.PopoutNote, 4000);
+            this.SetValue(_client.ElementMapper.TimelineReference.NoteTitle, title, "input");
+            this.SetValue(_client.ElementMapper.TimelineReference.NoteText, note, "iframe");
+            this.ClickButton(_client.ElementMapper.TimelineReference.NoteAdd);
         }
 
         #endregion
