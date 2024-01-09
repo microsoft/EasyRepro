@@ -86,7 +86,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 var row = rows.ElementAt(index + 1);
-                var cell = row.FindElements(By.XPath(SubGrid.SubGridReference.SubGridCells)).ElementAt(1);
+                var cell = row.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridCells)).ElementAt(1);
 
                 new Actions(driver).DoubleClick(cell).Perform();
                 driver.WaitForTransaction();

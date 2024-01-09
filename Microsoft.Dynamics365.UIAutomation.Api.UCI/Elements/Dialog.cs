@@ -475,7 +475,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 //Is the button in the ribbon?
-                if (ribbon.TryFindElement(By.XPath(SubGrid.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var command))
+                if (ribbon.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var command))
                 {
                     command.Click(true);
                     driver.WaitForTransaction();
@@ -491,7 +491,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         //Click the button
                         var flyOutMenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList)); ;
-                        if (flyOutMenu.TryFindElement(By.XPath(SubGrid.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
+                        if (flyOutMenu.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
                         {
                             overflowCommand.Click(true);
                             driver.WaitForTransaction();
@@ -507,7 +507,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     var submenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.MoreCommandsMenu));
 
-                    submenu.TryFindElement(By.XPath(SubGrid.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname)), out var subbutton);
+                    submenu.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname)), out var subbutton);
 
                     if (subbutton != null)
                     {
@@ -521,7 +521,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         var subSecondmenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.MoreCommandsMenu));
 
                         subSecondmenu.TryFindElement(
-                            By.XPath(SubGrid.SubGridReference.SubGridOverflowButton
+                            By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton
                                 .Replace("[NAME]", subSecondName)), out var subSecondbutton);
 
                         if (subSecondbutton != null)

@@ -16,36 +16,67 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     public class SubGrid : Element
     {
         #region DTO
-        public static class SubGridReference
+        public class SubGridReference
         {
-            public static string SubGridTitle = "//div[contains(text(), '[NAME]')]";
-            public static string SubGridRow = "//div[@data-id='[NAME]-pcf_grid_control_container']//div[@data-id='grid-container']//div[@data-list-index=\'[INDEX]\']";
-            public static string SubGridLastRow = "//div[@ref='centerContainer']//div[@role='rowgroup']//div[contains(@class, 'ag-row-last')]";
-            public static string SubGridContents = "//div[@id=\"dataSetRoot_[NAME]\"]";
-            public static string SubGridList = "//div[@data-id='[NAME]-pcf_grid_control_container']//div[@data-id='grid-container']//div[@data-automationid='ListCell']";
-            public static string SubGridListCells = ".//div[@class='ag-center-cols-viewport']//div[@role='rowgroup']//div[@row-index]";
-            public static string SubGridViewPickerButton = ".//span[contains(@id, 'ViewSelector') and contains(@id, 'button')]";
-            public static string SubGridViewPickerFlyout = "//div[contains(@id, 'ViewSelector') and contains(@flyoutroot, 'flyoutRootNode')]";
-            public static string SubGridCommandBar = ".//ul[contains(@data-id, 'CommandBar')]";
-            public static string SubGridCommandLabel = ".//button//span[text()=\"[NAME]\"]";
-            public static string SubGridOverflowContainer = ".//div[contains(@data-id, 'flyoutRootNode')]";
-            public static string SubGridOverflowButton = ".//button[contains(@aria-label, '[NAME]')]";
-            public static string SubGridHighDensityList = ".//div[contains(@data-lp-id, \"ReadOnlyGrid|[NAME]\") and contains(@class, 'editableGrid')]";
-            public static string EditableSubGridList = ".//div[contains(@data-lp-id, \"[NAME]\") and contains(@class, 'editableGrid') and not(contains(@class, 'readonly'))]";
-            public static string EditableSubGridListCells = ".//div[contains(@wj-part, 'cells') and contains(@class, 'wj-cells') and contains(@role, 'grid')]";
-            public static string EditableSubGridListCellRows = ".//div[contains(@class, 'wj-row') and contains(@role, 'row')]";
-            public static string EditableSubGridCells = ".//div[@role='gridcell']";
-            public static string SubGridControl = "Entity_SubGridControl";
-            public static string SubGridCells = "Entity_SubGridCells";
-            public static string SubGridRows = ".//div[@role='row' and ./div[@role='gridcell']]";
-            public static string SubGridRowsHighDensity = ".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Data')]";
-            public static string SubGridDataRowsEditable = ".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Data')]";
-            public static string SubGridHeaders = ".//div[contains(@class,'grid-header-text')]";
-            public static string SubGridHeadersHighDensity = ".//div[contains(@class, 'wj-colheaders') and contains(@wj-part, 'chcells')]/div/div";
-            public static string SubGridHeadersEditable = ".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Header')]/div";
-            public static string SubGridRecordCheckbox = "//div[contains(@data-id,'cell-[INDEX]-1') and contains(@data-lp-id,'[NAME]')]";
-            public static string SubGridSearchBox = ".//div[contains(@data-id, 'data-set-quickFind-container')]";
-            public static string SubGridAddButton = "//button[contains(@data-id,'[NAME].AddNewStandard')]/parent::li/parent::ul[contains(@data-lp-id, 'commandbar-SubGridStandard:[NAME]')]";
+            public const string SubGrid = "SubGrid";
+            #region private
+            private string _SubGridTitle = "//div[contains(text(), '[NAME]')]";
+            private string _SubGridRow = "//div[@data-id='[NAME]-pcf_grid_control_container']//div[@data-id='grid-container']//div[@data-list-index=\'[INDEX]\']";
+            private string _SubGridLastRow = "//div[@ref='centerContainer']//div[@role='rowgroup']//div[contains(@class, 'ag-row-last')]";
+            private string _SubGridContents = "//div[@id=\"dataSetRoot_[NAME]\"]";
+            private string _SubGridList = "//div[@data-id='[NAME]-pcf_grid_control_container']//div[@data-id='grid-container']//div[@data-automationid='ListCell']";
+            private string _SubGridListCells = ".//div[@class='ag-center-cols-viewport']//div[@role='rowgroup']//div[@row-index]";
+            private string _SubGridViewPickerButton = ".//span[contains(@id, 'ViewSelector') and contains(@id, 'button')]";
+            private string _SubGridViewPickerFlyout = "//div[contains(@id, 'ViewSelector') and contains(@flyoutroot, 'flyoutRootNode')]";
+            private string _SubGridCommandBar = ".//ul[contains(@data-id, 'CommandBar')]";
+            private string _SubGridCommandLabel = ".//button//span[text()=\"[NAME]\"]";
+            private string _SubGridOverflowContainer = ".//div[contains(@data-id, 'flyoutRootNode')]";
+            private string _SubGridOverflowButton = ".//button[contains(@aria-label, '[NAME]')]";
+            private string _SubGridHighDensityList = ".//div[contains(@data-lp-id, \"ReadOnlyGrid|[NAME]\") and contains(@class, 'editableGrid')]";
+            private string _EditableSubGridList = ".//div[contains(@data-lp-id, \"[NAME]\") and contains(@class, 'editableGrid') and not(contains(@class, 'readonly'))]";
+            private string _EditableSubGridListCells = ".//div[contains(@wj-part, 'cells') and contains(@class, 'wj-cells') and contains(@role, 'grid')]";
+            private string _EditableSubGridListCellRows = ".//div[contains(@class, 'wj-row') and contains(@role, 'row')]";
+            private string _EditableSubGridCells = ".//div[@role='gridcell']";
+            private string _SubGridControl = "Entity_SubGridControl";
+            private string _SubGridCells = "Entity_SubGridCells";
+            private string _SubGridRows = ".//div[@role='row' and ./div[@role='gridcell']]";
+            private string _SubGridRowsHighDensity = ".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Data')]";
+            private string _SubGridDataRowsEditable = ".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Data')]";
+            private string _SubGridHeaders = ".//div[contains(@class,'grid-header-text')]";
+            private string _SubGridHeadersHighDensity = ".//div[contains(@class, 'wj-colheaders') and contains(@wj-part, 'chcells')]/div/div";
+            private string _SubGridHeadersEditable = ".//div[contains(@class,'wj-row') and contains(@role, 'row') and contains(@aria-label, 'Header')]/div";
+            private string _SubGridRecordCheckbox = "//div[contains(@data-id,'cell-[INDEX]-1') and contains(@data-lp-id,'[NAME]')]";
+            private string _SubGridSearchBox = ".//div[contains(@data-id, 'data-set-quickFind-container')]";
+            private string _SubGridAddButton = "//button[contains(@data-id,'[NAME].AddNewStandard')]/parent::li/parent::ul[contains(@data-lp-id, 'commandbar-SubGridStandard:[NAME]')]";
+            #endregion
+            public string SubGridTitle { get => _SubGridTitle; set { _SubGridTitle = value; } }
+            public string SubGridRow { get => _SubGridRow; set { _SubGridRow = value; } }
+            public string SubGridLastRow { get => _SubGridLastRow; set { _SubGridLastRow = value; } }
+            public string SubGridContents { get => _SubGridContents; set { _SubGridContents = value; } }
+            public string SubGridList { get => _SubGridList; set { _SubGridList = value; } }
+            public string SubGridListCells { get => _SubGridListCells; set { _SubGridListCells = value; } }
+            public string SubGridViewPickerButton { get => _SubGridViewPickerButton; set { _SubGridViewPickerButton = value; } }
+            public string SubGridViewPickerFlyout { get => _SubGridViewPickerFlyout; set { _SubGridViewPickerFlyout = value; } }
+            public string SubGridCommandBar { get => _SubGridCommandBar; set { _SubGridCommandBar = value; } }
+            public string SubGridCommandLabel { get => _SubGridCommandLabel; set { _SubGridCommandLabel = value; } }
+            public string SubGridOverflowContainer { get => _SubGridOverflowContainer; set { _SubGridOverflowContainer = value; } }
+            public string SubGridOverflowButton { get => _SubGridOverflowButton; set { _SubGridOverflowButton = value; } }
+            public string SubGridHighDensityList { get => _SubGridHighDensityList; set { _SubGridHighDensityList = value; } }
+            public string EditableSubGridList { get => _EditableSubGridList; set { _EditableSubGridList = value; } }
+            public string EditableSubGridListCells { get => _EditableSubGridListCells; set { _EditableSubGridListCells = value; } }
+            public string EditableSubGridListCellRows { get => _EditableSubGridListCellRows; set { _EditableSubGridListCellRows = value; } }
+            public string EditableSubGridCells { get => _EditableSubGridCells; set { _EditableSubGridCells = value; } }
+            public string SubGridControl { get => _SubGridControl; set { _SubGridControl = value; } }
+            public string SubGridCells { get => _SubGridCells; set { _SubGridCells = value; } }
+            public string SubGridRows { get => _SubGridRows; set { _SubGridRows = value; } }
+            public string SubGridRowsHighDensity { get => _SubGridRowsHighDensity; set { _SubGridRowsHighDensity = value; } }
+            public string SubGridDataRowsEditable { get => _SubGridDataRowsEditable; set { _SubGridDataRowsEditable = value; } }
+            public string SubGridHeaders { get => _SubGridHeaders; set { _SubGridHeaders = value; } }
+            public string SubGridHeadersHighDensity { get => _SubGridHeadersHighDensity; set { _SubGridHeadersHighDensity = value; } }
+            public string SubGridHeadersEditable { get => _SubGridHeadersEditable; set { _SubGridHeadersEditable = value; } }
+            public string SubGridRecordCheckbox { get => _SubGridRecordCheckbox; set { _SubGridRecordCheckbox = value; } }
+            public string SubGridSearchBox { get => _SubGridSearchBox; set { _SubGridSearchBox = value; } }
+            public string SubGridAddButton { get => _SubGridAddButton; set { _SubGridAddButton = value; } }
         }
         #endregion
 
@@ -122,7 +153,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Get Sub Grid Control"), driver =>
             {
-                var subGrid = driver.FindElement(By.XPath(SubGridReference.SubGridContents.Replace("[NAME]", subGridName)));
+                var subGrid = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName)));
 
                 return subGrid.GetAttribute("innerHTML");
             });
@@ -137,16 +168,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 IWebElement viewPicker = null;
 
                 // Find the SubGrid
-                var subGrid = driver.FindElement(By.XPath(SubGridReference.SubGridContents.Replace("[NAME]", subGridName)));
+                var subGrid = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName)));
 
-                var foundPicker = subGrid.TryFindElement(By.XPath(SubGridReference.SubGridViewPickerButton), out viewPicker);
+                var foundPicker = subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridViewPickerButton), out viewPicker);
 
                 if (foundPicker)
                 {
                     viewPicker.Click(true);
 
                     // Locate the ViewSelector flyout
-                    var viewPickerFlyout = driver.WaitUntilAvailable(By.XPath(SubGridReference.SubGridViewPickerFlyout), new TimeSpan(0, 0, 2));
+                    var viewPickerFlyout = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.SubGridReference.SubGridViewPickerFlyout), new TimeSpan(0, 0, 2));
 
                     var viewItems = viewPickerFlyout.FindElements(By.TagName("li"));
 
@@ -173,7 +204,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Click add button of subgrid: {subgridName}"), driver =>
             {
-                driver.FindElement(By.XPath(SubGridReference.SubGridAddButton.Replace("[NAME]", subgridName)))?.Click();
+                driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridAddButton.Replace("[NAME]", subgridName)))?.Click();
 
                 return true;
             });
@@ -187,16 +218,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 IWebElement subGridCommandBar = null;
 
                 // Find the SubGrid
-                var subGrid = driver.FindElement(By.XPath(SubGridReference.SubGridContents.Replace("[NAME]", subGridName)));
+                var subGrid = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName)));
 
                 if (subGrid == null)
                     throw new NotFoundException($"Unable to locate subgrid contents for {subGridName} subgrid.");
 
                 // Check if grid commandBar was found
-                if (subGrid.TryFindElement(By.XPath(SubGridReference.SubGridCommandBar.Replace("[NAME]", subGridName)), out subGridCommandBar))
+                if (subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandBar.Replace("[NAME]", subGridName)), out subGridCommandBar))
                 {
                     //Is the button in the ribbon?
-                    if (subGridCommandBar.TryFindElement(By.XPath(SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var command))
+                    if (subGridCommandBar.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var command))
                     {
                         command.Click(true);
                         driver.WaitForTransaction();
@@ -204,17 +235,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else
                     {
                         // Is the button in More Commands overflow?
-                        if (subGridCommandBar.TryFindElement(By.XPath(SubGridReference.SubGridOverflowButton.Replace("[NAME]", "More commands")), out var moreCommands))
+                        if (subGridCommandBar.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", "More commands")), out var moreCommands))
                         {
                             // Click More Commandss
                             moreCommands.Click(true);
                             driver.WaitForTransaction();
 
                             // Locate the overflow button (More Commands flyout)
-                            var overflowContainer = driver.FindElement(By.XPath(SubGridReference.SubGridOverflowContainer));
+                            var overflowContainer = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowContainer));
 
                             //Click the primary button, if found
-                            if (overflowContainer.TryFindElement(By.XPath(SubGridReference.SubGridOverflowButton.Replace("[NAME]", name)), out var overflowCommand))
+                            if (overflowContainer.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", name)), out var overflowCommand))
                             {
                                 overflowCommand.Click(true);
                                 driver.WaitForTransaction();
@@ -229,10 +260,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (subName != null)
                     {
                         // Locate the sub-button flyout if subName present
-                        var overflowContainer = driver.FindElement(By.XPath(SubGridReference.SubGridOverflowContainer));
+                        var overflowContainer = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowContainer));
 
                         //Click the primary button, if found
-                        if (overflowContainer.TryFindElement(By.XPath(SubGridReference.SubGridOverflowButton.Replace("[NAME]", subName)), out var overflowButton))
+                        if (overflowContainer.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subName)), out var overflowButton))
                         {
                             overflowButton.Click(true);
                             driver.WaitForTransaction();
@@ -244,10 +275,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         if (subSecondName != null)
                         {
                             // Locate the sub-button flyout if subSecondName present
-                            overflowContainer = driver.FindElement(By.XPath(SubGridReference.SubGridOverflowContainer));
+                            overflowContainer = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowContainer));
 
                             //Click the primary button, if found
-                            if (overflowContainer.TryFindElement(By.XPath(SubGridReference.SubGridOverflowButton.Replace("[NAME]", subSecondName)), out var secondOverflowCommand))
+                            if (overflowContainer.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subSecondName)), out var secondOverflowCommand))
                             {
                                 secondOverflowCommand.Click(true);
                                 driver.WaitForTransaction();
@@ -277,7 +308,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 // Find the SubGrid
                 var subGrid = driver.WaitUntilAvailable(
-                    By.XPath(SubGridReference.SubGridContents.Replace("[NAME]", subGridName)),
+                    By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName)),
                     5.Seconds(),
                     $"Unable to find subgrid named {subGridName}.");
 
@@ -294,10 +325,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 IWebElement subGridSearchField = null;
                 // Find the SubGrid
-                var subGrid = driver.FindElement(By.XPath(SubGridReference.SubGridContents.Replace("[NAME]", subGridName)));
+                var subGrid = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName)));
                 if (subGrid != null)
                 {
-                    var foundSearchField = subGrid.TryFindElement(By.XPath(SubGridReference.SubGridSearchBox), out subGridSearchField);
+                    var foundSearchField = subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridSearchBox), out subGridSearchField);
                     if (foundSearchField)
                     {
                         var inputElement = subGridSearchField.FindElement(By.TagName("input"));
@@ -341,21 +372,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 GridItem item = new GridItem();
                 Dictionary<string, object> WindowStateData = (Dictionary<string, object>)driver.ExecuteScript($"return JSON.parse(JSON.stringify(window[Object.keys(window).find(i => !i.indexOf(\"__store$\"))].getState().data))");
                 // Find the SubGrid
-                var subGrid = driver.FindElement(By.XPath(SubGridReference.SubGridContents.Replace("[NAME]", subgridName)));
+                var subGrid = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subgridName)));
 
                 if (subGrid == null)
                     throw new NotFoundException($"Unable to locate subgrid contents for {subgridName} subgrid.");
                 // Check if ReadOnlyGrid was found
-                if (subGrid.TryFindElement(By.XPath(SubGridReference.SubGridListCells.Replace("[NAME]", subgridName)), out subGridRecordList))
+                if (subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName)), out subGridRecordList))
                 {
 
                     // Locate record list
-                    var foundRecords = subGrid.TryFindElement(By.XPath(SubGridReference.SubGridListCells.Replace("[NAME]", subgridName)), out subGridRecordList);
+                    var foundRecords = subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName)), out subGridRecordList);
 
                     if (foundRecords)
                     {
-                        var subGridRecordRows = subGrid.FindElements(By.XPath(SubGridReference.SubGridRows.Replace("[NAME]", subgridName)));
-                        var SubGridContainer = driver.FindElement(By.XPath(SubGridReference.SubGridContents.Replace("[NAME]", subgridName)));
+                        var subGridRecordRows = subGrid.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridRows.Replace("[NAME]", subgridName)));
+                        var SubGridContainer = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subgridName)));
                         string[] gridDataId = SubGridContainer.FindElement(By.XPath($"//div[contains(@data-lp-id,'{subgridName}')]")).GetAttribute("data-lp-id").Split('|');
                         //Need to add entity name
                         string keyForData = Grid.GetGridQueryKey(driver, gridDataId[2] + ":" + subgridName);
@@ -391,10 +422,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 }
                 // Attempt to locate the editable grid list
-                else if (subGrid.TryFindElement(By.XPath(SubGridReference.EditableSubGridList.Replace("[NAME]", subgridName)), out subGridRecordList))
+                else if (subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.EditableSubGridList.Replace("[NAME]", subgridName)), out subGridRecordList))
                 {
                     //Find the columns
-                    var headerCells = subGrid.FindElements(By.XPath(SubGridReference.SubGridHeadersEditable));
+                    var headerCells = subGrid.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridHeadersEditable));
 
                     foreach (IWebElement headerCell in headerCells)
                     {
@@ -403,12 +434,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
 
                     //Find the rows
-                    var rows = subGrid.FindElements(By.XPath(SubGridReference.SubGridDataRowsEditable));
+                    var rows = subGrid.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridDataRowsEditable));
 
                     //Process each row
                     foreach (IWebElement row in rows)
                     {
-                        var cells = row.FindElements(By.XPath(SubGridReference.SubGridCells));
+                        var cells = row.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridCells));
 
                         if (cells.Count > 0)
                         {
@@ -440,10 +471,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 }
                 // Special 'Related' high density grid control for entity forms
-                else if (subGrid.TryFindElement(By.XPath(SubGridReference.SubGridHighDensityList.Replace("[NAME]", subgridName)), out subGridRecordList))
+                else if (subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridHighDensityList.Replace("[NAME]", subgridName)), out subGridRecordList))
                 {
                     //Find the columns
-                    var headerCells = subGrid.FindElements(By.XPath(SubGridReference.SubGridHeadersHighDensity));
+                    var headerCells = subGrid.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridHeadersHighDensity));
 
                     foreach (IWebElement headerCell in headerCells)
                     {
@@ -452,7 +483,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
 
                     //Find the rows
-                    var rows = subGrid.FindElements(By.XPath(SubGridReference.SubGridRowsHighDensity));
+                    var rows = subGrid.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridRowsHighDensity));
 
                     //Process each row
                     foreach (IWebElement row in rows)
@@ -467,7 +498,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                             item.Id = new Guid((string)driver.ExecuteScript(getId));
                         }
 
-                        var cells = row.FindElements(By.XPath(SubGridReference.SubGridCells));
+                        var cells = row.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridCells));
 
                         if (cells.Count > 0)
                         {
@@ -527,16 +558,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Open Subgrid record for subgrid {subgridName}"), driver =>
             {
                 // Find the SubGrid
-                var subGrid = driver.FindElement(By.XPath(SubGridReference.SubGridContents.Replace("[NAME]", subgridName)));
+                var subGrid = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subgridName)));
 
                 // Find list of SubGrid records
                 IWebElement subGridRecordList = null;
-                var foundGrid = subGrid.TryFindElement(By.XPath(SubGridReference.SubGridListCells.Replace("[NAME]", subgridName)), out subGridRecordList);
+                var foundGrid = subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName)), out subGridRecordList);
 
                 // Read Only Grid Found
                 if (subGridRecordList != null && foundGrid)
                 {
-                    var subGridRecordRows = subGrid.FindElements(By.XPath(SubGridReference.SubGridListCells.Replace("[NAME]", subgridName)));
+                    var subGridRecordRows = subGrid.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName)));
                     if (subGridRecordRows == null)
                         throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
                     Actions actions = new Actions(driver);
@@ -564,13 +595,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else if (!foundGrid)
                 {
                     // Read Only Grid Not Found
-                    var foundEditableGrid = subGrid.TryFindElement(By.XPath(SubGridReference.EditableSubGridList.Replace("[NAME]", subgridName)), out subGridRecordList);
+                    var foundEditableGrid = subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.EditableSubGridList.Replace("[NAME]", subgridName)), out subGridRecordList);
 
                     if (foundEditableGrid)
                     {
-                        var editableGridListCells = subGridRecordList.FindElement(By.XPath(SubGridReference.EditableSubGridListCells));
+                        var editableGridListCells = subGridRecordList.FindElement(By.XPath(_client.ElementMapper.SubGridReference.EditableSubGridListCells));
 
-                        var editableGridCellRows = editableGridListCells.FindElements(By.XPath(SubGridReference.EditableSubGridListCellRows));
+                        var editableGridCellRows = editableGridListCells.FindElements(By.XPath(_client.ElementMapper.SubGridReference.EditableSubGridListCellRows));
 
                         var editableGridCellRow = editableGridCellRows[index + 1].FindElements(By.XPath("./div"));
 
@@ -591,7 +622,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", String.Empty);
 
                         //cell-0 is the checkbox for each record
-                        var checkBox = driver.FindElement(By.XPath(SubGridReference.SubGridRecordCheckbox.Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
+                        var checkBox = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridRecordCheckbox.Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
 
                         driver.DoubleClick(checkBox);
 

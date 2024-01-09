@@ -36,6 +36,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public PowerApp.PowerAppReference PowerAppReference;
         public QuickCreate.QuickCreateReference QuickCreateReference;
         public RelatedGrid.RelatedReference RelatedGridReference;
+        public SubGrid.SubGridReference SubGridReference;
         public ElementMapper(IConfiguration config) {
             ApplicationReference = new Navigation.ApplicationReference();
             config.GetSection(Navigation.ApplicationReference.Application).Bind(ApplicationReference);
@@ -67,6 +68,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             config.GetSection(QuickCreate.QuickCreateReference.QuickCreate).Bind(QuickCreateReference);
             RelatedGridReference = new RelatedGrid.RelatedReference();
             config.GetSection(RelatedGrid.RelatedReference.RelatedGrid).Bind(RelatedGridReference);
+            SubGridReference = new SubGrid.SubGridReference();
+            config.GetSection(SubGrid.SubGridReference.SubGrid).Bind(SubGridReference);
         }
     }
     public class WebClient : BrowserPage, IDisposable
