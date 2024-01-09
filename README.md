@@ -1,10 +1,17 @@
 # Overview #
 The purpose of this library is to provide Dynamics customers the ability to facilitate automated UI testing for their projects. These API's provide an easy to use set of commands that make setting up UI testing quick and easy. The functionality provided covers the core CRM commands that end users would perform on a typical workday and working to extend that coverage to more functionality.
 
-## Breaking Change
+## Breaking Changes from earlier versions of Easy Repro
+The impact to all tests is extremely minimal. In the case there is a potential breaking change, please review the section below.
+### Migraiton to .NET Core 
 This version of Easy Repro uses .NET Core 6. Previous versions used .NET Framework 4.6.1. This impacts how configuration for tests are retrieved.
 All tests have been updated showing how to use the runsettings file in combination with the ClassInitialize attribute.
 [ClassInitialize(InheritanceBehavior.BeforeEachDerivedClass)]
+### Timeline
+Previous tests using Timeline references will need to be updated to create an instance of Timeline.TimelineReference. 
+This will allow developers to update the locator at run time avoiding modification of source code.
+Previous tests used the Elements object as shown here [https://github.com/microsoft/EasyRepro/blob/1935401875313a9059481d8af0a3708f66a3fe08/Microsoft.Dynamics365.UIAutomation.Sample/UCI/Timeline/AddActivity.cs#L150]
+New tests should use the Timeline.TimelineReference as shown here: [https://github.com/microsoft/EasyRepro/blob/558c0bf9e4df8ee483c076378e442fe8f3b43ce5/Microsoft.Dynamics365.UIAutomation.Sample/UCI/Timeline/AddActivity.cs#L154]
 
 ## Software Requirements
 ### Supported Version

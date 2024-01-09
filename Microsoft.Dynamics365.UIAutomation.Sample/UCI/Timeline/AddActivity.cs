@@ -110,12 +110,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 //    Name = Reference.Timeline.EmailTo,
                 //    Values = new string[] { "Test Contact", "Jay Zee3" },
                 //});
-
+                Timeline.TimelineReference emailReference = new Timeline.TimelineReference();
+                
                 var multiselectedItems = xrmApp.Timeline.GetEmail(
                     new MultiValueOptionSet()
                     {
-                        Name = Timeline.TimelineReference.EmailTo,
-                    });
+                        
+                        Name = emailReference.EmailTo,
+                    }); 
 
                 xrmApp.ThinkTime(3000);
             }
@@ -147,11 +149,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
 
                 xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"), true);
-
+                Timeline.TimelineReference emailReference = new Timeline.TimelineReference();
                 var success = xrmApp.Timeline.RemoveEmail(
                     new MultiValueOptionSet()
                     {
-                        Name = Timeline.TimelineReference.EmailCC,
+                        Name = emailReference.EmailCC,
                         Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
                     });
 
@@ -214,20 +216,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
         private LookupItem[] CreateBccLookupItemsFor(params string[] lookupNames)
         {
+            Timeline.TimelineReference emailReference = new Timeline.TimelineReference();
             var lookupItemList = new List<LookupItem>();
             foreach (var lookupName in lookupNames)
             {
-                lookupItemList.Add(CreateLookupItem(Timeline.TimelineReference.EmailBcc, lookupName));
+                lookupItemList.Add(CreateLookupItem(emailReference.EmailBcc, lookupName));
             }
             return lookupItemList.ToArray();
         }
 
         private LookupItem[] CreateCcLooupItemsFor(params string[] v1)
         {
+            Timeline.TimelineReference emailReference = new Timeline.TimelineReference();
             var lookupItemList = new List<LookupItem>();
             foreach (var item in v1)
             {
-                lookupItemList.Add(CreateLookupItem(Timeline.TimelineReference.EmailCC, item));
+                lookupItemList.Add(CreateLookupItem(emailReference.EmailCC, item));
             }
             return lookupItemList.ToArray();
         }

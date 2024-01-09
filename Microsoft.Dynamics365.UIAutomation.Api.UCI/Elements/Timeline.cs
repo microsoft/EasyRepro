@@ -14,7 +14,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     /// </summary>
     public class Timeline : Element
     {
-
         #region DTO
         public class TimelineReference
         {
