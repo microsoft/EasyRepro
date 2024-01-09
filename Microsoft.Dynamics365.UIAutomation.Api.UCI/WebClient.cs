@@ -33,6 +33,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public OnlineLogin.LoginReference LoginReference;
         public Lookup.LookupReference LookupReference;
         public Navigation.NavigationReference NavigationReference;
+        public Telemetry.PerformanceWidgetReference PerformanceWidgetReference;
         public PowerApp.PowerAppReference PowerAppReference;
         public QuickCreate.QuickCreateReference QuickCreateReference;
         public RelatedGrid.RelatedReference RelatedGridReference;
@@ -62,6 +63,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             config.GetSection(Lookup.LookupReference.Lookup).Bind(LookupReference);
             NavigationReference = new Navigation.NavigationReference();
             config.GetSection(Navigation.NavigationReference.Navigation).Bind(NavigationReference);
+            PerformanceWidgetReference = new Telemetry.PerformanceWidgetReference();
+            config.GetSection(Telemetry.PerformanceWidgetReference.PerformanceWidget).Bind(PerformanceWidgetReference);
             PowerAppReference = new PowerApp.PowerAppReference();
             config.GetSection(PowerApp.PowerAppReference.PowerApp).Bind(PowerAppReference);
             QuickCreateReference = new QuickCreate.QuickCreateReference();

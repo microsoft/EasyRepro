@@ -24,11 +24,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public string Name;
             public double Value;
         }
-        public static class PerformanceWidgetReference
+        public class PerformanceWidgetReference
         {
-            public static string Container = "//div[@data-id='performance-widget']//*[text()='Page load']";
-            public static string Page = "//div[@data-id='performance-widget']//span[contains(text(), '[NAME]')]";
-        }
+            public const string PerformanceWidget = "PerformanceWidget";
+            private string _Container = "//div[@data-id='performance-widget']//*[text()='Page load']";
+            private string _Page = "//div[@data-id='performance-widget']//span[contains(text(), '[NAME]')]";
+            public string Container { get => _Container; set { _Container = value; } }
+            public string Page { get => _Page; set { _Page = value; }
+    }
+}
         #endregion
         private readonly WebClient _client;
 
@@ -202,11 +206,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal void ShowHidePerformanceWidget()
         {
-            _client.Browser.Driver.ClickWhenAvailable(By.XPath(PerformanceWidgetReference.Container));
+            _client.Browser.Driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.PerformanceWidgetReference.Container));
         }
         internal void SelectPerformanceWidgetPage(string page)
         {
-            _client.Browser.Driver.ClickWhenAvailable(By.XPath(PerformanceWidgetReference.Page.Replace("[NAME]",page)));
+            _client.Browser.Driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.PerformanceWidgetReference.Page.Replace("[NAME]",page)));
         }
 
         internal void ClearResourceTimings()
