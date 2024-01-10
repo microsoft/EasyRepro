@@ -16,7 +16,7 @@ jobs:
             OnlineUsername: '${{ secrets.ONLINE_USER }}'
             OnlinePassword: '${{ secrets.ONLINE_PASSWORD }}'
             OnlineCrmUrl: '${{ secrets.ONLINE_CRMURL  }}'
-            TestFilter: '${{ secrets.TEST_FILTER }}'
+            TestFilter: '${{ env.TEST_FILTER }}'
         run: |   
           dotnet build
           dotnet test --filter "${{ secrets.TEST_FILTER }}" --logger trx --results-directory "TestResults" --settings "Microsoft.Dynamics365.UIAutomation.Sample\AzureDevOps\EasyRepro.runsettings" 
