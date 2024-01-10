@@ -18,7 +18,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         private static readonly string RemoteType = "Chrome";
         private static readonly string RemoteHubServerURL = String.Empty;
         private static readonly string DriversPath = ConfigurationManager.AppSettings["DriversPath"] ?? string.Empty;
-        private static readonly string ConfigPath = ConfigurationManager.AppSettings["ConfigPath"] ?? string.Empty;
+        private static readonly string ConfigPath = ConfigurationManager.AppSettings["ConfigPath"] ?? "ElementReference.json";
         private static readonly bool UsePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"] ?? bool.TrueString);
 
 
