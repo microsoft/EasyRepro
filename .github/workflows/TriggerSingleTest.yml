@@ -1,0 +1,37 @@
+name: Trigger Single Test on Ubuntu-Latest
+
+on:
+  workflow_call:
+    inputs:
+      parameters:
+        required: true
+        type: string
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Integration Test
+        env:
+            OnlineUsername: '${{ secrets.ONLINE_USER }}'
+            OnlinePassword: '${{ secrets.ONLINE_PASSWORD }}'
+            OnlineCrmUrl: '${{ secrets.ONLINE_CRMURL  }}'
+            TestFilter: '${{ secrets.TEST_FILTER }}'
+        run: |   
+          dotnet build
+          dotnet test --filter "${{ secrets.TEST_FILTER }}" --logger trx --results-directory "TestResults" --settings "Microsoft.Dynamics365.UIAutomation.Sample\AzureDevOps\EasyRepro.runsettings" 
+          -- "TestRunParameters.Parameter(name=%22OnlineUsername%22, value=%22${{ secrets.ONLINE_USER }}%22)" -- "TestRunParameters.Parameter(name=%22OnlinePassword%22, value=%22${{ secrets.ONLINE_PASSWORD }}%22)" -- "TestRunParameters.Parameter(name=%22OnlineCrmUrl%22, value=%22${{ secrets.ONLINE_CRMURL  }}%22)" 
+      - name: Sample Test Report
+        uses: dorny/test-reporter@v1.5.0
+        if: success() || failure()    # run this step even if previous step failed
+        with:
+          name: Sample Tests          # Name of the check run which will be created
+          path: '**/*.trx'            
+          reporter: dotnet-trx        # Format of test results      
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2
+        if: ${{always()}}
+        with:
+            name: 'Test Run'
+            path: |
+                **/TestResults/**
