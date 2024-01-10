@@ -6,6 +6,8 @@ on:
       parameters:
         required: true
         type: string
+  workflow_dispatch:
+ 
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -19,6 +21,7 @@ jobs:
             TestFilter: '${{ env.TEST_FILTER }}'
         run: |   
           dotnet build
+          #https://github.com/microsoft/vstest/issues/2387
           dotnet test --filter "${{ secrets.TEST_FILTER }}" --logger trx --results-directory "TestResults" --settings "Microsoft.Dynamics365.UIAutomation.Sample\AzureDevOps\EasyRepro.runsettings" 
           -- "TestRunParameters.Parameter(name=%22OnlineUsername%22, value=%22${{ secrets.ONLINE_USER }}%22)" -- "TestRunParameters.Parameter(name=%22OnlinePassword%22, value=%22${{ secrets.ONLINE_PASSWORD }}%22)" -- "TestRunParameters.Parameter(name=%22OnlineCrmUrl%22, value=%22${{ secrets.ONLINE_CRMURL  }}%22)" 
       - name: Sample Test Report

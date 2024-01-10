@@ -17,7 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public BrowserOptions()
         {
             this.DriversPath = Path.Combine(Directory.GetCurrentDirectory()); //, @"Drivers\");
-            this.ConfigPath = Path.Combine(Directory.GetCurrentDirectory() + "\\ElementReference.json"); //, @"Drivers\");
+            this.ConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "ElementReference.json"); //, @"Drivers\");
             this.DownloadsPath = null;
             this.BrowserType = BrowserType.IE;
             this.BrowserFramework = BrowserFramework.Playwright;

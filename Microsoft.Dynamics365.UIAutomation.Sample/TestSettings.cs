@@ -18,6 +18,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         private static readonly string RemoteType = "Chrome";
         private static readonly string RemoteHubServerURL = String.Empty;
         private static readonly string DriversPath = ConfigurationManager.AppSettings["DriversPath"] ?? string.Empty;
+        private static readonly string ConfigPath = ConfigurationManager.AppSettings["ConfigPath"] ?? string.Empty;
         private static readonly bool UsePrivateMode = Convert.ToBoolean(ConfigurationManager.AppSettings["UsePrivateMode"] ?? bool.TrueString);
 
 
@@ -38,6 +39,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             RemoteHubServer = (!String.IsNullOrEmpty(RemoteHubServerURL)) ? new Uri(RemoteHubServerURL) : null,
             UCITestMode = true,
             UCIPerformanceMode = false,
+            ConfigPath = Path.IsPathRooted(ConfigPath) ? ConfigPath : Path.Combine(Directory.GetCurrentDirectory(), ConfigPath),
             DriversPath = Path.IsPathRooted(DriversPath) ? DriversPath : Path.Combine(Directory.GetCurrentDirectory(), DriversPath), 
             DisableExtensions = false,
             DisableFeatures = false,
@@ -69,6 +71,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             RemoteHubServer = SharedOptions.RemoteHubServer,
             UCITestMode = SharedOptions.UCITestMode,
             UCIPerformanceMode = SharedOptions.UCIPerformanceMode,
+            ConfigPath = SharedOptions.ConfigPath,
             DriversPath = SharedOptions.DriversPath,
             DisableExtensions = SharedOptions.DisableExtensions,
             DisableFeatures = SharedOptions.DisableFeatures,
