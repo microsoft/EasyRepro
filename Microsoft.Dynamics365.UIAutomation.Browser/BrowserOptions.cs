@@ -47,7 +47,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.DisableImplSidePainting = false;
             this.DisableDevShmUsage = false;
             this.DisableInfoBars = false;
-            this.Headless = false;
+            this.Headless = true;
             this.Kiosk = false;
             this.TestTypeBrowser = false;
             this.CookieСontrolsMode = 0;
