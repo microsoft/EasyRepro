@@ -40,7 +40,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.DisablePopupBlocking = false;
             this.DisableSettingsWindow = false;
             this.EnableJavascript = false;
-            this.NoSandbox = false;
+            this.NoSandbox = true;
             this.DisableGpu = false;
             this.DumpDom = false;
             this.EnableAutomation = false;
@@ -122,6 +122,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public virtual ChromeOptions ToChrome()
         {
             var options = new ChromeOptions();
+            if (this.NoSandbox)
+            {
+                options.AddArgument("--no-sandbox");
+            }
 
             if (this.StartMaximized)
             {
@@ -176,11 +180,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             if (this.EnableJavascript)
             {
                 options.AddArgument("--enable-javascript");
-            }
-
-            if (this.NoSandbox)
-            {
-                options.AddArgument("--no-sandbox");
             }
 
             if (this.DisableGpu)
