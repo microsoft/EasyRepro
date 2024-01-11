@@ -220,6 +220,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
 
             options.AddUserProfilePreference("profile.cookie_controls_mode", this.CookieСontrolsMode);
+            options.AddArgument("--remote-debugging-port=9222");
             return options;
         }
 
