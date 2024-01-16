@@ -15,6 +15,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public string Value { get; set; }
         public bool IsAvailable { get; set; }
         public bool IsClickable { get; set; }
+        public bool Selected { get; set; }
         #endregion
 
         public Element(BrowserPage page)
@@ -25,14 +26,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         #region methods
         public void Clear()
         {
-            
             _page.Execute(new BrowserCommandOptions(), browser =>
             {
                 return true;
             });
         }
 
-        public void Click()
+        public void Click(bool? click = true)
         {
 
         }
@@ -44,15 +44,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             return "";
         }
+        public bool HasAttribute(string attributeName)
+        {
+            return true;
+        }
         public void Focus()
         {
 
         }
-        public void SendKeys()
+        public void SendKeys(string key)
         {
 
         }
-        public void SetValue()
+        public void SetValue(string value)
         {
 
         }

@@ -12,7 +12,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             throw new NotImplementedException("TBD");
         }
-        public static Element? FindElements(this Element? element, string selector)
+        public static List<Element>? FindElements(this Element? element, string selector)
         {
             throw new NotImplementedException("TBD");
         }

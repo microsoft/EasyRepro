@@ -113,16 +113,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         internal bool WaitForMainPage(TimeSpan timeout, string errorMessage)
             => WaitForMainPage(timeout, null, () => throw new InvalidOperationException(errorMessage));
 
-        internal bool WaitForMainPage(TimeSpan? timeout = null, Action<IWebElement> successCallback = null, Action failureCallback = null)
+        internal bool WaitForMainPage(TimeSpan? timeout = null, Action<Element> successCallback = null, Action failureCallback = null)
         {
-            IWebDriver driver = Browser.Driver;
+            //IWebDriver driver = Browser;
             timeout = timeout ?? Constants.DefaultTimeout;
             successCallback = successCallback ?? (
                                   _ =>
                                   {
-                                      bool isUCI = driver.HasElement(By.XPath(this.ElementMapper.LoginReference.CrmUCIMainPage));
+                                      bool isUCI = this.Browser.Browser.HasElement(this.ElementMapper.LoginReference.CrmUCIMainPage);
                                       if (isUCI)
-                                          driver.WaitForTransaction();
+                                          driver.Wait();
                                   });
 
             var xpathToMainPage = By.XPath(this.ElementMapper.LoginReference.CrmMainPage);
@@ -139,50 +139,71 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         internal Element WaitUntilAvailable(string elementLocator, TimeSpan timeToWait)
         {
             if (this.Browser.Options.BrowserFramework == BrowserFramework.Selenium)
-                return new Element();
+                return new Element(this);
             else if (this.Browser.Options.BrowserFramework == BrowserFramework.Playwright)
-                return new Element();
-            else return new Element();
+                return new Element(this);
+            else return new Element(this);
         }
 
         #region FormContextType
 
         // Used by SetValue methods to determine the field context
-        public IWebElement ValidateFormContext(IWebDriver driver, FormContextType formContextType, string field, IWebElement fieldContainer)
+        public Element ValidateFormContext(IWebBrowser driver, FormContextType formContextType, string field, Element fieldContainer)
         {
             if (formContextType == FormContextType.QuickCreate)
             {
                 // Initialize the quick create form context
                 // If this is not done -- element input will go to the main form due to new flyout design
-                var formContext = driver.WaitUntilAvailable(By.XPath(this.ElementMapper.QuickCreateReference.QuickCreateFormContext));
-                fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
+                if (driver.HasElement(this.ElementMapper.QuickCreateReference.QuickCreateFormContext)) 
+                    fieldContainer = driver.FindElement(_entityReference.TextFieldContainer.Replace("[NAME]", field));
+                else
+                    throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, this.ElementMapper.QuickCreateReference.QuickCreateFormContext));
+
+                //var formContext = driver.WaitUntilAvailable(By.XPath(this.ElementMapper.QuickCreateReference.QuickCreateFormContext));
+                //fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
             }
             else if (formContextType == FormContextType.Entity)
             {
+                if (driver.HasElement(_entityReference.FormContext))
+                    fieldContainer = driver.FindElement(_entityReference.TextFieldContainer.Replace("[NAME]", field));
+                else
+                    throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, _entityReference.FormContext));
                 // Initialize the entity form context
-                var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.FormContext));
-                fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
+                //var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.FormContext));
+                //fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
             }
             else if (formContextType == FormContextType.BusinessProcessFlow)
             {
+                if (driver.HasElement(this.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext))
+                    fieldContainer = driver.FindElement(this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field));
+                else
+                    throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer));
                 // Initialize the Business Process Flow context
-                var formContext = driver.WaitUntilAvailable(By.XPath(this.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext));
-                fieldContainer = formContext.WaitUntilAvailable(By.XPath(this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field)));
+                //var formContext = driver.WaitUntilAvailable(By.XPath(this.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext));
+                //fieldContainer = formContext.WaitUntilAvailable(By.XPath(this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field)));
             }
             else if (formContextType == FormContextType.Header)
             {
+                if (driver.HasElement(_entityReference.HeaderContext))
+                    fieldContainer = driver.FindElement(_entityReference.TextFieldContainer.Replace("[NAME]", field));
+                else
+                    throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer));
                 // Initialize the Header context
-                var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.HeaderContext));
-                fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
+                //var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.HeaderContext));
+                //fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
             }
             else if (formContextType == FormContextType.Dialog)
             {
+                if (driver.HasElement(this.ElementMapper.DialogsReference.DialogContext))
+                    fieldContainer = driver.FindElement(_entityReference.TextFieldContainer.Replace("[NAME]", field));
+                else
+                    throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, this.ElementMapper.DialogsReference.DialogContext));
                 // Initialize the Dialog context
-                driver.WaitForTransaction();
-                var formContext = driver
-                    .FindElements(By.XPath(this.ElementMapper.DialogsReference.DialogContext))
-                    .LastOrDefault() ?? throw new NotFoundException("Unable to find a dialog.");
-                fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
+                //driver.Wait();
+                //var formContext = driver
+                //    .FindElements(By.XPath(this.ElementMapper.DialogsReference.DialogContext))
+                //    .LastOrDefault() ?? throw new NotFoundException("Unable to find a dialog.");
+                //fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
             }
 
             return fieldContainer;

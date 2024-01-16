@@ -24,22 +24,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client = new WebClient(options);
         }
 
-        public OnlineLogin OnlineLogin => this.GetElement<OnlineLogin>(_client);
-        public Navigation Navigation => this.GetElement<Navigation>(_client);
-        public CommandBar CommandBar => this.GetElement<CommandBar>(_client);
+        public OnlineLogin OnlineLogin => this.GetArea<OnlineLogin>(_client);
+        public Navigation Navigation => this.GetArea<Navigation>(_client);
+        public CommandBar CommandBar => this.GetArea<CommandBar>(_client);
         public Grid Grid => this.GetArea<Grid>(_client);
-        public PowerApp PowerApp => this.GetElement<PowerApp>(_client);
-        public Entity Entity => this.GetElement<Entity>(_client);
-        public Dialogs Dialogs => this.GetElement<Dialogs>(_client);
-        public Timeline Timeline => this.GetElement<Timeline>(_client);
-        public BusinessProcessFlow BusinessProcessFlow => this.GetElement<BusinessProcessFlow>(_client);
-        public Dashboard Dashboard => this.GetElement<Dashboard>(_client);
-        public RelatedGrid RelatedGrid => this.GetElement<RelatedGrid>(_client);
+        public PowerApp PowerApp => this.GetArea<PowerApp>(_client);
+        public Entity Entity => this.GetArea<Entity>(_client);
+        public Dialogs Dialogs => this.GetArea<Dialogs>(_client);
+        public Timeline Timeline => this.GetArea<Timeline>(_client);
+        public BusinessProcessFlow BusinessProcessFlow => this.GetArea<BusinessProcessFlow>(_client);
+        public Dashboard Dashboard => this.GetArea<Dashboard>(_client);
+        public RelatedGrid RelatedGrid => this.GetArea<RelatedGrid>(_client);
 
-        public GlobalSearch GlobalSearch => this.GetElement<GlobalSearch>(_client);
-		public QuickCreate QuickCreate => this.GetElement<QuickCreate>(_client);
-        public Lookup Lookup => this.GetElement<Lookup>(_client);
-        public Telemetry Telemetry => this.GetElement<Telemetry>(_client);
+        public GlobalSearch GlobalSearch => this.GetArea<GlobalSearch>(_client);
+		public QuickCreate QuickCreate => this.GetArea<QuickCreate>(_client);
+        public Lookup Lookup => this.GetArea<Lookup>(_client);
+        public Telemetry Telemetry => this.GetArea<Telemetry>(_client);
 
         public T GetArea<T>(WebClient client)
             where T : Element

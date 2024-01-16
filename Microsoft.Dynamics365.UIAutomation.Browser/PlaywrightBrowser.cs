@@ -155,6 +155,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             _page.WaitForTimeoutAsync((float)timeout.Value.TotalMilliseconds);
         }
 
+        public void ClickWhenAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object ExecuteScript(string selector, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool HasElement(string selector)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Element WaitUntilAvailable(string selector)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Element WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Element WaitUntilAvailable(string selector, string exceptionMessage)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion Disposal / Finalization
     }
 }

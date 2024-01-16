@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
-    public class Grid //: Element
+    public class Grid : Element
     {
         #region DTO
         public  class GridReference
@@ -86,7 +86,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #endregion
         private readonly WebClient _client;
         public enum GridType { PowerAppsGridControl, LegacyReadOnlyGrid, ReadOnlyGrid, EditableGrid }
-        public Grid(WebClient client) : base()
+        public Grid(WebClient client) : base(client)
         {
             _client = client;
         }
