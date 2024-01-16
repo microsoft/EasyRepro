@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using OpenQA.Selenium;
 using System;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
@@ -50,7 +49,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
         #endregion
         private readonly WebClient _client;
-        public BusinessProcessFlow(WebClient client)
+        public BusinessProcessFlow(WebClient client): base(client)
         {
             _client = client;
         }
@@ -212,17 +211,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
 
                 // Initialize the Business Process Flow context
-                var formContext = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext));
-                var fieldElement = formContext.WaitUntilAvailable(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.FieldSectionItemContainer.Replace("[NAME]", field)));
+                var formContext = driver.WaitUntilAvailable(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext);
+                var fieldElement = formContext.WaitUntilAvailable(_client.ElementMapper.BusinessProcessFlowReference.FieldSectionItemContainer.Replace("[NAME]", field));
                 Field returnField = new Field(fieldElement);
                 returnField.Name = field;
 
-                IWebElement fieldLabel = null;
+                Element fieldLabel = null;
                 try
                 {
-                    fieldLabel = fieldElement.FindElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.TextFieldLabel.Replace("[NAME]", field)));
+                    fieldLabel = fieldElement.FindElement(_client.ElementMapper.BusinessProcessFlowReference.TextFieldLabel.Replace("[NAME]", field));
                 }
-                catch (NoSuchElementException)
+                catch (KeyNotFoundException)
                 {
                     // Swallow
                 }
@@ -246,22 +245,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Set BPF Value"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field)));
+                var fieldContainer = driver.WaitUntilAvailable(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field));
 
-                if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
+                if (fieldContainer.FindElements("//input").Count > 0)
                 {
-                    var input = fieldContainer.FindElement(By.TagName("input"));
+                    var input = fieldContainer.FindElement("//input");
                     if (input != null)
                     {
                         input.Click(true);
                         input.Clear();
-                        input.SendKeys(value, true);
+                        input.SetValue(value);
                         input.SendKeys(Keys.Tab);
                     }
                 }
-                else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
+                else if (fieldContainer.FindElements("//textarea").Count > 0)
                 {
-                    var textarea = fieldContainer.FindElement(By.TagName("textarea"));
+                    var textarea = fieldContainer.FindElement("//textarea");
                     textarea.Click();
                     textarea.Clear();
                     textarea.SendKeys(value);
@@ -284,12 +283,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Set BPF Value: {option.Name}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", option.Name)));
+                var fieldContainer = driver.WaitUntilAvailable(_client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", option.Name));
 
-                if (fieldContainer.FindElements(By.TagName("select")).Count > 0)
+                if (fieldContainer.FindElements("//select").Count > 0)
                 {
-                    var select = fieldContainer.FindElement(By.TagName("select"));
-                    var options = select.FindElements(By.TagName("option"));
+                    var select = fieldContainer.FindElement("//select");
+                    var options = select.FindElements("//option");
 
                     foreach (var op in options)
                     {
@@ -316,16 +315,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Set BPF Value: {option.Name}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.BooleanFieldContainer.Replace("[NAME]", option.Name)));
+                var fieldContainer = driver.WaitUntilAvailable(_client.ElementMapper.BusinessProcessFlowReference.BooleanFieldContainer.Replace("[NAME]", option.Name));
                 var existingValue = fieldContainer.GetAttribute("Title") == "Yes";
 
                 if (option.Value != existingValue)
                 {
                     fieldContainer.Click();
-                    fieldContainer.ClickWhenAvailable(By.XPath("//option[not(@data-selected)]"));
+                    fieldContainer.ClickWhenAvailable("//option[not(@data-selected)]");
                 }
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -344,9 +343,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var dateField = _client.ElementMapper.BusinessProcessFlowReference.DateTimeFieldContainer.Replace("[FIELD]", field);
 
-                if (driver.HasElement(By.XPath(dateField)))
+                if (driver.HasElement(dateField))
                 {
-                    var fieldElement = driver.ClickWhenAvailable(By.XPath(dateField));
+                    var fieldElement = driver.ClickWhenAvailable(dateField);
 
                     if (fieldElement.GetAttribute("value").Length > 0)
                     {
@@ -358,13 +357,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         _client.ThinkTime(250);
                         fieldElement.Click();
                         _client.ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Backspace);
+                        //fieldElement.SendKeys(Keys.Backspace);
                         _client.ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Backspace);
+                        //fieldElement.SendKeys(Keys.Backspace);
                         _client.ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Backspace);
+                        //fieldElement.SendKeys(Keys.Backspace);
                         _client.ThinkTime(250);
-                        fieldElement.SendKeys(date.ToString(format), true);
+                        fieldElement.SetValue(date.ToString(format));
                         _client.ThinkTime(500);
                         fieldElement.SendKeys(Keys.Tab);
                         _client.ThinkTime(250);
@@ -375,11 +374,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         _client.ThinkTime(250);
                         fieldElement.Click();
                         _client.ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        _client.ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Backspace);
-                        _client.ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Backspace);
+                        //fieldElement.SendKeys(Keys.Backspace);
+                        //_client.ThinkTime(250);
+                        //fieldElement.SendKeys(Keys.Backspace);
+                        //_client.ThinkTime(250);
+                        //fieldElement.SendKeys(Keys.Backspace);
                         _client.ThinkTime(250);
                         fieldElement.SendKeys(date.ToString(format));
                         _client.ThinkTime(250);
@@ -401,14 +400,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Next Stage"), driver =>
             {
                 //Find the Business Process Stages
-                var processStages = driver.FindElements(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.NextStage_UCI));
+                var processStages = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage_UCI);
 
                 if (processStages.Count == 0)
                     return true;
 
                 foreach (var processStage in processStages)
                 {
-                    var divs = processStage.FindElements(By.TagName("div"));
+                    var divs = processStage.FindElements("//div");
 
                     //Click the Label of the Process Stage if found
                     foreach (var div in divs)
@@ -420,14 +419,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                 }
 
-                var flyoutFooterControls = driver.FindElements(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.Flyout_UCI));
+                var flyoutFooterControls = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.Flyout_UCI);
 
                 foreach (var control in flyoutFooterControls)
                 {
                     //If there's a field to enter, fill it out
                     if (businessProcessFlowField != null)
                     {
-                        var bpfField = control.FindElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFieldName.Replace("[NAME]", businessProcessFlowField.Name)));
+                        var bpfField = control.FindElement(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFieldName.Replace("[NAME]", businessProcessFlowField.Name));
 
                         if (bpfField != null)
                         {
@@ -440,7 +439,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
 
                     //Click the Next Stage Button
-                    var nextButton = control.FindElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.NextStageButton));
+                    var nextButton = control.FindElement(_client.ElementMapper.BusinessProcessFlowReference.NextStageButton);
                     nextButton.Click();
                 }
 
@@ -453,11 +452,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Select Stage: {stageName}"), driver =>
             {
                 //Find the Business Process Stages
-                var processStages = driver.FindElements(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.NextStage_UCI));
+                var processStages = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage_UCI);
 
                 foreach (var processStage in processStages)
                 {
-                    var divs = processStage.FindElements(By.TagName("div"));
+                    var divs = processStage.FindElements("//div");
 
                     //Click the Label of the Process Stage if found
                     foreach (var div in divs)
@@ -469,7 +468,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                 }
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -485,12 +484,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     SelectStage(stageName);
 
-                    if (!driver.HasElement(By.XPath("//button[contains(@data-id,'setActiveButton')]")))
-                        throw new NotFoundException($"Unable to find the Set Active button. Please verify the stage name {stageName} is correct.");
+                    if (!driver.HasElement("//button[contains(@data-id,'setActiveButton')]"))
+                        throw new KeyNotFoundException($"Unable to find the Set Active button. Please verify the stage name {stageName} is correct.");
 
-                    driver.FindElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.SetActiveButton)).Click(true);
+                    driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.SetActiveButton).Click(true);
 
-                    driver.WaitForTransaction();
+                    driver.Wait();
                 }
 
                 return true;
@@ -503,15 +502,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 //Click the BPF Stage
                 BPFSelectStage(stageName, 0);
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 //Pin the Stage
-                if (driver.HasElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.PinStageButton)))
-                    driver.FindElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.PinStageButton)).Click();
+                if (driver.HasElement(_client.ElementMapper.BusinessProcessFlowReference.PinStageButton))
+                    driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.PinStageButton).Click();
                 else
-                    throw new NotFoundException($"Pin button for stage {stageName} not found.");
+                    throw new KeyNotFoundException($"Pin button for stage {stageName} not found.");
 
-                driver.WaitForTransaction();
+                driver.Wait();
                 return true;
             });
         }
@@ -522,15 +521,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 //Click the BPF Stage
                 BPFSelectStage(stageName, 0);
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 //Pin the Stage
-                if (driver.HasElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.CloseStageButton)))
-                    driver.FindElement(By.XPath(_client.ElementMapper.BusinessProcessFlowReference.CloseStageButton)).Click(true);
+                if (driver.HasElement(_client.ElementMapper.BusinessProcessFlowReference.CloseStageButton))
+                    driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.CloseStageButton).Click(true);
                 else
-                    throw new NotFoundException($"Close button for stage {stageName} not found.");
+                    throw new KeyNotFoundException($"Close button for stage {stageName} not found.");
 
-                driver.WaitForTransaction();
+                driver.Wait();
                 return true;
             });
         }
@@ -541,10 +540,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Switch BusinessProcessFlow"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.EntityReference.ProcessButton), TimeSpan.FromSeconds(5));
+                driver.ClickWhenAvailable(_client.ElementMapper.EntityReference.ProcessButton, TimeSpan.FromSeconds(5));
 
                 driver.ClickWhenAvailable(
-                    By.XPath(_client.ElementMapper.EntityReference.SwitchProcess),
+                    _client.ElementMapper.EntityReference.SwitchProcess,
                     TimeSpan.FromSeconds(5),
                     "The Switch Process Button is not available."
                 );

@@ -16,6 +16,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool IsAvailable { get; set; }
         public bool IsClickable { get; set; }
         public bool Selected { get; set; }
+        public string Text { get; set; }
         #endregion
 
         public Element(BrowserPage page)

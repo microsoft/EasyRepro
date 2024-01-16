@@ -9,9 +9,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
     public interface IWebBrowser
     {
-        void ClickWhenAvailable(string selector);
-        void ClickWhenAvailable(string selector, TimeSpan timeToWait, string exceptionMessage);
+        Element ClickWhenAvailable(string selector);
+        void ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage = null);
         Element FindElement(string selector);
+        List<Element>? FindElements(string selector);
         object ExecuteScript(string selector, params object[] args);
         bool HasElement(string selector);
         void Navigate(string url);

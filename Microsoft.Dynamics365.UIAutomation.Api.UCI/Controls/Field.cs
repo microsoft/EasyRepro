@@ -20,7 +20,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             public static string RequiredIcon = ".//div[contains(@data-id, 'required-icon') or contains(@id, 'required-icon')]";
         }
         //Constructors
-        public Field(IWebElement containerElement)
+        public Field(Element containerElement)
         {
             this.containerElement = containerElement;
         }
@@ -31,10 +31,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
 
-        internal IWebElement _inputElement { get; set; }
+        internal Element _inputElement { get; set; }
 
         //Element that contains the container for the field on the form
-        internal IWebElement containerElement { get; set; }
+        internal Element containerElement { get; set; }
 
         public void Click()
         {
