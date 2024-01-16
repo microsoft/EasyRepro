@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Interactions;
+//using OpenQA.Selenium;
+//using OpenQA.Selenium.Interactions;
 using System;
 using System.Collections.Generic;
 
@@ -31,7 +31,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         private readonly WebClient _client;
         private Entity.EntityReference _entityReference;
         #region ctor
-        public CommandBar(WebClient client) : base()
+        public CommandBar(WebClient client) : base(client)
         {
             _client = client;
             _entityReference = new Entity.EntityReference();
@@ -72,7 +72,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Click Command"), driver =>
             {
                 // Find the button in the CommandBar
-                IWebElement ribbon;
+                Element ribbon;
                 // Checking if any dialog is active
                 if (driver.HasElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext)))
                 {
@@ -93,39 +93,44 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 //Is the button in the ribbon?
-                if (ribbon.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var command))
+                if (driver.HasElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                 {
+                    var command = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
                     command.Click(true);
                     driver.Wait();
                 }
                 else
                 {
                     //Is the button in More Commands?
-                    if (ribbon.TryFindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton), out var moreCommands))
+                    if (driver.HasElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton))
                     {
                         // Click More Commands
+                        var moreCommands = driver.FindElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton);
                         moreCommands.Click(true);
                         driver.Wait();
 
                         //Click the button
-                        var flyOutMenu = driver.WaitUntilAvailable(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList); ;
-                        if (flyOutMenu.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
+                        var flyOutMenu = driver.WaitUntilAvailable(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList);
+                        if (driver.HasElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                         {
+                            var overflowCommand = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
                             overflowCommand.Click(true);
                             driver.Wait();
                         }
                         else
                             throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar or the flyout menu.");
                     }
-                    else if (ribbon.TryFindElement(By.XPath(_client.ElementMapper.EntityReference.MoreCommands), out moreCommands))
+                    else if (driver.HasElement(_client.ElementMapper.EntityReference.MoreCommands))
                     {
+                        var moreCommands = driver.FindElement(_client.ElementMapper.EntityReference.MoreCommands);
                         moreCommands.Click(true);
                         driver.Wait();
 
                         //Click the button
                         var flyOutMenu = driver.WaitUntilAvailable(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList); ;
-                        if (flyOutMenu.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
+                        if (driver.HasElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                         {
+                            var overflowCommand = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
                             overflowCommand.Click(true);
                             driver.Wait();
                         }
@@ -200,7 +205,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 moreCommandsButton.Click(true);
 
-                driver.WaitUntilVisible(By.XPath(_client.ElementMapper.CommandBarReference.MoreCommandsMenu),
+                driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu,
                     menu => AddMenuItems(menu, commandBarItems),
                     "Unable to locate the 'More Commands' menu"
                     );
@@ -209,9 +214,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var result = GetCommandNames(commandBarItems.Values);
             return result;
         }
-        private static void AddMenuItems(IWebElement menu, Dictionary<string, IWebElement> dictionary)
+        private static void AddMenuItems(Element menu, Dictionary<string, Element> dictionary)
         {
-            var menuItems = menu.FindElements(By.TagName("li"));
+            var menuItems = menu.FindElements("//li");
             foreach (var item in menuItems)
             {
                 string key = item.Text.ToLowerString();
@@ -227,7 +232,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return result;
         }
 
-        private static List<string> GetCommandNames(IEnumerable<IWebElement> commandBarItems)
+        private static List<string> GetCommandNames(IEnumerable<Element> commandBarItems)
         {
             var result = new List<string>();
             foreach (var value in commandBarItems)
@@ -245,14 +250,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return result;
         }
 
-        private IWebElement GetRibbon(IWebDriver driver)
+        private Element GetRibbon(IWebBrowser driver)
         {
-            var xpathCommandBarContainer = By.XPath(_client.ElementMapper.CommandBarReference.Container);
-            var xpathCommandBarGrid = By.XPath(_client.ElementMapper.CommandBarReference.ContainerGrid);
+            var xpathCommandBarContainer = _client.ElementMapper.CommandBarReference.Container;
+            var xpathCommandBarGrid = _client.ElementMapper.CommandBarReference.ContainerGrid;
 
-            IWebElement ribbon =
-                driver.WaitUntilAvailable(xpathCommandBarContainer, 5.Seconds()) ??
-                driver.WaitUntilAvailable(xpathCommandBarGrid, 5.Seconds()) ??
+            Element ribbon =
+                driver.WaitUntilAvailable(xpathCommandBarContainer, new TimeSpan(0,0,5), null) ??
+                driver.WaitUntilAvailable(xpathCommandBarGrid, new TimeSpan(0, 0, 5), null) ??
                 throw new InvalidOperationException("Unable to find the ribbon.");
 
             return ribbon;
@@ -268,10 +273,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Close Opportunity"), driver =>
             {
-                var closeBtn = driver.WaitUntilAvailable(By.XPath(xPathQuery), "Opportunity Close Button is not available");
+                var closeBtn = driver.WaitUntilAvailable(xPathQuery, "Opportunity Close Button is not available");
 
                 closeBtn?.Click();
-                driver.WaitUntilVisible(By.XPath(_client.ElementMapper.DialogsReference.CloseOpportunity.Ok));
+                driver.WaitUntilVisible(_client.ElementMapper.DialogsReference.CloseOpportunity.Ok);
                 Dialogs dialogs = new Dialogs(_client);
                 dialogs.CloseOpportunityDialog(true);
 
@@ -289,7 +294,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.CloseDateId], closeDate);
                 //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
 
-                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.DialogsReference.CloseOpportunity.Ok),
+                driver.ClickWhenAvailable(_client.ElementMapper.DialogsReference.CloseOpportunity.Ok,
     TimeSpan.FromSeconds(5),
     "The Close Opportunity dialog is not available."
     );
@@ -304,14 +309,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Delete Entity"), driver =>
             {
-                var deleteBtn = driver.WaitUntilAvailable(By.XPath(_entityReference.Delete),
+                var deleteBtn = driver.WaitUntilAvailable(_entityReference.Delete,
                     "Delete Button is not available");
 
                 deleteBtn?.Click();
                 Dialogs dialogs = new Dialogs(_client);
                 dialogs.ConfirmationDialog(true);
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
