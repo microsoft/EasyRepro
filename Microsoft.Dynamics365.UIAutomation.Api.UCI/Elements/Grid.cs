@@ -112,7 +112,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Get Grid Control"), driver =>
             {
-                var gridContainer = driver.FindElement(By.XPath("//div[contains(@data-lp-id,'MscrmControls.Grid')]"));
+                var gridContainer = driver.FindElement("//div[contains(@data-lp-id,'MscrmControls.Grid')]");
 
                 return gridContainer.GetAttribute("innerHTML");
             });
@@ -124,12 +124,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Open View Picker"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.ViewSelector),
+                driver.ClickWhenAvailable(_client.ElementMapper.GridReference.ViewSelector,
                     TimeSpan.FromSeconds(20),
                     "Unable to click the View Picker"
                 );
 
-                var viewContainer = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.ViewContainer));
+                var viewContainer = driver.FindElement(_client.ElementMapper.GridReference.ViewContainer);
                 var viewItems = viewContainer.FindElements(By.TagName("li"));
 
                 var result = new Dictionary<string, IWebElement>();
@@ -192,7 +192,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //Generic Grid = //div[@data-type='Grid']
                 //Editable Grid = //div[@aria-label='Editable Grid']
 
-                var grid = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.GridContainer));
+                var grid = driver.FindElement(_client.ElementMapper.GridReference.GridContainer);
                 bool lastRow = false;
                 IWebElement gridRow = null;
                 Grid.GridType gridType = Grid.GridType.PowerAppsGridControl;
@@ -201,17 +201,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 while (!lastRow)
                 {
                     //determine which grid
-                    if (driver.HasElement(By.XPath(_client.ElementMapper.GridReference.Rows))) //Contacts
+                    if (driver.HasElement(_client.ElementMapper.GridReference.Rows)) //Contacts
                     {
                         gridType = Grid.GridType.PowerAppsGridControl;
                         Trace.WriteLine("Found Power Apps Grid.");
                     }
-                    else if (driver.HasElement(By.XPath(_client.ElementMapper.GridReference.LegacyReadOnlyRows)))//Lead
+                    else if (driver.HasElement(_client.ElementMapper.GridReference.LegacyReadOnlyRows))//Lead
                     {
                         gridType = Grid.GridType.LegacyReadOnlyGrid;
                         Trace.WriteLine("Found Legacy Read Only Grid.");
                     }
-                    else if (driver.HasElement(By.XPath(_client.ElementMapper.GridReference.EditableGrid))) //Account
+                    else if (driver.HasElement(_client.ElementMapper.GridReference.EditableGrid)) //Account
                     {
                         gridType = Grid.GridType.EditableGrid;
                         Trace.WriteLine("Found Editable Grid.");
@@ -223,22 +223,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
 
 
-                    if (!driver.HasElement(By.XPath(lastRowXPathLocator)))
+                    if (!driver.HasElement(lastRowXPathLocator))
                     {
                         lastRowInCurrentView = ClickGridAndPageDown(driver, grid, lastRowInCurrentView, gridType);
                     }
                     else
                     {
-                        gridRow = driver.FindElement(By.XPath(lastRowXPathLocator));
+                        gridRow = driver.FindElement(lastRowXPathLocator);
                         lastRow = true;
                     }
-                    if (driver.HasElement(By.XPath(_client.ElementMapper.GridReference.LastRow)))
+                    if (driver.HasElement(_client.ElementMapper.GridReference.LastRow))
                     {
                         lastRow = true;
                     }
                 }
                 if (gridRow == null) throw new NotFoundException($"Grid Row {index} not found.");
-                var xpathToGrid = By.XPath("//div[contains(@data-id,'DataSetHostContainer')]");//works for: PowerAppsGridControl, LegacyReadOnlyControl, 
+                var xpathToGrid = "//div[contains(@data-id,'DataSetHostContainer')]";//works for: PowerAppsGridControl, LegacyReadOnlyControl, 
                 IWebElement control = driver.WaitUntilAvailable(xpathToGrid);
 
                 Func<Actions, Actions> action;
@@ -293,6 +293,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public BrowserCommandResult<bool> Search(string searchCriteria, bool clearByDefault = true, int thinkTime = Constants.DefaultThinkTime)
         {
             _client.ThinkTime(thinkTime);
+
+            //find search bar
+            //input value
+            //pass results back
 
             return _client.Execute(_client.GetOptions($"Search"), driver =>
             {
@@ -524,7 +528,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             actions.SendKeys(OpenQA.Selenium.Keys.PageDown).Perform();
             return Convert.ToInt32(driver.FindElements(rowGroupLocator).Last().GetAttribute("row-index"));
         }
-        internal static string GetGridQueryKey(IWebDriver driver, string dataSetName = null)
+        internal static string GetGridQueryKey(IWebBrowser driver, string dataSetName = null)
         {
             Dictionary<string, object> pages = (Dictionary<string, object>)driver.ExecuteScript($"return window[Object.keys(window).find(i => !i.indexOf(\"__store$\"))].getState().pages");
             //This is the current view
@@ -593,7 +597,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var returnList = new List<GridItem>();
                 //#1294
-                var gridContainer = driver.FindElement(By.XPath("//div[contains(@data-id,'data-set-body-container')]/div"));
+                var gridContainer = driver.FindElement("//div[contains(@data-id,'data-set-body-container')]/div");
                 string[] gridDataId = gridContainer.GetAttribute("data-lp-id").Split('|');
                 Dictionary<string, object> WindowStateData = (Dictionary<string, object>)driver.ExecuteScript($"return window[Object.keys(window).find(i => !i.indexOf(\"__store$\"))].getState().data");
                 string keyForData = GetGridQueryKey(driver, null);

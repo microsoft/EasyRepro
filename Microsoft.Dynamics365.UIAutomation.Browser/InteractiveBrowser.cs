@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using static Microsoft.Dynamics365.UIAutomation.Browser.Constants;
 using ThreadState = System.Threading.ThreadState;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
@@ -40,9 +41,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             Trace = new TraceSource(this.Options.TraceSource);
         }
 
-        public InteractiveBrowser(IWebDriver driver)
+        public InteractiveBrowser(IWebBrowser browser)
         {
-            this.driver = driver;
+            this.browser = browser;
 
             lock (syncRoot)
             {
@@ -65,6 +66,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         private bool disposing = false;
         private IWebDriver driver;
         private IPage playwrightDriver;
+        private IWebBrowser browser;
         private readonly object syncRoot = new object();
 
         #endregion Private Members
@@ -75,54 +77,65 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         /// Gets the browser options that are used in this session.
         /// </summary>
         public BrowserOptions Options { get; private set; }
-
-        /// <summary>
-        /// Gets a reference to the underlying selenium driver for this browser.
-        /// </summary>
-        public IWebDriver Driver
-        {
-            get
-            {
-                if (this.driver == null)
+        public IWebBrowser Browser {
+            get {
+                if (this.browser == null)
                 {
-                    this.driver = BrowserDriverFactory.CreateWebDriver(this.Options);
-
-                    if (this.Options.FireEvents || this.Options.EnableRecording)
-                    {
-                        // Wire events
-                        var eventDriver = driver as EventFiringWebDriver;
-
-                        if (eventDriver == null)
-                            throw new InvalidOperationException(
-                                $"Driver of type '{driver.GetType().FullName}' is not an event firing web driver, and one was expected.");
-
-                        eventDriver.ElementClicked += EventDriver_ElementClicked;
-                        eventDriver.ElementValueChanged += EventDriver_ElementValueChanged;
-                        eventDriver.ExceptionThrown += EventDriver_ExceptionThrown;
-                        eventDriver.Navigated += EventDriver_Navigated;
-
-                        if (this.Options.FireEvents)
-                        {
-                            eventDriver.ElementClicking += EventDriver_ElementClicking;
-                            eventDriver.ElementValueChanging += EventDriver_ElementValueChanging;
-                            eventDriver.FindElementCompleted += EventDriver_FindElementCompleted;
-                            eventDriver.FindingElement += EventDriver_FindingElement;
-                            eventDriver.NavigatedBack += EventDriver_NavigatedBack;
-                            eventDriver.NavigatedForward += EventDriver_NavigatedForward;
-                            eventDriver.Navigating += EventDriver_Navigating;
-                            eventDriver.NavigatingBack += EventDriver_NavigatingBack;
-                            eventDriver.NavigatingForward += EventDriver_NavigatingForward;
-                            eventDriver.ScriptExecuted += EventDriver_ScriptExecuted;
-                            eventDriver.ScriptExecuting += EventDriver_ScriptExecuting;
-                        }
-                    }
+                    this.browser = BrowserDriverFactory.CreateBrowser(this.Options);
 
                     OnBrowserInitialized(new BrowserInitializeEventArgs(BrowserInitiationSource.NewBrowser));
                 }
 
-                return driver;
+                return browser;
             }
         }
+        /// <summary>
+        /// Gets a reference to the underlying selenium driver for this browser.
+        /// </summary>
+        //public IWebDriver Driver
+        //{
+        //    get
+        //    {
+        //        if (this.driver == null)
+        //        {
+        //            this.driver = BrowserDriverFactory.CreateBrowser(this.Options);
+
+        //            if (this.Options.FireEvents || this.Options.EnableRecording)
+        //            {
+        //                // Wire events
+        //                var eventDriver = driver as EventFiringWebDriver;
+
+        //                if (eventDriver == null)
+        //                    throw new InvalidOperationException(
+        //                        $"Driver of type '{driver.GetType().FullName}' is not an event firing web driver, and one was expected.");
+
+        //                eventDriver.ElementClicked += EventDriver_ElementClicked;
+        //                eventDriver.ElementValueChanged += EventDriver_ElementValueChanged;
+        //                eventDriver.ExceptionThrown += EventDriver_ExceptionThrown;
+        //                eventDriver.Navigated += EventDriver_Navigated;
+
+        //                if (this.Options.FireEvents)
+        //                {
+        //                    eventDriver.ElementClicking += EventDriver_ElementClicking;
+        //                    eventDriver.ElementValueChanging += EventDriver_ElementValueChanging;
+        //                    eventDriver.FindElementCompleted += EventDriver_FindElementCompleted;
+        //                    eventDriver.FindingElement += EventDriver_FindingElement;
+        //                    eventDriver.NavigatedBack += EventDriver_NavigatedBack;
+        //                    eventDriver.NavigatedForward += EventDriver_NavigatedForward;
+        //                    eventDriver.Navigating += EventDriver_Navigating;
+        //                    eventDriver.NavigatingBack += EventDriver_NavigatingBack;
+        //                    eventDriver.NavigatingForward += EventDriver_NavigatingForward;
+        //                    eventDriver.ScriptExecuted += EventDriver_ScriptExecuted;
+        //                    eventDriver.ScriptExecuting += EventDriver_ScriptExecuting;
+        //                }
+        //            }
+
+        //            OnBrowserInitialized(new BrowserInitializeEventArgs(BrowserInitiationSource.NewBrowser));
+        //        }
+
+        //        return driver;
+        //    }
+        //}
         //public IPage PlaywrightDriver {
         //    get {
         //        if (this.playwrightDriver == null)
@@ -189,39 +202,39 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             //Predicate<IWebDriver> seleniumPredicate = new Predicate<IWebDriver>(this.Driver);
             //SeleniumExtensions.RepeatUntil(this.Driver, action, seleniumPredicate, timeout, Constants.DefaultRetryAttempts, successCallback, failureCallback);
         }
-        public void WaitForTransaction()
-        {
+        //public void WaitForTransaction()
+        //{
 
-        }
-        public void WaitUntilVisible(string elementLocator)
-        {
-            //return new Element();
-        }
-        public Element ClickIfVisible(string elementLocator, TimeSpan seconds)
-        {
-            return new Element();
-        }
-        public Element ClickWhenAvailable(string elementLocator, TimeSpan seconds)
-        {
-            return new Element();
-        }
-        public Element FindElement(string elementLocator)
-        {
-            if (this.Options.BrowserFramework == BrowserFramework.Selenium)
-                return this.Driver.FindElement(By.XPath(elementLocator)) as Element;
-            else if (this.Options.BrowserFramework == BrowserFramework.Playwright)
-                return new Element();
-            else return new Element();
-        }
+        //}
+        //public void WaitUntilVisible(string elementLocator)
+        //{
+        //    //return new Element();
+        //}
+        //public Element ClickIfVisible(string elementLocator, TimeSpan seconds)
+        //{
+        //    return new Element();
+        //}
+        //public Element ClickWhenAvailable(string elementLocator, TimeSpan seconds)
+        //{
+        //    return new Element();
+        //}
+        //public Element FindElement(string elementLocator)
+        //{
+        //    if (this.Options.BrowserFramework == BrowserFramework.Selenium)
+        //        return this.Driver.FindElement(By.XPath(elementLocator)) as Element;
+        //    else if (this.Options.BrowserFramework == BrowserFramework.Playwright)
+        //        return new Element();
+        //    else return new Element();
+        //}
 
-        public Element WaitUntilAvailable(string elementLocator, TimeSpan timeToWait)
-        {
-            if (this.Options.BrowserFramework == BrowserFramework.Selenium)
-                return this.Driver.WaitUntilAvailable(By.XPath(elementLocator), timeToWait) as Element;
-            else if (this.Options.BrowserFramework == BrowserFramework.Playwright)
-                return new Element();
-            else return new Element();
-        }
+        //public Element WaitUntilAvailable(string elementLocator, TimeSpan timeToWait)
+        //{
+        //    if (this.Options.BrowserFramework == BrowserFramework.Selenium)
+        //        return this.Driver.WaitUntilAvailable(By.XPath(elementLocator), timeToWait) as Element;
+        //    else if (this.Options.BrowserFramework == BrowserFramework.Playwright)
+        //        return new Element();
+        //    else return new Element();
+        //}
         public void ThinkTime(int milliseconds)
         {
             if(!CommandThinkTimes.ContainsKey((Depth)))
@@ -234,10 +247,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             TotalThinkTime += milliseconds;
             Thread.Sleep(milliseconds);
         }
-        public void TakeWindowScreenShot(string path, ScreenshotImageFormat fileFormat)
-        {
-            this.Driver.TakeScreenshot().SaveAsFile(path, fileFormat);
-        }
+        //public void TakeWindowScreenShot(string path, ScreenshotImageFormat fileFormat)
+        //{
+        //    this.Driver.TakeScreenshot().SaveAsFile(path, fileFormat);
+        //}
 
         public T GetPage<T>()
             where T : BrowserPage
@@ -247,34 +260,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public void Navigate(Uri uri)
         {
-            this.Driver.Navigate().GoToUrl(uri);
+            this.Browser.Navigate(uri.ToString());
+            //this.Driver.Navigate().GoToUrl(uri);
         }
 
         public void Navigate(string uri)
         {
-            this.Driver.Navigate().GoToUrl(uri);
+            this.Browser.Navigate(uri);
+            //this.Driver.Navigate().GoToUrl(uri);
         }
 
-        public void Navigate(NavigationOperation operation)
-        {
-            switch (operation)
-            {
-                case NavigationOperation.NavigateBack:
-                    this.Driver.Navigate().Back();
+        //public void Navigate(NavigationOperation operation)
+        //{
+        //    switch (operation)
+        //    {
+        //        case NavigationOperation.NavigateBack:
+        //            this.Driver.Navigate().Back();
 
-                    break;
-                case NavigationOperation.NavigateForward:
-                    this.Driver.Navigate().Forward();
+        //            break;
+        //        case NavigationOperation.NavigateForward:
+        //            this.Driver.Navigate().Forward();
 
-                    break;
-                case NavigationOperation.Reload:
-                    this.Driver.Navigate().Refresh();
+        //            break;
+        //        case NavigationOperation.Reload:
+        //            this.Driver.Navigate().Refresh();
 
-                    break;
-                default:
-                    throw new InvalidOperationException($"The navigation operation '{operation}' is invalid.");
-            }
-        }
+        //            break;
+        //        default:
+        //            throw new InvalidOperationException($"The navigation operation '{operation}' is invalid.");
+        //    }
+        //}
 
         internal class BackgroundRecorder
         {
@@ -307,37 +322,37 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 this.IsRecording = false;
             }
 
-            internal void DoWork()
-            {
-                while (this.IsRecording)
-                {
-                    this.Driver.SwitchTo().DefaultContent();
+            //internal void DoWork()
+            //{
+            //    while (this.IsRecording)
+            //    {
+            //        this.Driver.SwitchTo().DefaultContent();
 
-                    this.CheckRecordingScripts();
+            //        this.CheckRecordingScripts();
 
-                    this.GetRecordedEvents();
+            //        this.GetRecordedEvents();
 
-                    Thread.Sleep(this.ScanInterval);
-                }
+            //        Thread.Sleep(this.ScanInterval);
+            //    }
 
-                //The Recording has stopped and we get any remaining events in the queue.
-                this.GetRecordedEvents();
+            //    //The Recording has stopped and we get any remaining events in the queue.
+            //    this.GetRecordedEvents();
 
-            }
+            //}
 
-            private void CheckRecordingScripts()
-            {
-                this.Driver.SwitchTo().DefaultContent();
+            //private void CheckRecordingScripts()
+            //{
+            //    this.Driver.SwitchTo().DefaultContent();
 
-                foreach (var handle in this.Driver.WindowHandles)
-                {
-                    this.Driver.SwitchTo().Window(handle);
-                    InjectRecordingScript();
-                }
+            //    foreach (var handle in this.Driver.WindowHandles)
+            //    {
+            //        this.Driver.SwitchTo().Window(handle);
+            //        InjectRecordingScript();
+            //    }
 
-                CheckFrames(this.Driver);
-                this.Driver.SwitchTo().DefaultContent();
-            }
+            //    CheckFrames(this.Driver);
+            //    this.Driver.SwitchTo().DefaultContent();
+            //}
 
             private void GetRecordedEvents()
             {
@@ -385,34 +400,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                     return true;
                 });
             }
-            private void CheckFrames(IWebDriver driver)
-            {
-                // Setup our retry options first.
-                var options = new BrowserCommandOptions
-                {
-                    RetryAttempts = 1,
-                    ExceptionTypes = { typeof(StaleElementReferenceException), typeof(NoSuchFrameException) },
-                    ExceptionAction = null
-                };
-                var command = new DelegateBrowserCommand<bool>(options, d =>
-                {
-                    var iframes = GetFrameElements(d);
+            //private void CheckFrames(IWebDriver driver)
+            //{
+            //    // Setup our retry options first.
+            //    var options = new BrowserCommandOptions
+            //    {
+            //        RetryAttempts = 1,
+            //        ExceptionTypes = { typeof(StaleElementReferenceException), typeof(NoSuchFrameException) },
+            //        ExceptionAction = null
+            //    };
+            //    var command = new DelegateBrowserCommand<bool>(options, d =>
+            //    {
+            //        var iframes = GetFrameElements(d);
 
-                    foreach (IWebElement frame in iframes)
-                    {
-                        var currentFrameId = frame.GetAttribute("id");
+            //        foreach (IWebElement frame in iframes)
+            //        {
+            //            var currentFrameId = frame.GetAttribute("id");
 
-                        driver.WaitUntilAvailable(By.Id(currentFrameId));
-                        d.SwitchTo().Frame(currentFrameId);
-                        InjectRecordingScript();
-                        //CheckFrames(driver); //Child Frames
-                    }
+            //            driver.WaitUntilAvailable(By.Id(currentFrameId));
+            //            d.SwitchTo().Frame(currentFrameId);
+            //            InjectRecordingScript();
+            //            //CheckFrames(driver); //Child Frames
+            //        }
 
-                    return true;
-                });
+            //        return true;
+            //    });
 
-                command.Execute(driver);
-            }
+            //    command.Execute(driver);
+            //}
 
             private IWebElement[] GetFrameElements(IWebDriver driver)
             {
@@ -434,21 +449,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
 
 
-        public void Record(IBrowserActionLogger logger)
-        {
-            if (this.IsRecording)
-                return;
+        //public void Record(IBrowserActionLogger logger)
+        //{
+        //    if (this.IsRecording)
+        //        return;
 
-            this.recorder = new BackgroundRecorder(this.Driver, logger, Options.RecordingScanInterval);
-            this.recorderThread = new Thread(recorder.DoWork)
-            {
-                IsBackground = true,
-                Name = "BrowserRecorder"
-            };
+        //    this.recorder = new BackgroundRecorder(this.Driver, logger, Options.RecordingScanInterval);
+        //    this.recorderThread = new Thread(recorder.DoWork)
+        //    {
+        //        IsBackground = true,
+        //        Name = "BrowserRecorder"
+        //    };
 
-            this.recorder.Start();
-            this.recorderThread.Start();
-        }
+        //    this.recorder.Start();
+        //    this.recorderThread.Start();
+        //}
 
         public void StopRecording()
         {

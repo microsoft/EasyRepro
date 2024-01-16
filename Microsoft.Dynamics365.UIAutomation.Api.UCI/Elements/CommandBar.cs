@@ -74,20 +74,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Find the button in the CommandBar
                 IWebElement ribbon;
                 // Checking if any dialog is active
-                if (driver.HasElement(By.XPath(string.Format(_client.ElementMapper.DialogsReference.DialogContext))))
+                if (driver.HasElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext)))
                 {
-                    var dialogContainer = driver.FindElement(By.XPath(string.Format(_client.ElementMapper.DialogsReference.DialogContext)));
-                    ribbon = dialogContainer.WaitUntilAvailable(By.XPath(string.Format(_client.ElementMapper.CommandBarReference.Container)));
+                    var dialogContainer = driver.FindElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext));
+                    ribbon = dialogContainer.WaitUntilAvailable(string.Format(_client.ElementMapper.CommandBarReference.Container));
                 }
                 else
                 {
-                    ribbon = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.Container));
+                    ribbon = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.Container);
                 }
 
 
                 if (ribbon == null)
                 {
-                    ribbon = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.ContainerGrid),
+                    ribbon = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.ContainerGrid,
                         TimeSpan.FromSeconds(5),
                         "Unable to find the ribbon.");
                 }
@@ -96,7 +96,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (ribbon.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var command))
                 {
                     command.Click(true);
-                    driver.WaitForTransaction();
+                    driver.Wait();
                 }
                 else
                 {
@@ -105,14 +105,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         // Click More Commands
                         moreCommands.Click(true);
-                        driver.WaitForTransaction();
+                        driver.Wait();
 
                         //Click the button
-                        var flyOutMenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList)); ;
+                        var flyOutMenu = driver.WaitUntilAvailable(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList); ;
                         if (flyOutMenu.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
                         {
                             overflowCommand.Click(true);
-                            driver.WaitForTransaction();
+                            driver.Wait();
                         }
                         else
                             throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar or the flyout menu.");
@@ -120,14 +120,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else if (ribbon.TryFindElement(By.XPath(_client.ElementMapper.EntityReference.MoreCommands), out moreCommands))
                     {
                         moreCommands.Click(true);
-                        driver.WaitForTransaction();
+                        driver.Wait();
 
                         //Click the button
-                        var flyOutMenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList)); ;
+                        var flyOutMenu = driver.WaitUntilAvailable(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList); ;
                         if (flyOutMenu.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
                         {
                             overflowCommand.Click(true);
-                            driver.WaitForTransaction();
+                            driver.Wait();
                         }
                         else
                             throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar or the flyout menu.");
@@ -138,9 +138,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (!string.IsNullOrEmpty(subname))
                 {
-                    var submenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.MoreCommandsMenu));
+                    var submenu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
 
-                    submenu.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname)), out var subbutton);
+                    submenu.TryFindElement(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname), out var subbutton);
 
                     if (subbutton != null)
                     {
@@ -151,11 +151,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     if (!string.IsNullOrEmpty(subSecondName))
                     {
-                        var subSecondmenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.MoreCommandsMenu));
+                        var subSecondmenu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
 
                         subSecondmenu.TryFindElement(
-                            By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton
-                                .Replace("[NAME]", subSecondName)), out var subSecondbutton);
+                            _client.ElementMapper.SubGridReference.SubGridOverflowButton
+                                .Replace("[NAME]", subSecondName), out var subSecondbutton);
 
                         if (subSecondbutton != null)
                         {
@@ -166,7 +166,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                 }
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -186,15 +186,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this._client.Execute(_client.GetOptions("Get CommandBar Command Count"), driver => TryGetCommandValues(includeMoreCommandsValues, driver));
         }
 
-        private List<string> TryGetCommandValues(bool includeMoreCommandsValues, IWebDriver driver)
+        private List<string> TryGetCommandValues(bool includeMoreCommandsValues, IWebBrowser driver)
         {
             const string moreCommandsLabel = "more commands";
 
             //Find the button in the CommandBar
-            IWebElement ribbon = GetRibbon(driver);
+            Element ribbon = GetRibbon(driver);
 
             //Get the CommandBar buttons
-            Dictionary<string, IWebElement> commandBarItems = GetMenuItems(ribbon);
+            Dictionary<string, Element> commandBarItems = GetMenuItems(ribbon);
             bool hasMoreCommands = commandBarItems.TryGetValue(moreCommandsLabel, out var moreCommandsButton);
             if (includeMoreCommandsValues && hasMoreCommands)
             {
@@ -220,9 +220,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 dictionary.Add(key, item);
             }
         }
-        private static Dictionary<string, IWebElement> GetMenuItems(IWebElement menu)
+        private static Dictionary<string, Element> GetMenuItems(Element menu)
         {
-            var result = new Dictionary<string, IWebElement>();
+            var result = new Dictionary<string, Element>();
             AddMenuItems(menu, result);
             return result;
         }

@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using OpenQA.Selenium;
 using System;
 using System.ComponentModel.DataAnnotations;
 using static Microsoft.Dynamics365.UIAutomation.Api.UCI.Dialogs;
@@ -454,47 +453,47 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Click Command"), driver =>
             {
                 // Find the button in the CommandBar
-                IWebElement ribbon;
+                Element ribbon;
                 // Checking if any dialog is active
-                if (driver.HasElement(By.XPath(string.Format(_client.ElementMapper.DialogsReference.DialogContext))))
+                if (driver.IsAvailable(string.Format(_client.ElementMapper.DialogsReference.DialogContext)))
                 {
-                    var dialogContainer = driver.FindElement(By.XPath(string.Format(_client.ElementMapper.DialogsReference.DialogContext)));
-                    ribbon = dialogContainer.WaitUntilAvailable(By.XPath(string.Format(_client.ElementMapper.CommandBarReference.Container)));
+                    var dialogContainer = driver.FindElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext));
+                    ribbon = dialogContainer.WaitUntilAvailable(string.Format(_client.ElementMapper.CommandBarReference.Container));
                 }
                 else
                 {
-                    ribbon = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.Container));
+                    ribbon = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.Container);
                 }
 
 
                 if (ribbon == null)
                 {
-                    ribbon = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.ContainerGrid),
+                    ribbon = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.ContainerGrid,
                         TimeSpan.FromSeconds(5),
                         "Unable to find the ribbon.");
                 }
 
                 //Is the button in the ribbon?
-                if (ribbon.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var command))
+                if (ribbon.TryFindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name), out var command))
                 {
                     command.Click(true);
-                    driver.WaitForTransaction();
+                    driver.Wait();
                 }
                 else
                 {
                     //Is the button in More Commands?
-                    if (ribbon.TryFindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton), out var moreCommands))
+                    if (ribbon.TryFindElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton, out var moreCommands))
                     {
                         // Click More Commands
                         moreCommands.Click(true);
-                        driver.WaitForTransaction();
+                        driver.Wait();
 
                         //Click the button
-                        var flyOutMenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList)); ;
-                        if (flyOutMenu.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var overflowCommand))
+                        var flyOutMenu = driver.WaitUntilAvailable(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList);
+                        if (flyOutMenu.TryFindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name), out var overflowCommand))
                         {
                             overflowCommand.Click(true);
-                            driver.WaitForTransaction();
+                            driver.Wait();
                         }
                         else
                             throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar or the flyout menu.");
@@ -505,9 +504,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (!string.IsNullOrEmpty(subname))
                 {
-                    var submenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.MoreCommandsMenu));
+                    var submenu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
 
-                    submenu.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname)), out var subbutton);
+                    submenu.TryFindElement(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname), out var subbutton);
 
                     if (subbutton != null)
                     {
@@ -518,11 +517,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     if (!string.IsNullOrEmpty(subSecondName))
                     {
-                        var subSecondmenu = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.CommandBarReference.MoreCommandsMenu));
+                        var subSecondmenu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
 
                         subSecondmenu.TryFindElement(
-                            By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton
-                                .Replace("[NAME]", subSecondName)), out var subSecondbutton);
+                            _client.ElementMapper.SubGridReference.SubGridOverflowButton
+                                .Replace("[NAME]", subSecondName), out var subSecondbutton);
 
                         if (subSecondbutton != null)
                         {
@@ -533,7 +532,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                 }
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -552,15 +551,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (inlineDialog)
                 {
                     //Wait until the buttons are available to click
-                    var dialogFooter = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.DialogsReference.OkButton));
+                    var dialogFooter = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.OkButton);
 
                     if (
-                        !(dialogFooter?.FindElements(By.XPath(_client.ElementMapper.DialogsReference.OkButton)).Count >
+                        !(dialogFooter?.FindElements(_client.ElementMapper.DialogsReference.OkButton).Count >
                           0)) return true;
 
                     //Click the Confirm or Cancel button
-                    IWebElement buttonToClick;
-                    buttonToClick = dialogFooter.FindElement(By.XPath(_client.ElementMapper.DialogsReference.OkButton));
+                    Element buttonToClick;
+                    buttonToClick = dialogFooter.FindElement(_client.ElementMapper.DialogsReference.OkButton);
                     buttonToClick.Click();
                 }
 
@@ -576,11 +575,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client.Browser.Driver.SwitchTo().DefaultContent();
 
             // Check to see if dialog is InlineDialog or popup
-            var inlineDialog = _client.Browser.Driver.HasElement(By.XPath(_client.ElementMapper.DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index)));
+            var inlineDialog = _client.Browser.Driver.HasElement(_client.ElementMapper.DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index));
             if (inlineDialog)
             {
                 //wait for the content panel to render
-                _client.Browser.Driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index)),
+                _client.Browser.Driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index),
                     TimeSpan.FromSeconds(2),
                     d => { _client.Browser.Driver.SwitchTo().Frame(_client.ElementMapper.DialogsReference.Frames.DialogFrameId.Replace("[INDEX]", index)); });
                 return true;

@@ -18,6 +18,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             _client = client;
         }
 
+        public XrmApp(BrowserOptions options)
+        {
+            _client = new WebClient(options);
+        }
+
         public OnlineLogin OnlineLogin => this.GetElement<OnlineLogin>(_client);
         public Navigation Navigation => this.GetElement<Navigation>(_client);
         public CommandBar CommandBar => this.GetElement<CommandBar>(_client);
@@ -35,7 +40,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public Lookup Lookup => this.GetElement<Lookup>(_client);
         public Telemetry Telemetry => this.GetElement<Telemetry>(_client);
 
-        public T GetElement<T>(WebClient client)
+        public T GetArea<T>(WebClient client)
             where T : Element
         {
             return (T)Activator.CreateInstance(typeof(T), new object[] { client });

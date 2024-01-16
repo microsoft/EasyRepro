@@ -498,7 +498,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             return WaitUntil(driver, d => d.FindVisible(by), timeout, successCallback, failureCallback);
         }
-
+        public static IWebElement WaitUntilClickable(this ISearchContext driver, string selector, string exceptionMessage)
+    => WaitUntilClickable(driver, selector, null, null, exceptionMessage);
 
         public static IWebElement WaitUntilClickable(this ISearchContext driver, By by, string exceptionMessage)
             => WaitUntilClickable(driver, by, null, null, exceptionMessage);
@@ -515,7 +516,48 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 exceptionMessage = $"Unable to find any clickable element by: {by}";
             return WaitUntilClickable(driver, by, timeout, successCallback, () => throw new InvalidOperationException(exceptionMessage));
         }
+        public static IWebElement WaitUntilClickable(this ISearchContext driver, string selector, TimeSpan? timeout, Action<IWebElement> successCallback, string exceptionMessage)
+        {
+            if (string.IsNullOrWhiteSpace(exceptionMessage))
+                exceptionMessage = $"Unable to find any clickable element by: {selector}";
+            return WaitUntilClickable(driver, selector, timeout, successCallback, () => throw new InvalidOperationException(exceptionMessage));
+        }
+        public static IWebElement WaitUntilClickable(this ISearchContext driver, string selector,
+   TimeSpan? timeout = null,
+   Action<IWebElement> successCallback = null,
+   Action failureCallback = null)
+        {
+            return WaitUntil(driver, d => d.FindClickable(selector), timeout,
+                successCallback,
+                failureCallback
+            );
+        }
+        private static ReadOnlyCollection<IWebElement> GetElements(ISearchContext driver, string selector)
+        {
+            ReadOnlyCollection<IWebElement> elements = null;
 
+            if (selector.StartsWith("#"))
+                elements = driver.FindElements(By.CssSelector(selector));
+            else if (selector.StartsWith("//"))
+                elements = driver.FindElements(By.XPath(selector));
+            else if (driver.FindElements(By.Id(selector)) != null)
+                elements = driver.FindElements(By.Id(selector));
+            else if (driver.FindElements(By.Name(selector)) != null)
+                elements = driver.FindElements(By.Name(selector));
+            else if (driver.FindElement(By.ClassName(selector)) != null)
+                elements = driver.FindElements(By.ClassName(selector));
+            else if (driver.FindElement(By.LinkText(selector)) != null)
+                elements = driver.FindElements(By.LinkText(selector));
+
+            return elements;
+        }
+
+        public static IWebElement FindClickable(this ISearchContext driver, string selector)
+        {
+            ReadOnlyCollection<IWebElement> elements = GetElements(driver, selector);
+            IWebElement result = elements.FirstOrDefault(IsClickable);
+            return result;
+        }
         public static IWebElement WaitUntilClickable(this ISearchContext driver, By by,
             TimeSpan? timeout = null,
             Action<IWebElement> successCallback = null,

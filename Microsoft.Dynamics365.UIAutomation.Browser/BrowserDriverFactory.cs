@@ -10,6 +10,7 @@ using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Remote;
 using System;
 using Microsoft.Playwright;
+using System.IO;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
@@ -19,7 +20,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
     //}
     public static class BrowserDriverFactory
     {
-        public static IWebDriver CreateWebDriver(BrowserOptions options)
+        public static IWebBrowser CreateBrowser(BrowserOptions options)
+        {
+            IWebBrowser browser = null;
+
+            if (options.BrowserFramework == BrowserFramework.Playwright)
+            {
+                IBrowser b = CreatePlaywrightBrowser(options);
+                browser = new PlaywrightBrowser(b, options);
+                IPage page;
+                
+            }
+
+            if (options.BrowserFramework == BrowserFramework.Selenium)
+            {
+                IWebDriver d = CreateSeleniumBrowser(options);
+                browser = new SeleniumBrowser(d, options);
+            }
+
+            return browser;
+        }
+        private static IWebDriver CreateSeleniumBrowser(BrowserOptions options)
         {
             IWebDriver driver;
            
@@ -81,14 +102,41 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return driver;
         }
 
-        public static IPlaywright CreatePlaywright(BrowserOptions options)
+        private static IBrowser CreatePlaywrightBrowser(BrowserOptions options)
         {
+            IBrowser browser;
             IPlaywright driver;
             driver = Microsoft.Playwright.Playwright.CreateAsync().Result;
 
             
 
-            return driver;
+            //return driver;
+
+   
+            //await Playwright.InstallAsync();
+            //var playwright = await Playwright.CreateAsync();
+
+            switch (options.BrowserType)
+            {
+                case BrowserType.Chrome:
+                    browser = driver.Chromium.LaunchAsync(
+                        new BrowserTypeLaunchOptions() { Headless = options.Headless }).Result;
+                    break;
+                case BrowserType.IE:
+                    throw new NotImplementedException();
+                case BrowserType.Firefox:
+                    throw new NotImplementedException();
+                case BrowserType.Edge:
+                    throw new NotImplementedException();
+                case BrowserType.Remote:
+                    throw new NotImplementedException();
+                default:
+                    throw new InvalidOperationException(
+                        $"The browser type '{options.BrowserType}' is not recognized.");
+            }
+
+
+            return browser;
         }
     }
 }

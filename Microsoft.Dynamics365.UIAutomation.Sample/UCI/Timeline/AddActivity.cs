@@ -1,5 +1,6 @@
 ﻿using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using Microsoft.Dynamics365.UIAutomation.Browser;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -133,6 +134,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
             {
+                
+                //using (var xrmApp2 = new XrmApp(options))
+                //{
+
+                //}
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
                 xrmApp.Navigation.OpenApp(UCIAppName.Sales);
@@ -153,7 +159,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 var success = xrmApp.Timeline.RemoveEmail(
                     new MultiValueOptionSet()
                     {
-                        Name = emailReference.EmailCC,
+                        Name = emailReference.EmailTo,
                         Values = new string[] { "Jim Glynn (sample)", "Nancy Anderson (sample)" },
                     });
 

@@ -625,7 +625,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var dictionary = new Dictionary<string, IWebElement>();
 
             //Sitemap without enableunifiedinterfaceshellrefresh
-            var hasPinnedSitemapEntity = driver.HasElement(By.XPath(_client.ElementMapper.NavigationReference.PinnedSitemapEntity));
+            var hasPinnedSitemapEntity = driver.IsAvailable(_client.ElementMapper.NavigationReference.PinnedSitemapEntity);
             if (!hasPinnedSitemapEntity)
             {
                 // Close SiteMap launcher since it is open
@@ -634,7 +634,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.NavigationReference.SiteMapLauncherButton));
 
-                var menuContainer = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.NavigationReference.SubAreaContainer));
+                var menuContainer = driver.WaitUntilAvailable(_client.ElementMapper.NavigationReference.SubAreaContainer);
 
                 var subItems = menuContainer.FindElements(By.TagName("li"));
 
