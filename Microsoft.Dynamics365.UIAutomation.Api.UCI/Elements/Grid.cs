@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
-    public class Grid : Element
+    public class Grid //: Element
     {
         #region DTO
         public  class GridReference
@@ -113,6 +113,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Get Grid Control"), driver =>
             {
                 var gridContainer = driver.FindElement("//div[contains(@data-lp-id,'MscrmControls.Grid')]");
+
+                
 
                 return gridContainer.GetAttribute("innerHTML");
             });

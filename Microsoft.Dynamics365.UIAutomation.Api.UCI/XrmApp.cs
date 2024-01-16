@@ -16,6 +16,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public XrmApp(WebClient client)
         {
             _client = client;
+            
         }
 
         public XrmApp(BrowserOptions options)
@@ -26,7 +27,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public OnlineLogin OnlineLogin => this.GetElement<OnlineLogin>(_client);
         public Navigation Navigation => this.GetElement<Navigation>(_client);
         public CommandBar CommandBar => this.GetElement<CommandBar>(_client);
-        public Grid Grid => this.GetElement<Grid>(_client);
+        public Grid Grid => this.GetArea<Grid>(_client);
         public PowerApp PowerApp => this.GetElement<PowerApp>(_client);
         public Entity Entity => this.GetElement<Entity>(_client);
         public Dialogs Dialogs => this.GetElement<Dialogs>(_client);
