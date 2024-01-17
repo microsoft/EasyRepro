@@ -250,7 +250,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Initialize the quick create form context
                 // If this is not done -- element input will go to the main form due to new flyout design
                 var formContext = driver.WaitUntilAvailable(client.ElementMapper.QuickCreateReference.QuickCreateFormContext);
-                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+                fieldContainer = driver.WaitUntilAvailable(client.ElementMapper.QuickCreateReference.QuickCreateFormContext + xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
                 var strExpanded = fieldContainer.GetAttribute("aria-expanded");
 
