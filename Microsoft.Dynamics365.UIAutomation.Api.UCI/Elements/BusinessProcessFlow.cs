@@ -212,14 +212,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 // Initialize the Business Process Flow context
                 var formContext = driver.WaitUntilAvailable(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext);
-                var fieldElement = formContext.WaitUntilAvailable(_client.ElementMapper.BusinessProcessFlowReference.FieldSectionItemContainer.Replace("[NAME]", field));
+                var fieldElement = driver.WaitUntilAvailable(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext + _client.ElementMapper.BusinessProcessFlowReference.FieldSectionItemContainer.Replace("[NAME]", field));
                 Field returnField = new Field(fieldElement);
                 returnField.Name = field;
 
                 Element fieldLabel = null;
                 try
                 {
-                    fieldLabel = fieldElement.FindElement(_client.ElementMapper.BusinessProcessFlowReference.TextFieldLabel.Replace("[NAME]", field));
+                    fieldLabel = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext + _client.ElementMapper.BusinessProcessFlowReference.FieldSectionItemContainer.Replace("[NAME]", field)+ _client.ElementMapper.BusinessProcessFlowReference.TextFieldLabel.Replace("[NAME]", field));
                 }
                 catch (KeyNotFoundException)
                 {
@@ -247,9 +247,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var fieldContainer = driver.WaitUntilAvailable(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field));
 
-                if (fieldContainer.FindElements("//input").Count > 0)
+                if (driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field) + "//input").Count > 0)
                 {
-                    var input = fieldContainer.FindElement("//input");
+                    var input = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field) + "//input//input");
                     if (input != null)
                     {
                         input.Click(true);
@@ -258,9 +258,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         input.SendKeys(Keys.Tab);
                     }
                 }
-                else if (fieldContainer.FindElements("//textarea").Count > 0)
+                else if (driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field) + "//textarea").Count > 0)
                 {
-                    var textarea = fieldContainer.FindElement("//textarea");
+                    var textarea = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field) + "//textarea");
                     textarea.Click();
                     textarea.Clear();
                     textarea.SendKeys(value);
@@ -285,10 +285,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var fieldContainer = driver.WaitUntilAvailable(_client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", option.Name));
 
-                if (fieldContainer.FindElements("//select").Count > 0)
+                if (driver.FindElements(_client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", option.Name) + "//select").Count > 0)
                 {
-                    var select = fieldContainer.FindElement("//select");
-                    var options = select.FindElements("//option");
+                    var select = driver.FindElement(_client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", option.Name) + "//select");
+                    var options = driver.FindElements(_client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", option.Name) + "//select//option");
 
                     foreach (var op in options)
                     {
@@ -408,7 +408,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 foreach (var processStage in processStages)
                 {
-                    var divs = processStage.FindElements("//div");
+                    var divs = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage_UCI + "//div");
 
                     //Click the Label of the Process Stage if found
                     foreach (var div in divs)
@@ -427,7 +427,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     //If there's a field to enter, fill it out
                     if (businessProcessFlowField != null)
                     {
-                        var bpfField = control.FindElement(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFieldName.Replace("[NAME]", businessProcessFlowField.Name));
+                        var bpfField = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.Flyout_UCI + _client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFieldName.Replace("[NAME]", businessProcessFlowField.Name));
 
                         if (bpfField != null)
                         {
@@ -440,7 +440,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
 
                     //Click the Next Stage Button
-                    var nextButton = control.FindElement(_client.ElementMapper.BusinessProcessFlowReference.NextStageButton);
+                    var nextButton = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.Flyout_UCI + _client.ElementMapper.BusinessProcessFlowReference.NextStageButton);
                     nextButton.Click();
                 }
 
@@ -457,7 +457,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 foreach (var processStage in processStages)
                 {
-                    var divs = processStage.FindElements("//div");
+                    var divs = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage_UCI + "//div");
 
                     //Click the Label of the Process Stage if found
                     foreach (var div in divs)
