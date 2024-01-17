@@ -458,7 +458,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (driver.HasElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext)))
             {
                 var dialogContainer = driver.FindElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext));
-                ribbon = dialogContainer.WaitUntilAvailable(string.Format(_client.ElementMapper.CommandBarReference.Container));
+                ribbon = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.DialogContext + _client.ElementMapper.CommandBarReference.Container);
             }
             else
             {
@@ -508,7 +508,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         var submenu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
 
-                        var subbutton = submenu.FindElement(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname));
+                        var subbutton = driver.FindElement(_client.ElementMapper.CommandBarReference.MoreCommandsMenu + _client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname));
 
                         if (subbutton != null)
                         {
@@ -521,7 +521,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         {
                             var subSecondmenu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
 
-                            var subSecondButton = subSecondmenu.FindElement(
+                            var subSecondButton = driver.FindElement(_client.ElementMapper.CommandBarReference.MoreCommandsMenu + 
                                 _client.ElementMapper.SubGridReference.SubGridOverflowButton
                                     .Replace("[NAME]", subSecondName));
 
@@ -556,12 +556,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var dialogFooter = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.OkButton);
 
                     if (
-                        !(dialogFooter?.FindElements(_client.ElementMapper.DialogsReference.OkButton).Count >
+                        !(driver?.FindElements(_client.ElementMapper.DialogsReference.OkButton).Count >
                           0)) return true;
 
                     //Click the Confirm or Cancel button
                     Element buttonToClick;
-                    buttonToClick = dialogFooter.FindElement(_client.ElementMapper.DialogsReference.OkButton);
+                    buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.OkButton);
                     buttonToClick.Click();
                 }
 
@@ -609,9 +609,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var dialogFooter = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.WarningFooter);
 
                     if (
-                        !(dialogFooter?.FindElements(_client.ElementMapper.DialogsReference.WarningCloseButton).Count >
+                        !(driver?.FindElements(_client.ElementMapper.DialogsReference.WarningFooter + _client.ElementMapper.DialogsReference.WarningCloseButton).Count >
                           0)) return true;
-                    var closeBtn = dialogFooter.FindElement(_client.ElementMapper.DialogsReference.WarningCloseButton);
+                    var closeBtn = driver.FindElement(_client.ElementMapper.DialogsReference.WarningFooter + _client.ElementMapper.DialogsReference.WarningCloseButton);
                     closeBtn.Click();
                 }
 
@@ -634,14 +634,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     //Wait until the buttons are available to click
                     var dialogFooter = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.ConfirmButton);
 
-                    if (!(dialogFooter?.FindElements(_client.ElementMapper.DialogsReference.ConfirmButton).Count > 0)) return true;
+                    if (!(driver?.FindElements(_client.ElementMapper.DialogsReference.ConfirmButton).Count > 0)) return true;
 
                     //Click the Confirm or Cancel button
                     Element buttonToClick;
                     if (ClickConfirmButton)
-                        buttonToClick = dialogFooter.FindElement(_client.ElementMapper.DialogsReference.ConfirmButton);
+                        buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.ConfirmButton);
                     else
-                        buttonToClick = dialogFooter.FindElement(_client.ElementMapper.DialogsReference.CancelButton);
+                        buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.CancelButton);
 
                     buttonToClick.Click();
                 }
@@ -675,15 +675,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var dialogFooter = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.DuplicateDetectionIgnoreSaveButton);
 
                     if (
-                        !(dialogFooter?.FindElements(_client.ElementMapper.DialogsReference.DuplicateDetectionIgnoreSaveButton).Count >
+                        !(driver?.FindElements(_client.ElementMapper.DialogsReference.DuplicateDetectionIgnoreSaveButton).Count >
                           0)) return true;
 
                     //Click the Confirm or Cancel button
                     Element buttonToClick;
                     if (clickSaveOrCancel)
-                        buttonToClick = dialogFooter.FindElement(_client.ElementMapper.DialogsReference.DuplicateDetectionIgnoreSaveButton);
+                        buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.DuplicateDetectionIgnoreSaveButton);
                     else
-                        buttonToClick = dialogFooter.FindElement(_client.ElementMapper.DialogsReference.DuplicateDetectionCancelButton);
+                        buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.DuplicateDetectionCancelButton);
 
                     buttonToClick.Click();
                 }
@@ -714,15 +714,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var dialog = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.SetStateDialog);
 
                     if (
-                        !(dialog?.FindElements("//button").Count >
+                        !(driver?.FindElements(_client.ElementMapper.DialogsReference.SetStateDialog + "//button").Count >
                           0)) return true;
 
                     //Click the Activate/Deactivate or Cancel button
                     Element buttonToClick;
                     if (clickOkButton)
-                        buttonToClick = dialog.FindElement(_client.ElementMapper.DialogsReference.SetStateActionButton);
+                        buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.SetStateDialog + _client.ElementMapper.DialogsReference.SetStateActionButton);
                     else
-                        buttonToClick = dialog.FindElement(_client.ElementMapper.DialogsReference.SetStateCancelButton);
+                        buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.SetStateDialog + _client.ElementMapper.DialogsReference.SetStateCancelButton);
 
                     buttonToClick.Click();
                 }
@@ -747,15 +747,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var dialogFooter = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.PublishConfirmButton);
 
                     if (
-                        !(dialogFooter?.FindElements(_client.ElementMapper.DialogsReference.PublishConfirmButton).Count >
+                        !(driver?.FindElements(_client.ElementMapper.DialogsReference.PublishConfirmButton).Count >
                           0)) return true;
 
                     //Click the Confirm or Cancel button
                     Element buttonToClick;
                     if (ClickConfirmButton)
-                        buttonToClick = dialogFooter.FindElement(_client.ElementMapper.DialogsReference.PublishConfirmButton);
+                        buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.PublishConfirmButton);
                     else
-                        buttonToClick = dialogFooter.FindElement(_client.ElementMapper.DialogsReference.PublishCancelButton);
+                        buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.PublishCancelButton);
 
                     buttonToClick.Click();
                 }
@@ -817,7 +817,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 //Select the Process
                 var popup = driver.FindElement(_client.ElementMapper.DialogsReference.SwitchProcessContainer);
-                var labels = popup.FindElements("//label");
+                var labels = driver.FindElements(_client.ElementMapper.DialogsReference.SwitchProcessContainer + "//label");
                 foreach (var label in labels)
                 {
                     if (label.Text.Equals(processToSwitchTo, StringComparison.OrdinalIgnoreCase))
@@ -886,7 +886,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     var errorDialog = driver.FindElement("//div[contains(@data-id,'errorDialogdialog')]");
 
-                    var errorDetails = errorDialog.FindElement(".//*[contains(@data-id,'errorDialog_subtitle')]");
+                    var errorDetails = driver.FindElement("//div[contains(@data-id,'errorDialogdialog')]" + ".//*[contains(@data-id,'errorDialog_subtitle')]");
 
                     if (!String.IsNullOrEmpty(errorDetails.Text))
                         throw new InvalidOperationException(errorDetails.Text);
@@ -908,7 +908,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 // Is error dialog present?
                 if (errorDialog != null)
                 {
-                    var errorDetailsElement = errorDialog.FindElement(".//*[contains(@data-id,'errorDialog_subtitle')]");
+                    var errorDetailsElement = driver.FindElement("//div[contains(@data-id,'errorDialogdialog')]" + ".//*[contains(@data-id,'errorDialog_subtitle')]");
 
                     if (errorDetailsElement != null)
                     {
