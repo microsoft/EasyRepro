@@ -330,7 +330,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>xrmApp.Entity.SetValue("birthdate", DateTime.Parse("11/1/1980"));</example>
         /// <example>xrmApp.Entity.SetValue("new_actualclosedatetime", DateTime.Now, "MM/dd/yyyy", "hh:mm tt");</example>
         /// <example>xrmApp.Entity.SetValue("estimatedclosedate", DateTime.Now);</example>
-        public static BrowserCommandResult<bool> SetValue(WebClient client, string field, DateTime value, FormContextType formContext, string formatDate = null, string formatTime = null)
+        internal static BrowserCommandResult<bool> SetValue(WebClient client, string field, DateTime value, FormContextType formContext, string formatDate = null, string formatTime = null)
         {
             var control = new DateTimeControl(field)
             {

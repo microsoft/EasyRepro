@@ -8,8 +8,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
     public class Element //: IWebElement, IElementHandle
     {
-        private IWebBrowser _browser;
-        private BrowserPage _page;
         #region properties
         public string Locator { get; set; }
         public string Id { get; set; }
@@ -20,13 +18,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public string Text { get; set; }
         #endregion
 
-        public Element(BrowserPage page)
+        public Element()
         {
-            _page = page;
         }
 
         #region methods
-        public void Clear()
+        public void Clear(BrowserPage page, string key)
         {
             _page.Execute(new BrowserCommandOptions(), browser =>
             {
@@ -34,33 +31,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             });
         }
 
-        public void Click(bool? click = true)
+        public void Click(BrowserPage page, bool? click = true)
         {
 
         }
-        public void DoubleClick()
+        public void DoubleClick(BrowserPage page, string key)
         {
 
         }
-        public string GetAttribute(string attributeName)
+        public string GetAttribute(BrowserPage page, string attributeName)
         {
             return "";
         }
-        public bool HasAttribute(string attributeName)
+        public bool HasAttribute(BrowserPage page, string attributeName)
         {
             return true;
         }
-        public void Focus()
+        public void Focus(BrowserPage page, string key)
         {
 
         }
-        public void SendKeys(string key)
+        public void SendKeys(BrowserPage page, string key)
         {
 
         }
-        public void SetValue(string value)
+        public virtual void SetValue(BrowserPage page, string value)
         {
-
+            _page.Execute(new BrowserCommandOptions(), browser =>
+            {
+                return true;
+            });
         }
         #endregion
     }
