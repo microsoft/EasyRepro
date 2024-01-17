@@ -6,27 +6,27 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
-    public static class ElementExtensions
-    {
-        public static Element FindElement(this Element element, string selector)
-        {
-            throw new NotImplementedException("TBD");
-        }
-        public static List<Element>? FindElements(this Element? element, string selector)
-        {
-            throw new NotImplementedException("TBD");
-        }
-        public static Element TryFindElement(this Element element, string selector, ref Element parentElement)
-        {
-            throw new NotImplementedException("TBD");
-        }
-        public static Element WaitUntilAvailable(this Element element, string selector)
-        {
-            throw new NotImplementedException("TBD");
-        }
-        public static Element WaitUntilAvailable(this Element element, string selector, string exceptionMessage)
-        {
-            throw new NotImplementedException("TBD");
-        }
-    }
+    //public static class ElementExtensions
+    //{
+    //    public static Element FindElement(this Element element, string selector)
+    //    {
+    //        throw new NotImplementedException("TBD");
+    //    }
+    //    public static List<Element>? FindElements(this Element? element, string selector)
+    //    {
+    //        throw new NotImplementedException("TBD");
+    //    }
+    //    public static Element TryFindElement(this Element element, string selector, ref Element parentElement)
+    //    {
+    //        throw new NotImplementedException("TBD");
+    //    }
+    //    public static Element WaitUntilAvailable(this Element element, string selector)
+    //    {
+    //        throw new NotImplementedException("TBD");
+    //    }
+    //    public static Element WaitUntilAvailable(this Element element, string selector, string exceptionMessage)
+    //    {
+    //        throw new NotImplementedException("TBD");
+    //    }
+    //}
 }
