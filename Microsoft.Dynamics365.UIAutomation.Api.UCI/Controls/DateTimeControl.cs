@@ -256,59 +256,59 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (strExpanded == null)
                 {
-                    fieldContainer = formContext.FindElement(client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName));
+                    fieldContainer = driver.FindElement(client.ElementMapper.QuickCreateReference.QuickCreateFormContext + client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName));
                 }
             }
             else if (formContextType == FormContextType.Entity)
             {
                 // Initialize the entity form context
                 var formContext = driver.WaitUntilAvailable(client.ElementMapper.EntityReference.FormContext);
-                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+                fieldContainer = driver.WaitUntilAvailable(client.ElementMapper.EntityReference.FormContext + xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
                 var strExpanded = fieldContainer.GetAttribute("aria-expanded");
 
                 if (strExpanded == null)
                 {
-                    fieldContainer = formContext.FindElement(client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName));
+                    fieldContainer = driver.FindElement(client.ElementMapper.EntityReference.FormContext + client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName));
                 }
             }
             else if (formContextType == FormContextType.BusinessProcessFlow)
             {
                 // Initialize the Business Process Flow context
                 var formContext = driver.WaitUntilAvailable(client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext);
-                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+                fieldContainer = driver.WaitUntilAvailable(client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext + xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
                 var strExpanded = fieldContainer.GetAttribute("aria-expanded");
 
                 if (strExpanded == null)
                 {
-                    fieldContainer = formContext.FindElement(client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName));
+                    fieldContainer = driver.FindElement(client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext + client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName));
                 }
             }
             else if (formContextType == FormContextType.Header)
             {
                 // Initialize the Header context
                 var formContext = driver.WaitUntilAvailable(client.ElementMapper.EntityReference.HeaderContext);
-                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+                fieldContainer = driver.WaitUntilAvailable(client.ElementMapper.EntityReference.HeaderContext + xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
                 var strExpanded = fieldContainer.GetAttribute("aria-expanded");
 
                 if (strExpanded == null)
                 {
-                    fieldContainer = formContext.FindElement(client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName));
+                    fieldContainer = driver.FindElement(client.ElementMapper.EntityReference.HeaderContext + client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName));
                 }
             }
             else if (formContextType == FormContextType.Dialog)
             {
                 // Initialize the Dialog context
                 var formContext = driver.WaitUntilAvailable(client.ElementMapper.DialogsReference.DialogContext);
-                fieldContainer = formContext.WaitUntilAvailable(xpathToInput, $"DateTime Field: '{controlName}' does not exist");
+                fieldContainer = driver.WaitUntilAvailable(client.ElementMapper.DialogsReference.DialogContext + xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
                 var strExpanded = fieldContainer.GetAttribute("aria-expanded");
 
                 if (strExpanded == null)
                 {
-                    fieldContainer = formContext.FindElement(client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName));
+                    fieldContainer = driver.FindElement(client.ElementMapper.DialogsReference.DialogContext + client.ElementMapper.EntityReference.TextFieldContainer.Replace("[NAME]", controlName));
                 }
 
             }
