@@ -16,6 +16,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         object ExecuteScript(string selector, params object[] args);
         bool HasElement(string selector);
         void Navigate(string url);
+        void SendKeys(string key);
         void SwitchToFrame(string locator);
         //bool TryFindElement(string selector, out Element element);
         void Wait(TimeSpan? timeout = null);

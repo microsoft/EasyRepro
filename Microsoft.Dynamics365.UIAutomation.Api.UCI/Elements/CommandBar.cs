@@ -77,7 +77,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (driver.HasElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext)))
                 {
                     var dialogContainer = driver.FindElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext));
-                    ribbon = dialogContainer.WaitUntilAvailable(string.Format(_client.ElementMapper.CommandBarReference.Container));
+                    ribbon = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.DialogContext + _client.ElementMapper.CommandBarReference.Container);
                 }
                 else
                 {
@@ -145,11 +145,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     var submenu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
 
-                    submenu.TryFindElement(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname), out var subbutton);
 
-                    if (subbutton != null)
+                    if (driver.FindElement(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname)) != null)
                     {
-                        subbutton.Click(true);
+                        driver.FindElement(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname)).Click(true);
                     }
                     else
                         throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
@@ -158,9 +157,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         var subSecondmenu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
 
-                        subSecondmenu.TryFindElement(
+                        var subSecondbutton = driver.FindElement(_client.ElementMapper.CommandBarReference.MoreCommandsMenu + 
                             _client.ElementMapper.SubGridReference.SubGridOverflowButton
-                                .Replace("[NAME]", subSecondName), out var subSecondbutton);
+                                .Replace("[NAME]", subSecondName));
 
                         if (subSecondbutton != null)
                         {
@@ -199,24 +198,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             Element ribbon = GetRibbon(driver);
 
             //Get the CommandBar buttons
-            Dictionary<string, Element> commandBarItems = GetMenuItems(ribbon);
+            Dictionary<string, Element> commandBarItems = GetMenuItems(driver, ribbon);
             bool hasMoreCommands = commandBarItems.TryGetValue(moreCommandsLabel, out var moreCommandsButton);
             if (includeMoreCommandsValues && hasMoreCommands)
             {
                 moreCommandsButton.Click(true);
 
-                driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu,
-                    menu => AddMenuItems(menu, commandBarItems),
-                    "Unable to locate the 'More Commands' menu"
-                    );
+                var menu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
+                if (menu == null) { throw new KeyNotFoundException("More Commands Not Found. XPath: " + _client.ElementMapper.CommandBarReference.MoreCommandsMenu); }
+                AddMenuItems(driver, menu, commandBarItems);
+
             }
 
             var result = GetCommandNames(commandBarItems.Values);
             return result;
         }
-        private static void AddMenuItems(Element menu, Dictionary<string, Element> dictionary)
+        private static void AddMenuItems(IWebBrowser browser, Element menu, Dictionary<string, Element> dictionary)
         {
-            var menuItems = menu.FindElements("//li");
+            var menuItems = browser.FindElements(menu.Locator + "//li");
             foreach (var item in menuItems)
             {
                 string key = item.Text.ToLowerString();
@@ -225,10 +224,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 dictionary.Add(key, item);
             }
         }
-        private static Dictionary<string, Element> GetMenuItems(Element menu)
+        private static Dictionary<string, Element> GetMenuItems(IWebBrowser browser, Element menu)
         {
             var result = new Dictionary<string, Element>();
-            AddMenuItems(menu, result);
+            AddMenuItems(browser, menu, result);
             return result;
         }
 
@@ -276,7 +275,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var closeBtn = driver.WaitUntilAvailable(xPathQuery, "Opportunity Close Button is not available");
 
                 closeBtn?.Click();
-                driver.WaitUntilVisible(_client.ElementMapper.DialogsReference.CloseOpportunity.Ok);
+                driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.CloseOpportunity.Ok);
                 Dialogs dialogs = new Dialogs(_client);
                 dialogs.CloseOpportunityDialog(true);
 
@@ -332,8 +331,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Save"), driver =>
             {
-                Actions action = new Actions(driver);
-                action.KeyDown(Keys.Control).SendKeys("S").Perform();
+                driver.SendKeys(Keys.Control);
+                driver.SendKeys("S");
+
+                //Actions action = new Actions(driver);
+                //action.KeyDown(Keys.Control).SendKeys("S").Perform();
 
                 return true;
             });

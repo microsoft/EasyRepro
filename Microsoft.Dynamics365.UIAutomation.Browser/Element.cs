@@ -11,6 +11,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         private IWebBrowser _browser;
         private BrowserPage _page;
         #region properties
+        public string Locator { get; set; }
         public string Id { get; set; }
         public string Value { get; set; }
         public bool IsAvailable { get; set; }
