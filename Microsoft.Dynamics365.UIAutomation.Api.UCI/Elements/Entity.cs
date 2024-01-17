@@ -197,7 +197,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public SubGrid SubGrid => this.GetElement<SubGrid>(_client);
         public RelatedGrid RelatedGrid => this.GetElement<RelatedGrid>(_client);
 
-        public Entity(WebClient client) : base()
+        public Entity(WebClient client) : base(client)
         {
             _client = client;
             _entityReference = new EntityReference();

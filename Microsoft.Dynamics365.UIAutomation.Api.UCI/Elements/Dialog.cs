@@ -452,46 +452,49 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Click Command"), driver =>
             {
-                // Find the button in the CommandBar
-                Element ribbon;
-                // Checking if any dialog is active
-                if (driver.HasElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext)))
-                {
-                    var dialogContainer = driver.FindElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext));
-                    ribbon = dialogContainer.WaitUntilAvailable(string.Format(_client.ElementMapper.CommandBarReference.Container));
-                }
-                else
-                {
-                    ribbon = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.Container);
-                }
+            // Find the button in the CommandBar
+            Element ribbon;
+            // Checking if any dialog is active
+            if (driver.HasElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext)))
+            {
+                var dialogContainer = driver.FindElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext));
+                ribbon = dialogContainer.WaitUntilAvailable(string.Format(_client.ElementMapper.CommandBarReference.Container));
+            }
+            else
+            {
+                ribbon = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.Container);
+            }
 
 
-                if (ribbon == null)
-                {
-                    ribbon = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.ContainerGrid,
-                        TimeSpan.FromSeconds(5),
-                        "Unable to find the ribbon.");
-                }
+            if (ribbon == null)
+            {
+                ribbon = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.ContainerGrid,
+                    TimeSpan.FromSeconds(5),
+                    "Unable to find the ribbon.");
+            }
 
                 //Is the button in the ribbon?
-                if (ribbon.TryFindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name), out var command))
+                if (driver.HasElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                 {
+                    var command = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
                     command.Click(true);
                     driver.Wait();
                 }
                 else
                 {
                     //Is the button in More Commands?
-                    if (ribbon.TryFindElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton, out var moreCommands))
+                    if (driver.HasElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton))
                     {
+                        var moreCommands = driver.FindElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton);
                         // Click More Commands
                         moreCommands.Click(true);
                         driver.Wait();
 
                         //Click the button
-                        var flyOutMenu = driver.WaitUntilAvailable(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList);
-                        if (flyOutMenu.TryFindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name), out var overflowCommand))
+                        //var flyOutMenu = driver.WaitUntilAvailable(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList);
+                        if (driver.HasElement(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList + _client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                         {
+                            var overflowCommand = driver.FindElement(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList + _client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
                             overflowCommand.Click(true);
                             driver.Wait();
                         }
@@ -500,38 +503,37 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     }
                     else
                         throw new InvalidOperationException($"No command with the name '{name}' exists inside of Commandbar.");
-                }
 
-                if (!string.IsNullOrEmpty(subname))
-                {
-                    var submenu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
-
-                    submenu.TryFindElement(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname), out var subbutton);
-
-                    if (subbutton != null)
+                    if (!string.IsNullOrEmpty(subname))
                     {
-                        subbutton.Click(true);
-                    }
-                    else
-                        throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
+                        var submenu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
 
-                    if (!string.IsNullOrEmpty(subSecondName))
-                    {
-                        var subSecondmenu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
+                        var subbutton = submenu.FindElement(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname));
 
-                        subSecondmenu.TryFindElement(
-                            _client.ElementMapper.SubGridReference.SubGridOverflowButton
-                                .Replace("[NAME]", subSecondName), out var subSecondbutton);
-
-                        if (subSecondbutton != null)
+                        if (subbutton != null)
                         {
-                            subSecondbutton.Click(true);
+                            subbutton.Click(true);
                         }
                         else
-                            throw new InvalidOperationException($"No sub command with the name '{subSecondName}' exists inside of Commandbar.");
+                            throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
+
+                        if (!string.IsNullOrEmpty(subSecondName))
+                        {
+                            var subSecondmenu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
+
+                            var subSecondButton = subSecondmenu.FindElement(
+                                _client.ElementMapper.SubGridReference.SubGridOverflowButton
+                                    .Replace("[NAME]", subSecondName));
+
+                            if (subSecondButton != null)
+                            {
+                                subSecondButton.Click(true);
+                            }
+                            else
+                                throw new InvalidOperationException($"No sub command with the name '{subSecondName}' exists inside of Commandbar.");
+                        }
                     }
                 }
-
                 driver.Wait();
 
                 return true;
@@ -572,16 +574,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (frameIndex > 0)
                 index = frameIndex.ToString();
 
-            _client.Browser.Driver.SwitchTo().DefaultContent();
+            //_client.Browser.Browser.SwitchTo().DefaultContent();
+            _client.Browser.Browser.SwitchToFrame("Default");
 
             // Check to see if dialog is InlineDialog or popup
-            var inlineDialog = _client.Browser.Driver.HasElement(_client.ElementMapper.DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index));
+            var inlineDialog = _client.Browser.Browser.HasElement(_client.ElementMapper.DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index));
             if (inlineDialog)
             {
                 //wait for the content panel to render
-                _client.Browser.Driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index),
-                    TimeSpan.FromSeconds(2),
-                    d => { _client.Browser.Driver.SwitchTo().Frame(_client.ElementMapper.DialogsReference.Frames.DialogFrameId.Replace("[INDEX]", index)); });
+                _client.Browser.Browser.WaitUntilAvailable(_client.ElementMapper.DialogsReference.Frames.DialogFrame.Replace("[INDEX]", index));
+                _client.Browser.Browser.SwitchToFrame(_client.ElementMapper.DialogsReference.Frames.DialogFrameId.Replace("[INDEX]", index));
+
                 return true;
             }
             else
@@ -676,7 +679,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                           0)) return true;
 
                     //Click the Confirm or Cancel button
-                    IWebElement buttonToClick;
+                    Element buttonToClick;
                     if (clickSaveOrCancel)
                         buttonToClick = dialogFooter.FindElement(_client.ElementMapper.DialogsReference.DuplicateDetectionIgnoreSaveButton);
                     else
@@ -688,7 +691,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (clickSaveOrCancel)
                 {
                     // Wait for Save before proceeding
-                    driver.WaitForTransaction();
+                    driver.Wait();
                 }
 
                 return true;
@@ -711,11 +714,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var dialog = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.SetStateDialog);
 
                     if (
-                        !(dialog?.FindElements(By.TagName("button")).Count >
+                        !(dialog?.FindElements("//button").Count >
                           0)) return true;
 
                     //Click the Activate/Deactivate or Cancel button
-                    IWebElement buttonToClick;
+                    Element buttonToClick;
                     if (clickOkButton)
                         buttonToClick = dialog.FindElement(_client.ElementMapper.DialogsReference.SetStateActionButton);
                     else
@@ -748,7 +751,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                           0)) return true;
 
                     //Click the Confirm or Cancel button
-                    IWebElement buttonToClick;
+                    Element buttonToClick;
                     if (ClickConfirmButton)
                         buttonToClick = dialogFooter.FindElement(_client.ElementMapper.DialogsReference.PublishConfirmButton);
                     else
@@ -786,17 +789,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     //Set the User Or Team
                     var userOrTeamField = driver.WaitUntilAvailable(entityReference.TextFieldLookup, "User field unavailable");
-                    var input = userOrTeamField.ClickWhenAvailable(By.TagName("input"), "User field unavailable");
-                    input.SendKeys(userOrTeamName, true);
+                    var input = driver.ClickWhenAvailable(entityReference.TextFieldLookup + "//input");
+                    input.SendKeys(userOrTeamName);
 
                     _client.ThinkTime(2000);
 
                     //Pick the User from the list
-                    var container = driver.WaitUntilVisible(_client.ElementMapper.DialogsReference.AssignDialogUserTeamLookupResults);
-                    container.WaitUntil(
-                        c => c.FindElements(By.TagName("li")).FirstOrDefault(r => r.Text.StartsWith(userOrTeamName, StringComparison.OrdinalIgnoreCase)),
-                        successCallback: e => e.Click(true),
-                        failureCallback: () => throw new InvalidOperationException($"None {to} found which match with '{userOrTeamName}'"));
+                    var container = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.AssignDialogUserTeamLookupResults, "Assign Dialog not visible.");
+                    var userOrTeamFieldField = driver.FindElements(_client.ElementMapper.DialogsReference.AssignDialogUserTeamLookupResults + "//li").FirstOrDefault(r => r.Text.StartsWith(userOrTeamName, StringComparison.OrdinalIgnoreCase));
+
                 }
 
                 //Click Assign
@@ -812,11 +813,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Switch Process Dialog"), driver =>
             {
                 //Wait for the Grid to load
-                driver.WaitUntilVisible(_client.ElementMapper.DialogsReference.ActiveProcessGridControlContainer);
+                driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.ActiveProcessGridControlContainer);
 
                 //Select the Process
                 var popup = driver.FindElement(_client.ElementMapper.DialogsReference.SwitchProcessContainer);
-                var labels = popup.FindElements(By.TagName("label"));
+                var labels = popup.FindElements("//label");
                 foreach (var label in labels)
                 {
                     if (label.Text.Equals(processToSwitchTo, StringComparison.OrdinalIgnoreCase))
@@ -876,7 +877,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         //Click Ignore and Save
                         driver.FindElement(_client.ElementMapper.EntityReference.DuplicateDetectionIgnoreAndSaveButton).Click(true);
-                        driver.WaitForTransaction();
+                        driver.Wait();
                     }
                 }
 
@@ -902,7 +903,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Get Business Process Error Text"), driver =>
             {
                 string errorDetails = string.Empty;
-                var errorDialog = driver.WaitUntilAvailable("//div[contains(@data-id,'errorDialogdialog')]", new TimeSpan(0, 0, waitTimeInSeconds));
+                var errorDialog = driver.WaitUntilAvailable("//div[contains(@data-id,'errorDialogdialog')]", new TimeSpan(0, 0, waitTimeInSeconds),"");
 
                 // Is error dialog present?
                 if (errorDialog != null)

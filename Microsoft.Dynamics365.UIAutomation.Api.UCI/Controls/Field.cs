@@ -219,7 +219,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        internal static void ClearFieldValue(WebClient client, IWebElement field)
+        internal static void ClearFieldValue(WebClient client, Element field)
         {
             if (field.GetAttribute("value").Length > 0)
             {

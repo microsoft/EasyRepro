@@ -30,7 +30,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public SubGrid SubGrid => this.GetElement<SubGrid>(_client);
 
-        public Dashboard(WebClient client)
+        public Dashboard(WebClient client) : base(client)
         {
             _client = client;
         }
@@ -61,12 +61,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Select Dashboard"), driver =>
             {
                 //Click the drop-down arrow
-                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.DashboardReference.DashboardSelector));
+                driver.ClickWhenAvailable(_client.ElementMapper.DashboardReference.DashboardSelector);
                 //Select the dashboard
-                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.DashboardReference.DashboardItemUCI.Replace("[NAME]", dashboardName)));
+                driver.ClickWhenAvailable(_client.ElementMapper.DashboardReference.DashboardItemUCI.Replace("[NAME]", dashboardName));
 
                 // Wait for Dashboard to load
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });

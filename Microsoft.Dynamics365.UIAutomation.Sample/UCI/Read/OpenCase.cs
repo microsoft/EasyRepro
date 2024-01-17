@@ -72,7 +72,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
                 // OpenQA.Selenium.NoSuchElementException: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@data-id='header_ownerId.fieldControl-Lookup_ownerId']"}
                 LookupItem ownerId = new LookupItem() { Name = "ownerid" };
                 string ownerIdValue = xrmApp.Entity.GetHeaderValue(ownerId);
-
+                DateTimeControl dtControl = new DateTimeControl("");
+                
+                BooleanItem boolControl = new BooleanItem(client);
                 xrmApp.ThinkTime(2000);
 
             }

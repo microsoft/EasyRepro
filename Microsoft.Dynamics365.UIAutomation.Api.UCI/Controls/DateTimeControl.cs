@@ -15,7 +15,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
     /// <summary>
     /// Represents a DateTime field in Dynamics 365.
     /// </summary>
-    public class DateTimeControl : Element
+    public class DateTimeControl
     {
         public DateTimeControl(string name)
         {
@@ -62,10 +62,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 // Try get Time
                 var timeFieldXPath = client.ElementMapper.EntityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", field);
-                bool success = browser.TryFindElement(timeFieldXPath, out var timeField);
-                if (!success || timeField == null)
+                bool success = browser.HasElement(timeFieldXPath);
+                if (!success)
                     return date;
 
+                var timeField = browser.FindElement(timeFieldXPath);
                 string strTime = timeField.GetAttribute("value");
                 if (strTime.IsEmptyValue())
                     return date;
@@ -118,27 +119,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //client.Browser.Driver.WaitForTransaction();
                 browser.Wait();
 
-                if (browser.TryFindElement(timeFieldXPath, out var timeField))
+                if (browser.HasElement(timeFieldXPath))
                 {
-                    TrySetTime(client, timeFieldXPath, control.TimeAsString);
+                    var timeField = browser.FindElement(timeFieldXPath);
+                    TrySetTime(client, timeField, control.TimeAsString);
                 }
                 return true;
             });
         }
-        internal static void TrySetTime(WebClient client, string timeField, string time)
+        internal static void TrySetTime(WebClient client, Element timeField, string time)
         {
             client.Execute(client.GetOptions("TrySetTime"), browser => {
                 // click & wait until the time get updated after change/clear the date
-                browser.Click(timeField);
+                timeField.Click();
                 browser.Wait();
-                browser.Clear(timeField);
-                browser.Click(timeField);
-                browser.SendKeys(timeField, time);
-                browser.SendKeys(timeField, "Tab");
+                timeField.Clear();
+                timeField.Click();
+                timeField.SendKeys(time);
+                timeField.SendKeys(Keys.Tab);
                 browser.Wait();
 
-                Element dateTimeField = browser.FindElement(timeField);
-                if (dateTimeField.GetAttribute("value") != time) throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {time}. Actual: {dateTimeField.GetAttribute("value")}");
+                //Element dateTimeField = browser.FindElement(timeField);
+                //if (dateTimeField.GetAttribute("value") != time) throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {time}. Actual: {dateTimeField.GetAttribute("value")}");
                 //driver.RepeatUntil(() =>
                 //{
                 //    timeField.Clear();
@@ -311,7 +313,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             }
 
-            TrySetDateValue(client, control, control.DateAsString, formContextType);
+            TrySetDateValue(client, fieldContainer, control.DateAsString, formContextType);
             Trace.WriteLine("End function: private void TrySetDateValue with DateTimeControl.");
         }
         internal BrowserCommandResult<bool> ClearValue(WebClient client, DateTimeControl control, FormContextType formContextType)
