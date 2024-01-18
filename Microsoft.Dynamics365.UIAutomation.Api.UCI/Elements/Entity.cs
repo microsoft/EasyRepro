@@ -656,7 +656,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="value">The value</param>
         public void SetValue(string field, string value)
         {
-            Field.SetValue(_client, field, value, FormContextType.Entity);
+            Field objField = new Field(_client);
+            objField.SetValue(_client, field, value, FormContextType.Entity);
         }
 
         /// <summary>
@@ -1031,11 +1032,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
 
 
-        public void SelectOption(ReadOnlyCollection<Element> options, string value)
-        {
-            var selectedOption = options.FirstOrDefault(op => op.Text == value || op.GetAttribute(_client, "value") == value);
-            selectedOption.Click(_client, true);
-        }
+
 
 
 
@@ -1729,7 +1726,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 TryExpandHeaderFlyout(driver);
 
-                Field.SetValue(_client, field, value, FormContextType.Header);
+                Field objField = new Field(_client);
+                objField.SetValue(_client, field, value, FormContextType.Header);
 
                 TryCloseHeaderFlyout(driver);
                 return true;
@@ -1783,7 +1781,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 driver => ExecuteInHeaderContainer(driver, xpathToContainer,
                     container =>
                     {
-                        OptionSet.TrySetValue(_client, container, control);
+                        control.TrySetValue(_client, container, control);
 
                         TryCloseHeaderFlyout(driver);
                         return true;

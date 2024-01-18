@@ -3,7 +3,7 @@
 
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using OpenQA.Selenium;
+using System.Collections.ObjectModel;
 using static Microsoft.Dynamics365.UIAutomation.Api.UCI.Entity;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
@@ -19,16 +19,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public OptionSet() {
             _entityReference = new EntityReference();
         }
+        public void SelectOption(WebClient client, List<Element> options, string value)
+        {
+            var selectedOption = options.FirstOrDefault(op => op.Text == value || op.GetAttribute(client, "value") == value);
+            selectedOption.Click(client, true);
+        }
         internal static BrowserCommandResult<bool> SetValue(WebClient client, OptionSet control, FormContextType formContextType)
         {
             var controlName = control.Name;
             return client.Execute(client.GetOptions($"Set OptionSet Value: {controlName}"), driver =>
             {
-                IWebElement fieldContainer = null;
+                Element fieldContainer = null;
                 fieldContainer = client.ValidateFormContext(driver, formContextType, controlName, fieldContainer);
 
-                OptionSet.TrySetValue(client,fieldContainer, control);
-                driver.WaitForTransaction();
+                control.TrySetValue(client,fieldContainer, control);
+                driver.Wait();
                 return true;
             });
         }
@@ -43,29 +48,30 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        internal static void TrySetValue(WebClient client, IWebElement fieldContainer, OptionSet control)
+        internal void TrySetValue(WebClient client, Element fieldContainer, OptionSet control)
         {
             var value = control.Value;
-            bool success = fieldContainer.TryFindElement(By.TagName("select"), out IWebElement select);
+            bool success = client.Browser.Browser.HasElement(fieldContainer.Locator + "//select");
             if (success)
             {
-                fieldContainer.WaitUntilAvailable(By.TagName("select"));
-                var options = select.FindElements(By.TagName("option"));
-                SelectOption(options, value);
+                Element select = client.Browser.Browser.FindElement(fieldContainer.Locator + "//select");
+                client.Browser.Browser.WaitUntilAvailable(fieldContainer.Locator + "//select");
+                var options = client.Browser.Browser.FindElements(select.Locator + "//option");
+                SelectOption(client, options, value);
                 return;
             }
 
             var name = control.Name;
-            var hasStatusCombo = fieldContainer.HasElement(By.XPath(_entityReference.EntityOptionsetStatusCombo.Replace("[NAME]", name)));
+            var hasStatusCombo = client.Browser.Browser.HasElement(fieldContainer.Locator + _entityReference.EntityOptionsetStatusCombo.Replace("[NAME]", name));
             if (hasStatusCombo)
             {
                 // This is for statuscode (type = status) that should act like an optionset doesn't doesn't follow the same pattern when rendered
-                fieldContainer.ClickWhenAvailable(By.XPath(_entityReference.EntityOptionsetStatusComboButton.Replace("[NAME]", name)));
+                client.Browser.Browser.ClickWhenAvailable(fieldContainer.Locator + _entityReference.EntityOptionsetStatusComboButton.Replace("[NAME]", name));
 
-                var listBox = fieldContainer.FindElement(By.XPath(_entityReference.EntityOptionsetStatusComboList.Replace("[NAME]", name)));
+                var listBox = client.Browser.Browser.FindElement(fieldContainer.Locator + _entityReference.EntityOptionsetStatusComboList.Replace("[NAME]", name));
 
-                var options = listBox.FindElements(By.TagName("li"));
-                SelectOption(options, value);
+                var options = client.Browser.Browser.FindElements(listBox.Locator + "//li");
+                SelectOption(client, options, value);
                 return;
             }
 

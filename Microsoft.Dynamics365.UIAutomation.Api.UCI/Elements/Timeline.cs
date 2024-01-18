@@ -3,7 +3,6 @@
 
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using OpenQA.Selenium;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -131,10 +130,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             this.OpenAndClickPopoutMenu(_client.ElementMapper.TimelineReference.Popout, _client.ElementMapper.TimelineReference.PopoutAppointment, 4000);
             _client.ThinkTime(4000);
-            Field.SetValue(_client, _client.ElementMapper.TimelineReference.AppointmentSubject, subject, FormContextType.QuickCreate);
-            Field.SetValue(_client, _client.ElementMapper.TimelineReference.AppointmentLocation, location, FormContextType.QuickCreate);
-            Field.SetValue(_client, _client.ElementMapper.TimelineReference.AppointmentDescription, description, FormContextType.QuickCreate);
-            Field.SetValue(_client, _client.ElementMapper.TimelineReference.AppointmentDuration, duration, FormContextType.QuickCreate);
+            Field objField = new Field(_client);
+            objField.SetValue(_client, _client.ElementMapper.TimelineReference.AppointmentSubject, subject, FormContextType.QuickCreate);
+            objField.SetValue(_client, _client.ElementMapper.TimelineReference.AppointmentLocation, location, FormContextType.QuickCreate);
+            objField.SetValue(_client, _client.ElementMapper.TimelineReference.AppointmentDescription, description, FormContextType.QuickCreate);
+            objField.SetValue(_client, _client.ElementMapper.TimelineReference.AppointmentDuration, duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -168,7 +168,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="subject">Subject of the email</param>
         public void AddEmailSubject(string subject)
         {
-            Field.SetValue(_client,_client.ElementMapper.TimelineReference.EmailSubject, subject);
+            Field objField = new Field(_client);
+            objField.SetValue(_client,_client.ElementMapper.TimelineReference.EmailSubject, subject);
         }
 
         /// <summary>
@@ -188,7 +189,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="duration">The duration as text</param>
         public void AddEmailDuration(string duration)
         {
-            Field.SetValue(_client, _client.ElementMapper.TimelineReference.EmailDuration, duration);
+            Field objField = new Field(_client);
+            objField.SetValue(_client, _client.ElementMapper.TimelineReference.EmailDuration, duration);
         }
 
         /// <summary>
@@ -236,10 +238,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             this.OpenAndClickPopoutMenu(_client.ElementMapper.TimelineReference.Popout, _client.ElementMapper.TimelineReference.PopoutPhoneCall, 4000);
             _client.ThinkTime(4000);
-            Field.SetValue(_client, _client.ElementMapper.TimelineReference.PhoneCallSubject, subject, FormContextType.QuickCreate);
-            Field.SetValue(_client, _client.ElementMapper.TimelineReference.PhoneCallNumber, phoneNumber, FormContextType.QuickCreate);
-            Field.SetValue(_client, _client.ElementMapper.TimelineReference.PhoneCallDescription, description, FormContextType.QuickCreate);
-            Field.SetValue(_client, _client.ElementMapper.TimelineReference.PhoneCallDuration, duration, FormContextType.QuickCreate);
+            Field objField = new Field(_client);
+            objField.SetValue(_client, _client.ElementMapper.TimelineReference.PhoneCallSubject, subject, FormContextType.QuickCreate);
+            objField.SetValue(_client, _client.ElementMapper.TimelineReference.PhoneCallNumber, phoneNumber, FormContextType.QuickCreate);
+            objField.SetValue(_client, _client.ElementMapper.TimelineReference.PhoneCallDescription, description, FormContextType.QuickCreate);
+            objField.SetValue(_client, _client.ElementMapper.TimelineReference.PhoneCallDuration, duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -260,9 +263,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             this.OpenAndClickPopoutMenu(_client.ElementMapper.TimelineReference.Popout, _client.ElementMapper.TimelineReference.PopoutTask, 4000);
             _client.ThinkTime(4000);
-            Field.SetValue(_client, _client.ElementMapper.TimelineReference.TaskSubject, subject, FormContextType.QuickCreate);
-            Field.SetValue(_client, _client.ElementMapper.TimelineReference.TaskDescription, description, FormContextType.QuickCreate);
-            Field.SetValue(_client, _client.ElementMapper.TimelineReference.TaskDuration, duration, FormContextType.QuickCreate);
+            Field objField = new Field(_client);
+            objField.SetValue(_client, _client.ElementMapper.TimelineReference.TaskSubject, subject, FormContextType.QuickCreate);
+            objField.SetValue(_client, _client.ElementMapper.TimelineReference.TaskDescription, description, FormContextType.QuickCreate);
+            objField.SetValue(_client, _client.ElementMapper.TimelineReference.TaskDuration, duration, FormContextType.QuickCreate);
         }
 
         /// <summary>
@@ -310,7 +314,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="popoutItemName">The By Object of the Popout Item name in the popout menu</param>
         /// <param name="thinkTime">Amount of time(milliseconds) to wait before this method will click on the "+" popout menu.</param>
         /// <returns>True on success, False on failure to invoke any action</returns>
-        internal BrowserCommandResult<bool> OpenAndClickPopoutMenu(By menuName, By menuItemName, int thinkTime = Constants.DefaultThinkTime)
+        internal BrowserCommandResult<bool> OpenAndClickPopoutMenu(string menuName, string menuItemName, int thinkTime = Constants.DefaultThinkTime)
         {
             _client.ThinkTime(thinkTime);
 
@@ -346,13 +350,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"{action} Activity"), driver =>
             {
-                var dialog = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.DialogsReference.DialogContext));
+                var dialog = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.DialogContext);
 
-                var actionButton = dialog.FindElement(By.XPath(xPathQuery));
+                var actionButton = driver.FindElement(dialog.Locator + xPathQuery);
 
-                actionButton?.Click();
+                actionButton?.Click(_client);
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -367,10 +371,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="popoutItemName">The name of the Popout Item name in the popout menu</param>
         /// <param name="thinkTime">Amount of time(milliseconds) to wait before this method will click on the "+" popout menu.</param>
         /// <returns>True on success, False on failure to invoke any action</returns>
-        internal BrowserCommandResult<bool> OpenAndClickPopoutMenu(string popoutName, string popoutItemName, int thinkTime = Constants.DefaultThinkTime)
-        {
-            return this.OpenAndClickPopoutMenu(By.XPath(popoutName), By.XPath(popoutItemName), thinkTime);
-        }
+        //internal BrowserCommandResult<bool> OpenAndClickPopoutMenu(string popoutName, string popoutItemName, int thinkTime = Constants.DefaultThinkTime)
+        //{
+        //    return this.OpenAndClickPopoutMenu(popoutName, popoutItemName, thinkTime);
+        //}
 
         /// <summary>
         /// Provided a By object which represents a HTML Button object, this method will
@@ -378,12 +382,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="by">The object of Type By which represents a HTML Button object</param>
         /// <returns>True on success, False/Exception on failure to invoke any action</returns>
-        internal BrowserCommandResult<bool> ClickButton(By by)
+        internal BrowserCommandResult<bool> ClickButton(string by)
         {
             return _client.Execute($"Open Timeline Add Post Popout", driver =>
             {
                 var button = driver.WaitUntilAvailable(by);
-                if (button.TagName.Equals("button"))
+                if (button.Tag.Equals("button"))
                 {
                     try
                     {
@@ -399,9 +403,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     return true;
                 }
-                else if (button.FindElements(By.TagName("button")).Any())
+                else if (driver.FindElements(button.Locator + "//button").Any())
                 {
-                    button.FindElements(By.TagName("button")).First().Click();
+                    driver.FindElements(button.Locator + "//button").First().Click(_client);
                     return true;
                 }
                 else
@@ -417,17 +421,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         /// <param name="fieldNameXpath">The field as a XPath which represents a HTML Button object</param>
         /// <returns>True on success, Exception on failure to invoke any action</returns>
-        internal BrowserCommandResult<bool> ClickButton(string fieldNameXpath)
-        {
-            try
-            {
-                return ClickButton(By.XPath(fieldNameXpath));
-            }
-            catch (Exception e)
-            {
-                throw new InvalidOperationException($"Field: {fieldNameXpath} with Does not exist", e);
-            }
-        }
+        //internal BrowserCommandResult<bool> ClickButton(string fieldNameXpath)
+        //{
+        //    try
+        //    {
+        //        return ClickButton(fieldNameXpath);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new InvalidOperationException($"Field: {fieldNameXpath} with Does not exist", e);
+        //    }
+        //}
 
 
 
@@ -444,27 +448,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute($"SetValue (Generic)", driver =>
             {
-                var inputbox = driver.WaitUntilAvailable(By.XPath(fieldName));
-                if (expectedTagName.Equals(inputbox.TagName, StringComparison.InvariantCultureIgnoreCase))
+                var inputbox = driver.WaitUntilAvailable(fieldName);
+                if (expectedTagName.Equals(inputbox.Tag, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (!inputbox.TagName.Contains("iframe", StringComparison.InvariantCultureIgnoreCase))
+                    if (!inputbox.Tag.Contains("iframe", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        inputbox.Click(true);
-                        inputbox.Clear();
-                        inputbox.SendKeys(value);
+                        inputbox.Click(_client);
+                        inputbox.Clear(_client, inputbox.Locator);
+                        inputbox.SetValue(_client, value);
                     }
                     else
                     {
-                        driver.SwitchTo().Frame(inputbox);
+                        driver.SwitchToFrame(inputbox.Locator);
 
-                        driver.WaitUntilAvailable(By.TagName("iframe"));
-                        driver.SwitchTo().Frame(0);
+                        driver.WaitUntilAvailable("//iframe");
+                        driver.SwitchToFrame("0");
 
-                        var inputBoxBody = driver.WaitUntilAvailable(By.TagName("body"));
-                        inputBoxBody.Click(true);
-                        inputBoxBody.SendKeys(value);
+                        var inputBoxBody = driver.WaitUntilAvailable("//body");
+                        inputBoxBody.Click(_client);
+                        inputBoxBody.SetValue(_client, value);
 
-                        driver.SwitchTo().DefaultContent();
+                        driver.SwitchToFrame("0");
                     }
 
                     return true;

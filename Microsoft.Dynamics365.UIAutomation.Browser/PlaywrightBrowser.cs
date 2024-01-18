@@ -25,6 +25,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public BrowserOptions Options { get { return _options; } set { _options = value; } }
 
+        public string Url { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         #region DoubleClick
         public void DoubleClick(string selector)
         {
@@ -181,6 +183,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
 
         public Element WaitUntilAvailable(string selector, string exceptionMessage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Element ClickWhenAvailable(string selector)
+        {
+            throw new NotImplementedException();
+        }
+
+        Element IWebBrowser.ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Element>? FindElements(string selector)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SendKeys(string[] keys)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SwitchToFrame(string locator)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Wait(PageEvent pageEvent)
         {
             throw new NotImplementedException();
         }

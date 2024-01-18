@@ -131,7 +131,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             input = driver.FindElement(fieldContainer + "//input");
             string value = control.Value?.Trim();
             if (found)
-                Field.SetInputValue(driver, input, value);
+            {
+                Field objField = new Field(_client);
+                objField.SetInputValue(driver, input, value);
+            }
 
             TrySetValue(driver, fieldContainer, control);
         }

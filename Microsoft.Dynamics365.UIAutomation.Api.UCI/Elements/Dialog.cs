@@ -345,7 +345,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="value">The value</param>
         public void SetValue(string field, string value)
         {
-            Field.SetValue(_client, field, value, FormContextType.Dialog);
+            Field objField = new Field(_client);
+            objField.SetValue(_client, field, value, FormContextType.Dialog);
         }
 
         /// <summary>

@@ -54,7 +54,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var xpathToDateField = client.ElementMapper.EntityReference.FieldControlDateTimeInputUCI.Replace("[FIELD]", field);
 
                 var dateField = browser.WaitUntilAvailable(xpathToDateField, $"Field: {field} Does not exist");
-                string strDate = dateField.GetAttribute("value");
+                string strDate = dateField.GetAttribute(client, "value");
                 if (strDate.IsEmptyValue())
                     return default;
 
@@ -67,7 +67,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     return date;
 
                 var timeField = browser.FindElement(timeFieldXPath);
-                string strTime = timeField.GetAttribute("value");
+                string strTime = timeField.GetAttribute(client, "value");
                 if (strTime.IsEmptyValue())
                     return date;
 
@@ -131,12 +131,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             client.Execute(client.GetOptions("TrySetTime"), browser => {
                 // click & wait until the time get updated after change/clear the date
-                timeField.Click();
+                timeField.Click(client);
                 browser.Wait();
-                timeField.Clear();
-                timeField.Click();
-                timeField.SendKeys(time);
-                timeField.SendKeys(Keys.Tab);
+                timeField.Clear(client, timeField.Locator);
+                timeField.Click(client);
+                timeField.SetValue(client, time);
+                timeField.SendKeys(client, new string[] { Keys.Tab });
                 browser.Wait();
 
                 //Element dateTimeField = browser.FindElement(timeField);
@@ -162,28 +162,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             Trace.WriteLine("Begin function: internal void TrySetDateValue with Element.");
             client.Execute(client.GetOptions("TrySetDateValue"), browser =>
             {
-                var strExpanded = dateField.GetAttribute("aria-expanded");
+                var strExpanded = dateField.GetAttribute(client, "aria-expanded");
 
                 if (strExpanded != null)
                 {
                     bool success = bool.TryParse(strExpanded, out var isCalendarExpanded);
                     if (success && isCalendarExpanded)
-                        dateField.Click(); // close calendar
+                        dateField.Click(client); // close calendar
 
 
                     // Only send Keys.Escape to avoid element not interactable exceptions with calendar flyout on forms.
                     // This can cause the Header or BPF flyouts to close unexpectedly
                     if (formContextType == FormContextType.Entity || formContextType == FormContextType.QuickCreate)
                     {
-                        dateField.SendKeys(Keys.Escape);
+                        dateField.SendKeys(client, new string[] { Keys.Escape });
                     }
                     Field.ClearFieldValue(client, dateField);
-                    dateField.SendKeys(date);
-                    dateField.SendKeys(Keys.Tab);
+                    dateField.SetValue(client, date);
+                    dateField.SendKeys(client, new string[] { Keys.Tab });
 
-                    if (!dateField.GetAttribute("value").IsValueEqualsTo(date))
+                    if (!dateField.GetAttribute(client, "value").IsValueEqualsTo(date))
                     {
-                        throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute("value")}");
+                        throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {date}. Actual: {dateField.GetAttribute(client, "value")}");
                     }
 
                     //browser.RepeatUntil(() =>
@@ -252,7 +252,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var formContext = driver.WaitUntilAvailable(client.ElementMapper.QuickCreateReference.QuickCreateFormContext);
                 fieldContainer = driver.WaitUntilAvailable(client.ElementMapper.QuickCreateReference.QuickCreateFormContext + xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
-                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+                var strExpanded = fieldContainer.GetAttribute(client, "aria-expanded");
 
                 if (strExpanded == null)
                 {
@@ -265,7 +265,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var formContext = driver.WaitUntilAvailable(client.ElementMapper.EntityReference.FormContext);
                 fieldContainer = driver.WaitUntilAvailable(client.ElementMapper.EntityReference.FormContext + xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
-                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+                var strExpanded = fieldContainer.GetAttribute(client, "aria-expanded");
 
                 if (strExpanded == null)
                 {
@@ -278,7 +278,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var formContext = driver.WaitUntilAvailable(client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext);
                 fieldContainer = driver.WaitUntilAvailable(client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext + xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
-                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+                var strExpanded = fieldContainer.GetAttribute(client, "aria-expanded");
 
                 if (strExpanded == null)
                 {
@@ -291,7 +291,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var formContext = driver.WaitUntilAvailable(client.ElementMapper.EntityReference.HeaderContext);
                 fieldContainer = driver.WaitUntilAvailable(client.ElementMapper.EntityReference.HeaderContext + xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
-                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+                var strExpanded = fieldContainer.GetAttribute(client, "aria-expanded");
 
                 if (strExpanded == null)
                 {
@@ -304,7 +304,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var formContext = driver.WaitUntilAvailable(client.ElementMapper.DialogsReference.DialogContext);
                 fieldContainer = driver.WaitUntilAvailable(client.ElementMapper.DialogsReference.DialogContext + xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
-                var strExpanded = fieldContainer.GetAttribute("aria-expanded");
+                var strExpanded = fieldContainer.GetAttribute(client, "aria-expanded");
 
                 if (strExpanded == null)
                 {

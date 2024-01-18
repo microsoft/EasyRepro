@@ -156,17 +156,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (hasRadio)
                 {
-                    var trueRadio = fieldContainer.FindElement(client.ElementMapper.EntityReference.EntityBooleanFieldRadioTrue.Replace("[NAME]", option.Name));
-                    var falseRadio = fieldContainer.FindElement(client.ElementMapper.EntityReference.EntityBooleanFieldRadioFalse.Replace("[NAME]", option.Name));
+                    var trueRadio = driver.FindElement(fieldContainer.Locator + client.ElementMapper.EntityReference.EntityBooleanFieldRadioTrue.Replace("[NAME]", option.Name));
+                    var falseRadio = driver.FindElement(fieldContainer.Locator + client.ElementMapper.EntityReference.EntityBooleanFieldRadioFalse.Replace("[NAME]", option.Name));
 
-                    if (option.Value && bool.Parse(falseRadio.GetAttribute("aria-checked")) || !option.Value && bool.Parse(trueRadio.GetAttribute("aria-checked")))
+                    if (option.Value && bool.Parse(falseRadio.GetAttribute(client, "aria-checked")) || !option.Value && bool.Parse(trueRadio.GetAttribute(client,"aria-checked")))
                     {
                         driver.ClickWhenAvailable(client.ElementMapper.EntityReference.EntityBooleanFieldRadioContainer.Replace("[NAME]", option.Name));
                     }
                 }
                 else if (hasCheckbox)
                 {
-                    var checkbox = fieldContainer.FindElement(client.ElementMapper.EntityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name));
+                    var checkbox = driver.FindElement(fieldContainer.Locator + client.ElementMapper.EntityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name));
 
                     if (option.Value && !checkbox.Selected || !option.Value && checkbox.Selected)
                     {
@@ -175,60 +175,60 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
                 else if (hasList)
                 {
-                    var list = fieldContainer.FindElement(client.ElementMapper.EntityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name));
-                    var options = list.FindElements(client.ElementMapper.EntityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name)+"//option");
-                    var selectedOption = options.FirstOrDefault(a => a.HasAttribute("data-selected") && bool.Parse(a.GetAttribute("data-selected")));
-                    var unselectedOption = options.FirstOrDefault(a => !a.HasAttribute("data-selected"));
+                    var list = driver.FindElement(fieldContainer.Locator + client.ElementMapper.EntityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name));
+                    var options = driver.FindElements(list.Locator + client.ElementMapper.EntityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name)+"//option");
+                    var selectedOption = options.FirstOrDefault(a => a.HasAttribute(client, "data-selected") && bool.Parse(a.GetAttribute(client, "data-selected")));
+                    var unselectedOption = options.FirstOrDefault(a => !a.HasAttribute(client, "data-selected"));
 
                     var trueOptionSelected = false;
                     if (selectedOption != null)
                     {
-                        trueOptionSelected = selectedOption.GetAttribute("value") == "1";
+                        trueOptionSelected = selectedOption.GetAttribute(client, "value") == "1";
                     }
 
                     if (option.Value && !trueOptionSelected || !option.Value && trueOptionSelected)
                     {
                         if (unselectedOption != null)
                         {
-                            driver.ClickWhenAvailable(unselectedOption.GetAttribute("id"));
+                            driver.ClickWhenAvailable(unselectedOption.GetAttribute(client, "id"));
                         }
                     }
                 }
                 else if (hasToggle)
                 {
-                    var toggle = fieldContainer.FindElement(client.ElementMapper.EntityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name));
-                    var link = toggle.FindElement(client.ElementMapper.EntityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name) + "//button");
-                    var value = bool.Parse(link.GetAttribute("aria-checked"));
+                    var toggle = driver.FindElement(fieldContainer.Locator + client.ElementMapper.EntityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name));
+                    var link = driver.FindElement(toggle.Locator + client.ElementMapper.EntityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name) + "//button");
+                    var value = bool.Parse(link.GetAttribute(client, "aria-checked"));
 
                     if (value != option.Value)
                     {
-                        link.Click();
+                        link.Click(client);
                     }
                 }
                 else if (hasFlipSwitch)
                 {
                     // flipSwitchContainer should exist based on earlier TryFindElement logic
-                    var link = flipSwitchContainer.FindElement("//a");
-                    var value = bool.Parse(link.GetAttribute("aria-checked"));
+                    var link = driver.FindElement(flipSwitchContainer.Locator + "//a");
+                    var value = bool.Parse(link.GetAttribute(client, "aria-checked"));
 
                     if (value != option.Value)
                     {
-                        link.Click();
+                        link.Click(client);
                     }
                 }
                 else if (hasButton)
                 {
-                    var container = fieldContainer.FindElement(client.ElementMapper.EntityReference.EntityBooleanFieldButtonContainer.Replace("[NAME]", option.Name));
-                    var trueButton = container.FindElement(client.ElementMapper.EntityReference.EntityBooleanFieldButtonTrue);
-                    var falseButton = container.FindElement(client.ElementMapper.EntityReference.EntityBooleanFieldButtonFalse);
+                    var container = driver.FindElement(fieldContainer.Locator + client.ElementMapper.EntityReference.EntityBooleanFieldButtonContainer.Replace("[NAME]", option.Name));
+                    var trueButton = driver.FindElement(container.Locator + client.ElementMapper.EntityReference.EntityBooleanFieldButtonTrue);
+                    var falseButton = driver.FindElement(container.Locator + client.ElementMapper.EntityReference.EntityBooleanFieldButtonFalse);
 
                     if (option.Value)
                     {
-                        trueButton.Click();
+                        trueButton.Click(client);
                     }
                     else
                     {
-                        falseButton.Click();
+                        falseButton.Click(client);
                     }
                 }
                 else

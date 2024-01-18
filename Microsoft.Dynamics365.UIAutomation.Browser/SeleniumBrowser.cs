@@ -95,6 +95,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         private readonly bool disposeOfDriver = true;
         private bool disposing = false;
 
+        public string Url { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public void Dispose()
         {
             bool isDisposing;
@@ -150,6 +152,36 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
 
         public Element WaitUntilAvailable(string selector, string exceptionMessage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Element ClickWhenAvailable(string selector)
+        {
+            throw new NotImplementedException();
+        }
+
+        Element IWebBrowser.ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Element>? FindElements(string selector)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SendKeys(string[] keys)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SwitchToFrame(string locator)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Wait(PageEvent pageEvent)
         {
             throw new NotImplementedException();
         }

@@ -9,6 +9,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
     public class Element //: IWebElement, IElementHandle
     {
         #region properties
+        public string Tag { get; set; }
         public string Locator { get; set; }
         public string Id { get; set; }
         public string Value { get; set; }

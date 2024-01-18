@@ -249,7 +249,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new InvalidOperationException("The application is wait for the OTC but your MFA-SecretKey is not set. Please check your configuration.");
 
                 var oneTimeCode = GenerateOneTimeCode(key);
-                Field.SetInputValue(_client.Browser.Browser, input, oneTimeCode, 1.Seconds());
+                Field objField = new Field(_client);
+                objField.SetInputValue(_client.Browser.Browser, input, oneTimeCode, 1.Seconds());
                 input.SendKeys(_client, new string[] { Keys.Enter });
                 return true; // input found & code was entered
             }

@@ -2,11 +2,6 @@
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.Dynamics365.UIAutomation.Browser.Extensions;
-using OpenQA.Selenium;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 using Microsoft.ApplicationInsights.DataContracts;
 
@@ -46,9 +41,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </summary>
         public void EnablePerformanceCenter()
         {
-            _client.Browser.Driver.Navigate().GoToUrl($"{_client.Browser.Driver.Url}&perf=true");
-            _client.Browser.Driver.WaitForPageToLoad();
-            _client.Browser.Driver.WaitForTransaction();
+            _client.Browser.Browser.Navigate($"{_client.Browser.Browser.Url}&perf=true");
+            _client.Browser.Browser.Wait(PageEvent.Load);
+            _client.Browser.Browser.Wait();
         }
 
         public enum BrowserEventType
@@ -165,13 +160,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal string GetRecentPageName()
         {
-            return _client.Browser.Driver.FindElement(By.XPath("//div[@data-id='performance-widget']//div[contains(@style, '253, 253, 253')]/span[1]")).Text;
+            return _client.Browser.Browser.FindElement("//div[@data-id='performance-widget']//div[contains(@style, '253, 253, 253')]/span[1]").Text;
         }
         internal Dictionary<string, double> GetPerformanceMarkers(string page)
         {
             SelectPerformanceWidgetPage(page);
 
-            var jsonResults = _client.Browser.Driver.ExecuteScript("return JSON.stringify(UCPerformanceTimeline.getKeyPerformanceIndicators())").ToString();
+            var jsonResults = _client.Browser.Browser.ExecuteScript("return JSON.stringify(UCPerformanceTimeline.getKeyPerformanceIndicators())").ToString();
             var list = JsonConvert.DeserializeObject<List<KeyPerformanceIndicator>>(jsonResults);
 
             Dictionary<string, double> dict = list.ToDictionary(x => x.Name, x => x.Value);
@@ -181,14 +176,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal Dictionary<string, string> GetMetadataMarkers()
         {
-            Dictionary<string, object> jsonResults = (Dictionary<string, object>)_client.Browser.Driver.ExecuteScript("return UCPerformanceTimeline.getMetadata()");
+            Dictionary<string, object> jsonResults = (Dictionary<string, object>)_client.Browser.Browser.ExecuteScript("return UCPerformanceTimeline.getMetadata()");
 
             return  jsonResults.ToDictionary(x=> x.Key, x=>x.Value.ToString());
         }
 
         internal Dictionary<string, string> GetBrowserTimings(BrowserEventType type, bool clearTimings = false)
         {
-            var entries = (IEnumerable<object>)_client.Browser.Driver.ExecuteScript("return window.performance.getEntriesByType('" + type.ToString("g").ToLowerString()+ "')");
+            var entries = (IEnumerable<object>)_client.Browser.Browser.ExecuteScript("return window.performance.getEntriesByType('" + type.ToString("g").ToLowerString()+ "')");
 
             var results = new Dictionary<string, string>();
 
@@ -206,16 +201,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal void ShowHidePerformanceWidget()
         {
-            _client.Browser.Driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.PerformanceWidgetReference.Container));
+            _client.Browser.Browser.ClickWhenAvailable(_client.ElementMapper.PerformanceWidgetReference.Container);
         }
         internal void SelectPerformanceWidgetPage(string page)
         {
-            _client.Browser.Driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.PerformanceWidgetReference.Page.Replace("[NAME]",page)));
+            _client.Browser.Browser.ClickWhenAvailable(_client.ElementMapper.PerformanceWidgetReference.Page.Replace("[NAME]",page));
         }
 
         internal void ClearResourceTimings()
         {
-            _client.Browser.Driver.ExecuteScript("return window.performance.clearResourceTimings();");
+            _client.Browser.Browser.ExecuteScript("return window.performance.clearResourceTimings();");
         }
         #endregion
 
