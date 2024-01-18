@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using OpenQA.Selenium.Interactions;
-using OpenQA.Selenium;
 using System.Collections.Generic;
 using static Microsoft.Dynamics365.UIAutomation.Api.UCI.Grid;
 using System.Collections.ObjectModel;
@@ -153,9 +151,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Get Sub Grid Control"), driver =>
             {
-                var subGrid = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName)));
+                var subGrid = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName));
 
-                return subGrid.GetAttribute("innerHTML");
+                return subGrid.GetAttribute(_client,"innerHTML");
             });
         }
         internal BrowserCommandResult<bool> SwitchSubGridView(string subGridName, string viewName, int thinkTime = Constants.DefaultThinkTime)
@@ -165,34 +163,35 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Switch SubGrid View"), driver =>
             {
                 // Initialize required variables
-                IWebElement viewPicker = null;
+                Element viewPicker = null;
 
                 // Find the SubGrid
-                var subGrid = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName)));
+                var subGrid = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName));
 
-                var foundPicker = subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridViewPickerButton), out viewPicker);
+                var foundPicker = driver.HasElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridViewPickerButton);
 
                 if (foundPicker)
                 {
-                    viewPicker.Click(true);
+                    viewPicker = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridViewPickerButton);
+                    viewPicker.Click(_client);
 
                     // Locate the ViewSelector flyout
-                    var viewPickerFlyout = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.SubGridReference.SubGridViewPickerFlyout), new TimeSpan(0, 0, 2));
+                    var viewPickerFlyout = driver.WaitUntilAvailable(_client.ElementMapper.SubGridReference.SubGridViewPickerFlyout, new TimeSpan(0, 0, 2), "Cannot click SubGrid View Picker Flyout. XPath: '" + _client.ElementMapper.SubGridReference.SubGridViewPickerFlyout + "'");
 
-                    var viewItems = viewPickerFlyout.FindElements(By.TagName("li"));
+                    var viewItems = driver.FindElements(viewPickerFlyout.Locator + "//li");
 
 
                     //Is the button in the ribbon?
-                    if (viewItems.Any(x => x.GetAttribute("aria-label").Equals(viewName, StringComparison.OrdinalIgnoreCase)))
+                    if (viewItems.Any(x => x.GetAttribute(_client,"aria-label").Equals(viewName, StringComparison.OrdinalIgnoreCase)))
                     {
-                        viewItems.FirstOrDefault(x => x.GetAttribute("aria-label").Equals(viewName, StringComparison.OrdinalIgnoreCase)).Click(true);
+                        viewItems.FirstOrDefault(x => x.GetAttribute(_client,"aria-label").Equals(viewName, StringComparison.OrdinalIgnoreCase)).Click(_client);
                     }
 
                 }
                 else
-                    throw new NotFoundException($"Unable to locate the viewPicker for SubGrid {subGridName}");
+                    throw new KeyNotFoundException($"Unable to locate the viewPicker for SubGrid {subGridName}");
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -204,7 +203,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Click add button of subgrid: {subgridName}"), driver =>
             {
-                driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridAddButton.Replace("[NAME]", subgridName)))?.Click();
+                driver.FindElement(_client.ElementMapper.SubGridReference.SubGridAddButton.Replace("[NAME]", subgridName))?.Click(_client);
 
                 return true;
             });
@@ -215,40 +214,44 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions("Click SubGrid Command"), driver =>
             {
                 // Initialize required local variables
-                IWebElement subGridCommandBar = null;
+                Element subGridCommandBar = null;
 
                 // Find the SubGrid
-                var subGrid = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName)));
+                var subGrid = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName));
 
                 if (subGrid == null)
-                    throw new NotFoundException($"Unable to locate subgrid contents for {subGridName} subgrid.");
+                    throw new KeyNotFoundException($"Unable to locate subgrid contents for {subGridName} subgrid.");
 
                 // Check if grid commandBar was found
-                if (subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandBar.Replace("[NAME]", subGridName)), out subGridCommandBar))
+                if (driver.HasElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridCommandBar.Replace("[NAME]", subGridName)))
                 {
+                    subGridCommandBar = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridCommandBar.Replace("[NAME]", subGridName));
                     //Is the button in the ribbon?
-                    if (subGridCommandBar.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)), out var command))
+                    if (driver.HasElement(subGridCommandBar.Locator + _client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                     {
-                        command.Click(true);
-                        driver.WaitForTransaction();
+                        var command = driver.FindElement(subGridCommandBar.Locator + _client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
+                        command.Click(_client);
+                        driver.Wait();
                     }
                     else
                     {
                         // Is the button in More Commands overflow?
-                        if (subGridCommandBar.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", "More commands")), out var moreCommands))
+                        if (driver.HasElement(subGridCommandBar.Locator + _client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", "More commands")))
                         {
+                            var moreCommands = driver.FindElement(subGridCommandBar.Locator + _client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", "More commands"));
                             // Click More Commandss
-                            moreCommands.Click(true);
-                            driver.WaitForTransaction();
+                            moreCommands.Click(_client);
+                            driver.Wait();
 
                             // Locate the overflow button (More Commands flyout)
-                            var overflowContainer = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowContainer));
+                            var overflowContainer = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridOverflowContainer);
 
                             //Click the primary button, if found
-                            if (overflowContainer.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", name)), out var overflowCommand))
+                            if (driver.HasElement(overflowContainer.Locator + _client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", name)))
                             {
-                                overflowCommand.Click(true);
-                                driver.WaitForTransaction();
+                                var overflowCommand = driver.FindElement(overflowContainer.Locator + _client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", name));
+                                overflowCommand.Click(_client);
+                                driver.Wait();
                             }
                             else
                                 throw new InvalidOperationException($"No command with the name '{name}' exists inside of {subGridName} Commandbar.");
@@ -260,13 +263,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (subName != null)
                     {
                         // Locate the sub-button flyout if subName present
-                        var overflowContainer = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowContainer));
+                        var overflowContainer = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridOverflowContainer);
 
                         //Click the primary button, if found
-                        if (overflowContainer.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subName)), out var overflowButton))
+                        if (driver.HasElement(overflowContainer.Locator + _client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subName)))
                         {
-                            overflowButton.Click(true);
-                            driver.WaitForTransaction();
+                            var overflowButton = driver.FindElement(overflowContainer.Locator + _client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subName));
+                            overflowButton.Click(_client);
+                            driver.Wait();
                         }
                         else
                             throw new InvalidOperationException($"No command with the name '{subName}' exists under the {name} command inside of {subGridName} Commandbar.");
@@ -275,13 +279,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         if (subSecondName != null)
                         {
                             // Locate the sub-button flyout if subSecondName present
-                            overflowContainer = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowContainer));
+                            overflowContainer = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridOverflowContainer);
 
                             //Click the primary button, if found
-                            if (overflowContainer.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subSecondName)), out var secondOverflowCommand))
+                            if (driver.HasElement(overflowContainer.Locator + _client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subSecondName)))
                             {
-                                secondOverflowCommand.Click(true);
-                                driver.WaitForTransaction();
+                                var secondOverflowCommand = driver.FindElement(overflowContainer.Locator + _client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subSecondName));
+                                secondOverflowCommand.Click(_client);
+                                driver.Wait();
                             }
                             else
                                 throw new InvalidOperationException($"No command with the name '{subSecondName}' exists under the {subName} command inside of {name} on the {subGridName} SubGrid Commandbar.");
@@ -308,12 +313,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 // Find the SubGrid
                 var subGrid = driver.WaitUntilAvailable(
-                    By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName)),
+                    _client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName),
                     5.Seconds(),
                     $"Unable to find subgrid named {subGridName}.");
 
-                subGrid.ClickWhenAvailable(By.XPath("//div[@role='columnheader']//span[@role='checkbox']"));
-                driver.WaitForTransaction();
+                driver.ClickWhenAvailable(subGrid.Locator + "//div[@role='columnheader']//span[@role='checkbox']");
+                driver.Wait();
 
                 return true;
             });
@@ -323,33 +328,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Search SubGrid {subGridName}"), driver =>
             {
-                IWebElement subGridSearchField = null;
+                Element subGridSearchField = null;
                 // Find the SubGrid
-                var subGrid = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName)));
+                var subGrid = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName));
                 if (subGrid != null)
                 {
-                    var foundSearchField = subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridSearchBox), out subGridSearchField);
+                    var foundSearchField = driver.HasElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridSearchBox);
                     if (foundSearchField)
                     {
-                        var inputElement = subGridSearchField.FindElement(By.TagName("input"));
+                        var inputElement = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridSearchBox);
 
                         if (clearByDefault)
                         {
-                            inputElement.Clear();
+                            inputElement.Clear(_client, inputElement.Locator);
                         }
 
-                        inputElement.SendKeys(searchCriteria);
+                        inputElement.SetValue(_client, searchCriteria );
 
-                        var startSearch = subGridSearchField.FindElement(By.TagName("button"));
-                        startSearch.Click(true);
+                        var startSearch = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridSearchBox + "//button");
+                        startSearch.Click(_client);
 
-                        driver.WaitForTransaction();
+                        driver.Wait();
                     }
                     else
-                        throw new NotFoundException($"Unable to locate the search box for subgrid {subGridName}. Please validate that view search is enabled for this subgrid");
+                        throw new KeyNotFoundException($"Unable to locate the search box for subgrid {subGridName}. Please validate that view search is enabled for this subgrid");
                 }
                 else
-                    throw new NotFoundException($"Unable to locate subgrid with name {subGridName}");
+                    throw new KeyNotFoundException($"Unable to locate subgrid with name {subGridName}");
 
                 return true;
             });
@@ -366,28 +371,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 List<GridItem> subGridRows = new List<GridItem>();
 
                 // Initialize required local variables
-                IWebElement subGridRecordList = null;
+                Element subGridRecordList = null;
                 List<string> columns = new List<string>();
                 List<string> cellValues = new List<string>();
                 GridItem item = new GridItem();
                 Dictionary<string, object> WindowStateData = (Dictionary<string, object>)driver.ExecuteScript($"return JSON.parse(JSON.stringify(window[Object.keys(window).find(i => !i.indexOf(\"__store$\"))].getState().data))");
                 // Find the SubGrid
-                var subGrid = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subgridName)));
+                var subGrid = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subgridName));
 
                 if (subGrid == null)
-                    throw new NotFoundException($"Unable to locate subgrid contents for {subgridName} subgrid.");
+                    throw new KeyNotFoundException($"Unable to locate subgrid contents for {subgridName} subgrid.");
                 // Check if ReadOnlyGrid was found
-                if (subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName)), out subGridRecordList))
+                if (driver.HasElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName)))
                 {
-
+                    subGridRecordList = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName));
                     // Locate record list
-                    var foundRecords = subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName)), out subGridRecordList);
-
+                    var foundRecords = driver.HasElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName));
+                    subGridRecordList = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName));
                     if (foundRecords)
                     {
-                        var subGridRecordRows = subGrid.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridRows.Replace("[NAME]", subgridName)));
-                        var SubGridContainer = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subgridName)));
-                        string[] gridDataId = SubGridContainer.FindElement(By.XPath($"//div[contains(@data-lp-id,'{subgridName}')]")).GetAttribute("data-lp-id").Split('|');
+                        var subGridRecordRows = driver.FindElements(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridRows.Replace("[NAME]", subgridName));
+                        var SubGridContainer = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subgridName));
+                        string[] gridDataId = driver.FindElement(SubGridContainer.Locator + $"//div[contains(@data-lp-id,'{subgridName}')]").GetAttribute(_client, "data-lp-id").Split('|');
                         //Need to add entity name
                         string keyForData = Grid.GetGridQueryKey(driver, gridDataId[2] + ":" + subgridName);
 
@@ -418,32 +423,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     }
                     else
-                        throw new NotFoundException($"Unable to locate record list for subgrid {subgridName}");
+                        throw new KeyNotFoundException($"Unable to locate record list for subgrid {subgridName}");
 
                 }
                 // Attempt to locate the editable grid list
-                else if (subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.EditableSubGridList.Replace("[NAME]", subgridName)), out subGridRecordList))
+                else if (driver.HasElement(subGrid.Locator + _client.ElementMapper.SubGridReference.EditableSubGridList.Replace("[NAME]", subgridName)))
                 {
+                    subGridRecordList = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.EditableSubGridList.Replace("[NAME]", subgridName));
                     //Find the columns
-                    var headerCells = subGrid.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridHeadersEditable));
+                    var headerCells = driver.FindElements(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridHeadersEditable);
 
-                    foreach (IWebElement headerCell in headerCells)
+                    foreach (Element headerCell in headerCells)
                     {
-                        var headerTitle = headerCell.GetAttribute("title");
+                        var headerTitle = headerCell.GetAttribute(_client,"title");
                         columns.Add(headerTitle);
                     }
 
                     //Find the rows
-                    var rows = subGrid.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridDataRowsEditable));
+                    var rows = driver.FindElements(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridDataRowsEditable);
 
                     //Process each row
-                    foreach (IWebElement row in rows)
+                    foreach (Element row in rows)
                     {
-                        var cells = row.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridCells));
+                        var cells = driver.FindElements(row.Locator + _client.ElementMapper.SubGridReference.SubGridCells);
 
                         if (cells.Count > 0)
                         {
-                            foreach (IWebElement thisCell in cells)
+                            foreach (Element thisCell in cells)
                                 cellValues.Add(thisCell.Text);
 
                             for (int i = 0; i < columns.Count; i++)
@@ -471,38 +477,39 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 }
                 // Special 'Related' high density grid control for entity forms
-                else if (subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridHighDensityList.Replace("[NAME]", subgridName)), out subGridRecordList))
+                else if (driver.HasElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridHighDensityList.Replace("[NAME]", subgridName)))
                 {
+                    subGridRecordList = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridHighDensityList.Replace("[NAME]", subgridName));
                     //Find the columns
-                    var headerCells = subGrid.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridHeadersHighDensity));
+                    var headerCells = driver.FindElements(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridHeadersHighDensity);
 
-                    foreach (IWebElement headerCell in headerCells)
+                    foreach (Element headerCell in headerCells)
                     {
-                        var headerTitle = headerCell.GetAttribute("data-id");
+                        var headerTitle = headerCell.GetAttribute(_client, "data-id");
                         columns.Add(headerTitle);
                     }
 
                     //Find the rows
-                    var rows = subGrid.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridRowsHighDensity));
+                    var rows = driver.FindElements(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridRowsHighDensity);
 
                     //Process each row
-                    foreach (IWebElement row in rows)
+                    foreach (Element row in rows)
                     {
                         //Get the entityId and entity Type
-                        if (row.GetAttribute("data-lp-id") != null)
+                        if (row.GetAttribute(_client, "data-lp-id") != null)
                         {
-                            var rowAttributes = row.GetAttribute("data-lp-id").Split('|');
+                            var rowAttributes = row.GetAttribute(_client, "data-lp-id").Split('|');
                             item.EntityName = rowAttributes[4];
                             //The row record IDs are not in the DOM. Must be retrieved via JavaScript
                             var getId = $"return Xrm.Page.getControl(\"{subgridName}\").getGrid().getRows().get({rows.IndexOf(row)}).getData().entity.getId()";
                             item.Id = new Guid((string)driver.ExecuteScript(getId));
                         }
 
-                        var cells = row.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridCells));
+                        var cells = driver.FindElements(row.Locator + _client.ElementMapper.SubGridReference.SubGridCells);
 
                         if (cells.Count > 0)
                         {
-                            foreach (IWebElement thisCell in cells)
+                            foreach (Element thisCell in cells)
                                 cellValues.Add(thisCell.Text);
 
                             for (int i = 0; i < columns.Count; i++)
@@ -535,17 +542,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             });
         }
 
-        private Actions ClickSubGridAndPageDown(IWebDriver driver, IWebElement grid)
+        private void ClickSubGridAndPageDown(IWebBrowser driver, Element grid)
         {
-            Actions actions = new Actions(driver);
+            //Actions actions = new Actions(driver);
             //var topRow = driver.FindElement(By.XPath("//div[@data-id='entity_control-pcf_grid_control_container']//div[@ref='centerContainer']//div[@role='rowgroup']//div[@role='row']"));
-            var topRow = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.Rows));
+            var topRow = driver.FindElement(_client.ElementMapper.GridReference.Rows);
             //topRow.Click();
             //actions.SendKeys(OpenQA.Selenium.Keys.PageDown).Perform();
 
-            actions.MoveToElement(topRow.FindElement(By.XPath("//div[@role='listitem']//button"))).Perform();
-            actions.KeyDown(OpenQA.Selenium.Keys.Alt).SendKeys(OpenQA.Selenium.Keys.ArrowDown).Build().Perform();
-            return actions;
+            driver.FindElement(topRow.Locator + "//div[@role='listitem']//button").Focus(_client, topRow.Locator + "//div[@role='listitem']//button");
+            driver.SendKeys(new string[] { Keys.Alt, Keys.ArrowDown });
+            //actions.KeyDown(OpenQA.Selenium.Keys.Alt).SendKeys(OpenQA.Selenium.Keys.ArrowDown).Build().Perform();
+            //return actions;
 
         }
         /// <summary>
@@ -558,57 +566,61 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Open Subgrid record for subgrid {subgridName}"), driver =>
             {
                 // Find the SubGrid
-                var subGrid = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subgridName)));
+                var subGrid = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subgridName));
 
                 // Find list of SubGrid records
-                IWebElement subGridRecordList = null;
-                var foundGrid = subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName)), out subGridRecordList);
-
+                Element subGridRecordList = null;
+                var foundGrid = driver.HasElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName));
+                subGridRecordList = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName));
                 // Read Only Grid Found
                 if (subGridRecordList != null && foundGrid)
                 {
-                    var subGridRecordRows = subGrid.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName)));
+                    var subGridRecordRows = driver.FindElements(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName));
                     if (subGridRecordRows == null)
-                        throw new NoSuchElementException($"No records were found for subgrid {subgridName}");
-                    Actions actions = new Actions(driver);
-                    actions.MoveToElement(subGrid).Perform();
-
-                    IWebElement gridRow = null;
+                        throw new Exception($"No records were found for subgrid {subgridName}");
+                    //Actions actions = new Actions(driver);
+                    //actions.MoveToElement(subGrid).Perform();
+                    subGrid.Focus(_client, subGrid.Locator);
+                    Element gridRow = null;
                     if (index + 1 < subGridRecordRows.Count)
                     {
                         gridRow = subGridRecordRows[index];
                     }
                     else
                     {
-                        var grid = driver.FindElement(By.XPath("//div[@ref='eViewport']"));
-                        actions.DoubleClick(gridRow).Perform();
-                        driver.WaitForTransaction();
+                        var grid = driver.FindElement("//div[@ref='eViewport']");
+                        //actions.DoubleClick(gridRow).Perform();
+                        //driver.WaitForTransaction();
+                        gridRow.DoubleClick(_client, gridRow.Locator);
+                        driver.Wait();
                     }
                     if (gridRow == null)
                         throw new IndexOutOfRangeException($"Subgrid {subgridName} record count: {subGridRecordRows.Count}. Expected: {index + 1}");
 
-
-                    actions.DoubleClick(gridRow).Perform();
-                    driver.WaitForTransaction();
+                    gridRow.DoubleClick(_client, gridRow.Locator);
+                    //actions.DoubleClick(gridRow).Perform();
+                    driver.Wait();
                     return true;
                 }
                 else if (!foundGrid)
                 {
                     // Read Only Grid Not Found
-                    var foundEditableGrid = subGrid.TryFindElement(By.XPath(_client.ElementMapper.SubGridReference.EditableSubGridList.Replace("[NAME]", subgridName)), out subGridRecordList);
-
+                    var foundEditableGrid = driver.HasElement(subGrid.Locator + _client.ElementMapper.SubGridReference.EditableSubGridList.Replace("[NAME]", subgridName));
+                    subGridRecordList = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.EditableSubGridList.Replace("[NAME]", subgridName));
                     if (foundEditableGrid)
                     {
-                        var editableGridListCells = subGridRecordList.FindElement(By.XPath(_client.ElementMapper.SubGridReference.EditableSubGridListCells));
+                        var editableGridListCells = driver.FindElement(subGridRecordList.Locator + _client.ElementMapper.SubGridReference.EditableSubGridListCells);
 
-                        var editableGridCellRows = editableGridListCells.FindElements(By.XPath(_client.ElementMapper.SubGridReference.EditableSubGridListCellRows));
+                        var editableGridCellRows = driver.FindElements(editableGridListCells.Locator + _client.ElementMapper.SubGridReference.EditableSubGridListCellRows);
 
-                        var editableGridCellRow = editableGridCellRows[index + 1].FindElements(By.XPath("./div"));
+                        var editableGridCellRow = driver.FindElements(editableGridCellRows[index + 1] + "./div");
 
-                        Actions actions = new Actions(driver);
-                        actions.DoubleClick(editableGridCellRow[0]).Perform();
+                        editableGridCellRow[0].DoubleClick(_client, editableGridCellRow[0].Locator);
 
-                        driver.WaitForTransaction();
+                        //Actions actions = new Actions(driver);
+                        //actions.DoubleClick(editableGridCellRow[0]).Perform();
+
+                        driver.Wait();
 
                         return true;
                     }
@@ -619,14 +631,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         // This opens a limited form view in-line on the grid
 
                         //Get the GridName
-                        string subGridName = subGrid.GetAttribute("data-id").Replace("dataSetRoot_", String.Empty);
+                        string subGridName = subGrid.GetAttribute(_client, "data-id").Replace("dataSetRoot_", String.Empty);
 
                         //cell-0 is the checkbox for each record
-                        var checkBox = driver.FindElement(By.XPath(_client.ElementMapper.SubGridReference.SubGridRecordCheckbox.Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName)));
+                        var checkBox = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridRecordCheckbox.Replace("[INDEX]", index.ToString()).Replace("[NAME]", subGridName));
 
-                        driver.DoubleClick(checkBox);
+                        checkBox.DoubleClick(_client, checkBox.Locator);
+                        //driver.DoubleClick(checkBox);
 
-                        driver.WaitForTransaction();
+                        driver.Wait();
                     }
                 }
 

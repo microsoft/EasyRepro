@@ -2,6 +2,8 @@
 {
     public static class Keys
     {
+        public static string Alt = "Alt";
+        public static string ArrowDown = "ArrowDown";
         public static string Backspace = "Backspace";
         public static string Control = "Control";
         public static string Enter = "Enter";
