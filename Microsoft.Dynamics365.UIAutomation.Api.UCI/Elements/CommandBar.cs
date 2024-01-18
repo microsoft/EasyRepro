@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
-//using OpenQA.Selenium;
-//using OpenQA.Selenium.Interactions;
 using System;
 using System.Collections.Generic;
 
@@ -31,7 +29,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         private readonly WebClient _client;
         private Entity.EntityReference _entityReference;
         #region ctor
-        public CommandBar(WebClient client) : base(client)
+        public CommandBar(WebClient client) : base()
         {
             _client = client;
             _entityReference = new Entity.EntityReference();
@@ -96,7 +94,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (driver.HasElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                 {
                     var command = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
-                    command.Click(true);
+                    command.Click(_client);
                     driver.Wait();
                 }
                 else
@@ -106,7 +104,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         // Click More Commands
                         var moreCommands = driver.FindElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton);
-                        moreCommands.Click(true);
+                        moreCommands.Click(_client);
                         driver.Wait();
 
                         //Click the button
@@ -114,7 +112,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         if (driver.HasElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                         {
                             var overflowCommand = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
-                            overflowCommand.Click(true);
+                            overflowCommand.Click(_client);
                             driver.Wait();
                         }
                         else
@@ -123,7 +121,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else if (driver.HasElement(_client.ElementMapper.EntityReference.MoreCommands))
                     {
                         var moreCommands = driver.FindElement(_client.ElementMapper.EntityReference.MoreCommands);
-                        moreCommands.Click(true);
+                        moreCommands.Click(_client);
                         driver.Wait();
 
                         //Click the button
@@ -131,7 +129,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         if (driver.HasElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                         {
                             var overflowCommand = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
-                            overflowCommand.Click(true);
+                            overflowCommand.Click(_client);
                             driver.Wait();
                         }
                         else
@@ -148,7 +146,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     if (driver.FindElement(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname)) != null)
                     {
-                        driver.FindElement(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname)).Click(true);
+                        driver.FindElement(_client.ElementMapper.SubGridReference.SubGridOverflowButton.Replace("[NAME]", subname)).Click(_client);
                     }
                     else
                         throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
@@ -163,7 +161,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         if (subSecondbutton != null)
                         {
-                            subSecondbutton.Click(true);
+                            subSecondbutton.Click(_client);
                         }
                         else
                             throw new InvalidOperationException($"No sub command with the name '{subSecondName}' exists inside of Commandbar.");
@@ -202,7 +200,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             bool hasMoreCommands = commandBarItems.TryGetValue(moreCommandsLabel, out var moreCommandsButton);
             if (includeMoreCommandsValues && hasMoreCommands)
             {
-                moreCommandsButton.Click(true);
+                moreCommandsButton.Click(_client);
 
                 var menu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
                 if (menu == null) { throw new KeyNotFoundException("More Commands Not Found. XPath: " + _client.ElementMapper.CommandBarReference.MoreCommandsMenu); }
@@ -274,7 +272,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var closeBtn = driver.WaitUntilAvailable(xPathQuery, "Opportunity Close Button is not available");
 
-                closeBtn?.Click();
+                closeBtn?.Click(_client);
                 driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.CloseOpportunity.Ok);
                 Dialogs dialogs = new Dialogs(_client);
                 dialogs.CloseOpportunityDialog(true);
@@ -311,7 +309,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var deleteBtn = driver.WaitUntilAvailable(_entityReference.Delete,
                     "Delete Button is not available");
 
-                deleteBtn?.Click();
+                deleteBtn?.Click(_client);
                 Dialogs dialogs = new Dialogs(_client);
                 dialogs.ConfirmationDialog(true);
 
@@ -331,8 +329,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Save"), driver =>
             {
-                driver.SendKeys(Keys.Control);
-                driver.SendKeys("S");
+                driver.SendKeys(new string[] { Keys.Control, "S" });
+                //driver.SendKeys("S");
 
                 //Actions action = new Actions(driver);
                 //action.KeyDown(Keys.Control).SendKeys("S").Perform();
