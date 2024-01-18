@@ -125,7 +125,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return LoginResult.Success;
 
             //driver.ClickIfVisible(By.Id(LoginReference.UseAnotherAccount));
-            _client.ClickIfVisible(_client.ElementMapper.LoginReference.UseAnotherAccount);
+            _client.Browser.Browser.ClickWhenAvailable(_client.ElementMapper.LoginReference.UseAnotherAccount);
 
             bool waitingForOtc = false;
             bool success = EnterUserName(username);
@@ -148,7 +148,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (!waitingForOtc)
             {
                 //driver.ClickIfVisible(By.Id("aadTile"));
-                _client.ClickIfVisible("aadTile");
+                _client.Browser.Browser.ClickWhenAvailable("aadTile");
                 _client.ThinkTime(1000);
 
                 //If expecting redirect then wait for redirect to trigger
@@ -180,9 +180,30 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return success ? LoginResult.Success : LoginResult.Failure;
         }
+        internal bool WaitForMainPage(TimeSpan timeout, string errorMessage)
+            => WaitForMainPage(timeout, null, () => throw new InvalidOperationException(errorMessage));
 
+        internal bool WaitForMainPage(TimeSpan? timeout = null, Action<Element> successCallback = null, Action failureCallback = null)
+        {
+            //IWebDriver driver = Browser;
+            timeout = timeout ?? Constants.DefaultTimeout;
+            bool isUCI = _client.Browser.Browser.HasElement(_client.ElementMapper.LoginReference.CrmUCIMainPage);
+            if (isUCI)
+                _client.Browser.Browser.Wait();
+            //successCallback = successCallback ?? (
+            //                      _ =>
+            //                      {
+            //                          bool isUCI = this.Browser.Browser.HasElement(this.ElementMapper.LoginReference.CrmUCIMainPage);
+            //                          if (isUCI)
+            //                              driver.Wait();
+            //                      });
 
-        private bool IsUserAlreadyLogged() => _client.WaitForMainPage(2.Seconds());
+            var xpathToMainPage = _client.ElementMapper.LoginReference.CrmMainPage;
+            var element = _client.Browser.Browser.WaitUntilAvailable(xpathToMainPage, timeout.Value, "Cannot navigate to main page");
+            return element != null;
+        }
+
+        private bool IsUserAlreadyLogged() => WaitForMainPage(2.Seconds());
 
         private static string GenerateOneTimeCode(string key)
         {
@@ -199,27 +220,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         private bool EnterUserName(SecureString username)
         {
             //var input = driver.WaitUntilAvailable(By.XPath(LoginReference.UserId), new TimeSpan(0, 0, 30));
-            var input = _client.Browser.Driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.LoginReference.UserId), new TimeSpan(0, 0, 30));
+            var input = _client.Browser.Browser.WaitUntilAvailable(_client.ElementMapper.LoginReference.UserId, new TimeSpan(0, 0, 30), "Cannot find User Id");
             if (input == null)
                 return false;
 
-            input.SendKeys(username.ToUnsecureString());
-            input.SendKeys(Keys.Enter);
+            input.SendKeys(_client, new string[] { username.ToUnsecureString() });
+            input.SendKeys(_client, new string[]{ Keys.Enter });
             return true;
         }
 
         private void EnterPassword(SecureString password)
         {
-            var input = _client.Browser.Driver.FindElement(By.XPath(_client.ElementMapper.LoginReference.LoginPassword));
-            input.SendKeys(password.ToUnsecureString());
-            input.Submit();
+            var input = _client.Browser.Browser.FindElement(_client.ElementMapper.LoginReference.LoginPassword);
+            input.SendKeys(_client, new string[] { password.ToUnsecureString() });
+            input.SendKeys(_client, new string[] { Keys.Enter });
         }
 
         private bool EnterOneTimeCode(SecureString mfaSecretKey)
         {
             try
             {
-                IWebElement input = GetOtcInput(); // wait for the dialog, even if key is null, to print the right error
+                Element input = GetOtcInput(); // wait for the dialog, even if key is null, to print the right error
                 if (input == null)
                     return true;
 
@@ -228,8 +249,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     throw new InvalidOperationException("The application is wait for the OTC but your MFA-SecretKey is not set. Please check your configuration.");
 
                 var oneTimeCode = GenerateOneTimeCode(key);
-                Field.SetInputValue(_client.Browser.Driver, input, oneTimeCode, 1.Seconds());
-                input.Submit();
+                Field.SetInputValue(_client.Browser.Browser, input, oneTimeCode, 1.Seconds());
+                input.SendKeys(_client, new string[] { Keys.Enter });
                 return true; // input found & code was entered
             }
             catch (Exception e)
@@ -241,13 +262,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
 
-        private IWebElement GetOtcInput()
-            => _client.Browser.Driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.LoginReference.OneTimeCode), TimeSpan.FromSeconds(2));
+        private Element GetOtcInput()
+            => _client.Browser.Browser.WaitUntilAvailable(_client.ElementMapper.LoginReference.OneTimeCode, TimeSpan.FromSeconds(2), "");
 
         private bool ClickStaySignedIn()
         {
-            var xpath = By.XPath(_client.ElementMapper.LoginReference.StaySignedIn);
-            var element = _client.Browser.Driver.ClickIfVisible(By.XPath(_client.ElementMapper.LoginReference.StaySignedIn), 2.Seconds());
+            var xpath = _client.ElementMapper.LoginReference.StaySignedIn;
+            var element = _client.Browser.Browser.ClickWhenAvailable(_client.ElementMapper.LoginReference.StaySignedIn, 2.Seconds(), "");
             return element != null;
         }
 
@@ -275,24 +296,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions("Pass Through Login"), driver =>
             {
-                driver.Navigate().GoToUrl(uri);
+                driver.Navigate(uri.ToString());
+                driver.Wait(PageEvent.Load);
+                var isUCI = driver.HasElement(_client.ElementMapper.LoginReference.CrmUCIMainPage);
+                if (isUCI)
+                {
+                    driver.Wait(PageEvent.Load);
+                    driver.Wait();
+                }
+                else
+                    //else we landed on the Web Client main page or app picker page
+                    SwitchToDefaultContent();
 
-                _client.WaitForMainPage(60.Seconds(),
-                    _ =>
-                    {
-                        //determine if we landed on the Unified Client Main page
-                        var isUCI = driver.HasElement(By.XPath(_client.ElementMapper.LoginReference.CrmUCIMainPage));
-                        if (isUCI)
-                        {
-                            driver.WaitForPageToLoad();
-                            driver.WaitForTransaction();
-                        }
-                        else
-                            //else we landed on the Web Client main page or app picker page
-                            SwitchToDefaultContent();
-                    },
-                    () => throw new InvalidOperationException("Load Main Page Fail.")
-                );
+                //_client.WaitForMainPage(60.Seconds(),
+                //    _ =>
+                //    {
+                //        //determine if we landed on the Unified Client Main page
+                //        var isUCI = driver.HasElement(By.XPath(_client.ElementMapper.LoginReference.CrmUCIMainPage));
+                //        if (isUCI)
+                //        {
+                //            driver.WaitForPageToLoad();
+                //            driver.WaitForTransaction();
+                //        }
+                //        else
+                //            //else we landed on the Web Client main page or app picker page
+                //            SwitchToDefaultContent();
+                //    },
+                //    () => throw new InvalidOperationException("Load Main Page Fail.")
+                //);
 
                 return LoginResult.Success;
             });
@@ -310,12 +341,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             //driver.FindElement(By.Id("passwordInput")).SendKeys(args.Password.ToUnsecureString());
             //driver.ClickWhenAvailable(By.Id("submitButton"), TimeSpan.FromSeconds(2));
-            _client.Browser.FindElement("passwordInput").SendKeys(args.Password.ToUnsecureString());
-            _client.Browser.ClickWhenAvailable("submitButton", TimeSpan.FromSeconds(2));
+            _client.Browser.Browser.FindElement("passwordInput").SendKeys(_client, new string[] { args.Password.ToUnsecureString() });
+            _client.Browser.Browser.ClickWhenAvailable("submitButton", TimeSpan.FromSeconds(2));
             //Insert any additional code as required for the SSO scenario
 
             //Wait for CRM Page to load
-            _client.WaitForMainPage(TimeSpan.FromSeconds(60), "Login page failed.");
+            _client.Browser.Browser.Wait(TimeSpan.FromSeconds(60));
             _client.Browser.SwitchToMainFrame();
         }
 
@@ -335,17 +366,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             _client.ThinkTime(5000);
 
-            _client.Browser.WaitUntilVisible("//div[@id=\"mfaGreetingDescription\"]");
+            _client.Browser.Browser.WaitUntilAvailable("//div[@id=\"mfaGreetingDescription\"]");
 
-            var azureMFA = _client.Browser.FindElement("//a[@id=\"WindowsAzureMultiFactorAuthentication\"]");
-            azureMFA.Click(true);
+            var azureMFA = _client.Browser.Browser.FindElement("//a[@id=\"WindowsAzureMultiFactorAuthentication\"]");
+            azureMFA.Click(_client);
 
             Thread.Sleep(20000);
 
             //Insert any additional code as required for the SSO scenario
 
             //Wait for CRM Page to load
-            _client.WaitForMainPage(TimeSpan.FromSeconds(60), "Login page failed.");
+            _client.Browser.Browser.Wait(TimeSpan.FromSeconds(60));
             SwitchToMainFrame();
         }
 
@@ -353,10 +384,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions("Initialize Unified Interface Modes"), driver =>
             {
-                driver.SwitchTo().DefaultContent();
+                driver.SwitchToFrame("0");
 
                 // Wait for main page to load before attempting this. If you don't do this it might still be authenticating and the URL will be wrong
-                _client.WaitForMainPage();
+                _client.Browser.Browser.Wait(PageEvent.Load);
 
                 string uri = driver.Url;
                 if (string.IsNullOrEmpty(uri))
@@ -383,10 +414,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     return true;
 
                 var testModeUri = uri + queryParams;
-                driver.Navigate().GoToUrl(testModeUri);
+                driver.Navigate(testModeUri);
 
                 // Again wait for loading
-                _client.WaitForMainPage();
+                driver.Wait(PageEvent.Load);
                 return true;
             });
         }

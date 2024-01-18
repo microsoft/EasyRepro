@@ -110,25 +110,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         //#region PageWaits
-        //internal bool WaitForMainPage(TimeSpan timeout, string errorMessage)
-        //    => WaitForMainPage(timeout, null, () => throw new InvalidOperationException(errorMessage));
 
-        //internal bool WaitForMainPage(TimeSpan? timeout = null, Action<Element> successCallback = null, Action failureCallback = null)
-        //{
-        //    //IWebDriver driver = Browser;
-        //    timeout = timeout ?? Constants.DefaultTimeout;
-        //    successCallback = successCallback ?? (
-        //                          _ =>
-        //                          {
-        //                              bool isUCI = this.Browser.Browser.HasElement(this.ElementMapper.LoginReference.CrmUCIMainPage);
-        //                              if (isUCI)
-        //                                  driver.Wait();
-        //                          });
-
-        //    var xpathToMainPage = By.XPath(this.ElementMapper.LoginReference.CrmMainPage);
-        //    var element = driver.WaitUntilAvailable(xpathToMainPage, timeout, successCallback, failureCallback);
-        //    return element != null;
-        //}
         //#endregion
 
         //internal void ClickIfVisible(string elementLocator)
