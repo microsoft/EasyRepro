@@ -6,6 +6,7 @@
         public static string Control = "Control";
         public static string Enter = "Enter";
         public static string Escape = "Escape";
+        public static string PageDown = "PageDown";
         public static string Tab = "Tab";
     }
 }

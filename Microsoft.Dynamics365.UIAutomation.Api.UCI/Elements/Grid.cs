@@ -2,8 +2,6 @@
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Newtonsoft.Json;
-using OpenQA.Selenium.Interactions;
-using OpenQA.Selenium;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -86,7 +84,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         #endregion
         private readonly WebClient _client;
         public enum GridType { PowerAppsGridControl, LegacyReadOnlyGrid, ReadOnlyGrid, EditableGrid }
-        public Grid(WebClient client) : base(client)
+        public Grid(WebClient client) : base()
         {
             _client = client;
         }
@@ -116,11 +114,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 
 
-                return gridContainer.GetAttribute("innerHTML");
+                return gridContainer.GetAttribute(_client,"innerHTML");
             });
         }
 
-        public BrowserCommandResult<Dictionary<string, IWebElement>> OpenViewPicker(int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<Dictionary<string, Element>> OpenViewPicker(int thinkTime = Constants.DefaultThinkTime)
         {
             _client.ThinkTime(thinkTime);
 
@@ -132,17 +130,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 );
 
                 var viewContainer = driver.FindElement(_client.ElementMapper.GridReference.ViewContainer);
-                var viewItems = viewContainer.FindElements(By.TagName("li"));
+                var viewItems = driver.FindElements(viewContainer.Locator + "//li");
 
-                var result = new Dictionary<string, IWebElement>();
+                var result = new Dictionary<string, Element>();
                 foreach (var viewItem in viewItems)
                 {
-                    var role = viewItem.GetAttribute("role");
+                    var role = viewItem.GetAttribute(_client,"role");
 
                     if (role != "presentation")
                         continue;
-                    if (!viewItem.HasElement(By.TagName("label"))) continue;
-                    var key = viewItem.FindElement(By.TagName("label")).Text.ToLowerString();
+                    if (!driver.HasElement(viewItem.Locator + "//label")) continue;
+                    var key = driver.FindElement(viewItem.Locator + "//label").Text.ToLowerString();
                     if (string.IsNullOrWhiteSpace(key))
                         continue;
 
@@ -169,14 +167,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (!success)
                     throw new InvalidOperationException($"No view with the name '{key}' exists.");
 
-                view.Click(true);
+                view.Click(_client);
 
                 if (subViewName != null)
                 {
                     // TBD
                 }
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -196,7 +194,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 var grid = driver.FindElement(_client.ElementMapper.GridReference.GridContainer);
                 bool lastRow = false;
-                IWebElement gridRow = null;
+                Element gridRow = null;
                 Grid.GridType gridType = Grid.GridType.PowerAppsGridControl;
                 int lastRowInCurrentView = 0;
                 string lastRowXPathLocator = _client.ElementMapper.GridReference.Row.Replace("[INDEX]", (index).ToString());
@@ -239,49 +237,76 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         lastRow = true;
                     }
                 }
-                if (gridRow == null) throw new NotFoundException($"Grid Row {index} not found.");
+                if (gridRow == null) throw new KeyNotFoundException($"Grid Row {index} not found.");
                 var xpathToGrid = "//div[contains(@data-id,'DataSetHostContainer')]";//works for: PowerAppsGridControl, LegacyReadOnlyControl, 
-                IWebElement control = driver.WaitUntilAvailable(xpathToGrid);
+                Element control = driver.WaitUntilAvailable(xpathToGrid);
 
-                Func<Actions, Actions> action;
-                if (checkRecord)
-                    action = e => e.Click();
-                else
-                    action = e => e.DoubleClick();
+                //Func<Actions, Actions> action;
+                //if (checkRecord)
+                //    action = e => e.Click();
+                //else
+                //    action = e => e.DoubleClick();
                 ////div[@class='ag-center-cols-container']//div[@row-index='[INDEX]']
-                var xpathToCell = By.XPath(_client.ElementMapper.GridReference.Row.Replace("[INDEX]", index.ToString()));
-                control.WaitUntilClickable(xpathToCell,
-                    cell =>
-                    {
-                        var emptyDiv = cell.FindElement(By.TagName("div"));
-                        switch (gridType)
-                        {
-                            case Grid.GridType.LegacyReadOnlyGrid: //Lead
-                                driver.Perform(action, emptyDiv, null);
-                                break;
-                            case Grid.GridType.ReadOnlyGrid:
-                                driver.Perform(action, emptyDiv, null);
-                                break;
-                            case Grid.GridType.PowerAppsGridControl:
-                                cell.FindElement(By.XPath(_client.ElementMapper.GridReference.PowerAppsGridControlClickableCell)).Click();//Contacts
-                                break;
-                            case Grid.GridType.EditableGrid:
-                                cell.FindElement(By.XPath("//a[contains(@aria-label,'Read only')]")).Click();
-                                break;
-                            default: throw new InvalidSelectorException("Did not find Read Only or Power Apps Grid.");
-                        }
-                        Trace.WriteLine("Clicked record.");
-                    },
-                    $"An error occur trying to open the record at position {index}"
-                );
+                var xpathToCell = _client.ElementMapper.GridReference.Row.Replace("[INDEX]", index.ToString());
 
-                driver.WaitForTransaction();
+                var gridControlCell = driver.WaitUntilAvailable(control.Locator + xpathToCell);
+                var emptyDiv = driver.WaitUntilAvailable(xpathToCell + "//div");
+                switch (gridType)
+                {
+                    case Grid.GridType.LegacyReadOnlyGrid: //Lead
+                        //driver.Perform(action, emptyDiv, null);
+                        if (checkRecord) emptyDiv.Click(_client); else emptyDiv.DoubleClick(_client, emptyDiv.Locator);
+                        break;
+                    case Grid.GridType.ReadOnlyGrid:
+                        //driver.Perform(action, emptyDiv, null);
+                        if (checkRecord) emptyDiv.Click(_client); else emptyDiv.DoubleClick(_client, emptyDiv.Locator);
+                        break;
+                    case Grid.GridType.PowerAppsGridControl:
+                        if (checkRecord) driver.FindElement(gridControlCell.Locator + _client.ElementMapper.GridReference.PowerAppsGridControlClickableCell).Click(_client); else driver.FindElement(gridControlCell.Locator + _client.ElementMapper.GridReference.PowerAppsGridControlClickableCell).DoubleClick(_client, gridControlCell.Locator + _client.ElementMapper.GridReference.PowerAppsGridControlClickableCell);//Contacts
+                        break;
+                    case Grid.GridType.EditableGrid:
+                        if (checkRecord)
+                            driver.FindElement(gridControlCell.Locator + "//a[contains(@aria-label,'Read only')]").Click(_client);
+                            else driver.FindElement(gridControlCell.Locator + "//a[contains(@aria-label,'Read only')]").DoubleClick(_client, gridControlCell.Locator + "//a[contains(@aria-label,'Read only')]");
+                        break;
+                    default: throw new Exception("Did not find Read Only or Power Apps Grid.");
+                }
+                Trace.WriteLine("Clicked record.");
+
+
+                //control.WaitUntilAvailable(xpathToCell,
+                //    cell =>
+                //    {
+                //        var emptyDiv = cell.FindElement(cell.LocBy.TagName("div"));
+                //        switch (gridType)
+                //        {
+                //            case Grid.GridType.LegacyReadOnlyGrid: //Lead
+                //                driver.Perform(action, emptyDiv, null);
+                //                emptyDiv.Click();
+                //                break;
+                //            case Grid.GridType.ReadOnlyGrid:
+                //                driver.Perform(action, emptyDiv, null);
+                //                break;
+                //            case Grid.GridType.PowerAppsGridControl:
+                //                cell.FindElement(_client.ElementMapper.GridReference.PowerAppsGridControlClickableCell).Click();//Contacts
+                //                break;
+                //            case Grid.GridType.EditableGrid:
+                //                cell.FindElement("//a[contains(@aria-label,'Read only')]").Click();
+                //                break;
+                //            default: throw new Exception("Did not find Read Only or Power Apps Grid.");
+                //        }
+                //        Trace.WriteLine("Clicked record.");
+                //    },
+                //    $"An error occur trying to open the record at position {index}"
+                //);
+
+                driver.Wait();
                 Trace.WriteLine("Click Record transaction complete.");
-                if (driver.HasElement(By.XPath("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']"))){
-                    Trace.WriteLine(String.Format("Found {0} Clickable Teaching Bubbles.", driver.FindElements(By.XPath("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']")).Count));
-                    foreach (var item in driver.FindElements(By.XPath("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']")))
+                if (driver.HasElement("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']")){
+                    Trace.WriteLine(String.Format("Found {0} Clickable Teaching Bubbles.", driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']").Count));
+                    foreach (var item in driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']"))
                     {
-                        item.Click();
+                        item.Click(_client);
                     }
                 }
                 return true;
@@ -302,15 +327,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Search"), driver =>
             {
-                driver.WaitUntilClickable(By.XPath(_client.ElementMapper.GridReference.QuickFind));
+                driver.WaitUntilAvailable(_client.ElementMapper.GridReference.QuickFind);
 
                 if (clearByDefault)
                 {
-                    driver.FindElement(By.XPath(_client.ElementMapper.GridReference.QuickFind)).Clear();
+                    driver.FindElement(_client.ElementMapper.GridReference.QuickFind).Clear(_client, _client.ElementMapper.GridReference.QuickFind);
                 }
 
-                driver.FindElement(By.XPath(_client.ElementMapper.GridReference.QuickFind)).SendKeys(searchCriteria);
-                driver.FindElement(By.XPath(_client.ElementMapper.GridReference.QuickFind)).SendKeys(Keys.Enter);
+                driver.FindElement(_client.ElementMapper.GridReference.QuickFind).SendKeys(_client,new string[] { searchCriteria });
+                driver.FindElement(_client.ElementMapper.GridReference.QuickFind).SendKeys(_client,new string[] { Keys.Enter });
 
                 //driver.WaitForTransaction();
 
@@ -326,9 +351,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Clear Search"), driver =>
             {
-                driver.WaitUntilClickable(By.XPath(_client.ElementMapper.GridReference.QuickFind));
+                driver.WaitUntilAvailable(_client.ElementMapper.GridReference.QuickFind);
 
-                driver.FindElement(By.XPath(_client.ElementMapper.GridReference.QuickFind)).Clear();
+                driver.FindElement(_client.ElementMapper.GridReference.QuickFind).Clear(_client, _client.ElementMapper.GridReference.QuickFind);
 
                 return true;
             });
@@ -340,11 +365,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Show Chart"), driver =>
             {
-                if (driver.HasElement(By.XPath(_client.ElementMapper.GridReference.ShowChart)))
+                if (driver.HasElement(_client.ElementMapper.GridReference.ShowChart))
                 {
-                    driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.ShowChart));
+                    driver.ClickWhenAvailable(_client.ElementMapper.GridReference.ShowChart);
 
-                    driver.WaitForTransaction();
+                    driver.Wait();
                 }
                 else
                 {
@@ -361,11 +386,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Hide Chart"), driver =>
             {
-                if (driver.HasElement(By.XPath(_client.ElementMapper.GridReference.HideChart)))
+                if (driver.HasElement(_client.ElementMapper.GridReference.HideChart))
                 {
-                    driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.HideChart));
+                    driver.ClickWhenAvailable(_client.ElementMapper.GridReference.HideChart);
 
-                    driver.WaitForTransaction();
+                    driver.Wait();
                 }
                 else
                 {
@@ -388,14 +413,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Filter by Letter"), driver =>
             {
-                var jumpBar = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.JumpBar));
-                var link = jumpBar.FindElement(By.Id(filter + "_link"));
-
+                var jumpBar = driver.FindElement(_client.ElementMapper.GridReference.JumpBar);
+                var link = driver.FindElement(jumpBar.Locator + filter + "_link");
+                //var link = driver.FindElement(By.Id(jumpBar.Locator + filter + "_link"));
                 if (link != null)
                 {
-                    link.Click();
+                    link.Click(_client);
 
-                    driver.WaitForTransaction();
+                    driver.Wait();
                 }
                 else
                 {
@@ -412,14 +437,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Filter by All Records"), driver =>
             {
-                var jumpBar = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.JumpBar));
-                var link = jumpBar.FindElement(By.XPath(_client.ElementMapper.GridReference.FilterByAll));
+                var jumpBar = driver.FindElement(_client.ElementMapper.GridReference.JumpBar);
+                var link = driver.FindElement(jumpBar.Locator + _client.ElementMapper.GridReference.FilterByAll);
 
                 if (link != null)
                 {
-                    link.Click();
+                    link.Click(_client);
 
-                    driver.WaitForTransaction();
+                    driver.Wait();
                 }
                 else
                 {
@@ -436,13 +461,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Select Grid Record"), driver =>
             {
-                var container = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.GridReference.RowsContainer), "Grid Container does not exist.");
+                var container = driver.WaitUntilAvailable(_client.ElementMapper.GridReference.RowsContainer, "Grid Container does not exist.");
 
-                var row = container.FindElement(By.Id("id-cell-" + index + "-1"));
+                var row = driver.FindElement(container.Locator + "id-cell-" + index + "-1");
+                //var row = container.FindElement(By.Id("id-cell-" + index + "-1"));
                 if (row == null)
                     throw new Exception($"Row with index: {index} does not exist.");
 
-                row.Click();
+                row.Click(_client);
                 return true;
             });
         }
@@ -451,18 +477,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             _client.ThinkTime(thinkTime);
 
-            if (!_client.Browser.Driver.IsVisible(By.XPath(_client.ElementMapper.GridReference.ChartSelector)))
+            if (!_client.Browser.Browser.HasElement(_client.ElementMapper.GridReference.ChartSelector))
                 ShowChart();
 
             _client.ThinkTime(1000);
 
             return _client.Execute(_client.GetOptions("Switch Chart"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.ChartSelector));
+                driver.ClickWhenAvailable(_client.ElementMapper.GridReference.ChartSelector);
 
-                var list = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.ChartViewList));
+                var list = driver.FindElement(_client.ElementMapper.GridReference.ChartViewList);
 
-                driver.ClickWhenAvailable(By.XPath("//li[contains(@title,'" + chartName + "')]"));
+                driver.ClickWhenAvailable("//li[contains(@title,'" + chartName + "')]");
 
                 return true;
             });
@@ -478,57 +504,57 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Sort by {columnName}"), driver =>
             {
-                var sortCol = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.GridSortColumn.Replace("[COLNAME]", columnName)));
+                var sortCol = driver.FindElement(_client.ElementMapper.GridReference.GridSortColumn.Replace("[COLNAME]", columnName));
 
                 if (sortCol == null)
                     throw new InvalidOperationException($"Column: {columnName} Does not exist");
                 else
                 {
-                    sortCol.Click(true);
-                    driver.WaitUntilClickable(By.XPath($@"//button[@name='{sortOptionButtonText}']")).Click(true);
+                    sortCol.Click(_client);
+                    driver.WaitUntilAvailable($@"//button[@name='{sortOptionButtonText}']").Click(_client);
                 }
 
-                driver.WaitForTransaction();
+                driver.Wait();
                 return true;
             });
         }
 
         #endregion
         #region Private
-        private int ClickGridAndPageDown(IWebDriver driver, IWebElement grid, int lastKnownFloor, Grid.GridType gridType)
+        private int ClickGridAndPageDown(IWebBrowser driver, Element grid, int lastKnownFloor, Grid.GridType gridType)
         {
-            Actions actions = new Actions(driver);
-            By rowGroupLocator = null;
-            By topRowLocator = null;
+            //Actions actions = new Actions(driver);
+            string rowGroupLocator = null;
+            string topRowLocator = null;
             switch (gridType)
             {
                 case Grid.GridType.LegacyReadOnlyGrid:
-                    rowGroupLocator = By.XPath(_client.ElementMapper.GridReference.LegacyReadOnlyRows);
-                    topRowLocator = By.XPath(_client.ElementMapper.GridReference.Rows);
+                    rowGroupLocator = _client.ElementMapper.GridReference.LegacyReadOnlyRows;
+                    topRowLocator = _client.ElementMapper.GridReference.Rows;
                     break;
                 case Grid.GridType.ReadOnlyGrid:
-                    rowGroupLocator = By.XPath(_client.ElementMapper.GridReference.Rows);
-                    topRowLocator = By.XPath(_client.ElementMapper.GridReference.Rows);
+                    rowGroupLocator = _client.ElementMapper.GridReference.Rows;
+                    topRowLocator = _client.ElementMapper.GridReference.Rows;
                     break;
                 case Grid.GridType.PowerAppsGridControl:
-                    rowGroupLocator = By.XPath(_client.ElementMapper.GridReference.Rows);
-                    topRowLocator = By.XPath(_client.ElementMapper.GridReference.Rows);
+                    rowGroupLocator = _client.ElementMapper.GridReference.Rows;
+                    topRowLocator = _client.ElementMapper.GridReference.Rows;
                     break;
                 case Grid.GridType.EditableGrid:
-                    rowGroupLocator = By.XPath(_client.ElementMapper.GridReference.EditableGridRows);
-                    topRowLocator = By.XPath(_client.ElementMapper.GridReference.EditableGridRows + "//div[@role='row']");
+                    rowGroupLocator = _client.ElementMapper.GridReference.EditableGridRows;
+                    topRowLocator = _client.ElementMapper.GridReference.EditableGridRows + "//div[@role='row']";
                     break;
                 default:
                     break;
             }
             var CurrentRows = driver.FindElements(rowGroupLocator);
-            var lastFloor = CurrentRows.Where(x => Convert.ToInt32(x.GetAttribute("row-index")) == lastKnownFloor).First();
+            var lastFloor = CurrentRows.Where(x => Convert.ToInt32(x.GetAttribute(_client,"row-index")) == lastKnownFloor).First();
             //var topRow = driver.FindElement(topRowLocator);
             var topRow = CurrentRows.First();
-            var firstCell = lastFloor.FindElement(By.XPath("//div[@aria-colindex='1']"));
-            lastFloor.Click();
-            actions.SendKeys(OpenQA.Selenium.Keys.PageDown).Perform();
-            return Convert.ToInt32(driver.FindElements(rowGroupLocator).Last().GetAttribute("row-index"));
+            var firstCell = driver.FindElement(lastFloor.Locator + "//div[@aria-colindex='1']");
+            lastFloor.Click(_client);
+            driver.SendKeys(new string[] { Keys.PageDown });
+            return Convert.ToInt32(driver.FindElements(rowGroupLocator).Last().GetAttribute(_client,"row-index"));
         }
         internal static string GetGridQueryKey(IWebBrowser driver, string dataSetName = null)
         {
@@ -600,7 +626,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var returnList = new List<GridItem>();
                 //#1294
                 var gridContainer = driver.FindElement("//div[contains(@data-id,'data-set-body-container')]/div");
-                string[] gridDataId = gridContainer.GetAttribute("data-lp-id").Split('|');
+                string[] gridDataId = gridContainer.GetAttribute(_client, "data-lp-id").Split('|');
                 Dictionary<string, object> WindowStateData = (Dictionary<string, object>)driver.ExecuteScript($"return window[Object.keys(window).find(i => !i.indexOf(\"__store$\"))].getState().data");
                 string keyForData = GetGridQueryKey(driver, null);
                 //Get Data Store
@@ -644,9 +670,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Next Page"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.NextPage));
+                driver.ClickWhenAvailable(_client.ElementMapper.GridReference.NextPage);
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -658,9 +684,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Previous Page"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.PreviousPage));
+                driver.ClickWhenAvailable(_client.ElementMapper.GridReference.PreviousPage);
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -672,9 +698,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"First Page"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.FirstPage));
+                driver.ClickWhenAvailable(_client.ElementMapper.GridReference.FirstPage);
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -686,9 +712,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Select All"), driver =>
             {
-                driver.ClickWhenAvailable(By.XPath(_client.ElementMapper.GridReference.SelectAll));
+                driver.ClickWhenAvailable(_client.ElementMapper.GridReference.SelectAll);
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
