@@ -6,8 +6,6 @@ using System.Diagnostics;
 using System.Security;
 using System.Web;
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using OpenQA.Selenium;
-using OpenQA.Selenium;
 using OtpNet;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI

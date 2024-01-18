@@ -11,7 +11,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
     {
         public string Url { get; set; }
         Element ClickWhenAvailable(string selector);
-        void ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage = null);
+        Element ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage = null);
         Element FindElement(string selector);
         List<Element>? FindElements(string selector);
         object ExecuteScript(string selector, params object[] args);

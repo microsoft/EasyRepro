@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Interactions;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 {
@@ -82,31 +80,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Global Search: {criteria}"), driver =>
             {
-                driver.WaitForTransaction();
+                driver.Wait();
 
-                IWebElement input;
-                if (driver.TryFindElement(By.Id("GlobalSearchBox"), out var globalSearch))
+                Element input;
+                if (driver.HasElement("//*[@id='GlobalSearchBox']"))
                 {
+                    var globalSearch = driver.FindElement("//*[@id='GlobalSearchBox']");
                     input = globalSearch;
                 }
                 else
                 {
                     driver.ClickWhenAvailable(
-                        By.XPath(_client.ElementMapper.NavigationReference.SearchButton),
+                        _client.ElementMapper.NavigationReference.SearchButton,
                         2.Seconds(),
                         "The Global Search (Categorized Search) button is not available.");
 
-                    input = driver.WaitUntilVisible(
-                        By.XPath(_client.ElementMapper.GlobalSearchReference.Text),
+                    input = driver.WaitUntilAvailable(
+                        _client.ElementMapper.GlobalSearchReference.Text,
                         2.Seconds(),
                         "The Categorized Search text field is not available.");
                 }
 
-                input.Click();
-                input.SendKeys(criteria, true);
-                input.SendKeys(Keys.Enter);
+                input.Click(_client);
+                input.SendKeys(_client, new string[] { criteria });
+                input.SendKeys(_client, new string[] { Keys.Enter });
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -123,13 +122,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Filter With: {entity}"), driver =>
             {
-                driver.WaitForTransaction();
+                driver.Wait();
 
-                if (driver.TryFindElement(By.XPath(_client.ElementMapper.GlobalSearchReference.Filter), out var filter))
+                if (driver.HasElement(_client.ElementMapper.GlobalSearchReference.Filter))
                 {
+                    var filter = driver.FindElement(_client.ElementMapper.GlobalSearchReference.Filter);
                     // Categorized Search
-                    var option = filter
-                        .FindElements(By.TagName("option"))
+                    var option = driver
+                        .FindElements(filter + "//option")
                         .FirstOrDefault(x => x.Text == entity);
 
                     if (option == null)
@@ -137,13 +137,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         throw new InvalidOperationException($"Entity '{entity}' does not exist in the Filter options.");
                     }
 
-                    filter.Click();
-                    option.Click();
+                    filter.Click(_client);
+                    option.Click(_client);
                 }
-                else if (driver.TryFindElement(By.XPath(_client.ElementMapper.GlobalSearchReference.RelevanceSearchResultsTab.Replace("[NAME]", entity)), out var entityTab))
+                else if (driver.HasElement(_client.ElementMapper.GlobalSearchReference.RelevanceSearchResultsTab.Replace("[NAME]", entity)))
                 {
+                    var entityTab = driver.FindElement(_client.ElementMapper.GlobalSearchReference.RelevanceSearchResultsTab.Replace("[NAME]", entity));
                     // Relevance Search
-                    entityTab.Click();
+                    entityTab.Click(_client);
                 }
                 else
                 {
@@ -166,26 +167,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Filter With: {value}"), driver =>
             {
-                driver.WaitForTransaction();
+                driver.Wait();
 
-                if (driver.TryFindElement(By.XPath(_client.ElementMapper.GlobalSearchReference.GroupContainer.Replace("[NAME]", filterBy)), out var entityPicker))
+                if (driver.HasElement(_client.ElementMapper.GlobalSearchReference.GroupContainer.Replace("[NAME]", filterBy)))
                 {
+                    var entityPicker = driver.FindElement(_client.ElementMapper.GlobalSearchReference.GroupContainer.Replace("[NAME]", filterBy));
                     // Categorized Search
-                    entityPicker.ClickWhenAvailable(
-                    By.XPath(_client.ElementMapper.GlobalSearchReference.FilterValue.Replace("[NAME]", value)),
+                    driver.ClickWhenAvailable(
+                    entityPicker.Locator + _client.ElementMapper.GlobalSearchReference.FilterValue.Replace("[NAME]", value), new TimeSpan(0,0,5),
                     $"Filter By Value '{value}' does not exist in the Filter options.");
                 }
-                else if (filterBy == "Record Type" && driver.TryFindElement(By.XPath(_client.ElementMapper.GlobalSearchReference.RelevanceSearchResultsTab.Replace("[NAME]", value)), out var entityTab))
+                else if (filterBy == "Record Type" && driver.HasElement(_client.ElementMapper.GlobalSearchReference.RelevanceSearchResultsTab.Replace("[NAME]", value)))
                 {
+                    var entityTab = driver.FindElement(_client.ElementMapper.GlobalSearchReference.RelevanceSearchResultsTab.Replace("[NAME]", value));
                     // Relevance Search
-                    entityTab.Click();
+                    entityTab.Click(_client);
                 }
                 else
                 {
                     throw new InvalidOperationException("Unable to filter global search results.");
                 }
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -203,42 +206,45 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Open Global Search Record"), driver =>
             {
-                driver.WaitForTransaction();
+                driver.Wait();
 
-                if (driver.TryFindElement(By.XPath(_client.ElementMapper.GlobalSearchReference.CategorizedResultsContainer), out var categorizedContainer))
+                if (driver.HasElement(_client.ElementMapper.GlobalSearchReference.CategorizedResultsContainer))
                 {
+                    var categorizedContainer = driver.FindElement(_client.ElementMapper.GlobalSearchReference.CategorizedResultsContainer);
                     // Categorized Search
-                    var records = categorizedContainer.FindElements(By.XPath(_client.ElementMapper.GlobalSearchReference.CategorizedResults.Replace("[ENTITY]", entity)));
+                    var records = driver.FindElements(categorizedContainer.Locator + _client.ElementMapper.GlobalSearchReference.CategorizedResults.Replace("[ENTITY]", entity));
                     if (index >= records.Count)
                     {
                         throw new InvalidOperationException($"There was less than {index + 1} records in the search result.");
                     }
 
-                    records[index].Click(true);
+                    records[index].Click(_client);
                 }
-                else if (driver.TryFindElement(By.Id("resultsContainer-view"), out var relevanceContainer))
+                else if (driver.HasElement("//*[@id='resultsContainer-view'"))
                 {
+                    var relevanceContainer = driver.FindElement("//*[@id='resultsContainer-view'");
                     // Relevance Search
-                    var selectedTab = relevanceContainer.FindElement(By.XPath(_client.ElementMapper.GlobalSearchReference.RelevanceSearchResultsSelectedTab));
-                    if (selectedTab.GetAttribute("name") != entity)
+                    var selectedTab = driver.FindElement(relevanceContainer.Locator + _client.ElementMapper.GlobalSearchReference.RelevanceSearchResultsSelectedTab);
+                    if (selectedTab.GetAttribute(_client, "name") != entity)
                     {
                         this.FilterWith(entity);
                     }
 
-                    var links = relevanceContainer.FindElements(By.XPath(_client.ElementMapper.GlobalSearchReference.RelevanceSearchResultLinks));
+                    var links = driver.FindElements(relevanceContainer.Locator + _client.ElementMapper.GlobalSearchReference.RelevanceSearchResultLinks);
                     if (index >= links.Count)
                     {
                         throw new InvalidOperationException($"There was less than {index + 1} records in the search result.");
                     }
 
-                    new Actions(driver).DoubleClick(links[index]).Perform();
+                    foreach (Element link in links) link.DoubleClick(_client, link.Locator);
+                    //new Actions(driver).DoubleClick(links[index]).Perform();
                 }
                 else
                 {
-                    throw new NotFoundException("Unable to locate global search results.");
+                    throw new KeyNotFoundException("Unable to locate global search results.");
                 }
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
