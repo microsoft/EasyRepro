@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Interactions;
 using static Microsoft.Dynamics365.UIAutomation.Api.UCI.RelatedGrid;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
@@ -71,10 +69,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Open Grid Item"), driver =>
             {
-                var grid = driver.FindElement(By.XPath(_client.ElementMapper.GridReference.Container));
-                var rows = grid
-                    .FindElement(By.XPath(_client.ElementMapper.GridReference.CellContainer))
-                    .FindElements(By.XPath(_client.ElementMapper.GridReference.Rows));
+                var grid = driver.FindElement(_client.ElementMapper.GridReference.Container);
+                var rows = driver.FindElements(grid.Locator + _client.ElementMapper.GridReference.CellContainer + _client.ElementMapper.GridReference.Rows);
 
                 if (rows.Count <= 0)
                 {
@@ -86,10 +82,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
 
                 var row = rows.ElementAt(index + 1);
-                var cell = row.FindElements(By.XPath(_client.ElementMapper.SubGridReference.SubGridCells)).ElementAt(1);
+                var cell = driver.FindElements(row.Locator + _client.ElementMapper.SubGridReference.SubGridCells).ElementAt(1);
 
-                new Actions(driver).DoubleClick(cell).Perform();
-                driver.WaitForTransaction();
+                cell.DoubleClick(_client, cell.Locator);
+
+                //new Actions(driver).DoubleClick(cell).Perform();
+                driver.Wait();
 
                 return true;
             });
@@ -100,43 +98,43 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions("Click Related Tab Command"), driver =>
             {
                 // Locate Related Command Bar Button List
-                var relatedCommandBarButtonList = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarButtonList));
+                var relatedCommandBarButtonList = driver.WaitUntilAvailable(_client.ElementMapper.RelatedGridReference.CommandBarButtonList);
 
                 // Validate list has provided command bar button
-                if (relatedCommandBarButtonList.HasElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarButton.Replace("[NAME]", name))))
+                if (driver.HasElement(_client.ElementMapper.RelatedGridReference.CommandBarButtonList + _client.ElementMapper.RelatedGridReference.CommandBarButton.Replace("[NAME]", name)))
                 {
-                    relatedCommandBarButtonList.FindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarButton.Replace("[NAME]", name))).Click(true);
+                    driver.FindElement(_client.ElementMapper.RelatedGridReference.CommandBarButtonList + _client.ElementMapper.RelatedGridReference.CommandBarButton.Replace("[NAME]", name)).Click(_client);
 
-                    driver.WaitForTransaction();
+                    driver.Wait();
 
                     if (subName != null)
                     {
                         //Look for Overflow flyout
-                        if (driver.HasElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer)))
+                        if (driver.HasElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer))
                         {
-                            var overFlowContainer = driver.FindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer));
+                            var overFlowContainer = driver.FindElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer);
 
-                            if (!overFlowContainer.HasElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName))))
-                                throw new NotFoundException($"{subName} button not found");
+                            if (!driver.HasElement(overFlowContainer.Locator + _client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName)))
+                                throw new KeyNotFoundException($"{subName} button not found");
 
-                            overFlowContainer.FindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName))).Click(true);
+                            driver.FindElement(overFlowContainer.Locator + _client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName)).Click(_client);
 
-                            driver.WaitForTransaction();
+                            driver.Wait();
                         }
 
                         if (subSecondName != null)
                         {
                             //Look for Overflow flyout
-                            if (driver.HasElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer)))
+                            if (driver.HasElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer))
                             {
-                                var overFlowContainer = driver.FindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer));
+                                var overFlowContainer = driver.FindElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer);
 
-                                if (!overFlowContainer.HasElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName))))
-                                    throw new NotFoundException($"{subName} button not found");
+                                if (!driver.HasElement(overFlowContainer.Locator + _client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName)))
+                                    throw new KeyNotFoundException($"{subName} button not found");
 
-                                overFlowContainer.FindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName))).Click(true);
+                                driver.FindElement(overFlowContainer.Locator + _client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName)).Click(_client);
 
-                                driver.WaitForTransaction();
+                                driver.Wait();
                             }
                         }
                     }
@@ -146,44 +144,44 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 else
                 {
                     // Button was not found, check if we should be looking under More Commands (OverflowButton)
-                    var moreCommands = relatedCommandBarButtonList.HasElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton));
+                    var moreCommands = driver.HasElement(relatedCommandBarButtonList.Locator + _client.ElementMapper.RelatedGridReference.CommandBarOverflowButton);
 
                     if (moreCommands)
                     {
-                        var overFlowButton = relatedCommandBarButtonList.FindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton));
-                        overFlowButton.Click(true);
+                        var overFlowButton = driver.FindElement(relatedCommandBarButtonList.Locator + _client.ElementMapper.RelatedGridReference.CommandBarOverflowButton);
+                        overFlowButton.Click(_client);
 
-                        if (driver.HasElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer))) //Look for Overflow
+                        if (driver.HasElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer)) //Look for Overflow
                         {
-                            var overFlowContainer = driver.FindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer));
+                            var overFlowContainer = driver.FindElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer);
 
-                            if (overFlowContainer.HasElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarButton.Replace("[NAME]", name))))
+                            if (driver.HasElement(overFlowContainer.Locator + _client.ElementMapper.RelatedGridReference.CommandBarButton.Replace("[NAME]", name)))
                             {
-                                overFlowContainer.FindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarButton.Replace("[NAME]", name))).Click(true);
+                                driver.FindElement(overFlowContainer.Locator + _client.ElementMapper.RelatedGridReference.CommandBarButton.Replace("[NAME]", name)).Click(_client);
 
-                                driver.WaitForTransaction();
+                                driver.Wait();
 
                                 if (subName != null)
                                 {
-                                    overFlowContainer = driver.FindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer));
+                                    overFlowContainer = driver.FindElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer);
 
-                                    if (!overFlowContainer.HasElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName))))
-                                        throw new NotFoundException($"{subName} button not found");
+                                    if (!driver.HasElement(overFlowContainer.Locator + _client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName)))
+                                        throw new KeyNotFoundException($"{subName} button not found");
 
-                                    overFlowContainer.FindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName))).Click(true);
+                                    driver.FindElement(overFlowContainer.Locator + _client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName)).Click(_client);
 
-                                    driver.WaitForTransaction();
+                                    driver.Wait();
 
                                     if (subSecondName != null)
                                     {
-                                        overFlowContainer = driver.FindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer));
+                                        overFlowContainer = driver.FindElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowContainer);
 
-                                        if (!overFlowContainer.HasElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName))))
-                                            throw new NotFoundException($"{subName} button not found");
+                                        if (!driver.HasElement(overFlowContainer.Locator + _client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName)))
+                                            throw new KeyNotFoundException($"{subName} button not found");
 
-                                        overFlowContainer.FindElement(By.XPath(_client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName))).Click(true);
+                                        driver.FindElement(overFlowContainer.Locator + _client.ElementMapper.RelatedGridReference.CommandBarSubButton.Replace("[NAME]", subName)).Click(_client);
 
-                                        driver.WaitForTransaction();
+                                        driver.Wait();
                                     }
                                 }
 
@@ -192,13 +190,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         }
                         else
                         {
-                            throw new NotFoundException($"{name} button not found in the More Commands container. Button names are case sensitive. Please check for proper casing of button name.");
+                            throw new KeyNotFoundException($"{name} button not found in the More Commands container. Button names are case sensitive. Please check for proper casing of button name.");
                         }
 
                     }
                     else
                     {
-                        throw new NotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
+                        throw new KeyNotFoundException($"{name} button not found. Button names are case sensitive. Please check for proper casing of button name.");
                     }
                 }
 
