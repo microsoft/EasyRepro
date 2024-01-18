@@ -252,18 +252,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     var input = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field) + "//input//input");
                     if (input != null)
                     {
-                        input.Click(true);
-                        input.Clear();
-                        input.SetValue(value);
-                        input.SendKeys(Keys.Tab);
+                        input.Click(_client);
+                        input.Clear(_client, input.Locator);
+                        input.SetValue(_client, value);
+                        input.SendKeys(_client, new string[]{ Keys.Tab});
                     }
                 }
                 else if (driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field) + "//textarea").Count > 0)
                 {
                     var textarea = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field) + "//textarea");
-                    textarea.Click();
-                    textarea.Clear();
-                    textarea.SendKeys(value);
+                    textarea.Click(_client);
+                    textarea.Clear(_client, textarea.Locator);
+                    textarea.SendKeys(_client, new string[] { value });
                 }
                 else
                 {
@@ -292,8 +292,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                     foreach (var op in options)
                     {
-                        if (op.Text != option.Value && op.GetAttribute("value") != option.Value) continue;
-                        op.Click(true);
+                        if (op.Text != option.Value && op.GetAttribute(_client,"value") != option.Value) continue;
+                        op.Click(_client);
                         break;
                     }
                 }
@@ -316,11 +316,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Set BPF Value: {option.Name}"), driver =>
             {
                 var fieldContainer = driver.WaitUntilAvailable(_client.ElementMapper.BusinessProcessFlowReference.BooleanFieldContainer.Replace("[NAME]", option.Name));
-                var existingValue = fieldContainer.GetAttribute("Title") == "Yes";
+                var existingValue = fieldContainer.GetAttribute(_client, "Title") == "Yes";
 
                 if (option.Value != existingValue)
                 {
-                    fieldContainer.Click();
+                    fieldContainer.Click(_client);
                     //fieldContainer.ClickWhenAvailable("//option[not(@data-selected)]");
                     driver.ClickWhenAvailable(_client.ElementMapper.BusinessProcessFlowReference.BooleanFieldContainer.Replace("[NAME]", option.Name) + "//option[not(@data-selected)]");
                 }
@@ -348,32 +348,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     var fieldElement = driver.ClickWhenAvailable(dateField);
 
-                    if (fieldElement.GetAttribute("value").Length > 0)
+                    if (fieldElement.GetAttribute(_client, "value").Length > 0)
                     {
                         //fieldElement.Click();
                         //fieldElement.SendKeys(date.ToString(format));
                         //fieldElement.SendKeys(Keys.Enter);
 
-                        fieldElement.Click();
+                        fieldElement.Click(_client);
                         _client.ThinkTime(250);
-                        fieldElement.Click();
-                        _client.ThinkTime(250);
-                        //fieldElement.SendKeys(Keys.Backspace);
+                        fieldElement.Click(_client);
                         _client.ThinkTime(250);
                         //fieldElement.SendKeys(Keys.Backspace);
                         _client.ThinkTime(250);
                         //fieldElement.SendKeys(Keys.Backspace);
                         _client.ThinkTime(250);
-                        fieldElement.SetValue(date.ToString(format));
+                        //fieldElement.SendKeys(Keys.Backspace);
+                        _client.ThinkTime(250);
+                        fieldElement.SetValue(_client, date.ToString(format));
                         _client.ThinkTime(500);
-                        fieldElement.SendKeys(Keys.Tab);
+                        fieldElement.SendKeys(_client, new string[] { Keys.Tab });
                         _client.ThinkTime(250);
                     }
                     else
                     {
-                        fieldElement.Click();
+                        fieldElement.Click(_client);
                         _client.ThinkTime(250);
-                        fieldElement.Click();
+                        fieldElement.Click(_client);
                         _client.ThinkTime(250);
                         //fieldElement.SendKeys(Keys.Backspace);
                         //_client.ThinkTime(250);
@@ -381,9 +381,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         //_client.ThinkTime(250);
                         //fieldElement.SendKeys(Keys.Backspace);
                         _client.ThinkTime(250);
-                        fieldElement.SendKeys(date.ToString(format));
+                        fieldElement.SetValue(_client,date.ToString(format));
                         _client.ThinkTime(250);
-                        fieldElement.SendKeys(Keys.Tab);
+                        fieldElement.SendKeys(_client, new string[] { Keys.Tab });
                         _client.ThinkTime(250);
                     }
                 }
@@ -415,7 +415,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         if (div.Text.Equals(stageName, StringComparison.OrdinalIgnoreCase))
                         {
-                            div.Click();
+                            div.Click(_client);
                         }
                     }
                 }
@@ -431,17 +431,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         if (bpfField != null)
                         {
-                            bpfField.Click();
+                            bpfField.Click(_client);
                             for (int i = 0; i < businessProcessFlowField.Value.Length; i++)
                             {
-                                bpfField.SendKeys(businessProcessFlowField.Value.Substring(i, 1));
+                                bpfField.SetValue(_client,businessProcessFlowField.Value.Substring(i, 1));
                             }
                         }
                     }
 
                     //Click the Next Stage Button
                     var nextButton = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.Flyout_UCI + _client.ElementMapper.BusinessProcessFlowReference.NextStageButton);
-                    nextButton.Click();
+                    nextButton.Click(_client);
                 }
 
                 return true;
@@ -464,7 +464,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         if (div.Text.Equals(stageName, StringComparison.OrdinalIgnoreCase))
                         {
-                            div.Click();
+                            div.Click(_client);
                         }
                     }
                 }
@@ -488,7 +488,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (!driver.HasElement("//button[contains(@data-id,'setActiveButton')]"))
                         throw new KeyNotFoundException($"Unable to find the Set Active button. Please verify the stage name {stageName} is correct.");
 
-                    driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.SetActiveButton).Click(true);
+                    driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.SetActiveButton).Click(_client);
 
                     driver.Wait();
                 }
@@ -507,7 +507,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 //Pin the Stage
                 if (driver.HasElement(_client.ElementMapper.BusinessProcessFlowReference.PinStageButton))
-                    driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.PinStageButton).Click();
+                    driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.PinStageButton).Click(_client);
                 else
                     throw new KeyNotFoundException($"Pin button for stage {stageName} not found.");
 
@@ -526,7 +526,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 //Pin the Stage
                 if (driver.HasElement(_client.ElementMapper.BusinessProcessFlowReference.CloseStageButton))
-                    driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.CloseStageButton).Click(true);
+                    driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.CloseStageButton).Click(_client);
                 else
                     throw new KeyNotFoundException($"Close button for stage {stageName} not found.");
 
