@@ -2,12 +2,10 @@
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Api.UCI.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 using static Microsoft.Dynamics365.UIAutomation.Api.UCI.BusinessProcessFlow;
 using System.Collections.ObjectModel;
-using OpenQA.Selenium.Interactions;
 using System.Web;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
@@ -306,7 +304,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <example>var errorText = xrmApp.Entity.GetBusinessProcessError(int waitTimeInSeconds);</example>
         public string GetBusinessProcessError(int waitTimeInSeconds = 120)
         {
-            _client.Browser.Driver.WaitForTransaction();
+            _client.Browser.Browser.Wait();
             Dialogs dialogs = new Dialogs(_client);
             return dialogs.GetBusinessProcessErrorText(waitTimeInSeconds);
         }
@@ -784,10 +782,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Assign Entity"), driver =>
             {
-                var assignBtn = driver.WaitUntilAvailable(By.XPath(this._entityReference.Assign),
+                var assignBtn = driver.WaitUntilAvailable(this._entityReference.Assign,
                     "Assign Button is not available");
 
-                assignBtn?.Click();
+                assignBtn?.Click(_client);
                 Dialogs dialogs = new Dialogs(_client);
                 dialogs.AssignDialog(Dialogs.AssignTo.User, userOrTeamToAssign);
 
@@ -806,15 +804,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute($"Select Tab", driver =>
             {
-                IWebElement tabList;
-                if (driver.HasElement(By.XPath(_client.ElementMapper.DialogsReference.DialogContext)))
+                Element tabList;
+                if (driver.HasElement(_client.ElementMapper.DialogsReference.DialogContext))
                 {
-                    var dialogContainer = driver.FindElement(By.XPath(_client.ElementMapper.DialogsReference.DialogContext));
-                    tabList = dialogContainer.WaitUntilAvailable(By.XPath(this._entityReference.TabList));
+                    var dialogContainer = driver.FindElement(_client.ElementMapper.DialogsReference.DialogContext);
+                    tabList = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.DialogContext + this._entityReference.TabList);
                 }
                 else
                 {
-                    tabList = driver.WaitUntilAvailable(By.XPath(this._entityReference.TabList));
+                    tabList = driver.WaitUntilAvailable(this._entityReference.TabList);
                 }
 
                 ClickTab(tabList, this._entityReference.Tab, tabName);
@@ -825,7 +823,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     this.ClickTab(tabList, this._entityReference.SubTab, subTabName);
                 }
 
-                driver.WaitForTransaction();
+                driver.Wait();
                 return true;
             });
         }
@@ -836,13 +834,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             Element listItem;
             // Look for the tab in the tab list, else in the more tabs menu
             Element searchScope = null;
-            if (tabList.HasElement(string.Format(xpath, name)))
+            if (_client.Browser.Browser.HasElement(tabList.Locator + string.Format(xpath, name)))
             {
                 searchScope = tabList;
             }
-            else if (tabList.TryFindElement(By.XPath(this._entityReference.MoreTabs), out moreTabsButton))
+            else if (_client.Browser.Browser.HasElement(tabList.Locator + this._entityReference.MoreTabs))
             {
-                moreTabsButton.Click();
+                moreTabsButton = _client.Browser.Browser.FindElement(tabList.Locator + this._entityReference.MoreTabs);
+                moreTabsButton.Click(_client);
 
                 // No tab to click - subtabs under 'Related' are automatically expanded in overflow menu
                 if (name == "Related")
@@ -851,13 +850,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
                 else
                 {
-                    searchScope = _client.Browser.Driver.FindElement(By.XPath(this._entityReference.MoreTabsMenu));
+                    searchScope = _client.Browser.Browser.FindElement(this._entityReference.MoreTabsMenu);
                 }
             }
 
-            if (searchScope.TryFindElement(By.XPath(string.Format(xpath, name)), out listItem))
+            if (_client.Browser.Browser.HasElement(string.Format(xpath, name)))
             {
-                listItem.Click(true);
+                listItem = _client.Browser.Browser.FindElement(string.Format(xpath, name));
+                listItem.Click(_client, true);
             }
             else
             {
@@ -876,7 +876,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var save = driver.WaitUntilAvailable(this._client.ElementMapper.QuickCreateReference.CancelButton,
                     "Quick Create Cancel Button is not available");
-                save?.Click(true);
+                save?.Click(_client, true);
 
                 driver.Wait();
 
@@ -897,7 +897,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Open: {entityName} {id}"), driver =>
             {
                 //https:///main.aspx?appid=98d1cf55-fc47-e911-a97c-000d3ae05a70&pagetype=entityrecord&etn=lead&id=ed975ea3-531c-e511-80d8-3863bb3ce2c8
-                var uri = new Uri(_client.Browser.Driver.Url);
+                var uri = new Uri(_client.Browser.Browser.Url);
                 var qs = HttpUtility.ParseQueryString(uri.Query.ToLower());
                 var appId = qs.Get("appid");
                 var link = $"{uri.Scheme}://{uri.Authority}/main.aspx?appid={appId}&etn={entityName}&pagetype=entityrecord&id={id}";
@@ -933,14 +933,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Save"), driver =>
             {
-                Actions action = new Actions(driver);
-                action.KeyDown(Keys.Control).SendKeys("S").Perform();
+                //Actions action = new Actions(driver);
+                //action.KeyDown(Keys.Control).SendKeys("S").Perform();
 
-                
+                driver.SendKeys(new string[] { Keys.Control, "S" });
 
                 Dialogs dialogs = new Dialogs(_client);
                 dialogs.HandleSaveDialog();
-                _client.Browser.Driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -952,11 +952,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"SaveQuickCreate"), driver =>
             {
-                var save = driver.WaitUntilAvailable(By.XPath(_client.ElementMapper.QuickCreateReference.SaveAndCloseButton),
+                var save = driver.WaitUntilAvailable(_client.ElementMapper.QuickCreateReference.SaveAndCloseButton,
                     "Quick Create Save Button is not available");
-                save?.Click(true);
+                save?.Click(_client, true);
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -976,27 +976,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions("Open Record Set Navigator"), driver =>
             {
                 // check if record set navigator parent div is set to open
-                driver.WaitForTransaction();
+                driver.Wait();
 
-                if (!driver.TryFindElement(By.XPath(this._entityReference.RecordSetNavList), out var navList))
+                if (!driver.HasElement(this._entityReference.RecordSetNavList))
                 {
-                    driver.FindElement(By.XPath(this._entityReference.RecordSetNavigator)).Click();
-                    driver.WaitForTransaction();
-                    navList = driver.FindElement(By.XPath(this._entityReference.RecordSetNavList));
+                    var navList = driver.FindElement(this._entityReference.RecordSetNavList);
+                    driver.FindElement(this._entityReference.RecordSetNavigator).Click(_client);
+                    driver.Wait();
+                    navList = driver.FindElement(this._entityReference.RecordSetNavList);
                 }
 
-                var links = navList.FindElements(By.TagName("li"));
+                var links = driver.FindElements(this._entityReference.RecordSetNavList + "//li");
 
                 try
                 {
-                    links[index].Click();
+                    links[index].Click(_client);
                 }
                 catch
                 {
                     throw new InvalidOperationException($"No record with the index '{index}' exists.");
                 }
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -1013,10 +1014,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions("Close Record Set Navigator"), driver =>
             {
-                var closeSpan = driver.HasElement(By.XPath(this._entityReference.RecordSetNavCollapseIcon));
+                var closeSpan = driver.HasElement(this._entityReference.RecordSetNavCollapseIcon);
                 if (closeSpan)
                 {
-                    driver.FindElement(By.XPath(this._entityReference.RecordSetNavCollapseIconParent)).Click();
+                    driver.FindElement(this._entityReference.RecordSetNavCollapseIconParent).Click(_client);
                 }
 
                 return true;
@@ -1902,16 +1903,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         internal void TryCloseHeaderFlyout(IWebBrowser driver)
         {
-            bool hasHeader = driver.IsAvailable(this._entityReference.HeaderContainer);
+            bool hasHeader = driver.HasElement(this._entityReference.HeaderContainer);
             if (!hasHeader)
                 throw new KeyNotFoundException("Unable to find header on the form");
 
             var xPath = this._entityReference.HeaderFlyoutButton;
             var headerFlyoutButton = driver.FindElement(xPath);
-            bool expanded = bool.Parse(headerFlyoutButton.GetAttribute("aria-expanded"));
+            bool expanded = bool.Parse(headerFlyoutButton.GetAttribute(_client, "aria-expanded"));
 
             if (expanded)
-                headerFlyoutButton.Click(true);
+                headerFlyoutButton.Click(_client, true);
         }
 
 

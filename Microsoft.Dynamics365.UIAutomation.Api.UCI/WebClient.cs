@@ -211,15 +211,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         //#endregion
 
-        //internal void ThinkTime(int milliseconds)
-        //{
-        //    Browser.ThinkTime(milliseconds);
-        //}
+        internal void ThinkTime(int milliseconds)
+        {
+            Browser.ThinkTime(milliseconds);
+        }
 
-        //internal void ThinkTime(TimeSpan timespan)
-        //{
-        //    ThinkTime((int)timespan.TotalMilliseconds);
-        //}
+        internal void ThinkTime(TimeSpan timespan)
+        {
+            ThinkTime((int)timespan.TotalMilliseconds);
+        }
 
         public void Dispose()
         {

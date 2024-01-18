@@ -49,7 +49,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
         #endregion
         private readonly WebClient _client;
-        public BusinessProcessFlow(WebClient client): base(client)
+        public BusinessProcessFlow(WebClient client): base()
         {
             _client = client;
         }

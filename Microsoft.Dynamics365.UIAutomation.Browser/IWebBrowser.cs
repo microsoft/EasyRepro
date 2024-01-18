@@ -9,6 +9,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
     public interface IWebBrowser
     {
+        public string Url { get; set; }
         Element ClickWhenAvailable(string selector);
         void ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage = null);
         Element FindElement(string selector);
@@ -16,7 +17,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         object ExecuteScript(string selector, params object[] args);
         bool HasElement(string selector);
         void Navigate(string url);
-        void SendKeys(string key);
+        void SendKeys(string[] key);
         void SwitchToFrame(string locator);
         //bool TryFindElement(string selector, out Element element);
         void Wait(TimeSpan? timeout = null);

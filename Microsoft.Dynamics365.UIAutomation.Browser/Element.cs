@@ -25,7 +25,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         #region methods
         public void Clear(BrowserPage page, string key)
         {
-            _page.Execute(new BrowserCommandOptions(), browser =>
+            page.Execute(new BrowserCommandOptions(), browser =>
             {
                 return true;
             });
@@ -57,7 +57,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
         public virtual void SetValue(BrowserPage page, string value)
         {
-            _page.Execute(new BrowserCommandOptions(), browser =>
+            page.Execute(new BrowserCommandOptions(), browser =>
             {
                 return true;
             });
