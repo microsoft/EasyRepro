@@ -147,67 +147,67 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         //#region FormContextType
 
-        //// Used by SetValue methods to determine the field context
-        //public Element ValidateFormContext(IWebBrowser driver, FormContextType formContextType, string field, Element fieldContainer)
-        //{
-        //    if (formContextType == FormContextType.QuickCreate)
-        //    {
-        //        // Initialize the quick create form context
-        //        // If this is not done -- element input will go to the main form due to new flyout design
-        //        if (driver.HasElement(this.ElementMapper.QuickCreateReference.QuickCreateFormContext)) 
-        //            fieldContainer = driver.FindElement(_entityReference.TextFieldContainer.Replace("[NAME]", field));
-        //        else
-        //            throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, this.ElementMapper.QuickCreateReference.QuickCreateFormContext));
+        // Used by SetValue methods to determine the field context
+        public Element ValidateFormContext(IWebBrowser driver, FormContextType formContextType, string field, Element fieldContainer)
+        {
+            if (formContextType == FormContextType.QuickCreate)
+            {
+                // Initialize the quick create form context
+                // If this is not done -- element input will go to the main form due to new flyout design
+                if (driver.HasElement(this.ElementMapper.QuickCreateReference.QuickCreateFormContext))
+                    fieldContainer = driver.FindElement(_entityReference.TextFieldContainer.Replace("[NAME]", field));
+                else
+                    throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, this.ElementMapper.QuickCreateReference.QuickCreateFormContext));
 
-        //        //var formContext = driver.WaitUntilAvailable(By.XPath(this.ElementMapper.QuickCreateReference.QuickCreateFormContext));
-        //        //fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
-        //    }
-        //    else if (formContextType == FormContextType.Entity)
-        //    {
-        //        if (driver.HasElement(_entityReference.FormContext))
-        //            fieldContainer = driver.FindElement(_entityReference.TextFieldContainer.Replace("[NAME]", field));
-        //        else
-        //            throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, _entityReference.FormContext));
-        //        // Initialize the entity form context
-        //        //var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.FormContext));
-        //        //fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
-        //    }
-        //    else if (formContextType == FormContextType.BusinessProcessFlow)
-        //    {
-        //        if (driver.HasElement(this.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext))
-        //            fieldContainer = driver.FindElement(this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field));
-        //        else
-        //            throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer));
-        //        // Initialize the Business Process Flow context
-        //        //var formContext = driver.WaitUntilAvailable(By.XPath(this.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext));
-        //        //fieldContainer = formContext.WaitUntilAvailable(By.XPath(this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field)));
-        //    }
-        //    else if (formContextType == FormContextType.Header)
-        //    {
-        //        if (driver.HasElement(_entityReference.HeaderContext))
-        //            fieldContainer = driver.FindElement(_entityReference.TextFieldContainer.Replace("[NAME]", field));
-        //        else
-        //            throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer));
-        //        // Initialize the Header context
-        //        //var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.HeaderContext));
-        //        //fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
-        //    }
-        //    else if (formContextType == FormContextType.Dialog)
-        //    {
-        //        if (driver.HasElement(this.ElementMapper.DialogsReference.DialogContext))
-        //            fieldContainer = driver.FindElement(_entityReference.TextFieldContainer.Replace("[NAME]", field));
-        //        else
-        //            throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, this.ElementMapper.DialogsReference.DialogContext));
-        //        // Initialize the Dialog context
-        //        //driver.Wait();
-        //        //var formContext = driver
-        //        //    .FindElements(By.XPath(this.ElementMapper.DialogsReference.DialogContext))
-        //        //    .LastOrDefault() ?? throw new NotFoundException("Unable to find a dialog.");
-        //        //fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
-        //    }
+                //var formContext = driver.WaitUntilAvailable(By.XPath(this.ElementMapper.QuickCreateReference.QuickCreateFormContext));
+                //fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
+            }
+            else if (formContextType == FormContextType.Entity)
+            {
+                if (driver.HasElement(_entityReference.FormContext))
+                    fieldContainer = driver.FindElement(_entityReference.TextFieldContainer.Replace("[NAME]", field));
+                else
+                    throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, _entityReference.FormContext));
+                // Initialize the entity form context
+                //var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.FormContext));
+                //fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
+            }
+            else if (formContextType == FormContextType.BusinessProcessFlow)
+            {
+                if (driver.HasElement(this.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext))
+                    fieldContainer = driver.FindElement(this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field));
+                else
+                    throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer));
+                // Initialize the Business Process Flow context
+                //var formContext = driver.WaitUntilAvailable(By.XPath(this.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext));
+                //fieldContainer = formContext.WaitUntilAvailable(By.XPath(this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", field)));
+            }
+            else if (formContextType == FormContextType.Header)
+            {
+                if (driver.HasElement(_entityReference.HeaderContext))
+                    fieldContainer = driver.FindElement(_entityReference.TextFieldContainer.Replace("[NAME]", field));
+                else
+                    throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, this.ElementMapper.BusinessProcessFlowReference.TextFieldContainer));
+                // Initialize the Header context
+                //var formContext = driver.WaitUntilAvailable(By.XPath(_entityReference.HeaderContext));
+                //fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
+            }
+            else if (formContextType == FormContextType.Dialog)
+            {
+                if (driver.HasElement(this.ElementMapper.DialogsReference.DialogContext))
+                    fieldContainer = driver.FindElement(_entityReference.TextFieldContainer.Replace("[NAME]", field));
+                else
+                    throw new KeyNotFoundException(String.Format("{0} control not found using XPath: '{1}'.", field, this.ElementMapper.DialogsReference.DialogContext));
+                // Initialize the Dialog context
+                //driver.Wait();
+                //var formContext = driver
+                //    .FindElements(By.XPath(this.ElementMapper.DialogsReference.DialogContext))
+                //    .LastOrDefault() ?? throw new NotFoundException("Unable to find a dialog.");
+                //fieldContainer = formContext.WaitUntilAvailable(By.XPath(_entityReference.TextFieldContainer.Replace("[NAME]", field)));
+            }
 
-        //    return fieldContainer;
-        //}
+            return fieldContainer;
+        }
 
         //#endregion
 

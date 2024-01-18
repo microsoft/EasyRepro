@@ -159,7 +159,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// </value>
         public string Value { get; set; }
 
-        internal static void SetInputValue(IWebDriver driver, IWebElement input, string value, TimeSpan? thinktime = null)
+        internal static void SetInputValue(IWebBrowser driver, Element input, string value, TimeSpan? thinktime = null)
         {
             // Repeat set value if expected value is not set
             // Do this to ensure that the static placeholder '---' is removed 
@@ -178,7 +178,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 failureCallback: () => throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {value}. Actual: {input.GetAttribute("value")}")
             );
 
-            driver.WaitForTransaction();
+            driver.Wait();
         }
 
         internal static BrowserCommandResult<bool> ClearValue(WebClient client, string fieldName, FormContextType formContextType)
