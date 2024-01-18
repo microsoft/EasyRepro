@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using Microsoft.Dynamics365.UIAutomation.Browser;
-using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -54,21 +53,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         #region PowerApp
         private bool _inPowerApps = false;
-        internal IWebElement LocatePowerApp(IWebDriver driver, string appId)
+        internal Element LocatePowerApp(IWebBrowser driver, string appId)
         {
-            IWebElement powerApp = null;
+            Element powerApp = null;
             Trace.WriteLine(String.Format("Locating {0} App", appId));
-            if (driver.HasElement(By.XPath(this._client.ElementMapper.PowerAppReference.ModelFormContainer.Replace("[NAME]", appId))))
+            if (driver.HasElement(this._client.ElementMapper.PowerAppReference.ModelFormContainer.Replace("[NAME]", appId)))
             {
-                powerApp = driver.FindElement(By.XPath(this._client.ElementMapper.PowerAppReference.ModelFormContainer.Replace("[NAME]", appId)));
-                driver.SwitchTo().Frame(powerApp);
-                powerApp = driver.FindElement(By.XPath(this._client.ElementMapper.PowerAppReference.PublishedAppIFrame));
-                driver.SwitchTo().Frame(powerApp);
+                powerApp = driver.FindElement(this._client.ElementMapper.PowerAppReference.ModelFormContainer.Replace("[NAME]", appId));
+                driver.SwitchToFrame(powerApp.Locator);
+                powerApp = driver.FindElement(this._client.ElementMapper.PowerAppReference.PublishedAppIFrame);
+                driver.SwitchToFrame(powerApp.Locator);
                 _inPowerApps = true;
             }
             else
             {
-                throw new NotFoundException(String.Format("PowerApp with Id {0} not found.", appId));
+                throw new KeyNotFoundException(String.Format("PowerApp with Id {0} not found.", appId));
             }
             return powerApp;
         }
@@ -86,13 +85,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions("PowerApp Select"), driver =>
             {
                 if (!_inPowerApps) LocatePowerApp(driver, appId);
-                if (driver.HasElement(By.XPath(this._client.ElementMapper.PowerAppReference.Control.Replace("[NAME]", control))))
+                if (driver.HasElement(this._client.ElementMapper.PowerAppReference.Control.Replace("[NAME]", control)))
                 {
-                    driver.FindElement(By.XPath(this._client.ElementMapper.PowerAppReference.Control.Replace("[NAME]", control))).Click();
+                    driver.FindElement(this._client.ElementMapper.PowerAppReference.Control.Replace("[NAME]", control)).Click(_client);
                 }
                 else
                 {
-                    throw new NotFoundException(String.Format("Control {0} not found in Power App {1}", control, appId));
+                    throw new KeyNotFoundException(String.Format("Control {0} not found in Power App {1}", control, appId));
                 }
                 return true;
             });
