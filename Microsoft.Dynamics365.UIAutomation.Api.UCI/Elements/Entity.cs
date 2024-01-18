@@ -195,7 +195,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public SubGrid SubGrid => this.GetElement<SubGrid>(_client);
         public RelatedGrid RelatedGrid => this.GetElement<RelatedGrid>(_client);
 
-        public Entity(WebClient client) : base(client)
+        public Entity(WebClient client) : base()
         {
             _client = client;
             _entityReference = new EntityReference();
@@ -695,7 +695,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The boolean field name.</param>
         public void SetValue(BooleanItem option)
         {
-            BooleanItem.SetValue(_client, option, FormContextType.Entity);
+            option.SetValue(_client, option, FormContextType.Entity);
         }
 
         /// <summary>
@@ -910,13 +910,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     link += "&perf=true";
                 }
-                driver.Navigate().GoToUrl(link);
+                driver.Navigate(link);
                 //SwitchToContent();
-                driver.WaitForPageToLoad();
-                driver.WaitForTransaction();
-                driver.WaitUntilClickable(By.XPath(this._entityReference.Form),
+                driver.Wait();
+                driver.Wait();
+                driver.WaitUntilAvailable(this._entityReference.Form,
                     TimeSpan.FromSeconds(30),
-                    "CRM Record is Unavailable or not finished loading. Timeout Exceeded"
+                    "Dynamics 365 Record is Unavailable or not finished loading. Timeout Exceeded"
                 );
 
                 return true;
@@ -1031,10 +1031,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
 
 
-        public static void SelectOption(ReadOnlyCollection<Element> options, string value)
+        public void SelectOption(ReadOnlyCollection<Element> options, string value)
         {
-            var selectedOption = options.FirstOrDefault(op => op.Text == value || op.GetAttribute("value") == value);
-            selectedOption.Click(true);
+            var selectedOption = options.FirstOrDefault(op => op.Text == value || op.GetAttribute(_client, "value") == value);
+            selectedOption.Click(_client, true);
         }
 
 
@@ -1044,16 +1044,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Get Field"), driver =>
             {
-                var fieldElement = driver.WaitUntilAvailable(By.XPath(this._entityReference.TextFieldContainer.Replace("[NAME]", field)));
+                var fieldElement = driver.WaitUntilAvailable(this._entityReference.TextFieldContainer.Replace("[NAME]", field));
                 Field returnField = new Field(fieldElement);
                 returnField.Name = field;
 
-                IWebElement fieldLabel = null;
+                Element fieldLabel = null;
                 try
                 {
-                    fieldLabel = fieldElement.FindElement(By.XPath(this._entityReference.TextFieldLabel.Replace("[NAME]", field)));
+                    fieldLabel = driver.FindElement(this._entityReference.TextFieldContainer.Replace("[NAME]", field) + this._entityReference.TextFieldLabel.Replace("[NAME]", field));
                 }
-                catch (NoSuchElementException)
+                catch (KeyNotFoundException)
                 {
                     // Swallow
                 }
@@ -1072,27 +1072,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Get Value"), driver =>
             {
                 string text = string.Empty;
-                var fieldContainer = driver.WaitUntilAvailable(By.XPath(this._entityReference.TextFieldContainer.Replace("[NAME]", field)));
+                var fieldContainer = driver.WaitUntilAvailable(this._entityReference.TextFieldContainer.Replace("[NAME]", field));
 
-                if (fieldContainer.FindElements(By.TagName("input")).Count > 0)
+                if (driver.FindElements(this._entityReference.TextFieldContainer.Replace("[NAME]", field) + "//input").Count > 0)
                 {
-                    var input = fieldContainer.FindElement(By.TagName("input"));
+                    var input = driver.FindElement(this._entityReference.TextFieldContainer.Replace("[NAME]", field) + "//input");
                     if (input != null)
                     {
                         //IWebElement fieldValue = input.FindElement(By.XPath(EntityReference.TextFieldValue].Replace("[NAME]", field)));
-                        text = input.GetAttribute("value").ToString();
+                        text = input.GetAttribute(_client, "value").ToString();
 
                         // Needed if getting a date field which also displays time as there isn't a date specifc GetValue method
-                        var timefields = driver.FindElements(By.XPath(this._entityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", field)));
+                        var timefields = driver.FindElements(this._entityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", field));
                         if (timefields.Any())
                         {
-                            text += $" {timefields.First().GetAttribute("value")}";
+                            text += $" {timefields.First().GetAttribute(_client,"value")}";
                         }
                     }
                 }
-                else if (fieldContainer.FindElements(By.TagName("textarea")).Count > 0)
+                else if (driver.FindElements(this._entityReference.TextFieldContainer.Replace("[NAME]", field) + "//textarea").Count > 0)
                 {
-                    text = fieldContainer.FindElement(By.TagName("textarea")).GetAttribute("value");
+                    text = driver.FindElement(this._entityReference.TextFieldContainer.Replace("[NAME]", field) + "//textarea").GetAttribute(_client, "value");
                 }
                 else
                 {
@@ -1149,30 +1149,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             var controlName = controls.First().Name;
             var xpathToExistingValues = _client.ElementMapper.EntityReference.LookupFieldExistingValue.Replace("[NAME]", controlName);
-            var existingValues = fieldContainer.FindElements(xpathToExistingValues);
+            var existingValues = _client.Browser.Browser.FindElements(fieldContainer.Locator + xpathToExistingValues);
 
-            var xpathToExpandButton = By.XPath(this._entityReference.LookupFieldExpandCollapseButton.Replace("[NAME]", controlName));
-            bool expandButtonFound = fieldContainer.TryFindElement(xpathToExpandButton, out var expandButton);
+            var xpathToExpandButton = this._entityReference.LookupFieldExpandCollapseButton.Replace("[NAME]", controlName);
+            bool expandButtonFound = _client.Browser.Browser.HasElement(fieldContainer.Locator + xpathToExpandButton);
             if (expandButtonFound)
             {
-                expandButton.Click(true);
-
+                var expandButton = _client.Browser.Browser.FindElement(fieldContainer.Locator + xpathToExpandButton);
+                expandButton.Click(_client, true);
+                
                 int count = existingValues.Count;
-                fieldContainer.WaitUntil(fc => fc.FindElements(xpathToExistingValues).Count > count);
+                
+                //fieldContainer.WaitUntil(fc => fc.FindElements(xpathToExistingValues).Count > count);
 
-                existingValues = fieldContainer.FindElements(xpathToExistingValues);
+                existingValues = _client.Browser.Browser.FindElements(fieldContainer.Locator + xpathToExistingValues);
             }
-
+            
             Exception ex = null;
             try
             {
                 if (existingValues.Count > 0)
                 {
-                    string[] lookupValues = existingValues.Select(v => v.GetAttribute("innerText").TrimSpecialCharacters()).ToArray(); //IE can return line breaks
+                    string[] lookupValues = existingValues.Select(v => v.GetAttribute(_client,"innerText").TrimSpecialCharacters()).ToArray(); //IE can return line breaks
                     return lookupValues;
                 }
 
-                if (fieldContainer.FindElements(By.TagName("input")).Any())
+                if (_client.Browser.Browser.FindElements(fieldContainer.Locator + "//input").Any())
                     return new string[0];
             }
             catch (Exception e)
@@ -1203,27 +1205,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         private string TryGetValue(Element fieldContainer, OptionSet control)
         {
-            bool success = fieldContainer.TryFindElement(By.TagName("select"), out IWebElement select);
+            bool success = _client.Browser.Browser.HasElement(fieldContainer + "//select");
             if (success)
             {
-                var options = select.FindElements(By.TagName("option"));
+                var select = _client.Browser.Browser.FindElement(fieldContainer + "//select");
+                var options = _client.Browser.Browser.FindElements(fieldContainer + "//select//option");
                 string result = GetSelectedOption(options);
                 return result;
             }
 
             var name = control.Name;
-            var hasStatusCombo = fieldContainer.HasElement(this._entityReference.EntityOptionsetStatusCombo.Replace("[NAME]", name));
+            var hasStatusCombo = _client.Browser.Browser.HasElement(fieldContainer.Locator + this._entityReference.EntityOptionsetStatusCombo.Replace("[NAME]", name));
             if (hasStatusCombo)
             {
                 // This is for statuscode (type = status) that should act like an optionset doesn't doesn't follow the same pattern when rendered
-                var valueSpan = fieldContainer.FindElement(this._entityReference.EntityOptionsetStatusTextValue.Replace("[NAME]", name));
+                var valueSpan = _client.Browser.Browser.FindElement(fieldContainer.Locator + this._entityReference.EntityOptionsetStatusTextValue.Replace("[NAME]", name));
                 return valueSpan.Text;
             }
 
             throw new InvalidOperationException($"OptionSet Field: '{name}' does not exist");
         }
 
-        private static string GetSelectedOption(ReadOnlyCollection<Element> options)
+        private static string GetSelectedOption(List<Element> options)
         {
             var selectedOption = options.FirstOrDefault(op => op.Selected);
             return selectedOption?.Text ?? string.Empty;
@@ -1240,42 +1243,42 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 var check = false;
 
-                var fieldContainer = driver.WaitUntilAvailable(this._entityReference.TextFieldContainer.Replace("[NAME]", option.Name));
+                var fieldContainer = this._entityReference.TextFieldContainer.Replace("[NAME]", option.Name);
 
-                var hasRadio = fieldContainer.HasElement(this._entityReference.EntityBooleanFieldRadioContainer.Replace("[NAME]", option.Name));
-                var hasCheckbox = fieldContainer.HasElement(this._entityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name));
-                var hasList = fieldContainer.HasElement(this._entityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name));
-                var hasToggle = fieldContainer.HasElement(this._entityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name));
+                var hasRadio = driver.HasElement(fieldContainer + this._entityReference.EntityBooleanFieldRadioContainer.Replace("[NAME]", option.Name));
+                var hasCheckbox = driver.HasElement(fieldContainer + this._entityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name));
+                var hasList = driver.HasElement(fieldContainer + this._entityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name));
+                var hasToggle = driver.HasElement(fieldContainer + this._entityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name));
 
                 if (hasRadio)
                 {
-                    var trueRadio = fieldContainer.FindElement(this._entityReference.EntityBooleanFieldRadioTrue.Replace("[NAME]", option.Name));
+                    var trueRadio = driver.FindElement(fieldContainer + this._entityReference.EntityBooleanFieldRadioTrue.Replace("[NAME]", option.Name));
 
-                    check = bool.Parse(trueRadio.GetAttribute("aria-checked"));
+                    check = bool.Parse(trueRadio.GetAttribute(_client,"aria-checked"));
                 }
                 else if (hasCheckbox)
                 {
-                    var checkbox = fieldContainer.FindElement(this._entityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name));
+                    var checkbox = driver.FindElement(fieldContainer + this._entityReference.EntityBooleanFieldCheckbox.Replace("[NAME]", option.Name));
 
-                    check = bool.Parse(checkbox.GetAttribute("aria-checked"));
+                    check = bool.Parse(checkbox.GetAttribute(_client, "aria-checked"));
                 }
                 else if (hasList)
                 {
-                    var list = fieldContainer.FindElement(this._entityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name));
-                    var options = list.FindElements(By.TagName("option"));
-                    var selectedOption = options.FirstOrDefault(a => a.HasAttribute("data-selected") && bool.Parse(a.GetAttribute("data-selected")));
+                    var list = driver.FindElement(fieldContainer + this._entityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name));
+                    var options = driver.FindElements(fieldContainer + this._entityReference.EntityBooleanFieldList.Replace("[NAME]", option.Name) + "//option");
+                    var selectedOption = options.FirstOrDefault(a => a.HasAttribute(_client,"data-selected") && bool.Parse(a.GetAttribute(_client,"data-selected")));
 
                     if (selectedOption != null)
                     {
-                        check = int.Parse(selectedOption.GetAttribute("value")) == 1;
+                        check = int.Parse(selectedOption.GetAttribute(_client,"value")) == 1;
                     }
                 }
                 else if (hasToggle)
                 {
-                    var toggle = fieldContainer.FindElement(this._entityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name));
-                    var link = toggle.FindElement(By.TagName("button"));
+                    var toggle = driver.FindElement(fieldContainer + this._entityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name));
+                    var link = driver.FindElement(fieldContainer + this._entityReference.EntityBooleanFieldToggle.Replace("[NAME]", option.Name) + "//button");
 
-                    check = bool.Parse(link.GetAttribute("aria-checked"));
+                    check = bool.Parse(link.GetAttribute(_client, "aria-checked"));
                 }
                 else
                     throw new InvalidOperationException($"Field: {option.Name} Does not exist");
@@ -1294,18 +1297,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Get Multi Select Value: {option.Name}"), driver =>
             {
                 MultiSelect multiSelect = new MultiSelect(_client.Configuration);
-                var containerXPath = By.XPath(multiSelect.DivContainer.Replace("[NAME]", option.Name));
+                var containerXPath = multiSelect.DivContainer.Replace("[NAME]", option.Name);
                 var container = driver.WaitUntilAvailable(containerXPath, $"Multi-select option set {option.Name} not found.");
 
-                container.Hover(driver, true);
-                var expandButtonXPath = By.XPath(multiSelect.ExpandCollapseButton);
-                if (container.TryFindElement(expandButtonXPath, out var expandButton) && expandButton.IsClickable())
+                container.Hover(_client,container.Locator);
+                var expandButtonXPath = driver.FindElement(container.Locator + multiSelect.ExpandCollapseButton);
+                var expandButton = driver.FindElement(container.Locator + expandButtonXPath);
+                if (driver.HasElement(container.Locator + expandButtonXPath) && expandButton.IsClickable)
                 {
-                    expandButton.Click();
+                    
+                    expandButton.Click(_client);
                 }
 
-                var selectedOptionsXPath = By.XPath(multiSelect.SelectedRecordLabel);
-                var selectedOptions = container.FindElements(selectedOptionsXPath);
+                var selectedOptionsXPath = multiSelect.SelectedRecordLabel;
+                var selectedOptions = driver.FindElements(containerXPath + selectedOptionsXPath);
 
                 return new MultiValueOptionSet
                 {
@@ -1322,7 +1327,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="control">The lookup field name of the lookup.</param>
         /// <example>xrmApp.Entity.GetValue(new DateTimeControl { Name = "scheduledstart" });</example>
         public BrowserCommandResult<DateTime?> EntityGetValue(DateTimeControl control)
-            => _client.Execute($"Get DateTime Value: {control.Name}", driver => DateTimeControl.TryGetValue(_client, container: driver, control: control));
+            => _client.Execute($"Get DateTime Value: {control.Name}", driver => DateTimeControl.TryGetValue(_client, control: control));
 
         /// <summary>
         /// Returns the ObjectId of the entity
@@ -1336,7 +1341,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 Guid oId;
                 if (!Guid.TryParse(objectId.ToString(), out oId))
-                    throw new NotFoundException("Unable to retrieve object Id for this entity");
+                    throw new KeyNotFoundException("Unable to retrieve object Id for this entity");
 
                 return oId;
             });
@@ -1354,7 +1359,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                 if (string.IsNullOrEmpty(entityName))
                 {
-                    throw new NotFoundException("Unable to retrieve Entity Name for this entity");
+                    throw new KeyNotFoundException("Unable to retrieve Entity Name for this entity");
                 }
 
                 return entityName;
@@ -1370,13 +1375,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Get Form Name"), driver =>
             {
                 // Wait for form selector visible
-                driver.WaitUntilVisible(By.XPath(this._entityReference.FormSelector));
+                driver.WaitUntilAvailable(this._entityReference.FormSelector);
 
                 string formName = driver.ExecuteScript("return Xrm.Page.ui.formContext.ui.formSelector.getCurrentItem().getLabel();").ToString();
 
                 if (string.IsNullOrEmpty(formName))
                 {
-                    throw new NotFoundException("Unable to retrieve Form Name for this entity");
+                    throw new KeyNotFoundException("Unable to retrieve Form Name for this entity");
                 }
 
                 return formName;
@@ -1392,13 +1397,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return _client.Execute(_client.GetOptions($"Get Header Title"), driver =>
             {
                 // Wait for form selector visible
-                var headerTitle = driver.WaitUntilVisible(By.XPath(this._entityReference.HeaderTitle), new TimeSpan(0, 0, 5));
+                var headerTitle = driver.WaitUntilAvailable(this._entityReference.HeaderTitle, new TimeSpan(0, 0, 5), "Header title not found with XPath: '" + this._entityReference.HeaderTitle + "'");
 
-                var headerTitleName = headerTitle?.GetAttribute("title");
+                var headerTitleName = headerTitle?.GetAttribute(_client, "title");
 
                 if (string.IsNullOrEmpty(headerTitleName))
                 {
-                    throw new NotFoundException("Unable to retrieve Header Title for this entity");
+                    throw new KeyNotFoundException("Unable to retrieve Header Title for this entity");
                 }
 
                 return headerTitleName;
@@ -1601,20 +1606,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Select Lookup Field {control.Name}"), driver =>
             {
-                if (driver.HasElement(By.XPath(this._entityReference.FieldLookupButton.Replace("[NAME]", control.Name))))
+                if (driver.HasElement(this._entityReference.FieldLookupButton.Replace("[NAME]", control.Name)))
                 {
-                    var lookupButton = driver.FindElement(By.XPath(this._entityReference.FieldLookupButton.Replace("[NAME]", control.Name)));
+                    var lookupButton = driver.FindElement(this._entityReference.FieldLookupButton.Replace("[NAME]", control.Name));
 
-                    lookupButton.Hover(driver);
+                    lookupButton.Hover(_client, lookupButton.Locator);
 
-                    driver.WaitForTransaction();
+                    driver.Wait();
 
-                    driver.FindElement(By.XPath(this._entityReference.SearchButtonIcon)).Click(true);
+                    driver.FindElement(this._entityReference.SearchButtonIcon).Click(_client, true);
                 }
                 else
-                    throw new NotFoundException($"Lookup field {control.Name} not found");
+                    throw new KeyNotFoundException($"Lookup field {control.Name} not found");
 
-                driver.WaitForTransaction();
+                driver.Wait();
 
                 return true;
             });
@@ -1688,19 +1693,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var xpathToContainer = this._entityReference.HeaderDateTimeFieldContainer.Replace("[NAME]", control.Name);
             return _client.Execute(_client.GetOptions($"Get Header DateTime Value {control.Name}"),
                 driver => ExecuteInHeaderContainer(driver, xpathToContainer,
-                    container => DateTimeControl.TryGetValue(_client, container, control)));
+                    container => DateTimeControl.TryGetValue(_client, control)));
         }
 
         internal BrowserCommandResult<string> GetStateFromForm()
         {
             return _client.Execute(_client.GetOptions($"Get Status value from form"), driver =>
             {
-                driver.WaitForTransaction();
-                if (!driver.TryFindElement(By.Id("message-formReadOnlyNotification"), out var readOnlyNotification))
+                driver.Wait();
+                if (!driver.HasElement("//*[id='message-formReadOnlyNotification']"))
                 {
                     return "Active";
                 }
-
+                var readOnlyNotification = driver.FindElement("//*[id='message-formReadOnlyNotification']");
                 var match = Regex.Match(readOnlyNotification.Text, "This record’s status: (.*)");
                 if (match.Success)
                 {
@@ -1713,7 +1718,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 }
                 catch (Exception ex)
                 {
-                    throw new NotFoundException("Unable to determine the status from the form. This can happen if you do not have access to edit the record and the state is not in the header.", ex);
+                    throw new KeyNotFoundException("Unable to determine the status from the form. This can happen if you do not have access to edit the record and the state is not in the header.", ex);
                 }
             });
         }
@@ -1804,7 +1809,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             {
                 TryExpandHeaderFlyout(driver);
 
-                BooleanItem.SetValue(_client, control, FormContextType.Header);
+                control.SetValue(_client, control, FormContextType.Header);
 
                 TryCloseHeaderFlyout(driver);
                 return true;
@@ -1829,28 +1834,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Select Form {formName}"), driver =>
             {
-                driver.WaitForTransaction();
+                driver.Wait();
 
-                if (!driver.HasElement(By.XPath(this._entityReference.FormSelector)))
-                    throw new NotFoundException("Unable to find form selector on the form");
+                if (!driver.HasElement(this._entityReference.FormSelector))
+                    throw new KeyNotFoundException("Unable to find form selector on the form");
 
-                var formSelector = driver.WaitUntilAvailable(By.XPath(this._entityReference.FormSelector));
+                var formSelector = driver.WaitUntilAvailable(this._entityReference.FormSelector);
                 // Click didn't work with IE
-                formSelector.SendKeys(Keys.Enter);
+                formSelector.SendKeys(_client,new string[] { Keys.Enter });
 
-                driver.WaitUntilVisible(By.XPath(this._entityReference.FormSelectorFlyout));
+                driver.WaitUntilAvailable(this._entityReference.FormSelectorFlyout);
 
-                var flyout = driver.FindElement(By.XPath(this._entityReference.FormSelectorFlyout));
-                var forms = flyout.FindElements(By.XPath(this._entityReference.FormSelectorItem));
+                var flyout = driver.FindElement(this._entityReference.FormSelectorFlyout);
+                var forms = driver.FindElements(flyout.Locator + this._entityReference.FormSelectorItem);
 
-                var form = forms.FirstOrDefault(a => a.GetAttribute("data-text").EndsWith(formName, StringComparison.OrdinalIgnoreCase));
+                var form = forms.FirstOrDefault(a => a.GetAttribute(_client,"data-text").EndsWith(formName, StringComparison.OrdinalIgnoreCase));
                 if (form == null)
-                    throw new NotFoundException($"Form {formName} is not in the form selector");
+                    throw new KeyNotFoundException($"Form {formName} is not in the form selector");
 
-                driver.ClickWhenAvailable(By.Id(form.GetAttribute("id")));
+                driver.ClickWhenAvailable(form.GetAttribute(_client, "id"));
 
-                driver.WaitForPageToLoad();
-                driver.WaitForTransaction();
+                driver.Wait(PageEvent.Load);
+                driver.Wait();
 
                 return true;
             });
@@ -1863,12 +1868,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             TryExpandHeaderFlyout(driver);
 
             var xpathToFlyout = this._entityReference.HeaderFlyout;
-            driver.WaitUntilVisible(xpathToFlyout, TimeSpan.FromSeconds(5),
-                flyout =>
-                {
-                    IWebElement container = flyout.FindElement(By.XPath(xpathToContainer));
-                    lookupValue = function(container);
-                });
+            var flyout = driver.WaitUntilAvailable(xpathToFlyout, TimeSpan.FromSeconds(5), "Flyout not available in header container.");
+            var container = driver.FindElement(xpathToContainer + xpathToFlyout);
+            lookupValue = function(container);
+                //flyout =>
+                //{
+                //    IWebElement container = flyout.FindElement(By.XPath(xpathToContainer));
+                //    lookupValue = function(container);
+                //}); ;
 
             return lookupValue;
         }
@@ -1881,10 +1888,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             var xPath = this._entityReference.HeaderFlyoutButton;
             var headerFlyoutButton = driver.FindElement(xPath);
-            bool expanded = bool.Parse(headerFlyoutButton.GetAttribute("aria-expanded"));
+            bool expanded = bool.Parse(headerFlyoutButton.GetAttribute(_client,"aria-expanded"));
 
             if (!expanded)
-                headerFlyoutButton.Click(true);
+                headerFlyoutButton.Click(_client,true);
         }
 
         //internal void TryCloseHeaderFlyout(IWebBrowser driver)

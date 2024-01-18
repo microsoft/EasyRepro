@@ -47,11 +47,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             return true;
         }
+        public void Hover(BrowserPage page, string key) { }
         public void Focus(BrowserPage page, string key)
         {
 
         }
-        public void SendKeys(BrowserPage page, string key)
+        public void SendKeys(BrowserPage page, string[] keys)
         {
 
         }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
+using Microsoft.Playwright;
 
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
@@ -24,7 +25,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             _driver.WaitUntilClickable(selector, "Can not click element");
             IWebElement element = GetElement(selector);
-
             if (element != null)
                 element.Click(true);
         }
