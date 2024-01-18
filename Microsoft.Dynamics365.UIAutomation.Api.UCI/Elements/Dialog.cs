@@ -208,7 +208,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         private readonly WebClient _client;
         #endregion
         #region ctor
-        public Dialogs(WebClient client) : base(client)
+        public Dialogs(WebClient client) : base()
         {
             _client = client;
         }
@@ -384,7 +384,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         /// <param name="option">The boolean field name.</param>
         public void SetValue(BooleanItem option)
         {
-            BooleanItem.SetValue(_client, option, FormContextType.Dialog);
+            option.SetValue(_client, option, FormContextType.Dialog);
         }
 
         /// <summary>
@@ -477,7 +477,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 if (driver.HasElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                 {
                     var command = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
-                    command.Click(true);
+                    command.Click(_client);
                     driver.Wait();
                 }
                 else
@@ -487,7 +487,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     {
                         var moreCommands = driver.FindElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton);
                         // Click More Commands
-                        moreCommands.Click(true);
+                        moreCommands.Click(_client);
                         driver.Wait();
 
                         //Click the button
@@ -495,7 +495,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         if (driver.HasElement(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList + _client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                         {
                             var overflowCommand = driver.FindElement(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList + _client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
-                            overflowCommand.Click(true);
+                            overflowCommand.Click(_client);
                             driver.Wait();
                         }
                         else
@@ -512,7 +512,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                         if (subbutton != null)
                         {
-                            subbutton.Click(true);
+                            subbutton.Click(_client);
                         }
                         else
                             throw new InvalidOperationException($"No sub command with the name '{subname}' exists inside of Commandbar.");
@@ -527,7 +527,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
                             if (subSecondButton != null)
                             {
-                                subSecondButton.Click(true);
+                                subSecondButton.Click(_client);
                             }
                             else
                                 throw new InvalidOperationException($"No sub command with the name '{subSecondName}' exists inside of Commandbar.");
@@ -562,7 +562,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     //Click the Confirm or Cancel button
                     Element buttonToClick;
                     buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.OkButton);
-                    buttonToClick.Click();
+                    buttonToClick.Click(_client);
                 }
 
                 return true;
@@ -612,7 +612,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                         !(driver?.FindElements(_client.ElementMapper.DialogsReference.WarningFooter + _client.ElementMapper.DialogsReference.WarningCloseButton).Count >
                           0)) return true;
                     var closeBtn = driver.FindElement(_client.ElementMapper.DialogsReference.WarningFooter + _client.ElementMapper.DialogsReference.WarningCloseButton);
-                    closeBtn.Click();
+                    closeBtn.Click(_client);
                 }
 
                 return true;
@@ -643,7 +643,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else
                         buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.CancelButton);
 
-                    buttonToClick.Click();
+                    buttonToClick.Click(_client);
                 }
 
                 return true;
@@ -685,7 +685,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else
                         buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.DuplicateDetectionCancelButton);
 
-                    buttonToClick.Click();
+                    buttonToClick.Click(_client);
                 }
 
                 if (clickSaveOrCancel)
@@ -724,7 +724,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else
                         buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.SetStateDialog + _client.ElementMapper.DialogsReference.SetStateCancelButton);
 
-                    buttonToClick.Click();
+                    buttonToClick.Click(_client);
                 }
 
                 return true;
@@ -757,7 +757,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     else
                         buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.PublishCancelButton);
 
-                    buttonToClick.Click();
+                    buttonToClick.Click(_client);
                 }
 
                 return true;
@@ -790,7 +790,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     //Set the User Or Team
                     var userOrTeamField = driver.WaitUntilAvailable(entityReference.TextFieldLookup, "User field unavailable");
                     var input = driver.ClickWhenAvailable(entityReference.TextFieldLookup + "//input");
-                    input.SendKeys(userOrTeamName);
+                    input.SendKeys(_client, new string[] { userOrTeamName });
 
                     _client.ThinkTime(2000);
 
@@ -822,14 +822,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 {
                     if (label.Text.Equals(processToSwitchTo, StringComparison.OrdinalIgnoreCase))
                     {
-                        label.Click();
+                        label.Click(_client);
                         break;
                     }
                 }
 
                 //Click the OK button
                 var okBtn = driver.FindElement(_client.ElementMapper.DialogsReference.SwitchProcessDialogOK);
-                okBtn.Click();
+                okBtn.Click(_client);
 
                 return true;
             });
@@ -873,10 +873,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                     if (driver.HasElement(_client.ElementMapper.EntityReference.DuplicateDetectionGridRows))
                     {
                         //Select the first record in the grid
-                        driver.FindElements(_client.ElementMapper.EntityReference.DuplicateDetectionGridRows)[0].Click(true);
+                        driver.FindElements(_client.ElementMapper.EntityReference.DuplicateDetectionGridRows)[0].Click(_client);
 
                         //Click Ignore and Save
-                        driver.FindElement(_client.ElementMapper.EntityReference.DuplicateDetectionIgnoreAndSaveButton).Click(true);
+                        driver.FindElement(_client.ElementMapper.EntityReference.DuplicateDetectionIgnoreAndSaveButton).Click(_client);
                         driver.Wait();
                     }
                 }

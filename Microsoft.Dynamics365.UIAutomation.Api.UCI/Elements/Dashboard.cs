@@ -29,7 +29,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
         public SubGrid SubGrid => this.GetElement<SubGrid>(_client);
 
-        public Dashboard(WebClient client) : base(client)
+        public Dashboard(WebClient client) : base()
         {
             _client = client;
         }
