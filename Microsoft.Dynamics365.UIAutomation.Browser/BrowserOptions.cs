@@ -220,10 +220,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
 
             options.AddUserProfilePreference("profile.cookie_controls_mode", this.CookieСontrolsMode);
-            options.AddArgument("--remote-debugging-port=9222");
-            options.AddArgument("--headless");
-            options.AddArgument("--no-sandbox");
-            options.AddArgument("--disable-dev-shm-usage");
+            //options.AddArgument("--remote-debugging-port=9222");
+            ////options.AddArgument("--headless");
+            //options.AddArgument("--no-sandbox");
+            //options.AddArgument("--disable-dev-shm-usage");
             return options;
         }
 

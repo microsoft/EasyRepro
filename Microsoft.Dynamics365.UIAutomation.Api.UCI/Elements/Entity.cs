@@ -937,7 +937,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 //Actions action = new Actions(driver);
                 //action.KeyDown(Keys.Control).SendKeys("S").Perform();
 
-                driver.SendKeys(new string[] { Keys.Control, "S" });
+                driver.SendKeys(_client.ElementMapper.EntityReference.Form, new string[] { Keys.Control, "S" });
 
                 Dialogs dialogs = new Dialogs(_client);
                 dialogs.HandleSaveDialog();

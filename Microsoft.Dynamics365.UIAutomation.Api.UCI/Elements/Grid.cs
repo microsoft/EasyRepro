@@ -553,7 +553,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             var topRow = CurrentRows.First();
             var firstCell = driver.FindElement(lastFloor.Locator + "//div[@aria-colindex='1']");
             lastFloor.Click(_client);
-            driver.SendKeys(new string[] { Keys.PageDown });
+            driver.SendKeys(rowGroupLocator, new string[] { Keys.PageDown });
             return Convert.ToInt32(driver.FindElements(rowGroupLocator).Last().GetAttribute(_client,"row-index"));
         }
         internal static string GetGridQueryKey(IWebBrowser driver, string dataSetName = null)

@@ -13,7 +13,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.SharedAPI
         {
             using (var browser = new InteractiveBrowser(TestSettings.Options))
             {
-                browser.Driver.Navigate().GoToUrl(_homePageUri);
+                browser.Navigate(_homePageUri);
             }
         }
 
@@ -22,7 +22,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.SharedAPI
         {
             using (var browser = new InteractiveBrowser(TestSettings.Options))
             {
-                browser.Driver.Navigate().GoToUrl(_homePageUri);
+                browser.Navigate(_homePageUri);
             }
         }
 
@@ -31,7 +31,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.SharedAPI
         {
             using (var browser = new InteractiveBrowser(TestSettings.Options))
             {
-                browser.Driver.Navigate().GoToUrl(_homePageUri);
+                browser.Navigate(_homePageUri);
             }
         }
 
@@ -40,7 +40,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.SharedAPI
         {
             using (var browser = new InteractiveBrowser(TestSettings.Options))
             {
-                browser.Driver.Navigate().GoToUrl(_homePageUri);
+                browser.Navigate(_homePageUri);
             }
         }
     }

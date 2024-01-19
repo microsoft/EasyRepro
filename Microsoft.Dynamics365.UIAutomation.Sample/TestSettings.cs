@@ -14,7 +14,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         public static string LookupField = "primarycontactid";
         public static string LookupName = "Nancy Anderson (sample)";
         private static readonly string Type = "Chrome";
-        private static string Framework = "Playwright";
+        private static readonly string Framework = "Other";
         private static readonly string RemoteType = "Chrome";
         private static readonly string RemoteHubServerURL = String.Empty;
         private static readonly string DriversPath = ConfigurationManager.AppSettings["DriversPath"] ?? string.Empty;
@@ -61,6 +61,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         {
             //BrowserFramework = SharedOptions.BrowserFramework,
             BrowserType = SharedOptions.BrowserType,
+            BrowserFramework = SharedOptions.BrowserFramework,
             PrivateMode = SharedOptions.PrivateMode,
             FireEvents = SharedOptions.FireEvents,
             Headless = SharedOptions.Headless,

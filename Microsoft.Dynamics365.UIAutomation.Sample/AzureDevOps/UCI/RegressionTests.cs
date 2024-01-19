@@ -56,9 +56,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
         #region Helper Methods
         private string TakeScreenshot(WebClient client, ICommandResult command)
         {
-            ScreenshotImageFormat fileFormat = ScreenshotImageFormat.Png;  // Image Format -> Png, Jpeg, Gif, Bmp and Tiff.
+            FileFormat fileFormat = FileFormat.Png;  // Image Format -> Png, Jpeg, Gif, Bmp and Tiff.
             string strFileName = String.Format("{2}_{0}.{1}", DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss"), fileFormat, command.CommandName.Replace(":",""));
-            client.Browser.TakeWindowScreenShot(strFileName, fileFormat);
+            client.Browser.Browser.TakeWindowScreenShot(strFileName, fileFormat);
             TestContext.AddResultFile(strFileName);
             return strFileName;
         }
@@ -146,7 +146,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             catch (System.Exception ex)
             {
                 telemetry.TrackException(ex);
-                WriteSource("EXCEPTION_Source_", client.Browser.Driver.PageSource);
+                //WriteSource("EXCEPTION_Source_", client.Browser.Browser.PageSource);
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
                 throw ex;
             }
@@ -230,7 +230,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             catch (System.Exception ex)
             {
                 telemetry.TrackException(ex);
-                WriteSource("EXCEPTION_Source_", client.Browser.Driver.PageSource);
+                //WriteSource("EXCEPTION_Source_", client.Browser.Driver.PageSource);
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
                 throw ex;
             }
@@ -314,7 +314,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             catch (System.Exception ex)
             {
                 telemetry.TrackException(ex);
-                WriteSource("EXCEPTION_Source_", client.Browser.Driver.PageSource);
+                //WriteSource("EXCEPTION_Source_", client.Browser.Driver.PageSource);
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
                 throw ex;
             }
@@ -335,6 +335,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             telemetry.Context.Operation.Id = Guid.NewGuid().ToString();
             telemetry.Context.Operation.ParentId = _sessionId;
             telemetry.Context.GlobalProperties.Add("Test", TestContext.TestName);
+            TestSettings.Options.BrowserFramework = BrowserFramework.Selenium;
             var client = new WebClient(TestSettings.Options);
             var xrmApp = new XrmApp(client);
             try
@@ -468,7 +469,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
             catch (System.Exception ex)
             {
                 telemetry.TrackException(ex);
-                WriteSource("EXCEPTION_Source_",client.Browser.Driver.PageSource);
+                //WriteSource("EXCEPTION_Source_",client.Browser.Driver.PageSource);
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
                 throw ex;
             }

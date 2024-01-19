@@ -33,7 +33,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             private string _crmUCIMainPage = "//*[contains(@data-id,'topBar')]";
             private string _staySignedIn = "//div[@data-viewid and contains(@data-bind, 'kmsi-view')]//input[@id='idSIButton9']";
             private string _oneTimeCode = "//input[@name='otc']";
-            private string _useAnotherAccount = "otherTile";
+            private string _useAnotherAccount = "//*[@id='otherTile']";
 
             public string UserId { get => _userId; set { _userId = value; } }
             public string LoginPassword { get => _loginPassword; set { _loginPassword = value; } }
@@ -125,7 +125,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 return LoginResult.Success;
 
             //driver.ClickIfVisible(By.Id(LoginReference.UseAnotherAccount));
-            _client.Browser.Browser.ClickWhenAvailable(_client.ElementMapper.LoginReference.UseAnotherAccount);
+            if (_client.Browser.Browser.HasElement(_client.ElementMapper.LoginReference.UseAnotherAccount))
+            {
+                _client.Browser.Browser.FindElement(_client.ElementMapper.LoginReference.UseAnotherAccount).Click(_client);
+            }
 
             bool waitingForOtc = false;
             bool success = EnterUserName(username);
@@ -148,7 +151,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (!waitingForOtc)
             {
                 //driver.ClickIfVisible(By.Id("aadTile"));
-                _client.Browser.Browser.ClickWhenAvailable("aadTile");
+                _client.Browser.Browser.ClickWhenAvailable("//*[@id='aadTile']");
                 _client.ThinkTime(1000);
 
                 //If expecting redirect then wait for redirect to trigger
@@ -224,16 +227,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             if (input == null)
                 return false;
 
-            input.SendKeys(_client, new string[] { username.ToUnsecureString() });
-            input.SendKeys(_client, new string[]{ Keys.Enter });
+            input.SetValue(_client, username.ToUnsecureString());
+            _client.Browser.Browser.SendKey(input.Locator, Keys.Enter);
             return true;
         }
 
         private void EnterPassword(SecureString password)
         {
             var input = _client.Browser.Browser.FindElement(_client.ElementMapper.LoginReference.LoginPassword);
-            input.SendKeys(_client, new string[] { password.ToUnsecureString() });
-            input.SendKeys(_client, new string[] { Keys.Enter });
+            input.SetValue(_client, password.ToUnsecureString());
+            _client.Browser.Browser.SendKey(input.Locator, Keys.Enter);
         }
 
         private bool EnterOneTimeCode(SecureString mfaSecretKey)
@@ -251,7 +254,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
                 var oneTimeCode = GenerateOneTimeCode(key);
                 Field objField = new Field(_client);
                 objField.SetInputValue(_client.Browser.Browser, input, oneTimeCode, 1.Seconds());
-                input.SendKeys(_client, new string[] { Keys.Enter });
+                _client.Browser.Browser.SendKey(input.Locator, Keys.Enter);
                 return true; // input found & code was entered
             }
             catch (Exception e)
@@ -264,7 +267,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
 
         private Element GetOtcInput()
-            => _client.Browser.Browser.WaitUntilAvailable(_client.ElementMapper.LoginReference.OneTimeCode, TimeSpan.FromSeconds(2), "");
+            => _client.Browser.Browser.WaitUntilAvailable(_client.ElementMapper.LoginReference.OneTimeCode);
 
         private bool ClickStaySignedIn()
         {

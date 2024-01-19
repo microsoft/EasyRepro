@@ -6,12 +6,26 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
 using Microsoft.Playwright;
+using System.Xml.Linq;
+using OpenQA.Selenium.Support.Extensions;
+using OpenQA.Selenium.Interactions;
 
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
     internal class SeleniumBrowser : IWebBrowser, IDisposable
     {
+        public string Url
+        {
+            get
+            {
+                return _driver.Url;
+            }
+            set
+            {
+                _driver.Url = value;
+            }
+        }
         private BrowserOptions _options;
         private IWebDriver _driver;
 
@@ -49,7 +63,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public void Navigate(string url)
         {
-            _driver.Navigate().GoToUrl(url);
+            //_driver.Navigate().GoToUrl(url);
+            _driver.Navigate().GoToUrl(new Uri(url));
         }
 
         public void SetValue(string selector, string value)
@@ -95,8 +110,40 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         private readonly bool disposeOfDriver = true;
         private bool disposing = false;
 
-        public string Url { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        string IWebBrowser.Url { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        private Element? ConvertToElement(IWebElement element, string selector)
+        {
+            Element rtnObject = new Element();
+            if (element == null) return null;
+            try
+            {
+                rtnObject.Text = element.Text;
+                rtnObject.Tag = element.TagName;
+                rtnObject.Selected = element.Selected;
+                rtnObject.Value = element.Text;
+                rtnObject.Id = element.GetAttribute("id");
+                rtnObject.Locator = selector;
+            }
+            catch (StaleElementReferenceException staleEx)
+            {
+                return null;
+                //throw;
+            }
+
+
+            return rtnObject;
+        }
+        private ICollection<Element> ConvertToElements(ICollection<IWebElement> elements, string selector)
+        {
+            ICollection<Element> rtnObject = new List<Element>();
+            foreach (var element in elements)
+            {
+                rtnObject.Add(ConvertToElement(element, selector));
+            }
+            return rtnObject;
+        }
         public void Dispose()
         {
             bool isDisposing;
@@ -118,7 +165,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public Element FindElement(string selector)
         {
             IWebElement seleniumElement = _driver.FindElement(By.XPath(selector));
-            return (Element) seleniumElement;
+            return ConvertToElement(seleniumElement, selector);
         }
 
         public void Wait(TimeSpan? timeout = null)
@@ -138,52 +185,82 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public bool HasElement(string selector)
         {
-            throw new NotImplementedException();
+            return _driver.HasElement(By.XPath(selector));
         }
 
-        public Element WaitUntilAvailable(string selector)
+        public Element? WaitUntilAvailable(string selector)
         {
-            throw new NotImplementedException();
+            IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector));
+            return ConvertToElement(element, selector);
         }
 
         public Element WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
         {
-            throw new NotImplementedException();
+            IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector), timeToWait, exceptionMessage);
+            return ConvertToElement(element, selector);
         }
 
         public Element WaitUntilAvailable(string selector, string exceptionMessage)
         {
-            throw new NotImplementedException();
+            IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector), exceptionMessage);
+            return ConvertToElement(element, selector);
         }
 
         public Element ClickWhenAvailable(string selector)
         {
-            throw new NotImplementedException();
+            IWebElement element = _driver.ClickIfVisible(By.XPath(selector), new TimeSpan(0,0,2));
+            return ConvertToElement(element, selector);
         }
 
         Element IWebBrowser.ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
         {
-            throw new NotImplementedException();
+            IWebElement element = _driver.ClickWhenAvailable(By.XPath(selector), timeToWait, exceptionMessage);
+            return ConvertToElement(element, selector);
         }
 
         public List<Element>? FindElements(string selector)
         {
-            throw new NotImplementedException();
+            ICollection<IWebElement> elements = _driver.FindElements(By.XPath(selector));
+            return ConvertToElements(elements, selector).ToList();
         }
 
-        public void SendKeys(string[] keys)
+        public void SendKeys(string locator, string[] keys)
         {
-            throw new NotImplementedException();
+            IWebElement element = _driver.FindElement(By.XPath(locator));
+            SeleniumExtensions.SendKeys(element, string.Join("",keys));
         }
 
         public void SwitchToFrame(string locator)
         {
-            throw new NotImplementedException();
+            if (int.TryParse(locator, out var frame))
+            {
+                _driver.SwitchTo().Frame(frame);
+            }
+            else
+                _driver.SwitchTo().Frame(locator);
         }
 
         public void Wait(PageEvent pageEvent)
         {
-            throw new NotImplementedException();
+            switch (pageEvent){
+                case PageEvent.Load:
+                    _driver.WaitForPageToLoad();
+                    break;
+                default:
+                    break;
+            }
+            
+        }
+
+        public void TakeWindowScreenShot(string fileName, FileFormat fileFormat)
+        {
+            _driver.TakeScreenshot();
+        }
+
+        public void SendKey(string locator, string key)
+        {
+            Actions keyPress = new Actions(_driver);
+            keyPress.SendKeys(OpenQA.Selenium.Keys.Enter).Perform();
         }
 
         #endregion Disposal / Finalization

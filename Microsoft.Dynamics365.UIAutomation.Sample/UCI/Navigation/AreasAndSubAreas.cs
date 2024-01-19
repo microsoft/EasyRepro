@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using OpenQA.Selenium;
+using Microsoft.Dynamics365.UIAutomation.Browser;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 {
@@ -30,7 +31,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 List<string> expectedAreas = new List<string> { "sales", "app settings", "sales insights settings", "personal settings", "help and support" };
 
-                Dictionary<string, IWebElement> areas = xrmApp.Navigation.OpenMenu();
+                Dictionary<string, Element> areas = xrmApp.Navigation.OpenMenu();
                 
 
                 List<string> actualAreas = new List<string>();
@@ -61,7 +62,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 List<string> expectedSubAreas = new List<string> { "Home","Recent","Pinned","Dashboards","Activities","Accounts","Contacts","Social Profiles","Cases","Queues","Knowledge Articles"};
 
-                Dictionary<string, IWebElement> subAreaMenuItems = xrmApp.Navigation.GetSubAreaMenuItems(client.Browser.Driver);
+                Dictionary<string, Element> subAreaMenuItems = xrmApp.Navigation.GetSubAreaMenuItems(client.Browser.Browser);
 
                 List<string> actualSubAreas = new List<string>();
 

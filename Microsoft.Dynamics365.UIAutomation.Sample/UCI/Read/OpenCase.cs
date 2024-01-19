@@ -75,11 +75,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.UCI
 
                 DateTimeControl dtControl = new DateTimeControl("msdyn_date");
 
-                xrmApp.Entity.SetValue(new DateTimeControl("msdyn_date") { Value = "1/1/1111" });
+                //xrmApp.Entity.SetValue(new DateTimeControl("msdyn_date") { Value = "1/1/1111" });
                 
                 BooleanItem boolControl = new BooleanItem();
 
-                xrmApp.Entity.SetValue(new BooleanItem("msdyn_bool") { Value = true });
+                xrmApp.Entity.SetValue(new BooleanItem() { Value = true });
                 xrmApp.ThinkTime(2000);
 
             }

@@ -172,7 +172,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             throw new NotImplementedException();
         }
 
-        public Element WaitUntilAvailable(string selector)
+        public Element? WaitUntilAvailable(string selector)
         {
             throw new NotImplementedException();
         }
@@ -202,7 +202,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             throw new NotImplementedException();
         }
 
-        public void SendKeys(string[] keys)
+        public void SendKeys(string locator, string[] keys)
         {
             throw new NotImplementedException();
         }
@@ -213,6 +213,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
 
         public void Wait(PageEvent pageEvent)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void TakeWindowScreenShot(string fileName, FileFormat fileFormat )
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SendKey(string locator, string key)
         {
             throw new NotImplementedException();
         }

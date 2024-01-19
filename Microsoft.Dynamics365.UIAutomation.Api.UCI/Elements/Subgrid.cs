@@ -551,7 +551,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             //actions.SendKeys(OpenQA.Selenium.Keys.PageDown).Perform();
 
             driver.FindElement(topRow.Locator + "//div[@role='listitem']//button").Focus(_client, topRow.Locator + "//div[@role='listitem']//button");
-            driver.SendKeys(new string[] { Keys.Alt, Keys.ArrowDown });
+            driver.SendKeys(grid.Locator, new string[] { Keys.Alt, Keys.ArrowDown });
             //actions.KeyDown(OpenQA.Selenium.Keys.Alt).SendKeys(OpenQA.Selenium.Keys.ArrowDown).Build().Perform();
             //return actions;
 

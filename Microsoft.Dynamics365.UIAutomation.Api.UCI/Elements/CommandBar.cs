@@ -329,7 +329,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
 
             return _client.Execute(_client.GetOptions($"Save"), driver =>
             {
-                driver.SendKeys(new string[] { Keys.Control, "S" });
+                driver.SendKeys(_client.ElementMapper.CommandBarReference.Button, new string[] { Keys.Control, "S" });
                 //driver.SendKeys("S");
 
                 //Actions action = new Actions(driver);

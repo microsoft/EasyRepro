@@ -55,12 +55,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
         public void SendKeys(BrowserPage page, string[] keys)
         {
-
+            page.Execute(new BrowserCommandOptions(), browser =>
+            {
+                browser.SendKeys(this.Locator, keys);
+                return true;
+            });
         }
         public virtual void SetValue(BrowserPage page, string value)
         {
             page.Execute(new BrowserCommandOptions(), browser =>
             {
+                browser.SetValue(this.Locator, value);
                 return true;
             });
         }
