@@ -13,8 +13,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             public const string BusinessProcessFlow = "BusinessProcessFlow";
             #region private prop
-            private string _NextStage_UCI = "//li[contains(@id,'processHeaderStage')]";
-            private string _Flyout_UCI = "//div[contains(@id,'businessProcessFlowFlyoutHeaderContainer')]";
+            private string _NextStage = "//li[contains(@id,'processHeaderStage')]";
+            private string _Flyout = "//div[contains(@id,'businessProcessFlowFlyoutHeaderContainer')]";
             private string _NextStageButton = "//button[contains(@data-id,'nextButtonContainer')]";
             private string _SetActiveButton = "//button[contains(@data-id,'setActiveButton')]";
             private string _BusinessProcessFlowFieldName = "//input[contains(@id,'[NAME]')]";
@@ -25,13 +25,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             private string _BooleanFieldContainer = ".//div[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-container\')]";
             private string _BooleanFieldSelectedOption = "//div[contains(@data-id, 'header_process_[NAME].fieldControl-checkbox-container')]//option[@data-selected='true']";
             private string _DateTimeFieldContainer = ".//input[contains(@data-id, \'[NAME].fieldControl-date-time-input\')]";
-            private string _FieldControlDateTimeInputUCI = ".//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]";
+            private string _FieldControlDateTimeInput = ".//input[contains(@data-id,'[FIELD].fieldControl-date-time-input')]";
             private string _PinStageButton = "//button[contains(@id,'stageDockModeButton')]";
             private string _CloseStageButton = "//button[contains(@id,'stageContentClose')]";
             #endregion
             #region prop
-            public string NextStage_UCI { get => _NextStage_UCI; set { _NextStage_UCI = value; } }
-            public string Flyout_UCI { get => _Flyout_UCI; set { _Flyout_UCI = value; } }
+            public string NextStage { get => _NextStage; set { _NextStage = value; } }
+            public string Flyout { get => _Flyout; set { _Flyout = value; } }
             public string NextStageButton { get => _NextStageButton; set { _NextStageButton = value; } }
             public string SetActiveButton { get => _SetActiveButton; set { _SetActiveButton = value; } }
             public string BusinessProcessFlowFieldName { get => _BusinessProcessFlowFieldName; set { _BusinessProcessFlowFieldName = value; } }
@@ -42,7 +42,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public string BooleanFieldContainer { get => _BooleanFieldContainer; set { _BooleanFieldContainer = value; } }
             public string BooleanFieldSelectedOption { get => _BooleanFieldSelectedOption; set { _BooleanFieldSelectedOption = value; } }
             public string DateTimeFieldContainer { get => _DateTimeFieldContainer; set { _DateTimeFieldContainer = value; } }
-            public string FieldControlDateTimeInputUCI { get => _FieldControlDateTimeInputUCI; set { _FieldControlDateTimeInputUCI = value; } }
+            public string FieldControlDateTimeInput { get => _FieldControlDateTimeInput; set { _FieldControlDateTimeInput = value; } }
             public string PinStageButton { get => _PinStageButton; set { _PinStageButton = value; } }
             public string CloseStageButton { get => _CloseStageButton; set { _CloseStageButton = value; } }
             #endregion
@@ -401,14 +401,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return _client.Execute(_client.GetOptions($"Next Stage"), driver =>
             {
                 //Find the Business Process Stages
-                var processStages = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage_UCI);
+                var processStages = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage);
 
                 if (processStages.Count == 0)
                     return true;
 
                 foreach (var processStage in processStages)
                 {
-                    var divs = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage_UCI + "//div");
+                    var divs = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage + "//div");
 
                     //Click the Label of the Process Stage if found
                     foreach (var div in divs)
@@ -420,14 +420,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                 }
 
-                var flyoutFooterControls = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.Flyout_UCI);
+                var flyoutFooterControls = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.Flyout);
 
                 foreach (var control in flyoutFooterControls)
                 {
                     //If there's a field to enter, fill it out
                     if (businessProcessFlowField != null)
                     {
-                        var bpfField = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.Flyout_UCI + _client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFieldName.Replace("[NAME]", businessProcessFlowField.Name));
+                        var bpfField = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.Flyout + _client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFieldName.Replace("[NAME]", businessProcessFlowField.Name));
 
                         if (bpfField != null)
                         {
@@ -440,7 +440,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
 
                     //Click the Next Stage Button
-                    var nextButton = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.Flyout_UCI + _client.ElementMapper.BusinessProcessFlowReference.NextStageButton);
+                    var nextButton = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.Flyout + _client.ElementMapper.BusinessProcessFlowReference.NextStageButton);
                     nextButton.Click(_client);
                 }
 
@@ -453,11 +453,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return _client.Execute(_client.GetOptions($"Select Stage: {stageName}"), driver =>
             {
                 //Find the Business Process Stages
-                var processStages = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage_UCI);
+                var processStages = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage);
 
                 foreach (var processStage in processStages)
                 {
-                    var divs = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage_UCI + "//div");
+                    var divs = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage + "//div");
 
                     //Click the Label of the Process Stage if found
                     foreach (var div in divs)

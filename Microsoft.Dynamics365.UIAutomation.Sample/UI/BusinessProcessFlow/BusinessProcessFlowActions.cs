@@ -7,11 +7,11 @@ using OpenQA.Selenium.DevTools.V109.Storage;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class BusinessProcessFlowActionUCI : TestsBase
+    public class BusinessProcessFlowAction : TestsBase
     {
 
         /// <summary>
-        ///  Business Process Flow - Open case record and call UCITestBusinessProcessFlowAction
+        ///  Business Process Flow - Open case record and call TestBusinessProcessFlowAction
         /// </summary>
         [TestCategory("BusinessProcessFlow")]
         [TestMethod]

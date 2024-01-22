@@ -10,15 +10,15 @@ using Microsoft.Dynamics365.UIAutomation.Sample;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.SharedAPI
 {
     [TestClass]
-    public class UploadTelemetryUCI : TestsBase
+    public class UploadTelemetry : TestsBase
     {
         private readonly string _azureKey = System.Configuration.ConfigurationManager.AppSettings["AzureKey"];
 
         [TestMethod]
-        public void SharedTestUploadTelemetryUCI()
+        public void SharedTestUploadTelemetry()
         {
             //Setting the options here to demonstrate what needs to 
-            //be set for tracking performance telemetry in UCI
+            //be set for tracking performance telemetry in 
             var options = TestSettings.Options;
             options.AppInsightsKey = _azureKey;
             options.PerformanceMode = true;

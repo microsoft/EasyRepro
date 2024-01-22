@@ -10,7 +10,7 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class SelectDashboardUCI : TestsBase
+    public class SelectDashboard : TestsBase
     {
 
         [TestCategory("Navigation")]

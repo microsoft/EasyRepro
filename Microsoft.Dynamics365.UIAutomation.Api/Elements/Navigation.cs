@@ -26,7 +26,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             private string _AreaMoreMenu = "//ul[@role=\"menubar\"]";
             private string _SubAreaContainer = "//*[@data-id=\"navbar-container\"]/div/ul";
             private string _WebAppMenuButton = "//*[@id=\"TabArrowDivider\"]/a";
-            private string _UCIAppMenuButton = "//a[@data-id=\"appBreadCrumb\"]";
+            private string _AppMenuButton = "//a[@data-id=\"appBreadCrumb\"]";
             private string _SiteMapLauncherButton = "//button[@data-lp-id=\"sitemap-launcher\"]";
             private string _SiteMapLauncherCloseButton = "//button[@data-id='navbutton']";
             private string _SiteMapAreaMoreButton = "//li[translate(@data-text,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz') = '[NAME]']";
@@ -52,8 +52,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             private string _SitemapMenuItems = "//li[contains(@data-id,'sitemap-entity')]";
             private string _SitemapSwitcherButton = "//button[contains(@data-id,'sitemap-areaSwitcher-expand-btn')]";
             private string _SitemapSwitcherFlyout = "//div[contains(@data-lp-id,'sitemap-area-switcher-flyout')]";
-            private string _UCIAppContainer = "//div[@id='AppLandingPageContentContainer']";
-            private string _UCIAppTile = "//div[@data-type='app-title' and @title='[NAME]']";
+            private string _AppContainer = "//div[@id='AppLandingPageContentContainer']";
+            private string _AppTile = "//div[@data-type='app-title' and @title='[NAME]']";
             private string _GoBack = "//button[@title='Go back']";
             #endregion
             public string AreaButton { get => _AreaButton; set { _AreaButton = value; } }
@@ -61,7 +61,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public string AreaMoreMenu { get => _AreaMoreMenu; set { _AreaMoreMenu = value; } }
             public string SubAreaContainer { get => _SubAreaContainer; set { _SubAreaContainer = value; } }
             public string WebAppMenuButton { get => _WebAppMenuButton; set { _WebAppMenuButton = value; } }
-            public string UCIAppMenuButton { get => _UCIAppMenuButton; set { _UCIAppMenuButton = value; } }
+            public string AppMenuButton { get => _AppMenuButton; set { _AppMenuButton = value; } }
             public string SiteMapLauncherButton { get => _SiteMapLauncherButton; set { _SiteMapLauncherButton = value; } }
             public string SiteMapLauncherCloseButton { get => _SiteMapLauncherCloseButton; set { _SiteMapLauncherCloseButton = value; } }
             public string SiteMapAreaMoreButton { get => _SiteMapAreaMoreButton; set { _SiteMapAreaMoreButton = value; } }
@@ -87,8 +87,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public string SitemapMenuItems { get => _SitemapMenuItems; set { _SitemapMenuItems = value; } }
             public string SitemapSwitcherButton { get => _SitemapSwitcherButton; set { _SitemapSwitcherButton = value; } }
             public string SitemapSwitcherFlyout { get => _SitemapSwitcherFlyout; set { _SitemapSwitcherFlyout = value; } }
-            public string UCIAppContainer { get => _UCIAppContainer; set { _UCIAppContainer = value; } }
-            public string UCIAppTile { get => _UCIAppTile; set { _UCIAppTile = value; } }
+            public string AppContainer { get => _AppContainer; set { _AppContainer = value; } }
+            public string AppTile { get => _AppTile; set { _AppTile = value; } }
             public string GoBack { get => _GoBack; set { _GoBack = value; } }
 
             public static class MenuRelatedReference
@@ -259,7 +259,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (!isSomeAppOpen)
                     success = TryToClickInAppTile(appName, driver);
                 else
-                    success = TryOpenAppFromMenu(driver, appName, _client.ElementMapper.NavigationReference.UCIAppMenuButton) ||
+                    success = TryOpenAppFromMenu(driver, appName, _client.ElementMapper.NavigationReference.AppMenuButton) ||
                               TryOpenAppFromMenu(driver, appName, _client.ElementMapper.NavigationReference.WebAppMenuButton);
 
                 if (!success)
@@ -704,7 +704,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         private bool TryOpenAppFromMenu(IWebBrowser driver, string appName, string appMenuButton)
         {
             bool found = false;
-            var xpathToAppMenu = _client.ElementMapper.NavigationReference.UCIAppMenuButton;
+            var xpathToAppMenu = _client.ElementMapper.NavigationReference.AppMenuButton;
             driver.Wait(new TimeSpan(0, 0, 5));
             var app = driver.ClickWhenAvailable(xpathToAppMenu);
             app.Click(_client);
@@ -763,8 +763,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             //    5.Seconds()
             //    );
 
-            var xpathToAppContainer = _client.ElementMapper.NavigationReference.UCIAppContainer;
-            var xpathToappTile = _client.ElementMapper.NavigationReference.UCIAppTile.Replace("[NAME]", appName);
+            var xpathToAppContainer = _client.ElementMapper.NavigationReference.AppContainer;
+            var xpathToappTile = _client.ElementMapper.NavigationReference.AppTile.Replace("[NAME]", appName);
 
             bool success = false;
             var appContainer = driver.WaitUntilAvailable(xpathToAppContainer);

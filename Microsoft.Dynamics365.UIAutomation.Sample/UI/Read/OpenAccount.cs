@@ -10,7 +10,7 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class OpenAccountUCI : TestsBase
+    public class OpenAccount : TestsBase
     {
         [TestCategory("Grid")]
         [TestCategory("EditableGrid")]

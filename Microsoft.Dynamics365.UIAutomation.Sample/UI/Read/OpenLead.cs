@@ -10,7 +10,7 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class OpenLeadUCI : TestsBase
+    public class OpenLead : TestsBase
     {
         [TestCategory("Grid")]
         [TestCategory("GridSearch")]

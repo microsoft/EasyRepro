@@ -13,7 +13,7 @@ using Microsoft.VisualBasic;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class CreateAccountUCI : TestsBase
+    public class CreateAccount : TestsBase
     {
         [TestCategory("Entity")]
         [TestMethod]

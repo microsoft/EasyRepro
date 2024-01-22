@@ -53,7 +53,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
                 xrmApp.Navigation.OpenApp(AppName.Sales);
                 xrmApp.Navigation.OpenGuidedHelp();
-                trace.Log("UCITestOpenGuidedHelp browser command count : " + client.CommandResults.Count());
+                trace.Log("TestOpenGuidedHelp browser command count : " + client.CommandResults.Count());
             }
         }
        

@@ -10,7 +10,7 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class OpenOpportunityUCIc: TestsBase
+    public class OpenOpportunityc: TestsBase
     {
 
         [TestCategory("Grid")]

@@ -52,8 +52,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             private string _RecordSetNavCollapseIcon = "//*[contains(@data-id, 'recordSetNavCollapseIcon')]";
             private string _RecordSetNavCollapseIconParent = "//*[contains(@data-id, 'recordSetNavCollapseIcon')]";
             private string _FieldControlDateTimeContainer = "//div[@data-id='[NAME]-FieldSectionItemContainer']";
-            private string _FieldControlDateTimeInputUCI = ".//*[contains(@data-id, '[FIELD].fieldControl-date-time-input')]";
-            private string _FieldControlDateTimeTimeInputUCI = ".//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input";
+            private string _FieldControlDateTimeInput = ".//*[contains(@data-id, '[FIELD].fieldControl-date-time-input')]";
+            private string _FieldControlDateTimeTimeInput = ".//div[contains(@data-id,'[FIELD].fieldControl._timecontrol-datetime-container')]/div/div/input";
             private string _Delete = "//button[contains(@data-id,'Delete')]";
             private string _Assign = "//button[contains(@data-id,'Assign')]";
             private string _MoreCommands = ".//button[contains(@data-id, 'OverflowButton') and contains(@data-lp-id, 'Form')]";
@@ -134,8 +134,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public string RecordSetNavCollapseIcon { get => _RecordSetNavCollapseIcon; set { _RecordSetNavCollapseIcon = value; } }
             public string RecordSetNavCollapseIconParent { get => _RecordSetNavCollapseIconParent; set { _RecordSetNavCollapseIconParent = value; } }
             public string FieldControlDateTimeContainer { get => _FieldControlDateTimeContainer; set { _FieldControlDateTimeContainer = value; } }
-            public string FieldControlDateTimeInputUCI { get => _FieldControlDateTimeInputUCI; set { _FieldControlDateTimeInputUCI = value; } }
-            public string FieldControlDateTimeTimeInputUCI { get => _FieldControlDateTimeTimeInputUCI; set { _FieldControlDateTimeTimeInputUCI = value; } }
+            public string FieldControlDateTimeInput { get => _FieldControlDateTimeInput; set { _FieldControlDateTimeInput = value; } }
+            public string FieldControlDateTimeTimeInput { get => _FieldControlDateTimeTimeInput; set { _FieldControlDateTimeTimeInput = value; } }
             public string Delete { get => _Delete; set { _Delete = value; } }
             public string Assign { get => _Assign; set { _Assign = value; } }
             public string MoreCommands { get => _MoreCommands; set { _MoreCommands = value; } }
@@ -528,7 +528,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         /// <summary>
         /// Open record set and navigate record index.
-        /// This method supersedes Navigate Up and Navigate Down outside of UCI 
+        /// This method supersedes Navigate Up and Navigate Down outside of UI 
         /// </summary>
         /// <param name="index">The index.</param>
         public void OpenRecordSetNavigator(int index = 0)
@@ -965,7 +965,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         /// <summary>
         /// Open record set and navigate record index.
-        /// This method supersedes Navigate Up and Navigate Down outside of UCI 
+        /// This method supersedes Navigate Up and Navigate Down outside of UI 
         /// </summary>
         /// <param name="index">The index.</param>
         /// <param name="thinkTime">Used to simulate a wait time between human interactions. The Default is 2 seconds.</param>
@@ -1080,7 +1080,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         text = input.GetAttribute(_client, "value").ToString();
 
                         // Needed if getting a date field which also displays time as there isn't a date specifc GetValue method
-                        var timefields = driver.FindElements(this._entityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", field));
+                        var timefields = driver.FindElements(this._entityReference.FieldControlDateTimeTimeInput.Replace("[FIELD]", field));
                         if (timefields.Any())
                         {
                             text += $" {timefields.First().GetAttribute(_client,"value")}";

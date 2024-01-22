@@ -11,7 +11,7 @@ using System.Collections.Generic;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class OpenContactUCI : TestsBase
+    public class OpenContact : TestsBase
     {
 
         [TestCategory("Grid")]

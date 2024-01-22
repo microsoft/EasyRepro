@@ -11,7 +11,7 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class AssignAccountUCI : TestsBase
+    public class AssignAccount : TestsBase
     {
 
         [TestCategory("Fail - DynamicData")]

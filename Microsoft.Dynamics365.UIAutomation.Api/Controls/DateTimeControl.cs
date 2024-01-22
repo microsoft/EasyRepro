@@ -51,7 +51,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 //browser.DoubleClick(selector);
 
                 //return true;
-                var xpathToDateField = client.ElementMapper.EntityReference.FieldControlDateTimeInputUCI.Replace("[FIELD]", field);
+                var xpathToDateField = client.ElementMapper.EntityReference.FieldControlDateTimeInput.Replace("[FIELD]", field);
 
                 var dateField = browser.WaitUntilAvailable(xpathToDateField, $"Field: {field} Does not exist");
                 string strDate = dateField.GetAttribute(client, "value");
@@ -61,7 +61,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var date = DateTime.Parse(strDate);
 
                 // Try get Time
-                var timeFieldXPath = client.ElementMapper.EntityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", field);
+                var timeFieldXPath = client.ElementMapper.EntityReference.FieldControlDateTimeTimeInput.Replace("[FIELD]", field);
                 bool success = browser.HasElement(timeFieldXPath);
                 if (!success)
                     return date;
@@ -84,7 +84,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             client.Execute(client.GetOptions("TrySetTime"),browser =>
             {
-                string timeFieldXPath = client.ElementMapper.EntityReference.FieldControlDateTimeTimeInputUCI.Replace("[FIELD]", control.Name);
+                string timeFieldXPath = client.ElementMapper.EntityReference.FieldControlDateTimeTimeInput.Replace("[FIELD]", control.Name);
 
                 Element formContext = null;
 
@@ -243,7 +243,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             Trace.WriteLine("Begin function: private void TrySetDateValue with DateTimeControl.");
             string controlName = control.Name;
             Element fieldContainer = null;
-            string xpathToInput = client.ElementMapper.EntityReference.FieldControlDateTimeInputUCI.Replace("[FIELD]", controlName);
+            string xpathToInput = client.ElementMapper.EntityReference.FieldControlDateTimeInput.Replace("[FIELD]", controlName);
 
             if (formContextType == FormContextType.QuickCreate)
             {

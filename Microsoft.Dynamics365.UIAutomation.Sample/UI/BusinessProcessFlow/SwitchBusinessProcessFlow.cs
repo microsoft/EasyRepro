@@ -6,7 +6,7 @@ using Microsoft.Dynamics365.UIAutomation.Api;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class SwitchBusinessProcessFlowUCI : TestsBase
+    public class SwitchBusinessProcessFlow : TestsBase
     {
         [TestCategory("BusinessProcessFlow")]
         [TestMethod]

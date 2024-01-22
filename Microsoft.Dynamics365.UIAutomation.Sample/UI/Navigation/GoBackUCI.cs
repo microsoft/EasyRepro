@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class GoBackUCI : TestsBase
+    public class GoBack : TestsBase
     {
         [TestCategory("Navigation")]
         [TestMethod]

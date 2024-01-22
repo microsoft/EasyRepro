@@ -10,7 +10,7 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample.AzureDevOps
 {
     [TestClass]
-    public class CreateAccountUCIDevOps
+    public class CreateAccountDevOps
     {
         private static string _username = "";
         private static string _password = "";

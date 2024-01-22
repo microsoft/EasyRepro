@@ -10,7 +10,7 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class UpdateCaseUCI : TestsBase
+    public class UpdateCase : TestsBase
     {
 
         [TestCategory("Entity")]

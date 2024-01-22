@@ -15,12 +15,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             #region private
             private string _DashboardSelector = "//span[contains(@id, 'Dashboard_Selector')]";
             private string _DashboardItem = "//li[contains(@title, '[NAME]')]";
-            private string _DashboardItemUCI = "//li[contains(@data-text, '[NAME]')]";
+            private string _DashboardItemUI = "//li[contains(@data-text, '[NAME]')]";
             #endregion
             #region prop
             public string DashboardSelector { get => _DashboardSelector; set { _DashboardSelector = value; } }
             public string DashboardItem { get => _DashboardItem; set { _DashboardItem = value; } }
-            public string DashboardItemUCI { get => _DashboardItemUCI; set { _DashboardItemUCI = value; } }
+            public string DashboardItemUI { get => _DashboardItemUI; set { _DashboardItemUI = value; } }
             #endregion
         }
         #endregion
@@ -62,7 +62,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 //Click the drop-down arrow
                 driver.ClickWhenAvailable(_client.ElementMapper.DashboardReference.DashboardSelector);
                 //Select the dashboard
-                driver.ClickWhenAvailable(_client.ElementMapper.DashboardReference.DashboardItemUCI.Replace("[NAME]", dashboardName));
+                driver.ClickWhenAvailable(_client.ElementMapper.DashboardReference.DashboardItemUI.Replace("[NAME]", dashboardName));
 
                 // Wait for Dashboard to load
                 driver.Wait();

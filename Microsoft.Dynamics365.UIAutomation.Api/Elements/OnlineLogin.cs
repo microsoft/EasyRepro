@@ -30,7 +30,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             private string _loginPassword = "//input[@type='password']";
             private string _signIn = "id(\"cred_sign_in_button\")";
             private string _crmMainPage = "//*[contains(@id,'crmTopBar') or contains(@data-id,'topBar')]";
-            private string _crmUCIMainPage = "//*[contains(@data-id,'topBar')]";
+            //private string _crmMainPage = "//*[contains(@data-id,'topBar')]";
             private string _staySignedIn = "//div[@data-viewid and contains(@data-bind, 'kmsi-view')]//input[@id='idSIButton9']";
             private string _oneTimeCode = "//input[@name='otc']";
             private string _useAnotherAccount = "//*[@id='otherTile']";
@@ -38,8 +38,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public string UserId { get => _userId; set { _userId = value; } }
             public string LoginPassword { get => _loginPassword; set { _loginPassword = value; } }
             public string SignIn { get => _signIn; set { _signIn = value; } }
+            //public string CrmMainPage { get => _crmMainPage; set { _crmMainPage = value; } }
             public string CrmMainPage { get => _crmMainPage; set { _crmMainPage = value; } }
-            public string CrmUCIMainPage { get => _crmUCIMainPage; set { _crmUCIMainPage = value; } }
             public string StaySignedIn { get => _staySignedIn; set { _staySignedIn = value; } }
             public string OneTimeCode { get => _oneTimeCode; set { _oneTimeCode = value; } }
             public string UseAnotherAccount { get => _useAnotherAccount; set { _useAnotherAccount = value; } }
@@ -190,8 +190,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             //IWebDriver driver = Browser;
             timeout = timeout ?? Constants.DefaultTimeout;
-            bool isUCI = _client.Browser.Browser.HasElement(_client.ElementMapper.LoginReference.CrmUCIMainPage);
-            if (isUCI)
+            bool isApp = _client.Browser.Browser.HasElement(_client.ElementMapper.LoginReference.CrmMainPage);
+            if (isApp)
                 _client.Browser.Browser.Wait();
             //successCallback = successCallback ?? (
             //                      _ =>
@@ -302,8 +302,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 driver.Navigate(uri.ToString());
                 driver.Wait(PageEvent.Load);
-                var isUCI = driver.HasElement(_client.ElementMapper.LoginReference.CrmUCIMainPage);
-                if (isUCI)
+                var isApp = driver.HasElement(_client.ElementMapper.LoginReference.CrmMainPage);
+                if (isApp)
                 {
                     driver.Wait(PageEvent.Load);
                     driver.Wait();

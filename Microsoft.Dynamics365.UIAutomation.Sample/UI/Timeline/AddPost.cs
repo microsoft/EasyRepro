@@ -7,7 +7,7 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class AddPostUCI : TestsBase
+    public class AddPost : TestsBase
     {
 
         [TestMethod]

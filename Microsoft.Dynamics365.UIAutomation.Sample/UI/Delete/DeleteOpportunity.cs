@@ -10,7 +10,7 @@ using System.Security;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class DeleteOpportunityUCI : TestsBase
+    public class DeleteOpportunity : TestsBase
     {
 
         [TestCategory("Dialogs")]

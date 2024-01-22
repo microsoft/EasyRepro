@@ -37,7 +37,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
         #region public
         /// <summary>
-        /// Enables Performance Center for UCI 
+        /// Enables Performance Center for UI 
         /// </summary>
         public void EnablePerformanceCenter()
         {
@@ -87,10 +87,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="additionalProperties">The additional properties you want to track in telemetry. These values will show up in the customDimensions of the customEvents</param>
         /// <param name="additionalMetrics">The additional metricsyou want to track in telemetry. These values will show up in the customMeasurements of the customEvents</param>
-        /// <exception cref="System.InvalidOperationException">UCI Performance Mode is not enabled.  Please enable performance mode in the Options before tracking performance telemetry.</exception>
+        /// <exception cref="System.InvalidOperationException">UI Performance Mode is not enabled.  Please enable performance mode in the Options before tracking performance telemetry.</exception>
         public void TrackPerformanceEvents(Dictionary<string, string> additionalProperties = null, Dictionary<string, double> additionalMetrics = null)
         {
-            if (!_client.Browser.Options.PerformanceMode) throw new InvalidOperationException("UCI Performance Mode is not enabled.  Please enable performance mode in the Options before tracking performance telemetry.");
+            if (!_client.Browser.Options.PerformanceMode) throw new InvalidOperationException("UI Performance Mode is not enabled.  Please enable performance mode in the Options before tracking performance telemetry.");
             ShowHidePerformanceWidget();
 
             Dictionary<string, string> metadata = GetMetadataMarkers();

@@ -8,7 +8,7 @@ using System;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class CreateActivityUCI : TestsBase
+    public class CreateActivity : TestsBase
     {
         [TestMethod]
         [TestCategory("RegressionTests")]
