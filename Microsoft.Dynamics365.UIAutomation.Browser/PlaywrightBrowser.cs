@@ -157,7 +157,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             _page.WaitForTimeoutAsync((float)timeout.Value.TotalMilliseconds);
         }
 
-        public void ClickWhenAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
+        public bool ClickWhenAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
         {
             throw new NotImplementedException();
         }
@@ -187,14 +187,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             throw new NotImplementedException();
         }
 
-        public Element ClickWhenAvailable(string selector)
+        public bool ClickWhenAvailable(string selector)
         {
             throw new NotImplementedException();
         }
 
-        Element IWebBrowser.ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
+        bool IWebBrowser.ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            ILocator locator = _page.Locator(selector);
+            locator.ClickAsync(new LocatorClickOptions()
+            {
+                
+            }).GetAwaiter().GetResult();
+            return true;
         }
 
         public List<Element>? FindElements(string selector)

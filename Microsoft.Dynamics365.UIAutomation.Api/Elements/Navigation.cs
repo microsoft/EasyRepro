@@ -706,8 +706,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             bool found = false;
             var xpathToAppMenu = _client.ElementMapper.NavigationReference.AppMenuButton;
             driver.Wait(new TimeSpan(0, 0, 5));
-            var app = driver.ClickWhenAvailable(xpathToAppMenu);
-            app.Click(_client);
+            var appClicked = driver.ClickWhenAvailable(xpathToAppMenu);
+            if (appClicked) driver.FindElement(xpathToAppMenu).Click(_client);
+            //app.Click(_client);
             found = TryToClickInAppTile(appName, driver) || OpenAppFromMenu(driver, appName);
             //driver.WaitUntilClickable(xpathToAppMenu, 5.Seconds(),
             //            appMenu =>
@@ -768,7 +769,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             bool success = false;
             var appContainer = driver.WaitUntilAvailable(xpathToAppContainer);
-            success = driver.ClickWhenAvailable(appContainer.Locator + xpathToappTile, TimeSpan.FromSeconds(5)).Locator != null;
+            success = driver.ClickWhenAvailable(appContainer.Locator + xpathToappTile, TimeSpan.FromSeconds(5)) != null;
             //driver.WaitUntilVisible(xpathToAppContainer, TimeSpan.FromSeconds(5),
             //    appContainer => success = appContainer.ClickWhenAvailable(xpathToappTile, TimeSpan.FromSeconds(5)) != null
             //    );

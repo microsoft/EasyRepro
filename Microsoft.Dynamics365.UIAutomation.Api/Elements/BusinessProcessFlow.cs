@@ -346,46 +346,49 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 if (driver.HasElement(dateField))
                 {
-                    var fieldElement = driver.ClickWhenAvailable(dateField);
+                    var dateFieldClicked = driver.ClickWhenAvailable(dateField);
+                    var fieldElement = driver.FindElement(dateField);
+                    if (dateFieldClicked) { 
 
-                    if (fieldElement.GetAttribute(_client, "value").Length > 0)
-                    {
-                        //fieldElement.Click();
-                        //fieldElement.SendKeys(date.ToString(format));
-                        //fieldElement.SendKeys(Keys.Enter);
+                        if (fieldElement.GetAttribute(_client, "value").Length > 0)
+                        {
+                            //fieldElement.Click();
+                            //fieldElement.SendKeys(date.ToString(format));
+                            //fieldElement.SendKeys(Keys.Enter);
 
-                        fieldElement.Click(_client);
-                        _client.ThinkTime(250);
-                        fieldElement.Click(_client);
-                        _client.ThinkTime(250);
-                        //fieldElement.SendKeys(Keys.Backspace);
-                        _client.ThinkTime(250);
-                        //fieldElement.SendKeys(Keys.Backspace);
-                        _client.ThinkTime(250);
-                        //fieldElement.SendKeys(Keys.Backspace);
-                        _client.ThinkTime(250);
-                        fieldElement.SetValue(_client, date.ToString(format));
-                        _client.ThinkTime(500);
-                        fieldElement.SendKeys(_client, new string[] { Keys.Tab });
-                        _client.ThinkTime(250);
-                    }
-                    else
-                    {
-                        fieldElement.Click(_client);
-                        _client.ThinkTime(250);
-                        fieldElement.Click(_client);
-                        _client.ThinkTime(250);
-                        //fieldElement.SendKeys(Keys.Backspace);
-                        //_client.ThinkTime(250);
-                        //fieldElement.SendKeys(Keys.Backspace);
-                        //_client.ThinkTime(250);
-                        //fieldElement.SendKeys(Keys.Backspace);
-                        _client.ThinkTime(250);
-                        fieldElement.SetValue(_client,date.ToString(format));
-                        _client.ThinkTime(250);
-                        fieldElement.SendKeys(_client, new string[] { Keys.Tab });
-                        _client.ThinkTime(250);
-                    }
+                            fieldElement.Click(_client);
+                            _client.ThinkTime(250);
+                            fieldElement.Click(_client);
+                            _client.ThinkTime(250);
+                            //fieldElement.SendKeys(Keys.Backspace);
+                            _client.ThinkTime(250);
+                            //fieldElement.SendKeys(Keys.Backspace);
+                            _client.ThinkTime(250);
+                            //fieldElement.SendKeys(Keys.Backspace);
+                            _client.ThinkTime(250);
+                            fieldElement.SetValue(_client, date.ToString(format));
+                            _client.ThinkTime(500);
+                            fieldElement.SendKeys(_client, new string[] { Keys.Tab });
+                            _client.ThinkTime(250);
+                        }
+                        else
+                        {
+                            fieldElement.Click(_client);
+                            _client.ThinkTime(250);
+                            fieldElement.Click(_client);
+                            _client.ThinkTime(250);
+                            //fieldElement.SendKeys(Keys.Backspace);
+                            //_client.ThinkTime(250);
+                            //fieldElement.SendKeys(Keys.Backspace);
+                            //_client.ThinkTime(250);
+                            //fieldElement.SendKeys(Keys.Backspace);
+                            _client.ThinkTime(250);
+                            fieldElement.SetValue(_client, date.ToString(format));
+                            _client.ThinkTime(250);
+                            fieldElement.SendKeys(_client, new string[] { Keys.Tab });
+                            _client.ThinkTime(250);
+                        }
+                }
                 }
                 else
                     throw new InvalidOperationException($"Field: {field} Does not exist");

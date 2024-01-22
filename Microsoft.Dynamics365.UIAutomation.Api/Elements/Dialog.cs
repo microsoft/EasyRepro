@@ -790,8 +790,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     //Set the User Or Team
                     var userOrTeamField = driver.WaitUntilAvailable(entityReference.TextFieldLookup, "User field unavailable");
-                    var input = driver.ClickWhenAvailable(entityReference.TextFieldLookup + "//input");
-                    input.SendKeys(_client, new string[] { userOrTeamName });
+                    var inputClicked = driver.ClickWhenAvailable(entityReference.TextFieldLookup + "//input");
+                    if (inputClicked) driver.FindElement(entityReference.TextFieldLookup + "//input").SetValue(_client, userOrTeamName);
+                    //input.SendKeys(_client, new string[] { userOrTeamName });
 
                     _client.ThinkTime(2000);
 

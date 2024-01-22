@@ -173,7 +173,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             SeleniumExtensions.WaitForTransaction(_driver, timeout);
         }
 
-        public void ClickWhenAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
+        public bool ClickWhenAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
         {
             throw new NotImplementedException();
         }
@@ -206,16 +206,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return ConvertToElement(element, selector);
         }
 
-        public Element ClickWhenAvailable(string selector)
+        public bool ClickWhenAvailable(string selector)
         {
-            IWebElement element = _driver.ClickIfVisible(By.XPath(selector), new TimeSpan(0,0,2));
-            return ConvertToElement(element, selector);
+            
+            try
+            {
+                IWebElement element = _driver.ClickIfVisible(By.XPath(selector), new TimeSpan(0, 0, 2));
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
         }
 
-        Element IWebBrowser.ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
+        bool IWebBrowser.ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
         {
-            IWebElement element = _driver.ClickWhenAvailable(By.XPath(selector), timeToWait, exceptionMessage);
-            return ConvertToElement(element, selector);
+            try
+            {
+                IWebElement element = _driver.ClickWhenAvailable(By.XPath(selector), timeToWait, exceptionMessage);
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(exceptionMessage);
+            }
+           
         }
 
         public List<Element>? FindElements(string selector)

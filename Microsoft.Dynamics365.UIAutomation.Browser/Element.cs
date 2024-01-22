@@ -31,7 +31,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 return true;
             });
         }
+        public bool ClickWhenAvailable(BrowserPage page, string key)
+        {
+            throw new  NotImplementedException("TBD");
 
+
+        }
+        public bool ClickWhenAvailable(BrowserPage page, string key, TimeSpan timeToWait, string? exceptionMessage = null)
+        {
+            throw new NotImplementedException("TBD");
+
+
+        }
         public void Click(BrowserPage page, bool? click = true)
         {
 
