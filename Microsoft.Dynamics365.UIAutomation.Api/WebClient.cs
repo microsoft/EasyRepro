@@ -127,6 +127,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         //    else return new Element(this);
         //}
 
+        #region TeachingBubbles
+        public void CloseTeachingBubbles(IWebBrowser driver)
+        {
+            if (driver.HasElement("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']"))
+            {
+                Trace.WriteLine(String.Format("Found {0} Clickable Teaching Bubbles.", driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']").Count));
+                foreach (var item in driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']"))
+                {
+                    item.Click(this);
+                }
+            }
+        }
+        #endregion
+
         //#region FormContextType
 
         // Used by SetValue methods to determine the field context

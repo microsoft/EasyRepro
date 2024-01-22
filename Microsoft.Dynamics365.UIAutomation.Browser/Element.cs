@@ -45,11 +45,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
         public void Click(BrowserPage page, bool? click = true)
         {
-
+            page.Execute(new BrowserCommandOptions(), browser =>
+            {
+                browser.ClickWhenAvailable(this.Locator);
+                return true;
+            });
         }
         public void DoubleClick(BrowserPage page, string key)
         {
-
+            page.Execute(new BrowserCommandOptions(), browser =>
+            {
+                browser.DoubleClick(key);
+                return true;
+            });
         }
         public string GetAttribute(BrowserPage page, string attributeName)
         {

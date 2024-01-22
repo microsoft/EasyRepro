@@ -43,13 +43,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 element.Click(true);
         }
 
-        public void DoubleClick(string selector)
+        public bool DoubleClick(string selector)
         {
             _driver.WaitUntilClickable(selector, "Can not click element");
             IWebElement element = GetElement(selector);
 
             if (element != null)
                 _driver.DoubleClick(element);
+
+            return true;
         }
 
         public void Focus(string selector)
@@ -281,6 +283,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             Actions keyPress = new Actions(_driver);
             keyPress.SendKeys(OpenQA.Selenium.Keys.Enter).Perform();
         }
+
+        //public bool DoubleClick(string selector)
+        //{
+        //    Actions act = new Actions(_driver);
+        //    IWebElement element = _driver.FindElement(By.XPath(selector));
+        //    act.DoubleClick(element);
+        //    return true;
+        //}
 
         #endregion Disposal / Finalization
     }

@@ -1,7 +1,11 @@
 ﻿using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.Playwright;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
 //using PlaywrightSharp;
 using System.Linq;
 using System.Text;
@@ -25,7 +29,51 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public BrowserOptions Options { get { return _options; } set { _options = value; } }
 
-        public string Url { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        string IWebBrowser.Url
+        {
+            get
+            {
+                return _page.Url;
+            }
+            set
+            {
+                throw new NotImplementedException("Cannot perform in Playwright");
+            }
+        }
+
+
+        private Element? ConvertToElement(ILocator element, string selector)
+        {
+            Element rtnObject = new Element();
+            if (element == null) return null;
+            try
+            {
+                rtnObject.Text = element.InnerTextAsync().Result;
+                //rtnObject.Tag = element.;
+                //rtnObject.Selected = element.IsCheckedAsync().Result;
+                rtnObject.Value = element.InnerTextAsync().Result;
+                rtnObject.Id = element.GetAttributeAsync("id").Result;
+                rtnObject.Locator = selector;
+            }
+            catch (StaleElementReferenceException staleEx)
+            {
+                return null;
+                //throw;
+            }
+
+
+            return rtnObject;
+        }
+
+        private ICollection<Element> ConvertToElements(IReadOnlyCollection<ILocator> elements, string selector)
+        {
+            ICollection<Element> rtnObject = new List<Element>();
+            foreach (var element in elements)
+            {
+                rtnObject.Add(ConvertToElement(element, selector));
+            }
+            return rtnObject;
+        }
 
         #region DoubleClick
         public void DoubleClick(string selector)
@@ -146,9 +194,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public Element FindElement(string selector)
         {
+            ILocator element = _page.Locator(selector);
             IElementHandle playWrightElement =  _page.QuerySelectorAsync(selector).GetAwaiter().GetResult();
             if (playWrightElement == null) { throw new PlaywrightException(String.Format("Could not find element using selector '{0}'", selector)); }
-            return (Element)playWrightElement;
+            return ConvertToElement(element, selector);
         }
 
         public void Wait(TimeSpan? timeout = null)
@@ -169,27 +218,60 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public bool HasElement(string selector)
         {
-            throw new NotImplementedException();
+            ILocator locator = _page.Locator(selector);
+            IElementHandle playWrightElement = _page.QuerySelectorAsync(selector).GetAwaiter().GetResult();
+            bool isAvailable = false;
+            if (playWrightElement != null) _page.WaitForSelectorAsync(selector).GetAwaiter().GetResult();
+            //locator.WaitForAsync().GetAwaiter().GetResult();
+            return (playWrightElement != null) ? true : false;
         }
 
         public Element? WaitUntilAvailable(string selector)
         {
-            throw new NotImplementedException();
+            ILocator locator = _page.Locator(selector);
+            locator.WaitForAsync().GetAwaiter().GetResult();
+            return ConvertToElement(locator, selector);
         }
 
         public Element WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
         {
-            throw new NotImplementedException();
+            //IElementHandle playWrightElement = _page.QuerySelectorAsync(selector).GetAwaiter().GetResult();
+            ILocator locator = _page.Locator(selector);
+            locator.WaitForAsync().GetAwaiter().GetResult();
+            //if (playWrightElement != null) 
+            return ConvertToElement(locator, selector);
         }
 
         public Element WaitUntilAvailable(string selector, string exceptionMessage)
         {
-            throw new NotImplementedException();
+            //IElementHandle playWrightElement = _page.QuerySelectorAsync(selector).GetAwaiter().GetResult();
+            ILocator locator = _page.Locator(selector);
+            locator.WaitForAsync().GetAwaiter().GetResult();
+            if (locator == null) throw new Exception(exceptionMessage);
+            return ConvertToElement(locator, selector);
         }
 
         public bool ClickWhenAvailable(string selector)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            ILocator locator = _page.Locator(selector);
+            try
+            {
+                locator.WaitForAsync(new LocatorWaitForOptions()
+                {
+                    Timeout = (float)Constants.DefaultTimeout.TotalMilliseconds
+                }).GetAwaiter().GetResult();
+                locator.ClickAsync(new LocatorClickOptions()
+                {
+
+                }).GetAwaiter().GetResult();
+                return true;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
         }
 
         bool IWebBrowser.ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
@@ -205,8 +287,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public List<Element>? FindElements(string selector)
         {
-            throw new NotImplementedException();
+            //IElementHandle playWrightElement = _page.QuerySelectorAsync(selector).GetAwaiter().GetResult();
+            ILocator locator = _page.Locator(selector);
+            //locator.WaitForAsync().GetAwaiter().GetResult();
+            IReadOnlyCollection<ILocator> elements = locator.AllAsync().GetAwaiter().GetResult();
+            //if (playWrightElement != null) 
+            return ConvertToElements(elements, selector).ToList();
         }
+
+
 
         public void SendKeys(string locator, string[] keys)
         {
@@ -215,12 +304,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public void SwitchToFrame(string locator)
         {
-            throw new NotImplementedException();
+            //IFrame frame = _page.Frame(locator);
+            //if (int.TryParse(locator, out int frameIndex)== 0) _page.MainFrame
+            //IFrameLocator frameLocator = frame.FrameLocator(locator);
+            
         }
 
         public void Wait(PageEvent pageEvent)
         {
-            throw new NotImplementedException();
+            _page.WaitForLoadStateAsync(LoadState.Load).GetAwaiter().GetResult();
         }
 
         public void TakeWindowScreenShot(string fileName, FileFormat fileFormat )
@@ -230,7 +322,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public void SendKey(string locator, string key)
         {
-            throw new NotImplementedException();
+
+            _page.Keyboard.PressAsync(key);
+        }
+
+        bool IWebBrowser.DoubleClick(string selector)
+        {
+            _page.DblClickAsync(selector).GetAwaiter().GetResult();
+            return true;
         }
 
         #endregion Disposal / Finalization

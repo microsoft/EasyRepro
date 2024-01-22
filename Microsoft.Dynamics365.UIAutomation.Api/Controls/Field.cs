@@ -165,11 +165,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             input.Clear(_client, input.Locator);
             input.Click(_client);
-            input.SendKeys(_client, new string[] { Keys.Control, "a" });
-            input.SendKeys(_client, new string[] { Keys.Control + "a" });
-            input.SendKeys(_client, new string[] { Keys.Backspace });
+            //input.SendKeys(_client, new string[] { Keys.Control, "a" });
+            //input.SendKeys(_client, new string[] { Keys.Control + "a" });
+            //input.SendKeys(_client, new string[] { Keys.Backspace });
             input.SetValue(_client, value);
-            driver.Wait();
+            //driver.Wait();
 
             // Repeat set value if expected value is not set
             // Do this to ensure that the static placeholder '---' is removed 

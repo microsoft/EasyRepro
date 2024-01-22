@@ -267,7 +267,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     case Grid.GridType.EditableGrid:
                         if (checkRecord)
                             driver.FindElement(gridControlCell.Locator + "//a[contains(@aria-label,'Read only')]").Click(_client);
-                            else driver.FindElement(gridControlCell.Locator + "//a[contains(@aria-label,'Read only')]").DoubleClick(_client, gridControlCell.Locator + "//a[contains(@aria-label,'Read only')]");
+                        else driver.FindElement(gridControlCell.Locator + "//a[contains(@aria-label,'Read only')]").DoubleClick(_client, gridControlCell.Locator + "//a[contains(@aria-label,'Read only')]");
                         break;
                     default: throw new Exception("Did not find Read Only or Power Apps Grid.");
                 }
@@ -302,16 +302,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 driver.Wait();
                 Trace.WriteLine("Click Record transaction complete.");
-                if (driver.HasElement("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']")){
-                    Trace.WriteLine(String.Format("Found {0} Clickable Teaching Bubbles.", driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']").Count));
-                    foreach (var item in driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']"))
-                    {
-                        item.Click(_client);
-                    }
-                }
+                _client.CloseTeachingBubbles(driver);
                 return true;
             });
         }
+
+
+
         /// <summary>
         /// Performs a Quick Find on the grid
         /// </summary>
@@ -324,7 +321,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             //find search bar
             //input value
             //pass results back
-
+            _client.CloseTeachingBubbles(_client.Browser.Browser);
             return _client.Execute(_client.GetOptions($"Search"), driver =>
             {
                 driver.WaitUntilAvailable(_client.ElementMapper.GridReference.QuickFind);
@@ -335,7 +332,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 }
 
                 driver.FindElement(_client.ElementMapper.GridReference.QuickFind).SendKeys(_client,new string[] { searchCriteria });
-                driver.FindElement(_client.ElementMapper.GridReference.QuickFind).SendKeys(_client,new string[] { Keys.Enter });
+                driver.SendKey(_client.ElementMapper.GridReference.QuickFind, Keys.Enter );
 
                 //driver.WaitForTransaction();
 

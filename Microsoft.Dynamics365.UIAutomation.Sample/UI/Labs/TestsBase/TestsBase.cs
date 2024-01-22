@@ -49,7 +49,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
 
             _username = _testContext.Properties["OnlineUsername"].ToString().ToSecureString();
             _password = _testContext.Properties["OnlinePassword"].ToString().ToSecureString();
-            _mfaSecretKey = _testContext.Properties["OnlinePassword"].ToString().ToSecureString();
+            _mfaSecretKey = _testContext.Properties["MfaSecretKey"].ToString().ToSecureString();
             _xrmUri = new Uri(_testContext.Properties["OnlineCrmUrl"].ToString());
             _framework = (BrowserFramework)Enum.Parse(typeof(BrowserFramework), _testContext.Properties["Framework"].ToString());
             TestSettings.Options.BrowserFramework = _framework;

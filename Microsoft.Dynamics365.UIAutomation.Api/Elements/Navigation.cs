@@ -277,6 +277,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (!success)
                     throw new InvalidOperationException($"App '{appName}' was found but app page was not loaded.");
 
+                _client.CloseTeachingBubbles(driver);
+
                 return true;
             });
         }
@@ -707,7 +709,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             var xpathToAppMenu = _client.ElementMapper.NavigationReference.AppMenuButton;
             driver.Wait(new TimeSpan(0, 0, 5));
             var appClicked = driver.ClickWhenAvailable(xpathToAppMenu);
-            if (appClicked) driver.FindElement(xpathToAppMenu).Click(_client);
+            //if (appClicked) driver.FindElement(xpathToAppMenu).Click(_client);
             //app.Click(_client);
             found = TryToClickInAppTile(appName, driver) || OpenAppFromMenu(driver, appName);
             //driver.WaitUntilClickable(xpathToAppMenu, 5.Seconds(),
@@ -730,6 +732,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 bool.TryParse(strSelected, out var selected);
                 if (!selected)
                 {
+                    element.Locator = "//*[@id='" + element.Id + "']";
                     element.Click(_client);
                 }
                 else
