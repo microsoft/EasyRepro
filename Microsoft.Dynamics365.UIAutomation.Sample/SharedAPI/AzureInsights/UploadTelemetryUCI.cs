@@ -2,10 +2,10 @@
 // Licensed under the MIT license.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.Dynamics365.UIAutomation.Api.UCI;
+using Microsoft.Dynamics365.UIAutomation.Api;
 using System.Linq;
 using System.Collections.Generic;
-using Microsoft.Dynamics365.UIAutomation.Sample.UCI;
+using Microsoft.Dynamics365.UIAutomation.Sample;
 
 namespace Microsoft.Dynamics365.UIAutomation.Sample.SharedAPI
 {
@@ -21,14 +21,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.SharedAPI
             //be set for tracking performance telemetry in UCI
             var options = TestSettings.Options;
             options.AppInsightsKey = _azureKey;
-            options.UCIPerformanceMode = true;
+            options.PerformanceMode = true;
             
             var client = new WebClient(options);
             using (var xrmApp = new XrmApp(client))
             {
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
 
-                xrmApp.Navigation.OpenApp(UCIAppName.Sales);
+                xrmApp.Navigation.OpenApp(AppName.Sales);
 
                 //Track Performance Center Telemetry
                 //----------------------------------------------------------------
@@ -60,9 +60,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.SharedAPI
 
                 //Track Browser Performance Telemetry
                 //----------------------------------------------------------------
-                xrmApp.Telemetry.TrackBrowserEvents(Api.UCI.Telemetry.BrowserEventType.Resource, null, true);
-                xrmApp.Telemetry.TrackBrowserEvents(Api.UCI.Telemetry.BrowserEventType.Navigation);
-                xrmApp.Telemetry.TrackBrowserEvents(Api.UCI.Telemetry.BrowserEventType.Server);
+                xrmApp.Telemetry.TrackBrowserEvents(Api.Telemetry.BrowserEventType.Resource, null, true);
+                xrmApp.Telemetry.TrackBrowserEvents(Api.Telemetry.BrowserEventType.Navigation);
+                xrmApp.Telemetry.TrackBrowserEvents(Api.Telemetry.BrowserEventType.Server);
                 //----------------------------------------------------------------
 
             }

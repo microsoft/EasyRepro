@@ -15,7 +15,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
     internal class SeleniumBrowser : IWebBrowser, IDisposable
     {
-        public string Url
+        string IWebBrowser.Url
         {
             get
             {
@@ -111,7 +111,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         private bool disposing = false;
 
 
-        string IWebBrowser.Url { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        //string IWebBrowser.Url { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         private Element? ConvertToElement(IWebElement element, string selector)
         {
@@ -187,7 +187,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             return _driver.HasElement(By.XPath(selector));
         }
-
+        
         public Element? WaitUntilAvailable(string selector)
         {
             IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector));
@@ -234,7 +234,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             if (int.TryParse(locator, out var frame))
             {
-                _driver.SwitchTo().Frame(frame);
+                if (frame == 0) { _driver.SwitchTo().ParentFrame(); }
+                else _driver.SwitchTo().Frame(frame);
             }
             else
                 _driver.SwitchTo().Frame(locator);

@@ -32,8 +32,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             this.HideDiagnosticWindow = true;
             this.Height = null;
             this.Width = null;
-            this.UCITestMode = true;
-            this.UCIPerformanceMode = false;
+            this.TestMode = true;
+            this.PerformanceMode = false;
             this.AppInsightsKey = string.Empty;
             this.DisableExtensions = false;
             this.DisableFeatures = false;
@@ -107,12 +107,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         /// This flag introduces full loading patterns that are not typical of a normal user experience, but are required for full DOM interaction.
         /// Please raise any issues with this TestMode being enabled to the Microsoft/EasyRepro community on GitHub for review.
         /// </summary>
-        public bool UCITestMode { get; set; }
+        public bool TestMode { get; set; }
 
         /// <summary>
         /// Gets or sets the Performance Mode to enable performance center telemetry. 
         /// </summary>
-        public bool UCIPerformanceMode { get; set; }
+        public bool PerformanceMode { get; set; }
 
         /// <summary>
         /// Gets or sets the Application Insights Instrumentation Key to write telemetry to. 

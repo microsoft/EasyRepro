@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
-using Microsoft.Dynamics365.UIAutomation.Api.UCI;
+using Microsoft.Dynamics365.UIAutomation.Api;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System.Configuration;
 
@@ -37,8 +37,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             DefaultThinkTime = 2000,
             RemoteBrowserType = (BrowserType)Enum.Parse(typeof(BrowserType), RemoteType),
             RemoteHubServer = (!String.IsNullOrEmpty(RemoteHubServerURL)) ? new Uri(RemoteHubServerURL) : null,
-            UCITestMode = true,
-            UCIPerformanceMode = false,
+            TestMode = true,
+            PerformanceMode = false,
             ConfigPath = Path.IsPathRooted(ConfigPath) ? ConfigPath : Path.Combine(Directory.GetCurrentDirectory(), ConfigPath),
             DriversPath = Path.IsPathRooted(DriversPath) ? DriversPath : Path.Combine(Directory.GetCurrentDirectory(), DriversPath), 
             DisableExtensions = false,
@@ -70,8 +70,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             DefaultThinkTime = SharedOptions.DefaultThinkTime,
             RemoteBrowserType = SharedOptions.RemoteBrowserType,
             RemoteHubServer = SharedOptions.RemoteHubServer,
-            UCITestMode = SharedOptions.UCITestMode,
-            UCIPerformanceMode = SharedOptions.UCIPerformanceMode,
+            TestMode = SharedOptions.TestMode,
+            PerformanceMode = SharedOptions.PerformanceMode,
             ConfigPath = SharedOptions.ConfigPath,
             DriversPath = SharedOptions.DriversPath,
             DisableExtensions = SharedOptions.DisableExtensions,
@@ -129,7 +129,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         }
     }
 
-    public static class UCIAppName
+    public static class AppName
     {
         public const string Sales = "Sales Hub";
         public const string CustomerService = "Customer Service Hub";
