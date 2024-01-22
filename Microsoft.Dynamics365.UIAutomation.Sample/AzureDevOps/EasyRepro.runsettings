@@ -43,6 +43,7 @@
     <Parameter name="OnlineUsername" value="" />
     <Parameter name="OnlinePassword" value="" />
     <Parameter name="OnlineCrmUrl" value="" />
+    <Parameter name="MfaSecretKey" value="" />
     <!-- 0=Selenium,1=Playwright-->
     <Parameter name="Framework" value="Playwright" />
     <Parameter name="BrowserType" value="Chrome" />
