@@ -155,6 +155,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public void Navigate(string url)
         {
             _page.GotoAsync(url).GetAwaiter().GetResult();
+            _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+            //_page.WaitForURLAsync(url).GetAwaiter().GetResult();
         }
         public async void NavigateAsync(string url)
         {
@@ -203,7 +205,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public void Wait(TimeSpan? timeout = null)
         {
             timeout = timeout ?? Constants.DefaultTimeout;
-            _page.WaitForTimeoutAsync((float)timeout.Value.TotalMilliseconds);
+            _page.WaitForTimeoutAsync((float)timeout.Value.TotalMilliseconds).Wait();
         }
 
         public bool ClickWhenAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
@@ -219,16 +221,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool HasElement(string selector)
         {
             ILocator locator = _page.Locator(selector);
-            IElementHandle playWrightElement = _page.QuerySelectorAsync(selector).GetAwaiter().GetResult();
-            bool isAvailable = false;
-            if (playWrightElement != null) _page.WaitForSelectorAsync(selector).GetAwaiter().GetResult();
             //locator.WaitForAsync().GetAwaiter().GetResult();
-            return (playWrightElement != null) ? true : false;
+            _page.WaitForLoadStateAsync(LoadState.DOMContentLoaded).GetAwaiter().GetResult();
+            _page.WaitForURLAsync(_page.Url).GetAwaiter().GetResult();
+            //_page.WaitForSelectorAsync(selector, new PageWaitForSelectorOptions()
+            //{
+            //    Timeout = 1000
+            //}).GetAwaiter().GetResult();
+            //IElementHandle playWrightElement = _page.QuerySelectorAsync(selector).GetAwaiter().GetResult();
+            try
+            {
+                //_page.WaitForSelectorAsync(selector).GetAwaiter().GetResult();
+                locator.WaitForAsync().GetAwaiter().GetResult();
+                return true;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+
         }
 
         public Element? WaitUntilAvailable(string selector)
         {
-            ILocator locator = _page.Locator(selector);
+            ILocator locator = SwitchedFrame.Locator(selector);
             locator.WaitForAsync().GetAwaiter().GetResult();
             return ConvertToElement(locator, selector);
         }
@@ -304,15 +321,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public void SwitchToFrame(string locator)
         {
-            //IFrame frame = _page.Frame(locator);
-            //if (int.TryParse(locator, out int frameIndex)== 0) _page.MainFrame
-            //IFrameLocator frameLocator = frame.FrameLocator(locator);
-            
+            SwitchedFrame = _page.Frame(locator);
+            //if (int.TryParse(locator, out int frameIndex)) { }
+            //else { IFrameLocator frameLocator = frame.FrameLocator(locator); }
+            //_page.Frame("AppLandingPage").QuerySelectorAsync("//div[@id='AppLandingPageContentContainer']").GetAwaiter().GetResult()
+        }
+        private IFrame _switchedFrame;
+        private IFrame SwitchedFrame
+        {
+            get
+            {
+                if (_switchedFrame == null) return _page.MainFrame;
+                return _switchedFrame;
+            }
+            set
+            {
+                _switchedFrame = value;
+            }
         }
 
         public void Wait(PageEvent pageEvent)
         {
             _page.WaitForLoadStateAsync(LoadState.Load).GetAwaiter().GetResult();
+            _page.WaitForURLAsync(_page.Url).GetAwaiter().GetResult();
+            _page.WaitForTimeoutAsync(1000).Wait();
+            //_page.WaitForWorkerAsync().Wait();
         }
 
         public void TakeWindowScreenShot(string fileName, FileFormat fileFormat )

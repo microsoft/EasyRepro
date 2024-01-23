@@ -418,6 +418,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     return true;
 
                 var testModeUri = uri + queryParams;
+                driver.Wait(new TimeSpan(0,0,2));
                 driver.Navigate(testModeUri);
 
                 // Again wait for loading
