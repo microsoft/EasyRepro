@@ -117,7 +117,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         private IElement? ConvertToElement(IWebElement element, string selector)
         {
-            IElement rtnObject = new SeleniumElement(element);
+            IElement rtnObject = new SeleniumElement(_driver, element);
             if (element == null) return null;
             try
             {
@@ -236,7 +236,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
                 throw new Exception(exceptionMessage);
             }
-           
+
         }
 
         public List<IElement>? FindElements(string selector)
@@ -258,8 +258,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 if (frame == 0) { _driver.SwitchTo().ParentFrame(); }
                 else _driver.SwitchTo().Frame(frame);
             }
-            else
+            else {
+                _driver.WaitUntilAvailable(By.Id(locator));
                 _driver.SwitchTo().Frame(locator);
+            }
         }
 
         public void Wait(PageEvent pageEvent)
@@ -292,13 +294,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public IElement Test(string selector, string exceptionMessage)
         {
-            _interfaceElement = new SeleniumElement(_driver.FindElement(By.XPath(selector)));
-            _element = _driver.FindElement(By.XPath(selector)); 
+            _interfaceElement = new SeleniumElement(_driver, _driver.FindElement(By.XPath(selector)));
             
             return _interfaceElement;
         }
 
-        private IWebElement _element;
         private SeleniumElement _interfaceElement;
 
         //public bool DoubleClick(string selector)

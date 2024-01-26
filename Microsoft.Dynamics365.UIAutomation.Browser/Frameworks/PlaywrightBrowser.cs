@@ -291,16 +291,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
         }
 
-        bool IWebBrowser.ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
-        {
-            //throw new NotImplementedException();
-            ILocator locator = _page.Locator(selector);
-            locator.ClickAsync(new LocatorClickOptions()
-            {
+        //bool IWebBrowser.ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
+        //{
+        //    //throw new NotImplementedException();
+        //    ILocator locator = _page.Locator(selector);
+        //    locator.ClickAsync(new LocatorClickOptions()
+        //    {
                 
-            }).GetAwaiter().GetResult();
-            return true;
-        }
+        //    }).GetAwaiter().GetResult();
+        //    return true;
+        //}
 
         public List<IElement>? FindElements(string selector)
         {
@@ -359,11 +359,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             _page.Keyboard.PressAsync(key);
         }
 
-        bool IWebBrowser.DoubleClick(string selector)
-        {
-            _page.DblClickAsync(selector).GetAwaiter().GetResult();
-            return true;
-        }
+        //bool IWebBrowser.DoubleClick(string selector)
+        //{
+        //    _page.DblClickAsync(selector).GetAwaiter().GetResult();
+        //    return true;
+        //}
 
         public string? FindElementAttribute(string selector, string attribute)
         {

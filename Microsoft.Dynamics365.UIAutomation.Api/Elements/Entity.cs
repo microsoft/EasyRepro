@@ -1202,11 +1202,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         private string TryGetValue(IElement fieldContainer, OptionSet control)
         {
-            bool success = _client.Browser.Browser.HasElement(fieldContainer + "//select");
+            bool success = _client.Browser.Browser.HasElement(fieldContainer.Locator + "//select");
             if (success)
             {
-                var select = _client.Browser.Browser.FindElement(fieldContainer + "//select");
-                var options = _client.Browser.Browser.FindElements(fieldContainer + "//select//option");
+                var select = _client.Browser.Browser.FindElement(fieldContainer.Locator + "//select");
+                var options = _client.Browser.Browser.FindElements(fieldContainer.Locator + "//select//option");
                 string result = GetSelectedOption(options);
                 return result;
             }
@@ -1867,7 +1867,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             var xpathToFlyout = this._entityReference.HeaderFlyout;
             var flyout = driver.WaitUntilAvailable(xpathToFlyout, TimeSpan.FromSeconds(5), "Flyout not available in header container.");
-            var container = driver.FindElement(xpathToContainer + xpathToFlyout);
+            var container = driver.FindElement(xpathToContainer);
             lookupValue = function(container);
                 //flyout =>
                 //{

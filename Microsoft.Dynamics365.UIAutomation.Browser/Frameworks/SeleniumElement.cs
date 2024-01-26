@@ -11,8 +11,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
     internal class SeleniumElement : IElement
     {
+        private IWebDriver _driver;
         private IWebElement _element;
-        public SeleniumElement(IWebElement element) {
+        public SeleniumElement(IWebDriver driver, IWebElement element) {
+            _driver = driver;
             _element = element;
 
         }
@@ -58,7 +60,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             page.Execute(new BrowserCommandOptions(), browser =>
             {
-                browser.DoubleClick(key);
+                _driver.DoubleClick(_element);
                 return true;
             });
         }
