@@ -133,9 +133,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var result = new Dictionary<string, IElement>();
                 foreach (var viewItem in viewItems)
                 {
-                    var newIIElement = driver.Test(_client.ElementMapper.GridReference.ViewContainer, "");
-                    var newIIElementtwo = driver.Test(_client.ElementMapper.GridReference.ViewContainer, "");
-                    var newRole = newIIElement.GetAttribute(_client, "role");
 
                     var role = viewItem.GetAttribute(_client,"role");
 

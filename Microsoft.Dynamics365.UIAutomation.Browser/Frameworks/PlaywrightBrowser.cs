@@ -46,39 +46,39 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return _page.EvaluateAsync(script, args);
         }
         #endregion
-        private IElement? ConvertToElement(ILocator element, string selector)
-        {
-            IElement rtnObject = new PlaywrightElement(element);
-            if (element == null) return null;
-            try
-            {
-                rtnObject.Text = element.InnerTextAsync().Result;
-                //rtnObject.Tag = element.;
-                //rtnObject.Selected = element.IsCheckedAsync().Result;
-                rtnObject.Value = element.InnerTextAsync().Result;
-                rtnObject.Id = element.GetAttributeAsync("id").Result;
-                rtnObject.Locator = selector;
-            }
-            catch (StaleElementReferenceException staleEx)
-            {
-                return null;
-                //throw;
-            }
+        //private IElement? ConvertToElement(ILocator element, string selector)
+        //{
+        //    IElement rtnObject = new PlaywrightElement(element);
+        //    if (element == null) return null;
+        //    try
+        //    {
+        //        rtnObject.Text = element.InnerTextAsync().Result;
+        //        //rtnObject.Tag = element.;
+        //        //rtnObject.Selected = element.IsCheckedAsync().Result;
+        //        rtnObject.Value = element.InnerTextAsync().Result;
+        //        rtnObject.Id = element.GetAttributeAsync("id").Result;
+        //        rtnObject.Locator = selector;
+        //    }
+        //    catch (StaleElementReferenceException staleEx)
+        //    {
+        //        return null;
+        //        //throw;
+        //    }
 
 
 
-            return rtnObject;
-        }
+        //    return rtnObject;
+        //}
 
-        private ICollection<IElement> ConvertToElements(IReadOnlyCollection<ILocator> elements, string selector)
-        {
-            ICollection<IElement> rtnObject = new List<IElement>();
-            foreach (var element in elements)
-            {
-                rtnObject.Add(ConvertToElement(element, selector));
-            }
-            return rtnObject;
-        }
+        //private ICollection<IElement> ConvertToElements(IReadOnlyCollection<ILocator> elements, string selector)
+        //{
+        //    ICollection<IElement> rtnObject = new List<IElement>();
+        //    foreach (var element in elements)
+        //    {
+        //        rtnObject.Add(ConvertToElement(element, selector));
+        //    }
+        //    return rtnObject;
+        //}
 
         #region SendKeys
 
@@ -102,16 +102,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             await _page.GotoAsync(url);
         }
         #endregion
-        bool ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
-        {
-            //throw new NotImplementedException();
-            ILocator locator = _page.Locator(selector);
-            locator.ClickAsync(new LocatorClickOptions()
-            {
 
-            }).GetAwaiter().GetResult();
-            return true;
-        }
         #region SwitchToFrame
 
         public void SwitchToFrame(string name)
@@ -301,6 +292,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
         }
 
+        public bool ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
+        {
+            //throw new NotImplementedException();
+            ILocator locator = _page.Locator(selector);
+            locator.ClickAsync(new LocatorClickOptions()
+            {
+
+            }).GetAwaiter().GetResult();
+            return true;
+        }
+
+        public bool ClickWhenAvailable(string selector)
+        {
+            ILocator locator = _page.Locator(selector);
+            locator.ClickAsync(new LocatorClickOptions()
+            {
+
+            }).GetAwaiter().GetResult();
+            return true;
+        }
+
+
 
         #endregion Disposal / Finalization
 
@@ -313,6 +326,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         //    return true;
         //}
 
-       
+
     }
 }

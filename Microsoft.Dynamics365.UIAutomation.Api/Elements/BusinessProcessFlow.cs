@@ -321,7 +321,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (option.Value != existingValue)
                 {
                     fieldContainer.Click(_client);
-                    //fieldContainer.ClickWhenAvailable("//option[not(@data-selected)]");
+                    //driver.ClickWhenAvailable(fieldContainer.Locator + "//option[not(@data-selected)]");
                     driver.ClickWhenAvailable(_client.ElementMapper.BusinessProcessFlowReference.BooleanFieldContainer.Replace("[NAME]", option.Name) + "//option[not(@data-selected)]");
                 }
 

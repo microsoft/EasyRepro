@@ -248,6 +248,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             _driver.TakeScreenshot();
         }
+
+        public bool ClickWhenAvailable(string selector)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage = null)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }

@@ -161,6 +161,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     if (option.Value && bool.Parse(falseRadio.GetAttribute(client, "aria-checked")) || !option.Value && bool.Parse(trueRadio.GetAttribute(client,"aria-checked")))
                     {
+
                         driver.ClickWhenAvailable(client.ElementMapper.EntityReference.EntityBooleanFieldRadioContainer.Replace("[NAME]", option.Name));
                     }
                 }

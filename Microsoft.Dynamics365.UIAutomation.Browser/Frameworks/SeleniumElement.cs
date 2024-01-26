@@ -47,13 +47,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public bool ClickWhenAvailable(BrowserPage page, string key)
         {
-            throw new NotImplementedException();
-            //return _element.ClickWhenAvailable(By.XPath(key));
+            _element.ClickWhenAvailable(By.XPath(key));
+            return true;
         }
 
         public bool ClickWhenAvailable(BrowserPage page, string key, TimeSpan timeToWait, string? exceptionMessage = null)
         {
-            throw new NotImplementedException();
+            _element.ClickWhenAvailable(By.XPath(key), exceptionMessage);
+            return true;
         }
 
         public void DoubleClick(BrowserPage page, string key)

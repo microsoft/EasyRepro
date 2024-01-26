@@ -16,8 +16,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public string Text { get; set; }
 
         public void Clear(BrowserPage page, string key);
-        public bool ClickWhenAvailable(BrowserPage page, string key);
-        public bool ClickWhenAvailable(BrowserPage page, string key, TimeSpan timeToWait, string? exceptionMessage = null);
+        //public bool ClickWhenAvailable(BrowserPage page, string key);
+        //public bool ClickWhenAvailable(BrowserPage page, string key, TimeSpan timeToWait, string? exceptionMessage = null);
         public void Click(BrowserPage page, bool? click = true);
         public void DoubleClick(BrowserPage page, string key);
         public string GetAttribute(BrowserPage page, string attributeName);

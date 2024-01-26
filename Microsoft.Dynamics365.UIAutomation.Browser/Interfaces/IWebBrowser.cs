@@ -10,8 +10,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
     public interface IWebBrowser
     {
         public string Url { get; set; }
-        //bool ClickWhenAvailable(string selector);//element
-        //bool ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage = null);//element
+
         IElement FindElement(string selector);
         List<IElement>? FindElements(string selector);
         object ExecuteScript(string selector, params object[] args);
@@ -27,5 +26,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         IElement? WaitUntilAvailable(string selector);
         IElement WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage);
         IElement WaitUntilAvailable(string selector, string exceptionMessage);
+        bool ClickWhenAvailable(string selector);//element
+        bool ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage = null);//element
     }
 }
