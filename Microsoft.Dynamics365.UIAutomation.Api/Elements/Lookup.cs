@@ -7,7 +7,7 @@ using static Microsoft.Dynamics365.UIAutomation.Api.Entity;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
-    public class Lookup : Element
+    public class Lookup 
     {
         #region DTO
         public class LookupReference
@@ -124,9 +124,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 return true;
             });
         }
-        public void TrySetValue(IWebBrowser driver, Element fieldContainer, LookupItem control)
+        public void TrySetValue(IWebBrowser driver, IElement fieldContainer, LookupItem control)
         {
-            Element input;
+            IElement input;
             bool found = driver.HasElement(fieldContainer + "//input");
             input = driver.FindElement(fieldContainer + "//input");
             string value = control.Value?.Trim();
@@ -139,9 +139,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             TrySetValue(driver, fieldContainer, control);
         }
 
-        public void TryToSetValue(IWebBrowser driver, Element fieldContainer, LookupItem[] controls)
+        public void TryToSetValue(IWebBrowser driver, IElement fieldContainer, LookupItem[] controls)
         {
-            Element input;
+            IElement input;
             bool found = driver.HasElement(fieldContainer.Locator + "//input");
             input = driver.FindElement(fieldContainer.Locator + "//input");
             foreach (var control in controls)
@@ -167,7 +167,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             input.SendKeys(_client, new string[] { Keys.Escape }); // IE wants to keep the flyout open on multi-value fields, this makes sure it closes
         }
 
-        public void TrySetValue(Element container, LookupItem control)
+        public void TrySetValue(IElement container, LookupItem control)
         {
             string value = control.Value;
             if (value == null)
@@ -179,7 +179,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             else
                 SetLookUpByValue(container, control);
         }
-        private void SetLookUpByValue(Element container, LookupItem control)
+        private void SetLookUpByValue(IElement container, LookupItem control)
         {
             var controlName = control.Name;
             var xpathToText = _entityReference.LookupFieldNoRecordsText.Replace("[NAME]", controlName);
@@ -203,7 +203,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             var selectedItem = items.ElementAt(index);
             selectedItem.Click(_client, true);
         }
-        internal ICollection<Element> GetListItems(Element container, LookupItem control)
+        internal ICollection<IElement> GetListItems(IElement container, LookupItem control)
         {
             var name = control.Name;
             var xpathToItems = this._entityReference.LookupFieldResultListItem.Replace("[NAME]", name);
@@ -215,14 +215,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             }
             //container.WaitUntil(d => d.FindVisible(xpathToItems)?.Text?.Contains(control.Value, StringComparison.OrdinalIgnoreCase) == true);
-            ICollection<Element> items = new List<Element>();
-            //ICollection<Element> result = container.WaitUntil(
+            ICollection<IElement> items = new List<IElement>();
+            //ICollection<IElement> result = container.WaitUntil(
             //    d => d.FindElements(xpathToItems),
             //    failureCallback: () => throw new InvalidOperationException($"No Results Matching {control.Value} Were Found.")
             //    );
             return items;
         }
-        private void SetLookupByIndex(Element container, LookupItem control)
+        private void SetLookupByIndex(IElement container, LookupItem control)
         {
             var controlName = control.Name;
             var xpathToControl = _entityReference.LookupResultsDropdown.Replace("[NAME]", controlName);
@@ -248,7 +248,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             var selectedItem = items.ElementAt(index);
             selectedItem.Click(_client, true);
         }
-        public void TryRemoveLookupValue(IWebBrowser driver, Element fieldContainer, LookupItem control, bool removeAll = true, bool isHeader = false)
+        public void TryRemoveLookupValue(IWebBrowser driver, IElement fieldContainer, LookupItem control, bool removeAll = true, bool isHeader = false)
         {
             var controlName = control.Name;
             fieldContainer.Hover(_client, fieldContainer.Locator);
@@ -323,7 +323,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 driver.Wait();
 
-                Element fieldContainer = null;
+                IElement fieldContainer = null;
                 fieldContainer = _client.ValidateFormContext(driver, formContextType, control.Name, fieldContainer);
 
                 TryRemoveLookupValue(driver, fieldContainer, control);
@@ -346,7 +346,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 driver.Wait();
 
-                Element fieldContainer = null;
+                IElement fieldContainer = null;
                 fieldContainer = _client.ValidateFormContext(driver, formContextType, controlName, fieldContainer);
 
                 if (clearFirst)
@@ -386,8 +386,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 driver.Wait();
 
-                List<Element> rows = null;
-                Element advancedLookup = null;
+                List<IElement> rows = null;
+                IElement advancedLookup = null;
                 if (driver.HasElement(_client.ElementMapper.AdvancedLookupReference.Container))
                 {
                     advancedLookup = driver.FindElement(_client.ElementMapper.AdvancedLookupReference.Container);
@@ -467,7 +467,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
             driver.Wait();
 
-            Element relatedEntity = null;
+            IElement relatedEntity = null;
             if (driver.HasElement(_client.ElementMapper.AdvancedLookupReference.Container))
             {
                 var advancedLookup = driver.FindElement(_client.ElementMapper.AdvancedLookupReference.Container);
@@ -609,7 +609,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 if (notificationMessage != null)
                 {
-                    Element icon = null;
+                    IElement icon = null;
 
                     try
                     {
@@ -645,7 +645,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         if (!Convert.ToBoolean(notificationBar.GetAttribute(_client, "aria-expanded")))
                             expandButton.Click(_client);
 
-                        // After expansion the list of notifications are now in a different element
+                        // After expansion the list of notifications are now in a different IElement
                         notificationBar = driver.WaitUntilAvailable(_entityReference.FormNotifcationFlyoutRoot, TimeSpan.FromSeconds(2), "Failed to open the form notifications");
                     }
 

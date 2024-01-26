@@ -113,18 +113,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         //#endregion
 
-        //internal void ClickIfVisible(string elementLocator)
+        //internal void ClickIfVisible(string IElementLocator)
         //{
 
         //}
 
-        //internal Element WaitUntilAvailable(string elementLocator, TimeSpan timeToWait)
+        //internal IElement WaitUntilAvailable(string IElementLocator, TimeSpan timeToWait)
         //{
         //    if (this.Browser.Options.BrowserFramework == BrowserFramework.Selenium)
-        //        return new Element(this);
+        //        return new IElement(this);
         //    else if (this.Browser.Options.BrowserFramework == BrowserFramework.Playwright)
-        //        return new Element(this);
-        //    else return new Element(this);
+        //        return new IElement(this);
+        //    else return new IElement(this);
         //}
 
         #region TeachingBubbles
@@ -144,12 +144,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         //#region FormContextType
 
         // Used by SetValue methods to determine the field context
-        public Element ValidateFormContext(IWebBrowser driver, FormContextType formContextType, string field, Element fieldContainer)
+        public IElement ValidateFormContext(IWebBrowser driver, FormContextType formContextType, string field, IElement fieldContainer)
         {
             if (formContextType == FormContextType.QuickCreate)
             {
                 // Initialize the quick create form context
-                // If this is not done -- element input will go to the main form due to new flyout design
+                // If this is not done -- IElement input will go to the main form due to new flyout design
                 if (driver.HasElement(this.ElementMapper.QuickCreateReference.QuickCreateFormContext))
                     fieldContainer = driver.FindElement(_entityReference.TextFieldContainer.Replace("[NAME]", field));
                 else

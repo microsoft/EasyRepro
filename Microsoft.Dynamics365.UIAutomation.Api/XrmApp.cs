@@ -42,7 +42,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public Telemetry Telemetry => this.GetArea<Telemetry>(_client);
 
         public T GetArea<T>(WebClient client)
-            where T : Element
+            //where T : IElement
         {
             return (T)Activator.CreateInstance(typeof(T), new object[] { client });
         }

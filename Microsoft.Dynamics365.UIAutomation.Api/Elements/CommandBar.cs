@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
-    public class CommandBar : Element
+    public class CommandBar
     {
         #region DTO
         public class CommandBarReference
@@ -70,7 +70,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return _client.Execute(_client.GetOptions($"Click Command"), driver =>
             {
                 // Find the button in the CommandBar
-                Element ribbon;
+                IElement ribbon;
                 // Checking if any dialog is active
                 if (driver.HasElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext)))
                 {
@@ -193,10 +193,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             const string moreCommandsLabel = "more commands";
 
             //Find the button in the CommandBar
-            Element ribbon = GetRibbon(driver);
+            IElement ribbon = GetRibbon(driver);
 
             //Get the CommandBar buttons
-            Dictionary<string, Element> commandBarItems = GetMenuItems(driver, ribbon);
+            Dictionary<string, IElement> commandBarItems = GetMenuItems(driver, ribbon);
             bool hasMoreCommands = commandBarItems.TryGetValue(moreCommandsLabel, out var moreCommandsButton);
             if (includeMoreCommandsValues && hasMoreCommands)
             {
@@ -211,7 +211,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             var result = GetCommandNames(commandBarItems.Values);
             return result;
         }
-        private static void AddMenuItems(IWebBrowser browser, Element menu, Dictionary<string, Element> dictionary)
+        private static void AddMenuItems(IWebBrowser browser, IElement menu, Dictionary<string, IElement> dictionary)
         {
             var menuItems = browser.FindElements(menu.Locator + "//li");
             foreach (var item in menuItems)
@@ -222,14 +222,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 dictionary.Add(key, item);
             }
         }
-        private static Dictionary<string, Element> GetMenuItems(IWebBrowser browser, Element menu)
+        private static Dictionary<string, IElement> GetMenuItems(IWebBrowser browser, IElement menu)
         {
-            var result = new Dictionary<string, Element>();
+            var result = new Dictionary<string, IElement>();
             AddMenuItems(browser, menu, result);
             return result;
         }
 
-        private static List<string> GetCommandNames(IEnumerable<Element> commandBarItems)
+        private static List<string> GetCommandNames(IEnumerable<IElement> commandBarItems)
         {
             var result = new List<string>();
             foreach (var value in commandBarItems)
@@ -247,12 +247,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return result;
         }
 
-        private Element GetRibbon(IWebBrowser driver)
+        private IElement GetRibbon(IWebBrowser driver)
         {
             var xpathCommandBarContainer = _client.ElementMapper.CommandBarReference.Container;
             var xpathCommandBarGrid = _client.ElementMapper.CommandBarReference.ContainerGrid;
 
-            Element ribbon =
+            IElement ribbon =
                 driver.WaitUntilAvailable(xpathCommandBarContainer, new TimeSpan(0,0,5), null) ??
                 driver.WaitUntilAvailable(xpathCommandBarGrid, new TimeSpan(0, 0, 5), null) ??
                 throw new InvalidOperationException("Unable to find the ribbon.");
@@ -287,9 +287,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return _client.Execute(_client.GetOptions($"Close Opportunity"), driver =>
             {
-                //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.ActualRevenueId], revenue.ToString(CultureInfo.CurrentCulture));
-                //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.CloseDateId], closeDate);
-                //SetValue(Elements.ElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
+                //SetValue(IElements.IElementId[AppReference.Dialogs.CloseOpportunity.ActualRevenueId], revenue.ToString(CultureInfo.CurrentCulture));
+                //SetValue(IElements.IElementId[AppReference.Dialogs.CloseOpportunity.CloseDateId], closeDate);
+                //SetValue(IElements.IElementId[AppReference.Dialogs.CloseOpportunity.DescriptionId], description);
 
                 driver.ClickWhenAvailable(_client.ElementMapper.DialogsReference.CloseOpportunity.Ok,
     TimeSpan.FromSeconds(5),

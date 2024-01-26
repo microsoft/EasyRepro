@@ -42,9 +42,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
 
 
-        private Element? ConvertToElement(ILocator element, string selector)
+        private IElement? ConvertToElement(ILocator element, string selector)
         {
-            Element rtnObject = new Element();
+            IElement rtnObject = new PlaywrightElement(element);
             if (element == null) return null;
             try
             {
@@ -65,9 +65,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return rtnObject;
         }
 
-        private ICollection<Element> ConvertToElements(IReadOnlyCollection<ILocator> elements, string selector)
+        private ICollection<IElement> ConvertToElements(IReadOnlyCollection<ILocator> elements, string selector)
         {
-            ICollection<Element> rtnObject = new List<Element>();
+            ICollection<IElement> rtnObject = new List<IElement>();
             foreach (var element in elements)
             {
                 rtnObject.Add(ConvertToElement(element, selector));
@@ -194,7 +194,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
         }
 
-        public Element FindElement(string selector)
+        public IElement FindElement(string selector)
         {
             ILocator element = _page.Locator(selector);
             IElementHandle playWrightElement =  _page.QuerySelectorAsync(selector).GetAwaiter().GetResult();
@@ -243,14 +243,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         }
 
-        public Element? WaitUntilAvailable(string selector)
+        public IElement? WaitUntilAvailable(string selector)
         {
             ILocator locator = SwitchedFrame.Locator(selector);
             locator.WaitForAsync().GetAwaiter().GetResult();
             return ConvertToElement(locator, selector);
         }
 
-        public Element WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
+        public IElement WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
         {
             //IElementHandle playWrightElement = _page.QuerySelectorAsync(selector).GetAwaiter().GetResult();
             ILocator locator = _page.Locator(selector);
@@ -259,7 +259,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return ConvertToElement(locator, selector);
         }
 
-        public Element WaitUntilAvailable(string selector, string exceptionMessage)
+        public IElement WaitUntilAvailable(string selector, string exceptionMessage)
         {
             //IElementHandle playWrightElement = _page.QuerySelectorAsync(selector).GetAwaiter().GetResult();
             ILocator locator = _page.Locator(selector);
@@ -302,7 +302,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return true;
         }
 
-        public List<Element>? FindElements(string selector)
+        public List<IElement>? FindElements(string selector)
         {
             //IElementHandle playWrightElement = _page.QuerySelectorAsync(selector).GetAwaiter().GetResult();
             ILocator locator = _page.Locator(selector);
@@ -363,6 +363,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             _page.DblClickAsync(selector).GetAwaiter().GetResult();
             return true;
+        }
+
+        public string? FindElementAttribute(string selector, string attribute)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IElement Test(string selector, string exceptionMessage)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion Disposal / Finalization

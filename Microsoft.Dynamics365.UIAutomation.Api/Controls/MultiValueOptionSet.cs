@@ -59,12 +59,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return client.Execute(client.GetOptions($"Remove Multi Select Value: {option.Name}"), driver =>
             {
-                Element fieldContainer = null;
+                IElement fieldContainer = null;
                 MultiSelect multiSelect = new MultiSelect(client.Configuration);
                 if (formContextType == FormContextType.QuickCreate)
                 {
                     // Initialize the quick create form context
-                    // If this is not done -- element input will go to the main form due to new flyout design
+                    // If this is not done -- IElement input will go to the main form due to new flyout design
                     var formContext = driver.WaitUntilAvailable(client.ElementMapper.QuickCreateReference.QuickCreateFormContext);
                     fieldContainer = driver.WaitUntilAvailable(formContext.Locator + multiSelect.DivContainer.Replace("[NAME]", option.Name));
                 }
@@ -106,7 +106,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 {
                     // With every click of the button, the underlying DOM changes and the
                     // entire collection becomes stale, hence we only click the first occurance of
-                    // the button and loop back to again find the elements and anyother occurance
+                    // the button and loop back to again find the IElements and anyother occurance
                     driver.FindElement(selectedRecords[0].Locator + deleteButtonXpath).Click(client);
                     driver.Wait();
                     selectedRecords = driver.FindElements(fieldContainer.Locator + selectedRecordXPath);
@@ -124,12 +124,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 return client.Execute(client.GetOptions($"Add Multi Select Value: {option.Name}"), driver =>
                 {
-                    Element fieldContainer = null;
+                    IElement fieldContainer = null;
                     MultiSelect multiSelect = new MultiSelect(client.Configuration);
                     if (formContextType == FormContextType.QuickCreate)
                     {
                         // Initialize the quick create form context
-                        // If this is not done -- element input will go to the main form due to new flyout design
+                        // If this is not done -- IElement input will go to the main form due to new flyout design
                         var formContext = driver.WaitUntilAvailable(client.ElementMapper.QuickCreateReference.QuickCreateFormContext);
                         fieldContainer = driver.WaitUntilAvailable(formContext.Locator + multiSelect.DivContainer.Replace("[NAME]", option.Name));
                     }

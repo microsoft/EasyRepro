@@ -6,7 +6,7 @@ using System;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
-    public class BusinessProcessFlow : Element
+    public class BusinessProcessFlow
     {
         #region DTO
         public class BusinessProcessFlowReference
@@ -212,11 +212,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 // Initialize the Business Process Flow context
                 var formContext = driver.WaitUntilAvailable(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext);
-                var fieldElement = driver.WaitUntilAvailable(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext + _client.ElementMapper.BusinessProcessFlowReference.FieldSectionItemContainer.Replace("[NAME]", field));
-                Field returnField = new Field(fieldElement);
+                var fieldIElement = driver.WaitUntilAvailable(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext + _client.ElementMapper.BusinessProcessFlowReference.FieldSectionItemContainer.Replace("[NAME]", field));
+                Field returnField = new Field(fieldIElement);
                 returnField.Name = field;
 
-                Element fieldLabel = null;
+                IElement fieldLabel = null;
                 try
                 {
                     fieldLabel = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext + _client.ElementMapper.BusinessProcessFlowReference.FieldSectionItemContainer.Replace("[NAME]", field)+ _client.ElementMapper.BusinessProcessFlowReference.TextFieldLabel.Replace("[NAME]", field));
@@ -347,45 +347,45 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (driver.HasElement(dateField))
                 {
                     var dateFieldClicked = driver.ClickWhenAvailable(dateField);
-                    var fieldElement = driver.FindElement(dateField);
+                    var fieldIElement = driver.FindElement(dateField);
                     if (dateFieldClicked) { 
 
-                        if (fieldElement.GetAttribute(_client, "value").Length > 0)
+                        if (fieldIElement.GetAttribute(_client, "value").Length > 0)
                         {
-                            //fieldElement.Click();
-                            //fieldElement.SendKeys(date.ToString(format));
-                            //fieldElement.SendKeys(Keys.Enter);
+                            //fieldIElement.Click();
+                            //fieldIElement.SendKeys(date.ToString(format));
+                            //fieldIElement.SendKeys(Keys.Enter);
 
-                            fieldElement.Click(_client);
+                            fieldIElement.Click(_client);
                             _client.ThinkTime(250);
-                            fieldElement.Click(_client);
+                            fieldIElement.Click(_client);
                             _client.ThinkTime(250);
-                            //fieldElement.SendKeys(Keys.Backspace);
+                            //fieldIElement.SendKeys(Keys.Backspace);
                             _client.ThinkTime(250);
-                            //fieldElement.SendKeys(Keys.Backspace);
+                            //fieldIElement.SendKeys(Keys.Backspace);
                             _client.ThinkTime(250);
-                            //fieldElement.SendKeys(Keys.Backspace);
+                            //fieldIElement.SendKeys(Keys.Backspace);
                             _client.ThinkTime(250);
-                            fieldElement.SetValue(_client, date.ToString(format));
+                            fieldIElement.SetValue(_client, date.ToString(format));
                             _client.ThinkTime(500);
-                            fieldElement.SendKeys(_client, new string[] { Keys.Tab });
+                            fieldIElement.SendKeys(_client, new string[] { Keys.Tab });
                             _client.ThinkTime(250);
                         }
                         else
                         {
-                            fieldElement.Click(_client);
+                            fieldIElement.Click(_client);
                             _client.ThinkTime(250);
-                            fieldElement.Click(_client);
+                            fieldIElement.Click(_client);
                             _client.ThinkTime(250);
-                            //fieldElement.SendKeys(Keys.Backspace);
+                            //fieldIElement.SendKeys(Keys.Backspace);
                             //_client.ThinkTime(250);
-                            //fieldElement.SendKeys(Keys.Backspace);
+                            //fieldIElement.SendKeys(Keys.Backspace);
                             //_client.ThinkTime(250);
-                            //fieldElement.SendKeys(Keys.Backspace);
+                            //fieldIElement.SendKeys(Keys.Backspace);
                             _client.ThinkTime(250);
-                            fieldElement.SetValue(_client, date.ToString(format));
+                            fieldIElement.SetValue(_client, date.ToString(format));
                             _client.ThinkTime(250);
-                            fieldElement.SendKeys(_client, new string[] { Keys.Tab });
+                            fieldIElement.SendKeys(_client, new string[] { Keys.Tab });
                             _client.ThinkTime(250);
                         }
                 }

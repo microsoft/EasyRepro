@@ -115,17 +115,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         //string IWebBrowser.Url { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        private Element? ConvertToElement(IWebElement element, string selector)
+        private IElement? ConvertToElement(IWebElement element, string selector)
         {
-            Element rtnObject = new Element();
+            IElement rtnObject = new SeleniumElement(element);
             if (element == null) return null;
             try
             {
-                rtnObject.Text = element.Text;
-                rtnObject.Tag = element.TagName;
-                rtnObject.Selected = element.Selected;
-                rtnObject.Value = element.Text;
-                rtnObject.Id = element.GetAttribute("id");
+                //rtnObject.Text = element.Text;
+                //rtnObject.Tag = element.TagName;
+                //rtnObject.Selected = element.Selected;
+                //rtnObject.Value = element.Text;
+                //rtnObject.Id = element.GetAttribute("id");
                 rtnObject.Locator = selector;
             }
             catch (StaleElementReferenceException staleEx)
@@ -137,9 +137,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
             return rtnObject;
         }
-        private ICollection<Element> ConvertToElements(ICollection<IWebElement> elements, string selector)
+        private ICollection<IElement> ConvertToElements(ICollection<IWebElement> elements, string selector)
         {
-            ICollection<Element> rtnObject = new List<Element>();
+            ICollection<IElement> rtnObject = new List<IElement>();
             foreach (var element in elements)
             {
                 rtnObject.Add(ConvertToElement(element, selector));
@@ -164,7 +164,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
         }
 
-        public Element FindElement(string selector)
+        public IElement FindElement(string selector)
         {
             IWebElement seleniumElement = _driver.FindElement(By.XPath(selector));
             return ConvertToElement(seleniumElement, selector);
@@ -190,19 +190,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return _driver.HasElement(By.XPath(selector));
         }
         
-        public Element? WaitUntilAvailable(string selector)
+        public IElement? WaitUntilAvailable(string selector)
         {
-            IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector));
+            IWebElement element = SeleniumExtensions.WaitUntilVisible(_driver, By.XPath(selector));
+            //IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector), null, null, WaitUntilAvailable(selector));
             return ConvertToElement(element, selector);
         }
 
-        public Element WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
+        public IElement WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
         {
             IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector), timeToWait, exceptionMessage);
             return ConvertToElement(element, selector);
         }
 
-        public Element WaitUntilAvailable(string selector, string exceptionMessage)
+        public IElement WaitUntilAvailable(string selector, string exceptionMessage)
         {
             IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector), exceptionMessage);
             return ConvertToElement(element, selector);
@@ -238,7 +239,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
            
         }
 
-        public List<Element>? FindElements(string selector)
+        public List<IElement>? FindElements(string selector)
         {
             ICollection<IWebElement> elements = _driver.FindElements(By.XPath(selector));
             return ConvertToElements(elements, selector).ToList();
@@ -283,6 +284,22 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             Actions keyPress = new Actions(_driver);
             keyPress.SendKeys(OpenQA.Selenium.Keys.Enter).Perform();
         }
+
+        public string? FindElementAttribute(string selector, string attribute)
+        {
+            return _driver.FindElement(By.XPath(selector)).GetAttribute(attribute);
+        }
+
+        public IElement Test(string selector, string exceptionMessage)
+        {
+            _interfaceElement = new SeleniumElement(_driver.FindElement(By.XPath(selector)));
+            _element = _driver.FindElement(By.XPath(selector)); 
+            
+            return _interfaceElement;
+        }
+
+        private IWebElement _element;
+        private SeleniumElement _interfaceElement;
 
         //public bool DoubleClick(string selector)
         //{

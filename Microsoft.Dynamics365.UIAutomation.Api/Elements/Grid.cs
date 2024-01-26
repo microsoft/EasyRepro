@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
-    public class Grid : Element
+    public class Grid
     {
         #region DTO
         public  class GridReference
@@ -118,7 +118,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
-        public BrowserCommandResult<Dictionary<string, Element>> OpenViewPicker(int thinkTime = Constants.DefaultThinkTime)
+        public BrowserCommandResult<Dictionary<string, IElement>> OpenViewPicker(int thinkTime = Constants.DefaultThinkTime)
         {
             _client.ThinkTime(thinkTime);
 
@@ -132,9 +132,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var viewContainer = driver.FindElement(_client.ElementMapper.GridReference.ViewContainer);
                 var viewItems = driver.FindElements(viewContainer.Locator + "//li");
 
-                var result = new Dictionary<string, Element>();
+                var result = new Dictionary<string, IElement>();
                 foreach (var viewItem in viewItems)
                 {
+                    var newIIElement = driver.Test(_client.ElementMapper.GridReference.ViewContainer, "");
+                    var newIIElementtwo = driver.Test(_client.ElementMapper.GridReference.ViewContainer, "");
+                    var newRole = newIIElement.GetAttribute(_client, "role");
+
                     var role = viewItem.GetAttribute(_client,"role");
 
                     if (role != "presentation")
@@ -194,7 +198,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 var grid = driver.FindElement(_client.ElementMapper.GridReference.GridContainer);
                 bool lastRow = false;
-                Element gridRow = null;
+                IElement gridRow = null;
                 Grid.GridType gridType = Grid.GridType.PowerAppsGridControl;
                 int lastRowInCurrentView = 0;
                 string lastRowXPathLocator = _client.ElementMapper.GridReference.Row.Replace("[INDEX]", (index).ToString());
@@ -239,7 +243,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 }
                 if (gridRow == null) throw new KeyNotFoundException($"Grid Row {index} not found.");
                 var xpathToGrid = "//div[contains(@data-id,'DataSetHostContainer')]";//works for: PowerAppsGridControl, LegacyReadOnlyControl, 
-                Element control = driver.WaitUntilAvailable(xpathToGrid);
+                IElement control = driver.WaitUntilAvailable(xpathToGrid);
 
                 //Func<Actions, Actions> action;
                 //if (checkRecord)
@@ -518,7 +522,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         #endregion
         #region Private
-        private int ClickGridAndPageDown(IWebBrowser driver, Element grid, int lastKnownFloor, Grid.GridType gridType)
+        private int ClickGridAndPageDown(IWebBrowser driver, IElement grid, int lastKnownFloor, Grid.GridType gridType)
         {
             //Actions actions = new Actions(driver);
             string rowGroupLocator = null;

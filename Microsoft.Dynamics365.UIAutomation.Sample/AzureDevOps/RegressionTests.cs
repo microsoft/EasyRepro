@@ -77,18 +77,26 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         [TestMethod]
         public void Regression_Grid_SwitchView_GetItems_Sort_SearchRecord_HighlightRecord_OpenRecord()
         {
+            _testContext.WriteLine("Starting test " + TestContext.TestName);
             Trace.TraceInformation("Starting test " + TestContext.TestName);
             var telemetry = new Microsoft.ApplicationInsights.TelemetryClient { InstrumentationKey = _azureKey };
+            _testContext.WriteLine("Implemented TelemetryClient");
             telemetry.Context.Operation.Id = Guid.NewGuid().ToString();
+            _testContext.WriteLine("OperationId :" + telemetry.Context.Operation.Id);
             telemetry.Context.Operation.ParentId = _sessionId;
+            _testContext.WriteLine("SessionId :" + telemetry.Context.Operation.ParentId);
             telemetry.Context.GlobalProperties.Add("Test", TestContext.TestName);
-            
+            _testContext.WriteLine("Added Test Global Property");
             var client = new WebClient(TestSettings.Options);
+            _testContext.WriteLine("WebClient Instance Created.");
             var xrmApp = new XrmApp(client);
+            _testContext.WriteLine("XrmApp Instance Created.");
             try
             {
+                _testContext.WriteLine("Login Started");
                 telemetry.TrackTrace("Login Started");
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
+                _testContext.WriteLine("Login Completed");
                 telemetry.TrackTrace("Login Completed");
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
                 //xrmApp.Navigation.OpenApp(AppName.Sales);

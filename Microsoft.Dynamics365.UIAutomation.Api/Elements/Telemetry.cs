@@ -10,8 +10,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
     /// <summary>
     /// 
     /// </summary>
-    /// <seealso cref="Microsoft.Dynamics365.UIAutomation.Browser.Element" />
-    public class Telemetry : Element
+    /// <seealso cref="Microsoft.Dynamics365.UIAutomation.Browser.IElement" />
+    public class Telemetry 
     {
         #region DTO
         public class KeyPerformanceIndicator

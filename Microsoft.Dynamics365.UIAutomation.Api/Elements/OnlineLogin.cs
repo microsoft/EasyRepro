@@ -10,7 +10,7 @@ using OtpNet;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
-    public class OnlineLogin : Element
+    public class OnlineLogin
     {
         #region prop
 
@@ -186,7 +186,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         internal bool WaitForMainPage(TimeSpan timeout, string errorMessage)
             => WaitForMainPage(timeout, null, () => throw new InvalidOperationException(errorMessage));
 
-        internal bool WaitForMainPage(TimeSpan? timeout = null, Action<Element> successCallback = null, Action failureCallback = null)
+        internal bool WaitForMainPage(TimeSpan? timeout = null, Action<IElement> successCallback = null, Action failureCallback = null)
         {
             //IWebDriver driver = Browser;
             timeout = timeout ?? Constants.DefaultTimeout;
@@ -202,8 +202,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             //                      });
 
             var xpathToMainPage = _client.ElementMapper.LoginReference.CrmMainPage;
-            var element = _client.Browser.Browser.WaitUntilAvailable(xpathToMainPage, timeout.Value, "Cannot navigate to main page");
-            return element != null;
+            var IElement = _client.Browser.Browser.WaitUntilAvailable(xpathToMainPage, timeout.Value, "Cannot navigate to main page");
+            return IElement != null;
         }
 
         private bool IsUserAlreadyLogged() => WaitForMainPage(2.Seconds());
@@ -243,7 +243,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             try
             {
-                Element input = GetOtcInput(); // wait for the dialog, even if key is null, to print the right error
+                IElement input = GetOtcInput(); // wait for the dialog, even if key is null, to print the right error
                 if (input == null)
                     return true;
 
@@ -266,14 +266,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
 
-        private Element GetOtcInput()
+        private IElement GetOtcInput()
             => _client.Browser.Browser.WaitUntilAvailable(_client.ElementMapper.LoginReference.OneTimeCode);
 
         private bool ClickStaySignedIn()
         {
             var xpath = _client.ElementMapper.LoginReference.StaySignedIn;
-            var element = _client.Browser.Browser.ClickWhenAvailable(_client.ElementMapper.LoginReference.StaySignedIn, 2.Seconds(), "");
-            return element != null;
+            var IElement = _client.Browser.Browser.ClickWhenAvailable(_client.ElementMapper.LoginReference.StaySignedIn, 2.Seconds(), "");
+            return IElement != null;
         }
 
         private void SwitchToDefaultContent()

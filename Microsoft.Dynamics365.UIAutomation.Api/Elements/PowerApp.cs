@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
-    public class PowerApp : Element
+    public class PowerApp 
     {
 
         #region DTO
@@ -53,9 +53,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         #region PowerApp
         private bool _inPowerApps = false;
-        internal Element LocatePowerApp(IWebBrowser driver, string appId)
+        internal IElement LocatePowerApp(IWebBrowser driver, string appId)
         {
-            Element powerApp = null;
+            IElement powerApp = null;
             Trace.WriteLine(String.Format("Locating {0} App", appId));
             if (driver.HasElement(this._client.ElementMapper.PowerAppReference.ModelFormContainer.Replace("[NAME]", appId)))
             {

@@ -5,7 +5,7 @@ using System;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
-    public class Dashboard : Element
+    public class Dashboard
     {
 
         #region DTO
@@ -36,7 +36,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         #region public
         public T GetElement<T>(WebClient client)
-            where T : Element
+            //where T : IElement
         {
             return (T)Activator.CreateInstance(typeof(T), new object[] { client });
         }

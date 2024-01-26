@@ -86,13 +86,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 string timeFieldXPath = client.ElementMapper.EntityReference.FieldControlDateTimeTimeInput.Replace("[FIELD]", control.Name);
 
-                Element formContext = null;
+                IElement formContext = null;
 
                 if (formContextType == FormContextType.QuickCreate)
                 {
                     //IWebDriver formContext;
                     // Initialize the quick create form context
-                    // If this is not done -- element input will go to the main form due to new flyout design
+                    // If this is not done -- IElement input will go to the main form due to new flyout design
                     formContext = browser.WaitUntilAvailable(client.ElementMapper.QuickCreateReference.QuickCreateFormContext, String.Format("control {0} not found in {1}", control.Name, formContextType));
                 }
                 else if (formContextType == FormContextType.Entity)
@@ -108,7 +108,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 else if (formContextType == FormContextType.Header)
                 {
                     // Initialize the Header context
-                    //formContext = browser as Element;
+                    //formContext = browser as IElement;
                 }
                 else if (formContextType == FormContextType.Dialog)
                 {
@@ -127,7 +127,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 return true;
             });
         }
-        internal static void TrySetTime(WebClient client, Element timeField, string time)
+        internal static void TrySetTime(WebClient client, IElement timeField, string time)
         {
             client.Execute(client.GetOptions("TrySetTime"), browser => {
                 // click & wait until the time get updated after change/clear the date
@@ -139,7 +139,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 timeField.SendKeys(client, new string[] { Keys.Tab });
                 browser.Wait();
 
-                //Element dateTimeField = browser.FindElement(timeField);
+                //IElement dateTimeField = browser.FindElement(timeField);
                 //if (dateTimeField.GetAttribute("value") != time) throw new InvalidOperationException($"Timeout after 10 seconds. Expected: {time}. Actual: {dateTimeField.GetAttribute("value")}");
                 //driver.RepeatUntil(() =>
                 //{
@@ -157,9 +157,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
             
         }
-        internal void TrySetDateValue(WebClient client, Element dateField, string date, FormContextType formContextType)
+        internal void TrySetDateValue(WebClient client, IElement dateField, string date, FormContextType formContextType)
         {
-            Trace.WriteLine("Begin function: internal void TrySetDateValue with Element.");
+            Trace.WriteLine("Begin function: internal void TrySetDateValue with IElement.");
             client.Execute(client.GetOptions("TrySetDateValue"), browser =>
             {
                 var strExpanded = dateField.GetAttribute(client, "aria-expanded");
@@ -171,7 +171,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         dateField.Click(client); // close calendar
 
 
-                    // Only send Keys.Escape to avoid element not interactable exceptions with calendar flyout on forms.
+                    // Only send Keys.Escape to avoid IElement not interactable exceptions with calendar flyout on forms.
                     // This can cause the Header or BPF flyouts to close unexpectedly
                     if (formContextType == FormContextType.Entity || formContextType == FormContextType.QuickCreate)
                     {
@@ -211,7 +211,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     //    {
                     //        dateField = dateField.FindElement(By.TagName("input"));
 
-                    //        // Only send Keys.Escape to avoid element not interactable exceptions with calendar flyout on forms.
+                    //        // Only send Keys.Escape to avoid IElement not interactable exceptions with calendar flyout on forms.
                     //        // This can cause the Header or BPF flyouts to close unexpectedly
                     //        if (formContextType == FormContextType.Entity || formContextType == FormContextType.QuickCreate)
                     //        {
@@ -229,7 +229,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 }
                 return true;
             });
-            Trace.WriteLine("End function: internal void TrySetDateValue with Element.");
+            Trace.WriteLine("End function: internal void TrySetDateValue with IElement.");
         }
         /// <summary>
         /// Used to find context of control. Passes correct control to internal TrySetDateValue
@@ -242,13 +242,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             Trace.WriteLine("Begin function: private void TrySetDateValue with DateTimeControl.");
             string controlName = control.Name;
-            Element fieldContainer = null;
+            IElement fieldContainer = null;
             string xpathToInput = client.ElementMapper.EntityReference.FieldControlDateTimeInput.Replace("[FIELD]", controlName);
 
             if (formContextType == FormContextType.QuickCreate)
             {
                 // Initialize the quick create form context
-                // If this is not done -- element input will go to the main form due to new flyout design
+                // If this is not done -- IElement input will go to the main form due to new flyout design
                 var formContext = driver.WaitUntilAvailable(client.ElementMapper.QuickCreateReference.QuickCreateFormContext);
                 fieldContainer = driver.WaitUntilAvailable(client.ElementMapper.QuickCreateReference.QuickCreateFormContext + xpathToInput, $"DateTime Field: '{controlName}' does not exist");
 
