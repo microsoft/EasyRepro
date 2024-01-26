@@ -30,21 +30,25 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public string Url { get { return _url; } set { _url = value; } }
 
         #region FindElement
-        public Element FindElement(string selector)
+        public IElement FindElement(string selector)
         {
             return GetElement(selector);
         }
-        public List<Element> FindElements(string selector)
+        public List<IElement> FindElements(string selector)
         {
             return GetElements(selector);
         }
         #endregion
 
         #region ExecuteScript
-
-        private Element? ConvertToElement(ILocator element, string selector)
+        public object ExecuteScript(string script, params object[] args)
         {
-            Element rtnObject = new Element();
+            return _page.EvaluateAsync(script, args);
+        }
+        #endregion
+        private IElement? ConvertToElement(ILocator element, string selector)
+        {
+            IElement rtnObject = new PlaywrightElement(element);
             if (element == null) return null;
             try
             {
@@ -61,14 +65,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 //throw;
             }
 
-        #region SendKeys
+
 
             return rtnObject;
         }
 
-        private ICollection<Element> ConvertToElements(IReadOnlyCollection<ILocator> elements, string selector)
+        private ICollection<IElement> ConvertToElements(IReadOnlyCollection<ILocator> elements, string selector)
         {
-            ICollection<Element> rtnObject = new List<Element>();
+            ICollection<IElement> rtnObject = new List<IElement>();
             foreach (var element in elements)
             {
                 rtnObject.Add(ConvertToElement(element, selector));
@@ -76,12 +80,38 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return rtnObject;
         }
 
+        #region SendKeys
+
+        public void SendKey(string selector, string key)
+        {
+            _page.Keyboard.TypeAsync(key);
+        }
+
         public void SendKeys(string selector, string[] keys)
         {
             _page.Keyboard.TypeAsync(keys.ToString());
         }
         #endregion
+        #region Navigate
+        public void Navigate(string url)
+        {
+            _page.GotoAsync(url).GetAwaiter().GetResult();
+        }
+        public async void NavigateAsync(string url)
+        {
+            await _page.GotoAsync(url);
+        }
+        #endregion
+        bool ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
+        {
+            //throw new NotImplementedException();
+            ILocator locator = _page.Locator(selector);
+            locator.ClickAsync(new LocatorClickOptions()
+            {
 
+            }).GetAwaiter().GetResult();
+            return true;
+        }
         #region SwitchToFrame
 
         public void SwitchToFrame(string name)
@@ -94,7 +124,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         #region TakeWindowScreenShot
 
-        public void TakeWindowScreenShot(string filename)
+        public void TakeWindowScreenShot(string filename, FileFormat fileFormat)
         {
             _page.ScreenshotAsync(new()
             {
@@ -112,18 +142,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
         #endregion
 
-        #region IsAvailable
-        public bool IsAvailable(string selector)
-        {
-            var hasElement = GetElement(selector);
-            return (hasElement != null) ? true : false;
-        }
-        #endregion
-
         #region Wait
-        public void Wait(TimeSpan timeSpan)
+        public void Wait(PageEvent pageEvent)
         {
-            ThinkTime((int)timeSpan.TotalMilliseconds);
+            _page.WaitForLoadStateAsync(LoadState.Load).GetAwaiter().GetResult();
+            _page.WaitForURLAsync(_page.Url).GetAwaiter().GetResult();
+            _page.WaitForTimeoutAsync(1000).Wait();
+        }
+        public void Wait(TimeSpan? timeSpan = null)
+        {
+            ThinkTime((int)timeSpan.GetValueOrDefault(Constants.DefaultTimeout).TotalMilliseconds);
         }
         public void Wait(int milliseconds)
         {
@@ -150,39 +178,50 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
         #endregion
 
-        #region WaitUntilVailable
-        Element IWebBrowser.WaitUntilAvailable(string selector)
+        #region WaitUntilVisibile
+        IElement IWebBrowser.WaitUntilAvailable(string selector)
         {
             WaitForSelector(selector);
             return GetElement(selector);
         }
 
-            if (!isDisposing)
-            {
-                lock (this.syncRoot)
-                {
-                    disposing = true;
-                }
-            }
-        }
+        //public IElement? WaitUntilAvailable(string selector)
+        //{
+        //    _page.WaitForLoadStateAsync(LoadState.NetworkIdle).GetAwaiter().GetResult();
+        //    //_page.WaitForLoadStateAsync(LifecycleEvent.Networkidle).GetAwaiter().GetResult();
+        //    //_page.WaitForSelectorAsync(selector,).GetAwaiter().GetResult();
+        //}
 
-        public Element FindElement(string selector)
+        public IElement WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
         {
-
             try
             {
                 PageWaitForSelectorOptions options = new PageWaitForSelectorOptions();
                 options.Timeout = (float)timeToWait.TotalMilliseconds;
                 WaitForSelector(selector, options);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new Exception(exceptionMessage);
             }
             return GetElement(selector);
         }
 
-        Element IWebBrowser.WaitUntilAvailable(string selector, string exceptionMessage)
+        public IElement WaitUntilAvailable(string selector, string exceptionMessage)
+        {
+            try
+            {
+                WaitForSelector(selector);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(exceptionMessage);
+            }
+            return GetElement(selector);
+        }
+
+
+        IElement IWebBrowser.WaitUntilAvailable(string selector, string exceptionMessage)
         {
             try
             {
@@ -196,54 +235,55 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
         #endregion
 
-        public Element? WaitUntilAvailable(string selector)
+
+        #region WaitForSelector
+        internal void WaitForSelector(string selector)
         {
             _page.WaitForLoadStateAsync(LoadState.NetworkIdle).GetAwaiter().GetResult();
             //_page.WaitForLoadStateAsync(LifecycleEvent.Networkidle).GetAwaiter().GetResult();
-            _page.WaitForSelectorAsync(selector,).GetAwaiter().GetResult();
+            _page.WaitForSelectorAsync(selector,new PageWaitForSelectorOptions()
+            {
+               State = WaitForSelectorState.Visible
+            }).GetAwaiter().GetResult();
         }
 
-        public Element WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
+        internal void WaitForSelector(string selector, PageWaitForSelectorOptions options)
         {
             _page.WaitForLoadStateAsync(LoadState.NetworkIdle).GetAwaiter().GetResult();
             //_page.WaitForLoadStateAsync(LifecycleEvent.Networkidle).GetAwaiter().GetResult();
             _page.WaitForSelectorAsync(selector, options).GetAwaiter().GetResult();
         }
 
-        public Element WaitUntilAvailable(string selector, string exceptionMessage)
+        internal async Task WaitForSelectorAsync(string selector)
         {
             await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
             await _page.WaitForSelectorAsync(selector);
         }
         #endregion
 
+
         #region GetElement
-        private Element GetElement(string selector)
+        private IElement GetElement(string selector)
         {
             IElementHandle playWrightElement = _page.QuerySelectorAsync(selector).GetAwaiter().GetResult();
             if (playWrightElement == null) { throw new PlaywrightException(String.Format("Could not find element using selector '{0}'", selector)); }
-            return (Element)playWrightElement;
+            return (IElement)playWrightElement;
         }
-        private List<Element> GetElements(string selector)
+        private List<IElement> GetElements(string selector)
         {
             IList<IElementHandle> playWrightElements = (IList<IElementHandle>)_page.QuerySelectorAllAsync(selector).GetAwaiter().GetResult();
             if (playWrightElements == null) { throw new PlaywrightException(String.Format("Could not find element using selector '{0}'", selector)); }
-            return new List<Element>(playWrightElements.Select(x => (Element)x));
+            return new List<IElement>(playWrightElements.Select(x => (IElement)x));
         }
         #endregion
 
-        bool IWebBrowser.ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
-        {
-            //throw new NotImplementedException();
-            ILocator locator = _page.Locator(selector);
-            locator.ClickAsync(new LocatorClickOptions()
-            {
-                
-            }).GetAwaiter().GetResult();
-            return true;
-        }
+        #region Disposal / Finalization
 
-        public List<Element>? FindElements(string selector)
+        private readonly object syncRoot = new object();
+        private readonly bool disposeOfDriver = true;
+        private bool disposing = false;
+
+        public void Dispose()
         {
             bool isDisposing;
 
@@ -261,12 +301,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
         }
 
-        bool IWebBrowser.DoubleClick(string selector)
-        {
-            _page.DblClickAsync(selector).GetAwaiter().GetResult();
-            return true;
-        }
 
         #endregion Disposal / Finalization
+
+
+
+
+        //bool IWebBrowser.DoubleClick(string selector)
+        //{
+        //    _page.DblClickAsync(selector).GetAwaiter().GetResult();
+        //    return true;
+        //}
+
+       
     }
 }
