@@ -934,8 +934,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return _client.Execute(_client.GetOptions($"Save"), driver =>
             {
-                //Actions action = new Actions(driver);
-                //action.KeyDown(Keys.Control).SendKeys("S").Perform();
+                
 
                 driver.SendKeys(_client.ElementMapper.EntityReference.Form, new string[] { Keys.Control, "S" });
 

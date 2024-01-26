@@ -12,7 +12,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public string Url { get; set; }
         bool ClickWhenAvailable(string selector);//element
         bool ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage = null);//element
-        //bool DoubleClick(string selector);//element
         IElement FindElement(string selector);
         List<IElement>? FindElements(string selector);
         object ExecuteScript(string selector, params object[] args);
@@ -20,16 +19,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         void Navigate(string url);
         void SendKeys(string locator, string[] keys);
         void SendKey(string locator, string key);
-        //void SetValue(string locator, string value);//element
         void SwitchToFrame(string locator);
         void TakeWindowScreenShot(string fileName, FileFormat fileFormat);
-        //bool TryFindElement(string selector, out Element element);
         void Wait(TimeSpan? timeout = null);
         void Wait(PageEvent pageEvent);
         IElement? WaitUntilAvailable(string selector);
         IElement WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage);
         IElement WaitUntilAvailable(string selector, string exceptionMessage);
-
         IElement Test(string selector, string exceptionMessage);
     }
 }

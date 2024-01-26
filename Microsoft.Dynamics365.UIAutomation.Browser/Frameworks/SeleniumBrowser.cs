@@ -247,8 +247,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public void SendKeys(string locator, string[] keys)
         {
-            IWebElement element = _driver.FindElement(By.XPath(locator));
-            SeleniumExtensions.SendKeys(element, string.Join("",keys));
+            Actions action = new Actions(_driver);
+            //action.KeyDown(Keys.Control).SendKeys("S").Perform();
+            int keyLength = keys.Length-1;
+            for(int x =0; x< keyLength; x++)
+            {
+                action.KeyDown(keys[x].Select(t => $"U+{Convert.ToUInt16(t):X4} ").FirstOrDefault());
+            }
+            action.SendKeys(keys[keyLength]);
+            action.Perform();
         }
 
         public void SwitchToFrame(string locator)

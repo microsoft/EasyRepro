@@ -112,8 +112,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 var gridContainer = driver.FindElement("//div[contains(@data-lp-id,'MscrmControls.Grid')]");
 
-                
-
                 return gridContainer.GetAttribute(_client,"innerHTML");
             });
         }

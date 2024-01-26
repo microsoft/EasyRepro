@@ -77,12 +77,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public bool HasAttribute(BrowserPage page, string attributeName)
         {
-            throw new NotImplementedException();
+            return _element.HasAttribute(attributeName);
         }
 
         public void Hover(BrowserPage page, string key)
         {
-            throw new NotImplementedException();
+            _element.Hover(_driver);
+            
         }
 
         public void SendKeys(BrowserPage page, string[] keys)
@@ -95,9 +96,5 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             _element.SendKeys(value);
         }
 
-        public void Test(BrowserPage page, string value)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

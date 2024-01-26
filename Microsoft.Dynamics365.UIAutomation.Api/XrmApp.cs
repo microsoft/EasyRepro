@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public Navigation Navigation => this.GetArea<Navigation>(_client);
         public CommandBar CommandBar => this.GetArea<CommandBar>(_client);
         public Grid Grid => this.GetArea<Grid>(_client);
+        public CustomerServiceCopilot CustomerServiceCopilot => this.GetArea<CustomerServiceCopilot>(_client);
         public PowerApp PowerApp => this.GetArea<PowerApp>(_client);
         public Entity Entity => this.GetArea<Entity>(_client);
         public Dialogs Dialogs => this.GetArea<Dialogs>(_client);

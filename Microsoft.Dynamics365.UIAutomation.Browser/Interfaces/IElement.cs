@@ -26,7 +26,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public void Focus(BrowserPage page, string key);
         public void SendKeys(BrowserPage page, string[] keys);
         public void SetValue(BrowserPage page, string value);
-        public void Test(BrowserPage page, string value);
     }
     //public class Element : IElement
     //{
