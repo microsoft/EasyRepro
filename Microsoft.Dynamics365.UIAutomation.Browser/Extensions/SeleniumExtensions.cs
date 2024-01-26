@@ -17,6 +17,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
     public static class SeleniumExtensions
     {
+        #region Element
+        public static IElement ToElement(this IWebElement element)
+        {
+            throw new NotImplementedException("TBD");
+        }
+        #endregion
         #region Click
 
         public static void Click(this IWebElement element, bool ignoreStaleElementException)

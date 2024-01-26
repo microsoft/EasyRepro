@@ -221,8 +221,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public IElement? WaitUntilAvailable(string selector)
         {
-            IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector));
-            return ConvertToElement(element, selector);
+           return _driver.WaitUntilAvailable(By.XPath(selector)).ToElement();
         }
 
         public IElement WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
