@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
-    public class Entity : Element
+    public class Entity
     {
         private EntityReference _entityReference { get; set; }
         #region DTO
@@ -203,7 +203,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         #region public
         public T GetElement<T>(WebClient client)
-    where T : Element
+    //where T : IElement
         {
             return (T)Activator.CreateInstance(typeof(T), new object[] { client });
         }
@@ -805,7 +805,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return _client.Execute($"Select Tab", driver =>
             {
-                Element tabList;
+                IElement tabList;
                 if (driver.HasElement(_client.ElementMapper.DialogsReference.DialogContext))
                 {
                     var dialogContainer = driver.FindElement(_client.ElementMapper.DialogsReference.DialogContext);
@@ -829,12 +829,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
-        internal void ClickTab(Element tabList, string xpath, string name)
+        internal void ClickTab(IElement tabList, string xpath, string name)
         {
-            Element moreTabsButton;
-            Element listItem;
+            IElement moreTabsButton;
+            IElement listItem;
             // Look for the tab in the tab list, else in the more tabs menu
-            Element searchScope = null;
+            IElement searchScope = null;
             if (_client.Browser.Browser.HasElement(tabList.Locator + string.Format(xpath, name)))
             {
                 searchScope = tabList;
@@ -934,8 +934,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return _client.Execute(_client.GetOptions($"Save"), driver =>
             {
-                //Actions action = new Actions(driver);
-                //action.KeyDown(Keys.Control).SendKeys("S").Perform();
+                
 
                 driver.SendKeys(_client.ElementMapper.EntityReference.Form, new string[] { Keys.Control, "S" });
 
@@ -1041,11 +1040,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return _client.Execute(_client.GetOptions($"Get Field"), driver =>
             {
-                var fieldElement = driver.WaitUntilAvailable(this._entityReference.TextFieldContainer.Replace("[NAME]", field));
-                Field returnField = new Field(fieldElement);
+                var fieldIElement = driver.WaitUntilAvailable(this._entityReference.TextFieldContainer.Replace("[NAME]", field));
+                Field returnField = new Field(fieldIElement);
                 returnField.Name = field;
 
-                Element fieldLabel = null;
+                IElement fieldLabel = null;
                 try
                 {
                     fieldLabel = driver.FindElement(this._entityReference.TextFieldContainer.Replace("[NAME]", field) + this._entityReference.TextFieldLabel.Replace("[NAME]", field));
@@ -1076,7 +1075,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     var input = driver.FindElement(this._entityReference.TextFieldContainer.Replace("[NAME]", field) + "//input");
                     if (input != null)
                     {
-                        //IWebElement fieldValue = input.FindElement(By.XPath(EntityReference.TextFieldValue].Replace("[NAME]", field)));
+                        //IWebIElement fieldValue = input.FindElement(By.XPath(EntityReference.TextFieldValue].Replace("[NAME]", field)));
                         text = input.GetAttribute(_client, "value").ToString();
 
                         // Needed if getting a date field which also displays time as there isn't a date specifc GetValue method
@@ -1111,13 +1110,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return _client.Execute($"Get Lookup Value: {controlName}", driver =>
             {
                 var xpathToContainer = _client.ElementMapper.EntityReference.TextFieldLookupFieldContainer.Replace("[NAME]", controlName);
-                Element fieldContainer = driver.WaitUntilAvailable(xpathToContainer);
+                IElement fieldContainer = driver.WaitUntilAvailable(xpathToContainer);
                 string lookupValue = TryGetValue(fieldContainer, control);
 
                 return lookupValue;
             });
         }
-        private string TryGetValue(Element fieldContainer, LookupItem control)
+        private string TryGetValue(IElement fieldContainer, LookupItem control)
         {
             string[] lookupValues = TryGetValue(fieldContainer, new[] { control });
             string result = string.Join("; ", lookupValues);
@@ -1142,7 +1141,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
-        private string[] TryGetValue(Element fieldContainer, LookupItem[] controls)
+        private string[] TryGetValue(IElement fieldContainer, LookupItem[] controls)
         {
             var controlName = controls.First().Name;
             var xpathToExistingValues = _client.ElementMapper.EntityReference.LookupFieldExistingValue.Replace("[NAME]", controlName);
@@ -1200,13 +1199,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
-        private string TryGetValue(Element fieldContainer, OptionSet control)
+        private string TryGetValue(IElement fieldContainer, OptionSet control)
         {
-            bool success = _client.Browser.Browser.HasElement(fieldContainer + "//select");
+            bool success = _client.Browser.Browser.HasElement(fieldContainer.Locator + "//select");
             if (success)
             {
-                var select = _client.Browser.Browser.FindElement(fieldContainer + "//select");
-                var options = _client.Browser.Browser.FindElements(fieldContainer + "//select//option");
+                var select = _client.Browser.Browser.FindElement(fieldContainer.Locator + "//select");
+                var options = _client.Browser.Browser.FindElements(fieldContainer.Locator + "//select//option");
                 string result = GetSelectedOption(options);
                 return result;
             }
@@ -1223,7 +1222,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             throw new InvalidOperationException($"OptionSet Field: '{name}' does not exist");
         }
 
-        private static string GetSelectedOption(List<Element> options)
+        private static string GetSelectedOption(List<IElement> options)
         {
             var selectedOption = options.FirstOrDefault(op => op.Selected);
             return selectedOption?.Text ?? string.Empty;
@@ -1421,7 +1420,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         //        }
 
         //        var entityName = subGrid
-        //            .FindElement(By.XPath(AppElements.Xpath[AppReference.Grid.Control]))
+        //            .FindElement(By.XPath(AppIElements.Xpath[AppReference.Grid.Control]))
         //            .GetAttribute("data-lp-id")
         //            .Split('|')
         //            .ElementAt(4);
@@ -1859,7 +1858,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
-        internal TResult ExecuteInHeaderContainer<TResult>(IWebBrowser driver, string xpathToContainer, Func<Element, TResult> function)
+        internal TResult ExecuteInHeaderContainer<TResult>(IWebBrowser driver, string xpathToContainer, Func<IElement, TResult> function)
         {
             TResult lookupValue = default(TResult);
 
@@ -1867,11 +1866,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             var xpathToFlyout = this._entityReference.HeaderFlyout;
             var flyout = driver.WaitUntilAvailable(xpathToFlyout, TimeSpan.FromSeconds(5), "Flyout not available in header container.");
-            var container = driver.FindElement(xpathToContainer + xpathToFlyout);
+            var container = driver.FindElement(xpathToContainer);
             lookupValue = function(container);
                 //flyout =>
                 //{
-                //    IWebElement container = flyout.FindElement(By.XPath(xpathToContainer));
+                //    IWebIElement container = flyout.FindElement(By.XPath(xpathToContainer));
                 //    lookupValue = function(container);
                 //}); ;
 

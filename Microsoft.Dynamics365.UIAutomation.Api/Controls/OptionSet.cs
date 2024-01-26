@@ -19,7 +19,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public OptionSet() {
             _entityReference = new EntityReference();
         }
-        public void SelectOption(WebClient client, List<Element> options, string value)
+        public void SelectOption(WebClient client, List<IElement> options, string value)
         {
             var selectedOption = options.FirstOrDefault(op => op.Text == value || op.GetAttribute(client, "value") == value);
             selectedOption.Click(client, true);
@@ -29,7 +29,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             var controlName = control.Name;
             return client.Execute(client.GetOptions($"Set OptionSet Value: {controlName}"), driver =>
             {
-                Element fieldContainer = null;
+                IElement fieldContainer = null;
                 fieldContainer = client.ValidateFormContext(driver, formContextType, controlName, fieldContainer);
 
                 control.TrySetValue(client,fieldContainer, control);
@@ -48,13 +48,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
-        internal void TrySetValue(WebClient client, Element fieldContainer, OptionSet control)
+        internal void TrySetValue(WebClient client, IElement fieldContainer, OptionSet control)
         {
             var value = control.Value;
             bool success = client.Browser.Browser.HasElement(fieldContainer.Locator + "//select");
             if (success)
             {
-                Element select = client.Browser.Browser.FindElement(fieldContainer.Locator + "//select");
+                IElement select = client.Browser.Browser.FindElement(fieldContainer.Locator + "//select");
                 client.Browser.Browser.WaitUntilAvailable(fieldContainer.Locator + "//select");
                 var options = client.Browser.Browser.FindElements(select.Locator + "//option");
                 SelectOption(client, options, value);

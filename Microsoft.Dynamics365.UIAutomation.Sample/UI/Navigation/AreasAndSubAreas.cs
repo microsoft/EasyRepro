@@ -31,7 +31,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
 
                 List<string> expectedAreas = new List<string> { "sales", "app settings", "sales insights settings", "personal settings", "help and support" };
 
-                Dictionary<string, Element> areas = xrmApp.Navigation.OpenMenu();
+                Dictionary<string, IElement> areas = xrmApp.Navigation.OpenMenu();
                 
 
                 List<string> actualAreas = new List<string>();
@@ -62,7 +62,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
 
                 List<string> expectedSubAreas = new List<string> { "Home","Recent","Pinned","Dashboards","Activities","Accounts","Contacts","Social Profiles","Cases","Queues","Knowledge Articles"};
 
-                Dictionary<string, Element> subAreaMenuItems = xrmApp.Navigation.GetSubAreaMenuItems(client.Browser.Browser);
+                Dictionary<string, IElement> subAreaMenuItems = xrmApp.Navigation.GetSubAreaMenuItems(client.Browser.Browser);
 
                 List<string> actualSubAreas = new List<string>();
 

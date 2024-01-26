@@ -8,7 +8,7 @@ using static Microsoft.Dynamics365.UIAutomation.Api.Dialogs;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
-    public class Dialogs : Element
+    public class Dialogs
     {
         public class AddConnectionReference
         {
@@ -454,7 +454,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return _client.Execute(_client.GetOptions($"Click Command"), driver =>
             {
             // Find the button in the CommandBar
-            Element ribbon;
+            IElement ribbon;
             // Checking if any dialog is active
             if (driver.HasElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext)))
             {
@@ -561,7 +561,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                           0)) return true;
 
                     //Click the Confirm or Cancel button
-                    Element buttonToClick;
+                    IElement buttonToClick;
                     buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.OkButton);
                     buttonToClick.Click(_client);
                 }
@@ -638,7 +638,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     if (!(driver?.FindElements(_client.ElementMapper.DialogsReference.ConfirmButton).Count > 0)) return true;
 
                     //Click the Confirm or Cancel button
-                    Element buttonToClick;
+                    IElement buttonToClick;
                     if (ClickConfirmButton)
                         buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.ConfirmButton);
                     else
@@ -680,7 +680,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                           0)) return true;
 
                     //Click the Confirm or Cancel button
-                    Element buttonToClick;
+                    IElement buttonToClick;
                     if (clickSaveOrCancel)
                         buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.DuplicateDetectionIgnoreSaveButton);
                     else
@@ -719,7 +719,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                           0)) return true;
 
                     //Click the Activate/Deactivate or Cancel button
-                    Element buttonToClick;
+                    IElement buttonToClick;
                     if (clickOkButton)
                         buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.SetStateDialog + _client.ElementMapper.DialogsReference.SetStateActionButton);
                     else
@@ -752,7 +752,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                           0)) return true;
 
                     //Click the Confirm or Cancel button
-                    Element buttonToClick;
+                    IElement buttonToClick;
                     if (ClickConfirmButton)
                         buttonToClick = driver.FindElement(_client.ElementMapper.DialogsReference.PublishConfirmButton);
                     else
@@ -781,7 +781,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 if (to == Dialogs.AssignTo.Me)
                 {
-                    //SetValue(new OptionSet { Name = Elements.ElementId[Reference.Dialogs.Assign.AssignToId], Value = "Me" }, FormContextType.Dialog);
+                    //SetValue(new OptionSet { Name = IElements.IElementId[Reference.Dialogs.Assign.AssignToId], Value = "Me" }, FormContextType.Dialog);
                     OptionSet.SetValue(_client, new OptionSet { Name = _client.ElementMapper.DialogsReference.Assign.AssignToId, Value = "Me" }, FormContextType.Dialog);
                 }
                 else
@@ -910,12 +910,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 // Is error dialog present?
                 if (errorDialog != null)
                 {
-                    var errorDetailsElement = driver.FindElement("//div[contains(@data-id,'errorDialogdialog')]" + ".//*[contains(@data-id,'errorDialog_subtitle')]");
+                    var errorDetailsIElement = driver.FindElement("//div[contains(@data-id,'errorDialogdialog')]" + ".//*[contains(@data-id,'errorDialog_subtitle')]");
 
-                    if (errorDetailsElement != null)
+                    if (errorDetailsIElement != null)
                     {
-                        if (!String.IsNullOrEmpty(errorDetailsElement.Text))
-                            errorDetails = errorDetailsElement.Text;
+                        if (!String.IsNullOrEmpty(errorDetailsIElement.Text))
+                            errorDetails = errorDetailsIElement.Text;
                     }
                 }
 

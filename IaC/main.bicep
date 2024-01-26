@@ -41,12 +41,27 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-12-01-previ
 // }
 
 module appInsights 'modules/appInsights.bicep' = {
-  name: 'appService'
+  name: 'alyousse-appInsights'
   params: {
     applicationInsightsName: applicationInsightsName
     location: location
     logAnalayticsId: logAnalytics.id
     environmentType: environmentType
+  }
+}
+
+module acrResource 'modules/containerRegistry.bicep' = {
+  name: 'alyousse-containerRegistry'
+  params: {
+    location: location
+  }
+}
+
+module containerInstanceResource 'modules/containerinstance.bicep' ={
+  name: 'alyousse-aci'
+  params:{
+     image: 'mcr.microsoft.com/dotnet/aspnet:6.0-focal-amd64'
+     location: location
   }
 }
 

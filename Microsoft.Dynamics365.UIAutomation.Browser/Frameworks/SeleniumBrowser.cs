@@ -69,29 +69,44 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         #region SwitchToFrame
 
-        public void SwitchToFrame(string name)
+
+        //string IWebBrowser.Url { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        private Element? ConvertToElement(IWebElement element, string selector)
         {
-            _driver.SwitchTo().Frame(name);
-        }
-        //Commenting these out as Playwright doesn't do frame # or Element. Just want to save these just in case. 
-        //public void SwitchToFrame(int frame)
-        //{
-        //    _driver.SwitchTo().Frame(frame);
-        //}
-        //public void SwitchToFrame(Element frameElement)
-        //{
-        //    _driver.SwitchTo().Frame((IWebElement)frameElement);
-        //}
+            Element rtnObject = new Element();
+            if (element == null) return null;
+            try
+            {
+                rtnObject.Text = element.Text;
+                rtnObject.Tag = element.TagName;
+                rtnObject.Selected = element.Selected;
+                rtnObject.Value = element.Text;
+                rtnObject.Id = element.GetAttribute("id");
+                rtnObject.Locator = selector;
+            }
+            catch (StaleElementReferenceException staleEx)
+            {
+                return null;
+                //throw;
+            }
 
         #endregion
 
-        #region TakeWindowScreenShot
-
-        public void TakeWindowScreenShot(string filename)
-        {           
-            _driver.TakeScreenshot().SaveAsFile(filename);
+            return rtnObject;
         }
-        #endregion
+        private ICollection<Element> ConvertToElements(ICollection<IWebElement> elements, string selector)
+        {
+            ICollection<Element> rtnObject = new List<Element>();
+            foreach (var element in elements)
+            {
+                rtnObject.Add(ConvertToElement(element, selector));
+            }
+            return rtnObject;
+        }
+        public void Dispose()
+        {
+            bool isDisposing;
 
         #region HasElement
         public bool HasElement(string selector)
@@ -103,7 +118,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         #region IsAvailable
 
-        public bool IsAvailable(string selector)
+        public Element FindElement(string selector)
         {
             var isAvailable = _driver.WaitUntilClickable(selector);
             return (isAvailable != null) ? true : false;
@@ -130,20 +145,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             return (Element)_driver.WaitUntilAvailable(GetSelectorType(selector));
         }
-
-        Element IWebBrowser.WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
+        
+        public Element? WaitUntilAvailable(string selector)
         {
-            return (Element)_driver.WaitUntilAvailable(GetSelectorType(selector),timeToWait,exceptionMessage);
+            IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector));
+            return ConvertToElement(element, selector);
         }
 
-        Element IWebBrowser.WaitUntilAvailable(string selector, string exceptionMessage)
+        public Element WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
         {
             return (Element)_driver.WaitUntilAvailable(GetSelectorType(selector), exceptionMessage);
         }
         #endregion
 
-        #region GetElement/GetSelectorType
-        private IWebElement GetElement(string selector)
+        public Element WaitUntilAvailable(string selector, string exceptionMessage)
         {
             return _driver.FindElement(GetSelectorType(selector));
         }
@@ -170,29 +185,72 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
         #endregion
 
-        #region Disposal / Finalization
+                throw new Exception(exceptionMessage);
+            }
+           
+        }
 
-        private readonly object syncRoot = new object();
-        private readonly bool disposeOfDriver = true;
-        private bool disposing = false;
-
-        public void Dispose()
+        public List<Element>? FindElements(string selector)
         {
             bool isDisposing;
 
-            lock (this.syncRoot)
-            {
-                isDisposing = disposing;
-            }
+        public void SendKeys(string locator, string[] keys)
+        {
+            IWebElement element = _driver.FindElement(By.XPath(locator));
+            SeleniumExtensions.SendKeys(element, string.Join("",keys));
+        }
 
             if (!isDisposing)
             {
-                lock (this.syncRoot)
-                {
-                    disposing = true;
-                }
+                if (frame == 0) { _driver.SwitchTo().ParentFrame(); }
+                else _driver.SwitchTo().Frame(frame);
             }
+            else
+                _driver.SwitchTo().Frame(locator);
         }
+
+        public void Wait(PageEvent pageEvent)
+        {
+            switch (pageEvent){
+                case PageEvent.Load:
+                    _driver.WaitForPageToLoad();
+                    break;
+                default:
+                    break;
+            }
+            
+        }
+
+        public void TakeWindowScreenShot(string fileName, FileFormat fileFormat)
+        {
+            _driver.TakeScreenshot();
+        }
+
+        public void SendKey(string locator, string key)
+        {
+            Actions keyPress = new Actions(_driver);
+            keyPress.SendKeys(OpenQA.Selenium.Keys.Enter).Perform();
+        }
+
+        public string? FindElementAttribute(string selector, string attribute)
+        {
+            return _driver.FindElement(By.XPath(selector)).GetAttribute(attribute);
+        }
+
+        public IElement Test(string selector, string exceptionMessage)
+        {
+            _interfaceElement = new SeleniumElement(_driver, _driver.FindElement(By.XPath(selector)));
+            
+            return _interfaceElement;
+        }
+
+        //public bool DoubleClick(string selector)
+        //{
+        //    Actions act = new Actions(_driver);
+        //    IWebElement element = _driver.FindElement(By.XPath(selector));
+        //    act.DoubleClick(element);
+        //    return true;
+        //}
 
         #endregion Disposal / Finalization
     }

@@ -8,7 +8,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
     /// <summary>
     ///  Related Grid class.
     ///  </summary>
-    public class RelatedGrid : Element
+    public class RelatedGrid 
     {
         #region DTO
         public class RelatedReference

@@ -11,7 +11,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
     /// <summary>
     ///  SubGrid Grid class.
     ///  </summary>
-    public class SubGrid : Element
+    public class SubGrid 
     {
         #region DTO
         public class SubGridReference
@@ -163,7 +163,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return _client.Execute(_client.GetOptions($"Switch SubGrid View"), driver =>
             {
                 // Initialize required variables
-                Element viewPicker = null;
+                IElement viewPicker = null;
 
                 // Find the SubGrid
                 var subGrid = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName));
@@ -214,7 +214,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             return _client.Execute(_client.GetOptions("Click SubGrid Command"), driver =>
             {
                 // Initialize required local variables
-                Element subGridCommandBar = null;
+                IElement subGridCommandBar = null;
 
                 // Find the SubGrid
                 var subGrid = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName));
@@ -328,7 +328,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return _client.Execute(_client.GetOptions($"Search SubGrid {subGridName}"), driver =>
             {
-                Element subGridSearchField = null;
+                IElement subGridSearchField = null;
                 // Find the SubGrid
                 var subGrid = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subGridName));
                 if (subGrid != null)
@@ -336,14 +336,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     var foundSearchField = driver.HasElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridSearchBox);
                     if (foundSearchField)
                     {
-                        var inputElement = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridSearchBox);
+                        var inputIElement = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridSearchBox);
 
                         if (clearByDefault)
                         {
-                            inputElement.Clear(_client, inputElement.Locator);
+                            inputIElement.Clear(_client, inputIElement.Locator);
                         }
 
-                        inputElement.SetValue(_client, searchCriteria );
+                        inputIElement.SetValue(_client, searchCriteria );
 
                         var startSearch = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridSearchBox + "//button");
                         startSearch.Click(_client);
@@ -371,7 +371,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 List<GridItem> subGridRows = new List<GridItem>();
 
                 // Initialize required local variables
-                Element subGridRecordList = null;
+                IElement subGridRecordList = null;
                 List<string> columns = new List<string>();
                 List<string> cellValues = new List<string>();
                 GridItem item = new GridItem();
@@ -433,7 +433,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     //Find the columns
                     var headerCells = driver.FindElements(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridHeadersEditable);
 
-                    foreach (Element headerCell in headerCells)
+                    foreach (IElement headerCell in headerCells)
                     {
                         var headerTitle = headerCell.GetAttribute(_client,"title");
                         columns.Add(headerTitle);
@@ -443,13 +443,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     var rows = driver.FindElements(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridDataRowsEditable);
 
                     //Process each row
-                    foreach (Element row in rows)
+                    foreach (IElement row in rows)
                     {
                         var cells = driver.FindElements(row.Locator + _client.ElementMapper.SubGridReference.SubGridCells);
 
                         if (cells.Count > 0)
                         {
-                            foreach (Element thisCell in cells)
+                            foreach (IElement thisCell in cells)
                                 cellValues.Add(thisCell.Text);
 
                             for (int i = 0; i < columns.Count; i++)
@@ -483,7 +483,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     //Find the columns
                     var headerCells = driver.FindElements(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridHeadersHighDensity);
 
-                    foreach (Element headerCell in headerCells)
+                    foreach (IElement headerCell in headerCells)
                     {
                         var headerTitle = headerCell.GetAttribute(_client, "data-id");
                         columns.Add(headerTitle);
@@ -493,7 +493,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     var rows = driver.FindElements(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridRowsHighDensity);
 
                     //Process each row
-                    foreach (Element row in rows)
+                    foreach (IElement row in rows)
                     {
                         //Get the entityId and entity Type
                         if (row.GetAttribute(_client, "data-lp-id") != null)
@@ -509,7 +509,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                         if (cells.Count > 0)
                         {
-                            foreach (Element thisCell in cells)
+                            foreach (IElement thisCell in cells)
                                 cellValues.Add(thisCell.Text);
 
                             for (int i = 0; i < columns.Count; i++)
@@ -542,7 +542,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
-        private void ClickSubGridAndPageDown(IWebBrowser driver, Element grid)
+        private void ClickSubGridAndPageDown(IWebBrowser driver, IElement grid)
         {
             //Actions actions = new Actions(driver);
             //var topRow = driver.FindElement(By.XPath("//div[@data-id='entity_control-pcf_grid_control_container']//div[@ref='centerContainer']//div[@role='rowgroup']//div[@role='row']"));
@@ -569,7 +569,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var subGrid = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridContents.Replace("[NAME]", subgridName));
 
                 // Find list of SubGrid records
-                Element subGridRecordList = null;
+                IElement subGridRecordList = null;
                 var foundGrid = driver.HasElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName));
                 subGridRecordList = driver.FindElement(subGrid.Locator + _client.ElementMapper.SubGridReference.SubGridListCells.Replace("[NAME]", subgridName));
                 // Read Only Grid Found
@@ -579,9 +579,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     if (subGridRecordRows == null)
                         throw new Exception($"No records were found for subgrid {subgridName}");
                     //Actions actions = new Actions(driver);
-                    //actions.MoveToElement(subGrid).Perform();
+                    //actions.MoveToIElement(subGrid).Perform();
                     subGrid.Focus(_client, subGrid.Locator);
-                    Element gridRow = null;
+                    IElement gridRow = null;
                     if (index + 1 < subGridRecordRows.Count)
                     {
                         gridRow = subGridRecordRows[index];

@@ -22,9 +22,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string RequiredIcon = ".//div[contains(@data-id, 'required-icon') or contains(@id, 'required-icon')]";
         }
         //Constructors
-        public Field(Element containerElement)
+        public Field(IElement containerIElement)
         {
-            this.containerElement = containerElement;
+            this.containerIElement = containerIElement;
         }
 
         public Field(WebClient client)
@@ -33,14 +33,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
 
         private WebClient _client { get; set; }
-        internal Element _inputElement { get; set; }
+        internal IElement _inputIElement { get; set; }
 
-        //Element that contains the container for the field on the form
-        internal Element containerElement { get; set; }
+        //IElement that contains the container for the field on the form
+        internal IElement containerIElement { get; set; }
 
         public void Click(WebClient client)
         {
-            _inputElement.Click(client);
+            _inputIElement.Click(client);
         }
 
         /// <summary>
@@ -72,9 +72,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             get
             {
-                if (_client.Browser.Browser.HasElement(containerElement.Locator + FieldReference.ReadOnly))
+                if (_client.Browser.Browser.HasElement(containerIElement.Locator + FieldReference.ReadOnly))
                 {
-                    var readOnly = _client.Browser.Browser.FindElement(containerElement.Locator + FieldReference.ReadOnly);
+                    var readOnly = _client.Browser.Browser.FindElement(containerIElement.Locator + FieldReference.ReadOnly);
 
                     if (readOnly.HasAttribute(_client,"aria-readonly"))
                     {
@@ -86,32 +86,32 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     else if (readOnly.HasAttribute(_client, "readonly"))
                         return true;
                 }
-                else if (_client.Browser.Browser.HasElement(containerElement.Locator + "//select"))
+                else if (_client.Browser.Browser.HasElement(containerIElement.Locator + "//select"))
                 {
                     // Option Set Condition
-                    var readOnlySelect = _client.Browser.Browser.FindElement(containerElement.Locator + "//select");
+                    var readOnlySelect = _client.Browser.Browser.FindElement(containerIElement.Locator + "//select");
 
                     if (readOnlySelect.HasAttribute(_client, "disabled"))
                         return true;
 
                 }
-                else if (_client.Browser.Browser.HasElement(containerElement.Locator + "//input"))
+                else if (_client.Browser.Browser.HasElement(containerIElement.Locator + "//input"))
                 {
                     // DateTime condition
-                    var readOnlyInput = _client.Browser.Browser.FindElement(containerElement.Locator + "//input");
+                    var readOnlyInput = _client.Browser.Browser.FindElement(containerIElement.Locator + "//input");
 
                     if (readOnlyInput.HasAttribute(_client, "disabled") || readOnlyInput.HasAttribute(_client, "readonly"))
                         return true;
                 }
-                else if (_client.Browser.Browser.HasElement(containerElement.Locator + "//textarea"))
+                else if (_client.Browser.Browser.HasElement(containerIElement.Locator + "//textarea"))
                 {
-                    var readOnlyTextArea = _client.Browser.Browser.FindElement(containerElement.Locator + "//textarea");
+                    var readOnlyTextArea = _client.Browser.Browser.FindElement(containerIElement.Locator + "//textarea");
                     return readOnlyTextArea.HasAttribute(_client, "readonly");
                 }
                 else
                 {
                     // Special Lookup Field condition (e.g. transactioncurrencyid)
-                    var lookupRecordList = _client.Browser.Browser.FindElement(containerElement.Locator + ".//div[contains(@id,'RecordList') and contains(@role,'presentation')]");
+                    var lookupRecordList = _client.Browser.Browser.FindElement(containerIElement.Locator + ".//div[contains(@id,'RecordList') and contains(@role,'presentation')]");
                     var lookupDescription = _client.Browser.Browser.FindElement(lookupRecordList.Locator + "//div");
 
                     if (lookupDescription != null)
@@ -131,9 +131,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             get
             {
-                if (_client.Browser.Browser.HasElement(containerElement.Locator + FieldReference.RequiredIcon))
+                if (_client.Browser.Browser.HasElement(containerIElement.Locator + FieldReference.RequiredIcon))
                 {
-                    var required = _client.Browser.Browser.FindElement(containerElement.Locator + FieldReference.RequiredIcon);
+                    var required = _client.Browser.Browser.FindElement(containerIElement.Locator + FieldReference.RequiredIcon);
 
                     if (required != null)
                         return true;
@@ -149,7 +149,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public bool IsVisible {
             get
             {
-                return containerElement.IsAvailable;
+                return containerIElement.IsAvailable;
             }
         }
 
@@ -161,7 +161,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </value>
         public string Value { get; set; }
 
-        internal void SetInputValue(IWebBrowser driver, Element input, string value, TimeSpan? thinktime = null)
+        internal void SetInputValue(IWebBrowser driver, IElement input, string value, TimeSpan? thinktime = null)
         {
             input.Clear(_client, input.Locator);
             input.Click(_client);
@@ -212,10 +212,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         {
             return client.Execute(client.GetOptions("Set Value"), driver =>
             {
-                Element fieldContainer = null;
+                IElement fieldContainer = null;
                 fieldContainer = client.ValidateFormContext(driver, formContextType, field, fieldContainer);
 
-                Element input;
+                IElement input;
                 bool found = client.Browser.Browser.HasElement(fieldContainer.Locator + "//input");
                 input = client.Browser.Browser.FindElement(fieldContainer.Locator + "//input");
                 if (!found)
@@ -232,7 +232,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             });
         }
 
-        internal static void ClearFieldValue(WebClient client, Element field)
+        internal static void ClearFieldValue(WebClient client, IElement field)
         {
             if (field.GetAttribute(client, "value").Length > 0)
             {

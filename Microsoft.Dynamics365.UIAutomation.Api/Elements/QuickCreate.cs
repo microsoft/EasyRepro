@@ -6,7 +6,7 @@ using System;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
-    public class QuickCreate : Element
+    public class QuickCreate 
     {
 
         #region DTO

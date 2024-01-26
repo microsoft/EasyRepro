@@ -10,7 +10,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
     /// <summary>
     /// Represents a Boolean Item in Dynamics 365.
     /// </summary>
-    public class BooleanItem : Element
+    public class BooleanItem //: IElement
     {
         public string Name { get; set; }
         public bool Value { get; set; }
@@ -25,7 +25,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         //        // ensure that the option.Name value is lowercase -- will cause XPath lookup issues
         //        option.Name = option.Name.ToLowerInvariant();
 
-        //        Element fieldContainer = null;
+        //        IElement fieldContainer = null;
         //        fieldContainer = client.ValidateFormContext(driver, formContextType, option.Name, fieldContainer);
 
         //        var hasRadio = driver.HasElement(client.ElementMapper.EntityReference.EntityBooleanFieldRadioContainer.Replace("[NAME]", option.Name));
@@ -35,7 +35,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         //        var hasFlipSwitch = driver.HasElement(client.ElementMapper.EntityReference.EntityBooleanFieldFlipSwitchLink.Replace("[NAME]", option.Name));
 
         //        // Need to validate whether control is FlipSwitch or Button
-        //        Element flipSwitchContainer = null;
+        //        IElement flipSwitchContainer = null;
         //        var flipSwitch = hasFlipSwitch ? driver.HasElement(client.ElementMapper.EntityReference.EntityBooleanFieldFlipSwitchContainer.Replace("[NAME]", option.Name)) : false;
         //        var hasButton = flipSwitchContainer != null ? driver.HasElement(client.ElementMapper.EntityReference.EntityBooleanFieldButtonTrue) : false;
         //        hasFlipSwitch = hasButton ? false : hasFlipSwitch; //flipSwitch and button have the same container reference, so if it has a button it is not a flipSwitch
@@ -138,7 +138,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 // ensure that the option.Name value is lowercase -- will cause XPath lookup issues
                 option.Name = option.Name.ToLowerInvariant();
 
-                Element fieldContainer = null;
+                IElement fieldContainer = null;
                 fieldContainer = client.ValidateFormContext(driver, formContextType, option.Name, fieldContainer);
 
                 var hasRadio = driver.HasElement(client.ElementMapper.EntityReference.EntityBooleanFieldRadioContainer.Replace("[NAME]", option.Name));
@@ -148,7 +148,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var hasFlipSwitch = driver.HasElement(client.ElementMapper.EntityReference.EntityBooleanFieldFlipSwitchLink.Replace("[NAME]", option.Name));
 
                 // Need to validate whether control is FlipSwitch or Button
-                Element flipSwitchContainer = null;
+                IElement flipSwitchContainer = null;
                 var flipSwitch = hasFlipSwitch ? driver.HasElement(client.ElementMapper.EntityReference.EntityBooleanFieldFlipSwitchContainer.Replace("[NAME]", option.Name)) : false;
                 var hasButton = flipSwitchContainer != null ? driver.HasElement(client.ElementMapper.EntityReference.EntityBooleanFieldButtonTrue) : false;
                 hasFlipSwitch = hasButton ? false : hasFlipSwitch; //flipSwitch and button have the same container reference, so if it has a button it is not a flipSwitch

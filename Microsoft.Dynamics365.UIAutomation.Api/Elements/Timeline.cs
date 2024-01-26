@@ -11,7 +11,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
     /// It contains methods which map to the actions invoked in the menu popout
     /// of the widget.
     /// </summary>
-    public class Timeline : Element
+    public class Timeline 
     {
         #region DTO
         public class TimelineReference
@@ -327,7 +327,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 }
                 catch
                 {
-                    // Element is stale reference is thrown here since the HTML components 
+                    // IElement is stale reference is thrown here since the HTML components 
                     // get destroyed and thus leaving the references null. 
                     // It is expected that the components will be destroyed and the next 
                     // action should take place after it and hence it is ignored.
@@ -395,7 +395,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                     catch
                     {
-                        // Element is stale reference is thrown here since the HTML components 
+                        // IElement is stale reference is thrown here since the HTML components 
                         // get destroyed and thus leaving the references null. 
                         // It is expected that the components will be destroyed and the next 
                         // action should take place after it and hence it is ignored.

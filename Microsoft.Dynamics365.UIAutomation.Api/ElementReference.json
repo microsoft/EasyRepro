@@ -47,7 +47,8 @@
   "Entity": {
     "Form": "//*[contains(@id, \"tablist1\")]",
     "TextFieldLookupFieldContainer": ".//div[contains(@data-id,'[NAME].fieldControl-Lookup_[NAME]')]",
-    "DuplicateDetectionWindowMarker": "//div[contains(@data-id,'ManageDuplicates')]"
+    "DuplicateDetectionWindowMarker": "//div[contains(@data-id,'ManageDuplicates')]",
+    "LookupFieldExistingValue": "//*[contains(@data-id, '[NAME].fieldControl-LookupResultsDropdown_[NAME]_selected_tag') and @role='link']"
   },
   "GlobalSearch": {
   },

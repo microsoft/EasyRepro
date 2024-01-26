@@ -42,28 +42,38 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         #region ExecuteScript
 
-        public object ExecuteScript(string script, params object[] args)
+        private Element? ConvertToElement(ILocator element, string selector)
         {
-            return _page.EvaluateAsync(script, args);
-        }
-        #endregion
-
-        #region Navigate
-        public void Navigate(string url)
-        {
-            _page.GotoAsync(url).GetAwaiter().GetResult();
-        }
-        public async void NavigateAsync(string url)
-        {
-            await _page.GotoAsync(url);
-        }
-        #endregion
+            Element rtnObject = new Element();
+            if (element == null) return null;
+            try
+            {
+                rtnObject.Text = element.InnerTextAsync().Result;
+                //rtnObject.Tag = element.;
+                //rtnObject.Selected = element.IsCheckedAsync().Result;
+                rtnObject.Value = element.InnerTextAsync().Result;
+                rtnObject.Id = element.GetAttributeAsync("id").Result;
+                rtnObject.Locator = selector;
+            }
+            catch (StaleElementReferenceException staleEx)
+            {
+                return null;
+                //throw;
+            }
 
         #region SendKeys
 
-        public void SendKey(string selector, string key)
+            return rtnObject;
+        }
+
+        private ICollection<Element> ConvertToElements(IReadOnlyCollection<ILocator> elements, string selector)
         {
-            _page.Keyboard.TypeAsync(key);
+            ICollection<Element> rtnObject = new List<Element>();
+            foreach (var element in elements)
+            {
+                rtnObject.Add(ConvertToElement(element, selector));
+            }
+            return rtnObject;
         }
 
         public void SendKeys(string selector, string[] keys)
@@ -147,7 +157,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             return GetElement(selector);
         }
 
-        Element IWebBrowser.WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
+            if (!isDisposing)
+            {
+                lock (this.syncRoot)
+                {
+                    disposing = true;
+                }
+            }
+        }
+
+        public Element FindElement(string selector)
         {
 
             try
@@ -177,22 +196,21 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
         #endregion
 
-        #region WaitForSelector
-        internal void WaitForSelector(string selector)
+        public Element? WaitUntilAvailable(string selector)
         {
             _page.WaitForLoadStateAsync(LoadState.NetworkIdle).GetAwaiter().GetResult();
             //_page.WaitForLoadStateAsync(LifecycleEvent.Networkidle).GetAwaiter().GetResult();
             _page.WaitForSelectorAsync(selector,).GetAwaiter().GetResult();
         }
 
-        internal void WaitForSelector(string selector, PageWaitForSelectorOptions options)
+        public Element WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
         {
             _page.WaitForLoadStateAsync(LoadState.NetworkIdle).GetAwaiter().GetResult();
             //_page.WaitForLoadStateAsync(LifecycleEvent.Networkidle).GetAwaiter().GetResult();
             _page.WaitForSelectorAsync(selector, options).GetAwaiter().GetResult();
         }
 
-        internal async Task WaitForSelectorAsync(string selector)
+        public Element WaitUntilAvailable(string selector, string exceptionMessage)
         {
             await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
             await _page.WaitForSelectorAsync(selector);
@@ -214,13 +232,18 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
         #endregion
 
-        #region Disposal / Finalization
+        bool IWebBrowser.ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
+        {
+            //throw new NotImplementedException();
+            ILocator locator = _page.Locator(selector);
+            locator.ClickAsync(new LocatorClickOptions()
+            {
+                
+            }).GetAwaiter().GetResult();
+            return true;
+        }
 
-        private readonly object syncRoot = new object();
-        private readonly bool disposeOfDriver = true;
-        private bool disposing = false;
-
-        public void Dispose()
+        public List<Element>? FindElements(string selector)
         {
             bool isDisposing;
 
@@ -238,6 +261,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
         }
 
+        bool IWebBrowser.DoubleClick(string selector)
+        {
+            _page.DblClickAsync(selector).GetAwaiter().GetResult();
+            return true;
+        }
 
         #endregion Disposal / Finalization
     }

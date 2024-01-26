@@ -4,7 +4,7 @@ using Microsoft.Dynamics365.UIAutomation.Browser;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
-    public class GlobalSearch : Element
+    public class GlobalSearch
     {
         #region DTO
         public class GlobalSearchReference
@@ -82,7 +82,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 driver.Wait();
 
-                Element input;
+                IElement input;
                 if (driver.HasElement("//*[@id='GlobalSearchBox']"))
                 {
                     var globalSearch = driver.FindElement("//*[@id='GlobalSearchBox']");
@@ -236,7 +236,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         throw new InvalidOperationException($"There was less than {index + 1} records in the search result.");
                     }
 
-                    foreach (Element link in links) link.DoubleClick(_client, link.Locator);
+                    foreach (IElement link in links) link.DoubleClick(_client, link.Locator);
                     //new Actions(driver).DoubleClick(links[index]).Perform();
                 }
                 else
