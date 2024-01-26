@@ -5,29 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
-using Microsoft.Playwright;
-using System.Xml.Linq;
-using OpenQA.Selenium.Support.Extensions;
-using OpenQA.Selenium.Interactions;
+using System.IO;
 
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
 {
     internal class SeleniumBrowser : IWebBrowser, IDisposable
     {
-        string IWebBrowser.Url
-        {
-            get
-            {
-                return _driver.Url;
-            }
-            set
-            {
-                _driver.Url = value;
-            }
-        }
         private BrowserOptions _options;
         private IWebDriver _driver;
+        private string _url = "";
 
         public SeleniumBrowser(IWebDriver driver, BrowserOptions options)
         {
@@ -35,97 +22,67 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             _driver = driver;
         }
 
-        public void Click(string selector)
+        public BrowserOptions Options { get { return _options; } set { _options = value; } }
+
+        public string Url { get { return _url; } set { _url = value; } }
+
+        #region FindElement
+
+        public Element FindElement(string selector)
         {
-            _driver.WaitUntilClickable(selector, "Can not click element");
-            IWebElement element = GetElement(selector);
-            if (element != null)
-                element.Click(true);
+            return (Element)_driver.FindElement(By.XPath(selector);
         }
-
-        public bool DoubleClick(string selector)
+        public List<Element> FindElements(string selector)
         {
-            _driver.WaitUntilClickable(selector, "Can not click element");
-            IWebElement element = GetElement(selector);
-
-            if (element != null)
-                _driver.DoubleClick(element);
-
-            return true;
+            return new List<Element>(_driver.FindElements(By.XPath(selector)).Select(x => (Element)x));
         }
+        #endregion
 
-        public void Focus(string selector)
+        #region ExecuteScript
+
+        public object ExecuteScript(string script, params object[] args)
         {
-            _driver.WaitUntilClickable(selector, "Element not available");
-            IWebElement element = GetElement(selector);
-
-            if (element != null)
-                element.Click();
+            return _driver.ExecuteScript(script, args);
         }
+        #endregion
+
+        #region Navigate
 
         public void Navigate(string url)
         {
-            //_driver.Navigate().GoToUrl(url);
-            _driver.Navigate().GoToUrl(new Uri(url));
+            _driver.Navigate().GoToUrl(url);
         }
+        #endregion
 
-        public void SetValue(string selector, string value)
+        #region SendKeys
+
+        public void SendKey(string selector, string key)
         {
-            _driver.WaitUntilClickable(selector, "Element not available");
-            IWebElement element = GetElement(selector);
-
-            if (element != null)
-            {
-                element.Click();
-                element.SendKeys(value);
-            }
+            GetElement(selector).SendKeys(key);
         }
 
-        public bool IsAvailable(string selector)
+        public void SendKeys(string selector, string[] keys)
         {
-            var isAvailable = _driver.WaitUntilClickable(selector);
-            return (isAvailable != null) ? true : false;
+            GetElement(selector).SendKeys(keys.ToString());
         }
+        #endregion
 
-        private IWebElement GetElement(string selector)
-        {
-            IWebElement element = null;
-
-            if (selector.StartsWith("#"))
-                element = _driver.FindElement(By.CssSelector(selector));
-            else if(selector.StartsWith("//"))
-                element = _driver.FindElement(By.XPath(selector));
-            else if (_driver.FindElement(By.Id(selector)) != null)
-                element = _driver.FindElement(By.Id(selector));
-            else if (_driver.FindElement(By.Name(selector)) != null)
-                element = _driver.FindElement(By.Name(selector));
-            else if (_driver.FindElement(By.ClassName(selector)) != null)
-                element = _driver.FindElement(By.ClassName(selector));
-            else if (_driver.FindElement(By.LinkText(selector)) != null)
-                element = _driver.FindElement(By.LinkText(selector));
-
-            return element;
-        }
-        #region Disposal / Finalization
-
-        private readonly object syncRoot = new object();
-        private readonly bool disposeOfDriver = true;
-        private bool disposing = false;
+        #region SwitchToFrame
 
 
         //string IWebBrowser.Url { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        private IElement? ConvertToElement(IWebElement element, string selector)
+        private Element? ConvertToElement(IWebElement element, string selector)
         {
-            IElement rtnObject = new SeleniumElement(_driver, element);
+            Element rtnObject = new Element();
             if (element == null) return null;
             try
             {
-                //rtnObject.Text = element.Text;
-                //rtnObject.Tag = element.TagName;
-                //rtnObject.Selected = element.Selected;
-                //rtnObject.Value = element.Text;
-                //rtnObject.Id = element.GetAttribute("id");
+                rtnObject.Text = element.Text;
+                rtnObject.Tag = element.TagName;
+                rtnObject.Selected = element.Selected;
+                rtnObject.Value = element.Text;
+                rtnObject.Id = element.GetAttribute("id");
                 rtnObject.Locator = selector;
             }
             catch (StaleElementReferenceException staleEx)
@@ -134,12 +91,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
                 //throw;
             }
 
+        #endregion
 
             return rtnObject;
         }
-        private ICollection<IElement> ConvertToElements(ICollection<IWebElement> elements, string selector)
+        private ICollection<Element> ConvertToElements(ICollection<IWebElement> elements, string selector)
         {
-            ICollection<IElement> rtnObject = new List<IElement>();
+            ICollection<Element> rtnObject = new List<Element>();
             foreach (var element in elements)
             {
                 rtnObject.Add(ConvertToElement(element, selector));
@@ -150,125 +108,105 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         {
             bool isDisposing;
 
-            lock (this.syncRoot)
-            {
-                isDisposing = disposing;
-            }
-
-            if (!isDisposing)
-            {
-                lock (this.syncRoot)
-                {
-                    disposing = true;
-                }
-            }
-        }
-
-        public IElement FindElement(string selector)
-        {
-            IWebElement seleniumElement = _driver.FindElement(By.XPath(selector));
-            return ConvertToElement(seleniumElement, selector);
-        }
-
-        public void Wait(TimeSpan? timeout = null)
-        {
-            SeleniumExtensions.WaitForTransaction(_driver, timeout);
-        }
-
-        public bool ClickWhenAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
-        {
-            throw new NotImplementedException();
-        }
-
-        public object ExecuteScript(string selector, params object[] args)
-        {
-            throw new NotImplementedException();
-        }
-
+        #region HasElement
         public bool HasElement(string selector)
         {
-            return _driver.HasElement(By.XPath(selector));
+            var hasElement = _driver.WaitUntilClickable(selector);
+            return (hasElement != null) ? true : false;
+        }
+        #endregion
+
+        #region IsAvailable
+
+        public Element FindElement(string selector)
+        {
+            var isAvailable = _driver.WaitUntilClickable(selector);
+            return (isAvailable != null) ? true : false;
+        }
+        #endregion
+
+        #region Wait
+        public void Wait(TimeSpan timeSpan)
+        {
+            ThinkTime((int)timeSpan.TotalMilliseconds);
+        }
+        public void Wait(int milliseconds)
+        {
+            ThinkTime(milliseconds);
+        }
+        private void ThinkTime(int milliseconds)
+        {
+            Thread.Sleep(milliseconds);
+        }
+        #endregion
+
+        #region WaitUntilVailable
+        Element IWebBrowser.WaitUntilAvailable(string selector)
+        {
+            return (Element)_driver.WaitUntilAvailable(GetSelectorType(selector));
         }
         
-        public IElement? WaitUntilAvailable(string selector)
+        public Element? WaitUntilAvailable(string selector)
         {
-            IWebElement element = SeleniumExtensions.WaitUntilVisible(_driver, By.XPath(selector));
-            //IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector), null, null, WaitUntilAvailable(selector));
+            IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector));
             return ConvertToElement(element, selector);
         }
 
-        public IElement WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
+        public Element WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
         {
-            IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector), timeToWait, exceptionMessage);
-            return ConvertToElement(element, selector);
+            return (Element)_driver.WaitUntilAvailable(GetSelectorType(selector), exceptionMessage);
         }
+        #endregion
 
-        public IElement WaitUntilAvailable(string selector, string exceptionMessage)
+        public Element WaitUntilAvailable(string selector, string exceptionMessage)
         {
-            IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector), exceptionMessage);
-            return ConvertToElement(element, selector);
+            return _driver.FindElement(GetSelectorType(selector));
         }
-
-        public bool ClickWhenAvailable(string selector)
+        private By GetSelectorType(string selector)
         {
-            
-            try
-            {
-                IWebElement element = _driver.ClickIfVisible(By.XPath(selector), new TimeSpan(0, 0, 2));
-                return true;
-            }
-            catch (Exception ex)
-            {
+            By type = null;
 
-                throw ex;
-            }
+            if (selector.StartsWith("#"))
+                type = By.CssSelector(selector);
+            else if (selector.StartsWith("//"))
+                type = By.XPath(selector);
+            else if (_driver.FindElement(By.Id(selector)) != null)
+                type = By.Id(selector);
+            else if (_driver.FindElement(By.Name(selector)) != null)
+                type = By.Name(selector);
+            else if (_driver.FindElement(By.ClassName(selector)) != null)
+                type = By.ClassName(selector);
+            else if (_driver.FindElement(By.LinkText(selector)) != null)
+                type = By.LinkText(selector);
+
+            if(type == null) throw new Exception(String.Format("Invalid Selctor Type. Can't determine the selector type for selector '{0}'", selector));
+
+            return type;
         }
-
-        bool IWebBrowser.ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage)
-        {
-            try
-            {
-                IWebElement element = _driver.ClickWhenAvailable(By.XPath(selector), timeToWait, exceptionMessage);
-                return true;
-            }
-            catch (Exception ex)
-            {
+        #endregion
 
                 throw new Exception(exceptionMessage);
             }
-
+           
         }
 
-        public List<IElement>? FindElements(string selector)
+        public List<Element>? FindElements(string selector)
         {
-            ICollection<IWebElement> elements = _driver.FindElements(By.XPath(selector));
-            return ConvertToElements(elements, selector).ToList();
-        }
+            bool isDisposing;
 
         public void SendKeys(string locator, string[] keys)
         {
-            Actions action = new Actions(_driver);
-            //action.KeyDown(Keys.Control).SendKeys("S").Perform();
-            int keyLength = keys.Length-1;
-            for(int x =0; x< keyLength; x++)
-            {
-                action.KeyDown(keys[x].Select(t => $"U+{Convert.ToUInt16(t):X4} ").FirstOrDefault());
-            }
-            action.SendKeys(keys[keyLength]);
-            action.Perform();
+            IWebElement element = _driver.FindElement(By.XPath(locator));
+            SeleniumExtensions.SendKeys(element, string.Join("",keys));
         }
 
-        public void SwitchToFrame(string locator)
-        {
-            if (int.TryParse(locator, out var frame))
+            if (!isDisposing)
             {
                 if (frame == 0) { _driver.SwitchTo().ParentFrame(); }
                 else _driver.SwitchTo().Frame(frame);
             }
-            else {
-                _driver.WaitUntilAvailable(By.Id(locator));
+            else
                 _driver.SwitchTo().Frame(locator);
-            }
         }
 
         public void Wait(PageEvent pageEvent)
@@ -305,8 +243,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             
             return _interfaceElement;
         }
-
-        private SeleniumElement _interfaceElement;
 
         //public bool DoubleClick(string selector)
         //{
