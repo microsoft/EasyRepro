@@ -42,6 +42,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             private string _AdminPortalButton = "//*[@id=(\"O365_AppTile_Admin\")]";
             private string _SearchButton = "//*[@id=\"searchLauncher\"]/button";
             private string _Search = "//*[@id=\"categorizedSearchInputAndButton\"]";
+            private string _QuickLaunchActivities = "//button[contains(@data-id, 'quickCreateMenuButton_Activities')]";
             private string _QuickLaunchMenu = "//div[contains(@data-id,'quick-launch-bar')]";
             private string _QuickLaunchButton = "//li[contains(@title, '[NAME]')]";
             private string _QuickCreateButton = "//button[contains(@data-id,'quickCreateLauncher')]";
@@ -77,6 +78,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public string AdminPortalButton { get => _AdminPortalButton; set { _AdminPortalButton = value; } }
             public string SearchButton { get => _SearchButton; set { _SearchButton = value; } }
             public string Search { get => _Search; set { _Search = value; } }
+
+            public string QuickLaunchActivities { get => _QuickLaunchActivities; set { _QuickLaunchActivities = value; } }
             public string QuickLaunchMenu { get => _QuickLaunchMenu; set { _QuickLaunchMenu = value; } }
             public string QuickLaunchButton { get => _QuickLaunchButton; set { _QuickLaunchButton = value; } }
             public string QuickCreateButton { get => _QuickCreateButton; set { _QuickCreateButton = value; } }
@@ -205,6 +208,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var entityMenuItems = driver.FindElements(entityMenuList.Locator + _client.ElementMapper.NavigationReference.QuickCreateMenuItems);
                 var entitybutton = entityMenuItems.FirstOrDefault(e => e.Text.Contains(entityName, StringComparison.OrdinalIgnoreCase));
 
+                //Text could be in Activities. Expand and verify
+                if (driver.HasElement(_client.ElementMapper.NavigationReference.QuickLaunchActivities))
+                {
+                    var activityExpander = driver.FindElement(_client.ElementMapper.NavigationReference.QuickLaunchActivities);
+                    activityExpander.Click(_client);
+
+                    if (driver.HasElement("//button[@data-id=\"quickCreateMenuButton_[NAME]\"]".Replace("[NAME]", entityName)))
+                    {
+                        driver.FindElement("//button[@data-id=\"quickCreateMenuButton_[NAME]\"]".Replace("[NAME]", entityName)).Click(_client);
+                    }
+                    return true;
+                }
+
                 if (entitybutton == null)
                     throw new Exception(String.Format("{0} not found in Quick Create list.", entityName));
 
@@ -228,6 +244,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var buttons = driver.FindElement(_client.ElementMapper.NavigationReference.QuickLaunchMenu);
                 var launchButton = driver.FindElement(buttons.Locator + _client.ElementMapper.NavigationReference.QuickLaunchButton.Replace("[NAME]", toolTip));
                 launchButton.Click(_client);
+
+                //Text could be in Activities. Expand and verify
+                if (driver.HasElement(_client.ElementMapper.NavigationReference.QuickLaunchActivities))
+                {
+                    var activityExpander = driver.FindElement(_client.ElementMapper.NavigationReference.QuickLaunchActivities);
+                    activityExpander.Click(_client);
+
+                    if (driver.HasElement("//button[@data-id=\"quickCreateMenuButton_[NAME]\"]".Replace("[NAME]", toolTip))){
+                        driver.FindElement("//button[@data-id=\"quickCreateMenuButton_[NAME]\"]".Replace("[NAME]", toolTip)).Click(_client);
+                    }
+                }
 
                 return true;
             });
@@ -420,6 +447,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
         private void AddMenuItemsFrom(IWebBrowser driver, string referenceToMenuItemsContainer, Dictionary<string, IElement> dictionary)
         {
+            Trace.TraceInformation("Attempting to collect menu items using XPath:" + referenceToMenuItemsContainer);
             var menu = driver.WaitUntilAvailable(referenceToMenuItemsContainer,
                 TimeSpan.FromSeconds(2), "The Main Menu is not available.");
             AddMenuItems(menu, dictionary);
@@ -547,6 +575,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 bool success = driver.HasElement(xpathSiteMapLauncherButton);
                 if (success)
                 {
+                    
                     IElement launcherButton = driver.FindElement(xpathSiteMapLauncherButton);
                     bool expanded = bool.Parse(launcherButton.GetAttribute(_client, "aria-expanded"));
                     if (!expanded)
@@ -563,7 +592,6 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     IElement switcherButton = driver.FindElement(xpathSitemapSwitcherButton);
                     switcherButton.Click(_client);
                     driver.Wait();
-
                     AddMenuItemsFrom(driver, _client.ElementMapper.NavigationReference.SitemapSwitcherFlyout, dictionary);
                 }
 

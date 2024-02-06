@@ -122,6 +122,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             return _client.Execute(_client.GetOptions("Open View Picker"), driver =>
             {
+                Trace.TraceInformation("Grid.OpenViewPicker initiated.");
                 driver.ClickWhenAvailable(_client.ElementMapper.GridReference.ViewSelector,
                     TimeSpan.FromSeconds(20),
                     "Unable to click the View Picker"
@@ -146,6 +147,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     if (!result.ContainsKey(key))
                         result.Add(key, viewItem);
                 }
+                Trace.TraceInformation(String.Format("Grid.OpenViewPicker finalized with {0} results.", result.Count()));
                 return result;
             });
         }
@@ -320,6 +322,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             //find search bar
             //input value
             //pass results back
+            _client.CloseNPS(_client.Browser.Browser);
             _client.CloseTeachingBubbles(_client.Browser.Browser);
             return _client.Execute(_client.GetOptions($"Search"), driver =>
             {

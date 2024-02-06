@@ -70,14 +70,35 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         //}
 
         #region TeachingBubbles
-        public void CloseTeachingBubbles(IWebBrowser driver)
+        public void CloseNPS(IWebBrowser driver)
         {
-            if (driver.HasElement("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']"))
+            if (driver.HasElement("//div[contains(@id,'nps-survey')]"))
             {
-                Trace.WriteLine(String.Format("Found {0} Clickable Teaching Bubbles.", driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']").Count));
-                foreach (var item in driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']"))
+                Trace.WriteLine("Found NPS Survey, attempting to close.");
+                driver.SwitchToFrame("nps-feedback-iframe");
+                foreach (var item in driver.FindElements("//button[contains(@aria-label,'Close')]"))
                 {
                     item.Click(this);
+                }
+            }
+        }
+        public void CloseTeachingBubbles(IWebBrowser driver)
+        {
+            if (driver.HasElement("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' ]"))
+            {
+                Trace.WriteLine(String.Format("Found {0} Clickable Teaching Bubbles.", driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']").Count));
+                foreach (var item in driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' ]"))
+                {
+                    try
+                    {
+                        item.Click(this);
+                    }
+                    catch (Exception)
+                    {
+
+                        //Teaching bubbles can disappear so do not pass exception.
+                    }
+                    
                 }
             }
         }

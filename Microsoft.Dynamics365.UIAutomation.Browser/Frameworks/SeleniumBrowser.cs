@@ -8,6 +8,7 @@ using OpenQA.Selenium;
 using System.IO;
 using OpenQA.Selenium.DevTools.V107.DOM;
 using OpenQA.Selenium.Interactions;
+using System.Diagnostics;
 
 
 namespace Microsoft.Dynamics365.UIAutomation.Browser
@@ -26,7 +27,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public BrowserOptions Options { get { return _options; } set { _options = value; } }
 
-        public string Url { get { return _url; } set { _url = value; } }
+        public string Url { get { return _driver.Url; } set { _url = value; } }
 
         #region FindElement
 
@@ -84,21 +85,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         //string IWebBrowser.Url { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        private IElement? ConvertToElement(IWebElement element, string selector)
-        {
-            IElement rtnObject = new SeleniumElement(_driver, element); ;
-            if (element == null) return null;
-            try
-            {
-                rtnObject.Locator = selector;
-            }
-            catch (StaleElementReferenceException staleEx)
-            {
-                return null;
-                //throw;
-            }
-            return rtnObject;
-        }
+
 
 
 
@@ -107,7 +94,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             ICollection<IElement> rtnObject = new List<IElement>();
             foreach (var element in elements)
             {
-                rtnObject.Add(ConvertToElement(element, selector));
+                rtnObject.Add(element.ToElement(_driver, selector));
             }
             return rtnObject;
         }
@@ -140,15 +127,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         #region HasElement
         public bool HasElement(string selector)
         {
-            var hasElement = _driver.WaitUntilClickable(selector);
-            return (hasElement != null) ? true : false;
+            Trace.TraceInformation("[Selenium] Browser has element initated. XPath: " + selector);
+            return _driver.HasElement(By.XPath(selector));
         }
         #endregion
 
         #region GetElement/GetSelectorType
         private IWebElement GetElement(string selector)
         {
-            IWebElement element = GetElement(selector);
+            //IWebElement element = GetElement(selector);
             return _driver.FindElement(GetSelectorType(selector));
         }
         private By GetSelectorType(string selector)
@@ -157,7 +144,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
             if (selector.StartsWith("#"))
                 type = By.CssSelector(selector);
-            else if (selector.StartsWith("//"))
+            else if (selector.StartsWith("//") || selector.StartsWith(".//"))
                 type = By.XPath(selector);
             else if (_driver.FindElement(By.Id(selector)) != null)
                 type = By.Id(selector);
@@ -178,11 +165,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public IElement FindElement(string selector)
         {
-            return ConvertToElement(GetElement(selector), selector);
+            Trace.TraceInformation("[Selenium] Browser find element initated. XPath: " + selector);
+            return GetElement(selector).ToElement(_driver, selector);
         }
         List<IElement>? IWebBrowser.FindElements(string selector)
         {
-            throw new NotImplementedException();
+            Trace.TraceInformation("[Selenium] Browser find elements initated. XPath: " + selector);
+            var elements = _driver.FindElements(By.XPath(selector));
+            return elements.ToElements(_driver, selector);
         }
         #endregion
 
@@ -213,33 +203,43 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         }
         #endregion
 
-        #region WaitUntilVailable
-        IElement IWebBrowser.WaitUntilAvailable(string selector)
-        {
-            return (IElement)_driver.WaitUntilAvailable(GetSelectorType(selector));
-        }
+        #region WaitUntilAvailable
 
         public IElement? WaitUntilAvailable(string selector)
         {
-           return _driver.WaitUntilAvailable(By.XPath(selector)).ToElement();
+            Trace.TraceInformation("[Selenium] Browser wait until available initated. XPath: " + selector);
+            return _driver.WaitUntilAvailable(By.XPath(selector)).ToElement(_driver, selector);
         }
 
         public IElement WaitUntilAvailable(string selector, TimeSpan timeToWait, string exceptionMessage)
         {
-            return (IElement)_driver.WaitUntilAvailable(GetSelectorType(selector), exceptionMessage);
+            Trace.TraceInformation("[Selenium] Browser wait until available initated. XPath: " + selector);
+            return _driver.WaitUntilAvailable(GetSelectorType(selector), exceptionMessage).ToElement(_driver, selector);
         }
         public IElement WaitUntilAvailable(string selector, string exceptionMessage)
         {
+            Trace.TraceInformation("[Selenium] Browser wait until available initated. XPath: " + selector);
             IWebElement element = SeleniumExtensions.WaitUntilVisible(_driver, By.XPath(selector));
             //IWebElement element = _driver.WaitUntilAvailable(By.XPath(selector), null, null, WaitUntilAvailable(selector));
-            return ConvertToElement(element, selector);
+            return element.ToElement(_driver, selector);
         }
         #endregion
 
         #region SwitchFrame
         public void SwitchToFrame(string locator)
         {
-            throw new NotImplementedException();
+            if (int.TryParse(locator, out var frame))
+            {
+                if (frame == 0) { _driver.SwitchTo().ParentFrame(); }
+                else _driver.SwitchTo().Frame(frame);
+            }
+            else
+            {
+                _driver.WaitUntilAvailable(By.Id(locator));
+                _driver.SwitchTo().Frame(locator);
+            }
+            //_driver.WaitForTransaction();
+            
         }
         #endregion
 
@@ -251,12 +251,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         public bool ClickWhenAvailable(string selector)
         {
-            throw new NotImplementedException();
+            try
+            {
+                IWebElement element = _driver.ClickIfVisible(By.XPath(selector), new TimeSpan(0, 0, 2));
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
+            return true;
         }
 
         public bool ClickWhenAvailable(string selector, TimeSpan timeToWait, string? exceptionMessage = null)
         {
-            throw new NotImplementedException();
+            try
+            {
+                IWebElement element = _driver.ClickWhenAvailable(By.XPath(selector), timeToWait, exceptionMessage);
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(exceptionMessage);
+            }
         }
         #endregion
     }

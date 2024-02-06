@@ -43,7 +43,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 xrmApp.Grid.SwitchView("Active Cases");
 
                 xrmApp.Grid.OpenRecord(0);
-                xrmApp.Entity.GetValue("");
+                xrmApp.Entity.GetValue("telephone1");
             }
         }
 

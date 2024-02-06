@@ -88,9 +88,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     ribbon = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.ContainerGrid,
                         TimeSpan.FromSeconds(5),
                         "Unable to find the ribbon.");
+                    ribbon.Click(_client);
                 }
 
                 //Is the button in the ribbon?
+                
                 if (driver.HasElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                 {
                     var command = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));

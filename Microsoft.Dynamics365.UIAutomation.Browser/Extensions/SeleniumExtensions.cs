@@ -18,9 +18,29 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
     public static class SeleniumExtensions
     {
         #region Element
-        public static IElement ToElement(this IWebElement element)
+        public static IElement ToElement(this IWebElement element, IWebDriver driver, string selector)
         {
-            throw new NotImplementedException("TBD");
+            IElement rtnObject = new SeleniumElement(driver, element);
+            if (element == null) return null;
+            try
+            {
+                rtnObject.Locator = selector;
+            }
+            catch (StaleElementReferenceException staleEx)
+            {
+                return null;
+                //throw;
+            }
+            return rtnObject;
+        }
+        public static List<IElement> ToElements(this ReadOnlyCollection<IWebElement> elements, IWebDriver driver, string selector)
+        {
+            List<IElement> rtnObject = new List<IElement>();
+            foreach (IWebElement element in elements)
+            {
+                rtnObject.Add(ToElement(element, driver, selector));
+            }
+            return rtnObject;
         }
         #endregion
         #region Click

@@ -3,6 +3,7 @@
 using Microsoft.Dynamics365.UIAutomation.Api.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using static Microsoft.Dynamics365.UIAutomation.Api.Entity;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
@@ -60,11 +61,9 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
         #endregion
         private readonly WebClient _client;
-        private Entity.EntityReference _entityReference;
         public Lookup(WebClient client) : base()
         {
             _client = client;
-            _entityReference = new Entity.EntityReference();
         }
         #region public
         /// <summary>
@@ -182,13 +181,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         private void SetLookUpByValue(IElement container, LookupItem control)
         {
             var controlName = control.Name;
-            var xpathToText = _entityReference.LookupFieldNoRecordsText.Replace("[NAME]", controlName);
-            var xpathToResultList = _entityReference.LookupFieldResultList.Replace("[NAME]", controlName);
+            var xpathToText = _client.ElementMapper.EntityReference.LookupFieldNoRecordsText.Replace("[NAME]", controlName);
+            var xpathToResultList = _client.ElementMapper.EntityReference.LookupFieldResultList.Replace("[NAME]", controlName);
             var bypathResultList = xpathToText + "|" + xpathToResultList;
 
             _client.Browser.Browser.WaitUntilAvailable(container.Locator + bypathResultList, TimeSpan.FromSeconds(10), "Cannot find lookup. XPath: '" + container.Locator + bypathResultList + "'");
 
-            var byPathToFlyout = _entityReference.TextFieldLookupMenu.Replace("[NAME]", controlName);
+            var byPathToFlyout = _client.ElementMapper.EntityReference.TextFieldLookupMenu.Replace("[NAME]", controlName);
             var flyoutDialog = _client.Browser.Browser.WaitUntilAvailable(container.Locator + byPathToFlyout);
 
             var items = GetListItems(flyoutDialog, control);
@@ -206,10 +205,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         internal ICollection<IElement> GetListItems(IElement container, LookupItem control)
         {
             var name = control.Name;
-            var xpathToItems = this._entityReference.LookupFieldResultListItem.Replace("[NAME]", name);
+            var xpathToItems = this._client.ElementMapper.EntityReference.LookupFieldResultListItem.Replace("[NAME]", name);
 
             //wait for complete the search
-            var lookupResult = _client.Browser.Browser.WaitUntilAvailable(_entityReference.LookupFieldResultListItem, "Lookup Field Results not available with XPath: '" + xpathToItems + "'");
+            var lookupResult = _client.Browser.Browser.WaitUntilAvailable(_client.ElementMapper.EntityReference.LookupFieldResultListItem, "Lookup Field Results not available with XPath: '" + xpathToItems + "'");
             if(lookupResult.Text.Contains(control.Value, StringComparison.OrdinalIgnoreCase) == true)
             {
 
@@ -225,10 +224,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         private void SetLookupByIndex(IElement container, LookupItem control)
         {
             var controlName = control.Name;
-            var xpathToControl = _entityReference.LookupResultsDropdown.Replace("[NAME]", controlName);
+            var xpathToControl = _client.ElementMapper.EntityReference.LookupResultsDropdown.Replace("[NAME]", controlName);
             var lookupResultsDialog = _client.Browser.Browser.WaitUntilAvailable(container.Locator + xpathToControl);
 
-            var xpathFieldResultListItem = _entityReference.LookupFieldResultListItem.Replace("[NAME]", controlName);
+            var xpathFieldResultListItem = _client.ElementMapper.EntityReference.LookupFieldResultListItem.Replace("[NAME]", controlName);
             var lookupResult = _client.Browser.Browser.FindElements(container.Locator + xpathFieldResultListItem).Count;
             if (lookupResult > 0)
             {
@@ -250,13 +249,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
         public void TryRemoveLookupValue(IWebBrowser driver, IElement fieldContainer, LookupItem control, bool removeAll = true, bool isHeader = false)
         {
+            Trace.TraceInformation("Lookup.TryRemoveLookupValue initated.");
             var controlName = control.Name;
             fieldContainer.Hover(_client, fieldContainer.Locator);
 
-            var xpathDeleteExistingValues = _entityReference.LookupFieldDeleteExistingValue.Replace("[NAME]", controlName);
+            var xpathDeleteExistingValues = _client.ElementMapper.EntityReference.LookupFieldDeleteExistingValue.Replace("[NAME]", controlName);
             var existingValues = driver.FindElements(fieldContainer.Locator + xpathDeleteExistingValues);
 
-            var xpathToExpandButton = _entityReference.LookupFieldExpandCollapseButton.Replace("[NAME]", controlName);
+            var xpathToExpandButton = _client.ElementMapper.EntityReference.LookupFieldExpandCollapseButton.Replace("[NAME]", controlName);
             bool success = driver.HasElement(fieldContainer.Locator + xpathToExpandButton);
             var expandButton = driver.FindElement(fieldContainer.Locator + xpathToExpandButton);
             if (success)
@@ -268,7 +268,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 if (removeLookupValue.Count < count) driver.Wait();
             }
 
-            driver.WaitUntilAvailable(fieldContainer.Locator + _entityReference.TextFieldLookupSearchButton.Replace("[NAME]", controlName));
+            driver.WaitUntilAvailable(fieldContainer.Locator + _client.ElementMapper.EntityReference.TextFieldLookupSearchButton.Replace("[NAME]", controlName));
 
             existingValues = driver.FindElements(fieldContainer.Locator + xpathDeleteExistingValues);
             if (existingValues.Count == 0)
@@ -374,7 +374,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             var controlName = control.Name;
             return _client.Execute(_client.GetOptions($"Clear Field {controlName}"), driver =>
             {
-                var fieldContainer = driver.WaitUntilAvailable(_entityReference.TextFieldLookupFieldContainer.Replace("[NAME]", controlName));
+                var fieldContainer = driver.WaitUntilAvailable(_client.ElementMapper.EntityReference.TextFieldLookupFieldContainer.Replace("[NAME]", controlName));
                 TryRemoveLookupValue(driver, fieldContainer, control, removeAll);
                 return true;
             });
@@ -605,7 +605,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 List<FormNotification> notifications = new List<FormNotification>();
 
                 // Look for notificationMessageAndButtons bar
-                var notificationMessage = driver.WaitUntilAvailable(_entityReference.FormMessageBar, TimeSpan.FromSeconds(2), "Cannot Get Form Notification. XPath: '" + _entityReference.FormMessageBar + "'");
+                var notificationMessage = driver.WaitUntilAvailable(_client.ElementMapper.EntityReference.FormMessageBar, TimeSpan.FromSeconds(2), "Cannot Get Form Notification. XPath: '" + _client.ElementMapper.EntityReference.FormMessageBar + "'");
 
                 if (notificationMessage != null)
                 {
@@ -613,7 +613,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     try
                     {
-                        icon = driver.FindElement(_entityReference.FormMessageBarTypeIcon);
+                        icon = driver.FindElement(_client.ElementMapper.EntityReference.FormMessageBarTypeIcon);
                     }
                     catch (Exception)
                     {
@@ -633,28 +633,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 }
 
                 // Look for the notification wrapper, if it doesn't exist there are no notificatios
-                var notificationBar = driver.WaitUntilAvailable(_entityReference.FormNotifcationBar, TimeSpan.FromSeconds(2), "");
+                var notificationBar = driver.WaitUntilAvailable(_client.ElementMapper.EntityReference.FormNotifcationBar, TimeSpan.FromSeconds(2), "");
                 if (notificationBar == null)
                     return notifications;
                 else
                 {
                     // If there are multiple notifications, the notifications must be expanded first.
-                    if (driver.HasElement(notificationBar.Locator + _entityReference.FormNotifcationExpandButton))
+                    if (driver.HasElement(notificationBar.Locator + _client.ElementMapper.EntityReference.FormNotifcationExpandButton))
                     {
-                        var expandButton = driver.FindElement(notificationBar.Locator + _entityReference.FormNotifcationExpandButton);
+                        var expandButton = driver.FindElement(notificationBar.Locator + _client.ElementMapper.EntityReference.FormNotifcationExpandButton);
                         if (!Convert.ToBoolean(notificationBar.GetAttribute(_client, "aria-expanded")))
                             expandButton.Click(_client);
 
                         // After expansion the list of notifications are now in a different IElement
-                        notificationBar = driver.WaitUntilAvailable(_entityReference.FormNotifcationFlyoutRoot, TimeSpan.FromSeconds(2), "Failed to open the form notifications");
+                        notificationBar = driver.WaitUntilAvailable(_client.ElementMapper.EntityReference.FormNotifcationFlyoutRoot, TimeSpan.FromSeconds(2), "Failed to open the form notifications");
                     }
 
-                    var notificationList = driver.FindElement(notificationBar.Locator + _entityReference.FormNotifcationList);
+                    var notificationList = driver.FindElement(notificationBar.Locator + _client.ElementMapper.EntityReference.FormNotifcationList);
                     var notificationListItems = driver.FindElements(notificationList.Locator + "//li");
 
                     foreach (var item in notificationListItems)
                     {
-                        var icon = driver.FindElement(item.Locator + _entityReference.FormNotifcationTypeIcon);
+                        var icon = driver.FindElement(item.Locator + _client.ElementMapper.EntityReference.FormNotifcationTypeIcon);
 
                         var notification = new FormNotification
                         {
@@ -667,7 +667,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                     if (notificationBar != null)
                     {
-                        notificationBar = driver.WaitUntilAvailable(_entityReference.FormNotifcationBar, TimeSpan.FromSeconds(2),"");
+                        notificationBar = driver.WaitUntilAvailable(_client.ElementMapper.EntityReference.FormNotifcationBar, TimeSpan.FromSeconds(2),"");
                         notificationBar.Click(_client,true); // Collapse the notification bar
                     }
                     return notifications;

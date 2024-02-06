@@ -66,13 +66,31 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         public class CustomerServiceCopilotReference
         {
             public const string CustomerServiceCopilot = "CustomerServiceCopilot";
+            private string _botContentContainer = "//div[@aria-roledescription=\"message\"]";
+            private string _botContentMarkdown = "//div[@aria-roledescription=\"message\"]//div[contains(@class,\"markdown\")]";
+            private string _botContentSources = "//div[@aria-roledescription=\"message\"]//div[contains(@id,\"check-sources\")]//button";
+            private string _controlTabs = "//div[@data-id=\"MscrmControls.CSIntelligence.AICopilotControl_container\"]//div[@role=\"tablist\"]//button";
             private string _controlId = "//div[@id=\"AppSidePane_MscrmControls.CSIntelligence.AICopilotControl\"]";
-            private string _controlButtonId = "//button[@id=\"sidepane-tab-button-AppSidePane_MscrmControls.CSIntelligence.AICopilotControl\"]";
+            private string _controlButtonId = "//button[@aria-controls=\"AppSidePane_MscrmControls.CSIntelligence.AICopilotControl\"]";
+
+            private string _emailAssistControl = "//div[@data-id=\"MscrmControls.CSIntelligence.AICopilotControl.MscrmControls.CSIntelligence.EmailAssistControl_container\"]";
+            private string _emailAssistOptions = "//div[@data-id=\"MscrmControls.CSIntelligence.AICopilotControl.MscrmControls.CSIntelligence.EmailAssistControl_container\"]//button";
+            private string _emailAssistStartOver = "//div[@data-id=\"MscrmControls.CSIntelligence.AICopilotControl.MscrmControls.CSIntelligence.EmailAssistControl_container\"]//button[@data-automationid=\"splitbuttonprimary\"]";
+            private string _emailAssistText = "//div[@data-id=\"MscrmControls.CSIntelligence.AICopilotControl.MscrmControls.CSIntelligence.EmailAssistControl_container\"]//textarea[@data-testid=\"txtResponseDescription\"]";
             private string _userInput = "//textarea[@data-id=\"webchat-sendbox-input\"]";
             private string _userSubmit = "//div[@class=\"webchat__send-box__main\"]//button";
 
+
+            public string BotContentContainer { get => _botContentContainer; set { _botContentContainer = value; } }
+            public string BotContentMarkdown { get => _botContentMarkdown; set { _botContentMarkdown = value; } }
+            public string BotContentSources { get => _botContentSources; set { _botContentSources = value; } }
             public string ControlId { get => _controlId; set { _controlId = value; } }
             public string ControlButtonId { get => _controlButtonId; set { _controlButtonId = value; } }
+            public string ControlTabs { get => _controlTabs; set { _controlTabs = value; } }
+            public string EmailAssistControl { get => _emailAssistControl; set { _emailAssistControl = value; } }
+            public string EmailAssistOptions { get => _emailAssistOptions; set { _emailAssistOptions = value; } }
+            public string EmailAssistStartOver { get => _emailAssistStartOver; set { _emailAssistStartOver = value; } }
+            public string EmailAssistText{ get => _emailAssistText; set { _emailAssistText = value; } }
             public string UserInput { get => _userInput; set { _userInput = value; } }
             public string UserSubmit { get => _userSubmit; set { _userSubmit = value; } }
         }
@@ -105,54 +123,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
             return this.AskAQuestion(userInput);
         }
 
-        #region Copilot
-        private bool _coPilotEnabled = false;
-        private bool _inPowerApps = false;
-        internal bool EnableCustomerServiceCopilot(IWebBrowser driver)
+        public BrowserCommandResult<string> WriteAnEmail(string userInput, int thinkTime = Constants.DefaultThinkTime)
         {
-            IElement powerApp = null;
-            Trace.WriteLine("Locating Copilot");
-            if (driver.HasElement(_client.ElementMapper.PowerAppReference.ModelFormContainer))
-            {
-                powerApp = driver.FindElement(_client.ElementMapper.PowerAppReference.ModelFormContainer);
-                driver.SwitchToFrame(_client.ElementMapper.PowerAppReference.ModelFormContainer);
-                powerApp = driver.FindElement("//iframe[@class='publishedAppIframe']");
-                driver.SwitchToFrame("//iframe[@class='publishedAppIframe']");
-                _inPowerApps = true;
-            }
-            else
-            {
-                throw new KeyNotFoundException("Copilot not found or not enabled.");
-            }
-            return true;
+            return this.WriteAnEmail(userInput);
         }
+
+        #region Copilot
+
         internal BrowserCommandResult<bool> EnableAskAQuestion()
         {
             return _client.Execute(_client.GetOptions($"Enable Ask A Question for Copilot"), driver =>
             {
-                if (!_coPilotEnabled) EnableCustomerServiceCopilot(driver);
+                EnableCustomerServiceCopilot(driver);
                 IElement relatedEntity = null;
-                //if (driver.TryFindElement(By.XPath(""), out var copilot))
-                //{
-                //    // Advanced lookup
-                //    //relatedEntity = advancedLookup.WaitUntilAvailable(
-                //    //    By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.FilterTable].Replace("[NAME]", entityName)),
-                //    //    2.Seconds());
-                //}
-                //else
-                //{
-                //    // Lookup 
-                //    //relatedEntity = driver.WaitUntilAvailable(
-                //    //    By.XPath(AppElements.Xpath[AppReference.Lookup.RelatedEntityLabel].Replace("[NAME]", entityName)),
-                //    //    2.Seconds());
-                //}
-
-                //if (relatedEntity == null)
-                //{
-                //    throw new NotFoundException($"Lookup Entity {entityName} not found.");
-                //}
-
-                //relatedEntity.Click();
                 driver.Wait();
 
                 return true;
@@ -163,33 +146,112 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         {
             return _client.Execute(_client.GetOptions($"Ask A Question for Copilot"), driver =>
             {
-                if (!_coPilotEnabled) EnableCustomerServiceCopilot(driver);
+                Trace.TraceInformation("CustomerServiceCopilot.AskAQuestion initated.");
+                EnableCustomerServiceCopilot(driver);
                 IElement relatedEntity = null;
-                //if (driver.TryFindElement(By.XPath(""), out var copilot))
-                //{
-                //    // Advanced lookup
-                //    //relatedEntity = advancedLookup.WaitUntilAvailable(
-                //    //    By.XPath(AppElements.Xpath[AppReference.AdvancedLookup.FilterTable].Replace("[NAME]", entityName)),
-                //    //    2.Seconds());
-                //}
-                //else
-                //{
-                //    // Lookup 
-                //    //relatedEntity = driver.WaitUntilAvailable(
-                //    //    By.XPath(AppElements.Xpath[AppReference.Lookup.RelatedEntityLabel].Replace("[NAME]", entityName)),
-                //    //    2.Seconds());
-                //}
+                if (driver.HasElement(_client.ElementMapper.CustomerServiceCopilotReference.UserInput))
+                {
+                    driver.FindElement(_client.ElementMapper.CustomerServiceCopilotReference.UserInput).SetValue(_client, userInput);
+                    driver.FindElement(_client.ElementMapper.CustomerServiceCopilotReference.UserSubmit).Click(_client);
+                    driver.Wait();
+                    
 
-                //if (relatedEntity == null)
-                //{
-                //    throw new NotFoundException($"Lookup Entity {entityName} not found.");
-                //}
-
-                //relatedEntity.Click();
-                driver.Wait();
-
-                return string.Empty;
+                    var response = ReadBotResponse(driver);
+                    var sources = ReadBotResponseSources(driver);
+                    Trace.TraceInformation("CustomerServiceCopilot.AskAQuestion finalized.");
+                    return response;
+                }
+                else
+                {
+                    throw new KeyNotFoundException("Copilot Text Input not found. XPath: " + _client.ElementMapper.CustomerServiceCopilotReference.UserInput);
+                }
+                
             });
+        }
+
+        internal BrowserCommandResult<string> WriteAnEmail(string userInput)
+        {
+            return _client.Execute(_client.GetOptions($"Write an Email for Copilot"), driver =>
+            {
+                _client.CloseTeachingBubbles(driver);
+                Trace.TraceInformation("CustomerServiceCopilot.WriteAnEmail initated.");
+                EnableCustomerServiceCopilot(driver);
+                IElement relatedEntity = null;
+
+                SwitchCustomerServiceCopilotTab(driver, "Write an email");
+                var emailOptions = driver.FindElements(_client.ElementMapper.CustomerServiceCopilotReference.EmailAssistOptions);
+                foreach (var emailOption in emailOptions)
+                {
+                    Trace.TraceInformation("Email Option Name: " + emailOption.Text);
+                    if (emailOption.Text == userInput)
+                    {
+                        driver.FindElement(emailOption.Locator + "[text()='" + userInput + "']").Click(_client);
+                        driver.Wait();
+                    }
+                }
+                
+                
+
+
+                var response = ReadBotResponse(driver);
+                var sources = ReadBotResponseSources(driver);
+                Trace.TraceInformation("CustomerServiceCopilot.WriteAnEmail finalized.");
+                return response;
+
+            });
+        }
+
+        internal bool EnableCustomerServiceCopilot(IWebBrowser driver)
+        {
+            IElement powerApp = null;
+            Trace.WriteLine("Locating Copilot");
+            if (driver.HasElement(_client.ElementMapper.CustomerServiceCopilotReference.ControlButtonId))
+            {
+                var customerServiceCopilotButton = driver.FindElement(_client.ElementMapper.CustomerServiceCopilotReference.ControlButtonId);
+                if (customerServiceCopilotButton.GetAttribute(_client, "aria-selected") == "false")
+                {
+                    customerServiceCopilotButton.Click(_client);
+                }
+                return true;
+            }
+            else
+            {
+                throw new KeyNotFoundException("Copilot not found or not enabled.");
+            }
+        }
+
+        internal bool SwitchCustomerServiceCopilotTab(IWebBrowser driver, string locator)
+        {
+            IElement powerApp = null;
+            Trace.WriteLine("SwitchCustomerServiceCopilotTab");
+            if (driver.HasElement(_client.ElementMapper.CustomerServiceCopilotReference.ControlTabs))
+            {
+                var customerServiceCopilotTab = driver.FindElements(_client.ElementMapper.CustomerServiceCopilotReference.ControlTabs);
+                foreach(var tab in customerServiceCopilotTab)
+                {
+                    if (tab.Text == locator)
+                    {
+                        tab.Click(_client);
+                        return true;
+                    }
+                }
+                return false;
+            }
+            else
+            {
+                throw new KeyNotFoundException("Copilot not found or not enabled.");
+            }
+        }
+
+        internal string ReadBotResponse(IWebBrowser driver)
+        {
+            Trace.TraceInformation("CustomerServiceCopilot.ReadBotResponse initated.");
+            return driver.FindElement(_client.ElementMapper.CustomerServiceCopilotReference.BotContentMarkdown).Text;
+        }
+        internal List<string> ReadBotResponseSources(IWebBrowser driver)
+        {
+            Trace.TraceInformation("CustomerServiceCopilot.ReadBotResponseSources initated.");
+            return driver.FindElements(_client.ElementMapper.CustomerServiceCopilotReference.BotContentSources).Select(x=>x.Text).ToList();
         }
         #endregion
     }

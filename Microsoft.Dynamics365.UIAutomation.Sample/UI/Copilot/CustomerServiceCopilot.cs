@@ -37,7 +37,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.CustomerService
         [TestCategory("Customer Service Workspace")]
         [TestCategory("Copilot")]
         [TestMethod]
-        public void ProjectOpsTestCreateBookableResource()
+        public void CustomerServiceCopilot_AskAQuestion()
         {
             var client = new WebClient(TestSettings.Options);
             using (var xrmApp = new XrmApp(client))
@@ -52,7 +52,33 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample.CustomerService
 
                 xrmApp.Grid.OpenRecord(0);
 
-                xrmApp.CustomerServiceCopilot.AskAQuestion("Help summarize this case");
+                var copilotResponse = xrmApp.CustomerServiceCopilot.AskAQuestion("Help summarize this case");
+
+            }
+
+        }
+
+        [TestCategory("Customer Service Workspace")]
+        [TestCategory("Copilot")]
+        [TestMethod]
+        public void CustomerServiceCopilot_WriteAnEmail()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
+
+                xrmApp.Navigation.OpenApp(AppName.CustomerService);
+
+                xrmApp.Navigation.QuickCreate("email");
+
+                //xrmApp.Navigation.OpenSubArea("Services", "Cases");
+
+                //xrmApp.Grid.SwitchView("Active Cases");
+
+                //xrmApp.Grid.OpenRecord(0);
+
+                var copilotResponse = xrmApp.CustomerServiceCopilot.WriteAnEmail("Suggest a call");
 
             }
 
