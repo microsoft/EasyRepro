@@ -57,7 +57,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public void SendKey(string locator, string key)
         {
             Actions keyPress = new Actions(_driver);
-            keyPress.SendKeys(OpenQA.Selenium.Keys.Enter).Perform();
+            string keyToPress = string.Empty;
+            switch (key.ToLower()){
+                case "enter":
+                    keyToPress = OpenQA.Selenium.Keys.Enter;
+                    break;
+                case "right":
+                    keyToPress = OpenQA.Selenium.Keys.ArrowRight;
+                    break;
+                default:
+                    keyToPress = OpenQA.Selenium.Keys.Enter;
+                    break;
+            }
+            keyPress.SendKeys(keyToPress).Perform();
         }
         //public void SendKey(string selector, string key)
         //{

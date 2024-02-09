@@ -98,12 +98,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
 
                 xrmApp.Grid.OpenRecord(0);
 
-                xrmApp.Timeline.ClickEmailMenuItem();
-                xrmApp.ThinkTime(4000);
+                //xrmApp.Timeline.ClickEmailMenuItem();
+                //xrmApp.ThinkTime(4000);
 
-                xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
-                xrmApp.Timeline.AddEmailContacts(CreateBccLookupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"), true);
-                xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"), true);
+                //xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
+                //xrmApp.Timeline.AddEmailContacts(CreateBccLookupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"), true);
+                //xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"), true);
 
                 // This fails as it already has a value.
                 //xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
@@ -119,6 +119,57 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                         
                         Name = emailReference.EmailTo,
                     }); 
+
+                xrmApp.ThinkTime(3000);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("Timeline")]
+        [TestCategory("Email")]
+        [TestCategory("RegressionTests")]
+        public void TestAccountGetMultiSelectEmail_Activities()
+        {
+            var client = new WebClient(TestSettings.Options);
+            using (var xrmApp = new XrmApp(client))
+            {
+                xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
+
+                xrmApp.Navigation.OpenApp(AppName.Sales);
+
+                xrmApp.Navigation.OpenSubArea("Sales", "Activities");
+
+                //xrmApp.Grid.SwitchView("Active Accounts");
+
+                xrmApp.CommandBar.ClickCommand("Email");
+                Timeline.TimelineReference emailReference = new Timeline.TimelineReference();
+                xrmApp.Entity.SetValue(new MultiValueOptionSet()
+                {
+                    Name = "to",
+                    Values = new[] { "Nancy Anderson (sample)", "Jim Glynn (sample)" }
+                });
+
+                //xrmApp.Timeline.ClickEmailMenuItem();
+                //xrmApp.ThinkTime(4000);
+
+                //xrmApp.Timeline.AddEmailSubject("Request admission to butterfly section in zoo");
+                //xrmApp.Timeline.AddEmailContacts(CreateBccLookupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"), true);
+                //xrmApp.Timeline.AddEmailContacts(CreateCcLooupItemsFor("Jim Glynn (sample)", "Nancy Anderson (sample)"), true);
+
+                // This fails as it already has a value.
+                //xrmApp.Timeline.AddEmailContacts(new MultiValueOptionSet()
+                //{
+                //    Name = Reference.Timeline.EmailTo,
+                //    Values = new string[] { "Test Contact", "Jay Zee3" },
+                //});
+                //Timeline.TimelineReference emailReference = new Timeline.TimelineReference();
+
+                var multiselectedItems = xrmApp.Timeline.GetEmail(
+                    new MultiValueOptionSet()
+                    {
+
+                        Name = emailReference.EmailTo,
+                    });
 
                 xrmApp.ThinkTime(3000);
             }

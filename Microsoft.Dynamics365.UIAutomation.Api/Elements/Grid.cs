@@ -140,7 +140,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     if (role != "presentation")
                         continue;
                     if (!driver.HasElement(viewItem.Locator + "//label")) continue;
-                    var key = driver.FindElement(viewItem.Locator + "//label").Text.ToLowerString();
+                    var key = viewItem.Text.ToLowerString();
+
                     if (string.IsNullOrWhiteSpace(key))
                         continue;
 
@@ -157,6 +158,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="viewName">Name of the view to select</param>
         public BrowserCommandResult<bool> SwitchView(string viewName, string subViewName = null, int thinkTime = Constants.DefaultThinkTime)
         {
+            Trace.TraceInformation("Entered Grid.SwitchView");
             _client.ThinkTime(thinkTime);
 
             return _client.Execute(_client.GetOptions($"Switch View"), driver =>
@@ -187,6 +189,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="index">The index of the row to open</param>
         public BrowserCommandResult<bool> OpenRecord(int index, int thinkTime = Constants.DefaultThinkTime, bool checkRecord = false)
         {
+            Trace.TraceInformation("Entered Grid.OpenRecord");
             _client.ThinkTime(thinkTime);
             return _client.Execute(_client.GetOptions("Open Grid Record"), driver =>
             {
@@ -216,8 +219,10 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     {
                         gridType = Grid.GridType.EditableGrid;
                         Trace.WriteLine("Found Editable Grid.");
-                        lastRowXPathLocator = _client.ElementMapper.GridReference.EditableGridRows + "//div[@row-index='[INDEX]']".Replace("[INDEX]", (index).ToString());
-                        //if (!grid.HasElement(By.XPath("//div[@role='row' and @aria-rowindex='[INDEX]']".Replace("[INDEX]", (index).ToString()))))
+                        var headerRowLocator = _client.ElementMapper.GridReference.EditableGridRows + "//div[@aria-label='Header']";
+                        var headerRow = driver.FindElement(headerRowLocator).GetAttribute(_client, "aria-rowindex");
+                        lastRowXPathLocator = _client.ElementMapper.GridReference.EditableGridRows + "//div[@aria-rowindex='[INDEX]']".Replace("[INDEX]", (Convert.ToInt16(headerRow) + 1 + index).ToString());
+                        //if (!driver.HasElement(lastRowXPathLocator))
                         //{
                         //    lastRowInCurrentView = ClickGridAndPageDown(driver, grid, lastRowInCurrentView, gridType);
                         //}
@@ -242,16 +247,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var xpathToGrid = "//div[contains(@data-id,'DataSetHostContainer')]";//works for: PowerAppsGridControl, LegacyReadOnlyControl, 
                 IElement control = driver.WaitUntilAvailable(xpathToGrid);
 
-                //Func<Actions, Actions> action;
-                //if (checkRecord)
-                //    action = e => e.Click();
-                //else
-                //    action = e => e.DoubleClick();
-                ////div[@class='ag-center-cols-container']//div[@row-index='[INDEX]']
+                Trace.TraceInformation("Set gridControlCell");
                 var xpathToCell = _client.ElementMapper.GridReference.Row.Replace("[INDEX]", index.ToString());
 
-                var gridControlCell = driver.WaitUntilAvailable(control.Locator + xpathToCell);
-                var emptyDiv = driver.WaitUntilAvailable(xpathToCell + "//div");
+                //var gridControlCell = driver.WaitUntilAvailable(control.Locator + xpathToCell);
+var gridControlCell = driver.WaitUntilAvailable(lastRowXPathLocator);
+                //var emptyDiv = driver.WaitUntilAvailable(xpathToCell + "//div");
+                Trace.TraceInformation("Set emptyDiv");
+                var emptyDiv = driver.WaitUntilAvailable(lastRowXPathLocator + "//div");
                 switch (gridType)
                 {
                     case Grid.GridType.LegacyReadOnlyGrid: //Lead
@@ -266,9 +269,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         if (checkRecord) driver.FindElement(gridControlCell.Locator + _client.ElementMapper.GridReference.PowerAppsGridControlClickableCell).Click(_client); else driver.FindElement(gridControlCell.Locator + _client.ElementMapper.GridReference.PowerAppsGridControlClickableCell).DoubleClick(_client, gridControlCell.Locator + _client.ElementMapper.GridReference.PowerAppsGridControlClickableCell);//Contacts
                         break;
                     case Grid.GridType.EditableGrid:
+                        Trace.TraceInformation("CheckRecord: " + checkRecord);
                         if (checkRecord)
                             driver.FindElement(gridControlCell.Locator + "//a[contains(@aria-label,'Read only')]").Click(_client);
-                        else driver.FindElement(gridControlCell.Locator + "//a[contains(@aria-label,'Read only')]").DoubleClick(_client, gridControlCell.Locator + "//a[contains(@aria-label,'Read only')]");
+                        else
+                        {
+                            Trace.TraceInformation("DoubleClick " + gridType);
+                            //driver.FindElement(gridControlCell.Locator + "//a[contains(@aria-label,'Read only')]").DoubleClick(_client, gridControlCell.Locator + "//a[contains(@aria-label,'Read only')]");
+                            driver.ClickWhenAvailable(gridControlCell.Locator + "//div[@aria-colindex='2']");
+                            LocateAndPressEditableGridNavigateCell(driver, gridControlCell);
+                        }
                         break;
                     default: throw new Exception("Did not find Read Only or Power Apps Grid.");
                 }
@@ -306,6 +316,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 _client.CloseTeachingBubbles(driver);
                 return true;
             });
+        }
+
+        private void LocateAndPressEditableGridNavigateCell(IWebBrowser driver, IElement? gridControlCell)
+        {
+            Trace.TraceInformation("Entered Grid.LocateAndPressEditableGridNavigateCell");
+            if (driver.HasElement(gridControlCell.Locator + "//div[contains(@aria-label,'Navigate')]"))
+            {
+                driver.FindElement(gridControlCell.Locator + "//div[contains(@aria-label,'Navigate')]").Click(_client);
+                driver.FindElement(gridControlCell.Locator + "//div[contains(@aria-label,'Navigate')]").DoubleClick(_client, gridControlCell.Locator + "//div[contains(@aria-label,'Navigate')]");
+            }
+            else
+            {
+                Trace.TraceInformation("Navigate cell not found for Editable grid. Attempting to click right.");
+                driver.SendKey(gridControlCell.Locator, "Right");
+                LocateAndPressEditableGridNavigateCell(driver, gridControlCell);
+                //driver.FindElement(gridControlCell.Locator).SendKeys(_client,"Right");
+            }
         }
 
 
@@ -522,6 +549,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         #region Private
         private int ClickGridAndPageDown(IWebBrowser driver, IElement grid, int lastKnownFloor, Grid.GridType gridType)
         {
+            Trace.TraceInformation("Entered Grid.ClickGridAndPageDown. Last Known Floor: " + lastKnownFloor + ". Grid Type: " + gridType);
             //Actions actions = new Actions(driver);
             string rowGroupLocator = null;
             string topRowLocator = null;
@@ -547,6 +575,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     break;
             }
             var CurrentRows = driver.FindElements(rowGroupLocator);
+            Trace.TraceInformation("Current Rows Count: " + CurrentRows.Count());
             var lastFloor = CurrentRows.Where(x => Convert.ToInt32(x.GetAttribute(_client,"row-index")) == lastKnownFloor).First();
             //var topRow = driver.FindElement(topRowLocator);
             var topRow = CurrentRows.First();

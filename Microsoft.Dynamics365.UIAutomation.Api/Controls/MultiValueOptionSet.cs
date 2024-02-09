@@ -5,6 +5,7 @@ using Microsoft.Dynamics365.UIAutomation.Api.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
+using System.Diagnostics;
 using static Microsoft.Dynamics365.UIAutomation.Api.BusinessProcessFlow;
 using static Microsoft.Dynamics365.UIAutomation.Api.QuickCreate;
 
@@ -122,6 +123,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             /// <returns></returns>
             public static BrowserCommandResult<bool> AddMultiOptions(WebClient client, MultiValueOptionSet option, FormContextType formContextType)
             {
+                Trace.TraceInformation("Entered into MultiValueOptionSet.AddMultiOptions with FormContextType: " + formContextType + " and MultiValueOptionSet: " + option.Name);
                 return client.Execute(client.GetOptions($"Add Multi Select Value: {option.Name}"), driver =>
                 {
                     IElement fieldContainer = null;
@@ -158,14 +160,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         fieldContainer = driver.WaitUntilAvailable(formContext.Locator + client.ElementMapper.DialogsReference.DialogContext.Replace("[NAME]", option.Name));
                     }
 
+                    Trace.TraceInformation("Locating MultiValueOptionSet input");
                     var inputXPath = multiSelect.InputSearch;
                     driver.FindElement(fieldContainer.Locator + inputXPath).SendKeys(client, new string[] { string.Empty });
 
+                    Trace.TraceInformation("Locating MultiValueOptionSet flyout");
                     var flyoutCaretXPath = multiSelect.FlyoutCaret;
                     client.Browser.Browser.FindElement(fieldContainer.Locator + flyoutCaretXPath).Click(client);
 
                     foreach (var optionValue in option.Values)
                     {
+                        Trace.TraceInformation("Locating option value: " + optionValue);
                         var flyoutOptionXPath = multiSelect.FlyoutOption.Replace("[NAME]", optionValue);
                         if (driver.HasElement(fieldContainer.Locator + flyoutOptionXPath))
                         {
@@ -190,14 +195,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
     {
         public MultiSelect(IConfiguration config) { }
         #region private
-        private string _divContainer = ".//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]";
-        private string _inputSearch = ".//input[contains(@data-id,\"textInputBox\")]";
+        private string _divContainer = "//div[contains(@data-id,\"[NAME]-FieldSectionItemContainer\")]";
+        private string _inputSearch = "//input[contains(@type,\"text\")]";
         private string _selectedRecord = ".//li";
         //public string SelectedRecordButton = ".//button[contains(@data-id, \"delete\")]";
         private string _selectedOptionDeleteButton = ".//button[contains(@data-id, \"delete\")]";
         private string _selectedRecordLabel = ".//span[contains(@class, \"msos-selected-display-item-text\")]";
         private string _flyoutCaret = "//button[contains(@class, \"msos-caret-button\")]";
-        private string _flyoutOption = "//li[label[contains(@title, \"[NAME]\")] and contains(@class,\"msos-option\")]";
+        private string _flyoutOption = "//li[label[@title=\"[NAME]\"] and contains(@class,\"msos-option\")]";
         private string _flyoutOptionCheckbox = "//input[contains(@class, \"msos-checkbox\")]";
         private string _expandCollapseButton = ".//button[contains(@class,\"msos-selecteditems-toggle\")]";
         #endregion

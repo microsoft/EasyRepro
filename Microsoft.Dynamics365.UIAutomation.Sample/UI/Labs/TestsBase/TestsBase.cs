@@ -19,6 +19,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         protected static SecureString _username;
         protected static SecureString _password;
         protected static SecureString _mfaSecretKey;
+        protected static string _azureKey;
+        protected static string _sessionId;
         protected TracingService trace;
         protected XrmApp _xrmApp;
         protected WebClient _client;
@@ -35,9 +37,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         private static BrowserFramework _framework;
         private static BrowserType _browserType;
         private static string _browserVersion = "";
-        private static string _driversPath = "";
-        private static string _azureKey = "";
-        private static string _sessionId = "";
+        protected static string _driversPath = "";
         //public TestContext TestContext { get; set; }
 
         private static TestContext _testContext;

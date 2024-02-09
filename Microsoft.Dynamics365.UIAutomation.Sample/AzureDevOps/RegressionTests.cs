@@ -16,42 +16,42 @@ using System.Text;
 namespace Microsoft.Dynamics365.UIAutomation.Sample
 {
     [TestClass]
-    public class RegressionTests
+    public class RegressionTests : TestsBase
     {
-        private static SecureString _username;
-        private static SecureString _password;
-        private static SecureString _mfaSecretKey;
-        private static BrowserFramework _framework;
-        private static BrowserType _browserType;
-        private static Uri _xrmUri;
-        private static string _browserVersion = "";
-        private static string _driversPath = "";
-        private static string _azureKey = "";
-        private static string _sessionId = "";
-        public TestContext TestContext { get; set; }
+        //private static SecureString _username;
+        //private static SecureString _password;
+        //private static SecureString _mfaSecretKey;
+        //private static BrowserFramework _framework;
+        //private static BrowserType _browserType;
+        //private static Uri _xrmUri;
+        //private static string _browserVersion = "";
+        //private static string _driversPath = "";
+        //private static string _azureKey = "";
+        //private static string _sessionId = "";
+        //public TestContext TestContext { get; set; }
 
-        private static TestContext _testContext;
+        //private static TestContext TestContext;
 
-        [ClassInitialize]
-        public static void Initialize(TestContext TestContext)
-        {
-            _testContext = TestContext;
+        //[ClassInitialize]
+        //public static void Initialize(TestContext TestContext)
+        //{
+        //    TestContext = TestContext;
 
-            _username = _testContext.Properties["OnlineUsername"].ToString().ToSecureString();
-            _password = _testContext.Properties["OnlinePassword"].ToString().ToSecureString();
-            _mfaSecretKey = _testContext.Properties["OnlinePassword"].ToString().ToSecureString();
-            _xrmUri = new Uri(_testContext.Properties["OnlineCrmUrl"].ToString());
-            _framework = (BrowserFramework)Enum.Parse(typeof(BrowserFramework), _testContext.Properties["Framework"].ToString());
-            _browserType = (BrowserType)Enum.Parse(typeof(BrowserType), _testContext.Properties["BrowserType"].ToString());
-            _azureKey = _testContext.Properties["AzureKey"].ToString();
-            _sessionId = _testContext.Properties["SessionId"].ToString() ?? Guid.NewGuid().ToString();
-            _driversPath = _testContext.Properties["DriversPath"].ToString();
-            if (!String.IsNullOrEmpty(_driversPath))
-            {
-                TestSettings.SharedOptions.DriversPath = _driversPath;
-                TestSettings.Options.DriversPath = _driversPath;
-            }
-        }
+        //    _username = TestContext.Properties["OnlineUsername"].ToString().ToSecureString();
+        //    _password = TestContext.Properties["OnlinePassword"].ToString().ToSecureString();
+        //    _mfaSecretKey = TestContext.Properties["OnlinePassword"].ToString().ToSecureString();
+        //    _xrmUri = new Uri(TestContext.Properties["OnlineCrmUrl"].ToString());
+        //    _framework = (BrowserFramework)Enum.Parse(typeof(BrowserFramework), TestContext.Properties["Framework"].ToString());
+        //    _browserType = (BrowserType)Enum.Parse(typeof(BrowserType), TestContext.Properties["BrowserType"].ToString());
+        //    _azureKey = TestContext.Properties["AzureKey"].ToString();
+        //    _sessionId = TestContext.Properties["SessionId"].ToString() ?? Guid.NewGuid().ToString();
+        //    _driversPath = TestContext.Properties["DriversPath"].ToString();
+        //    if (!String.IsNullOrEmpty(_driversPath))
+        //    {
+        //        TestSettings.SharedOptions.DriversPath = _driversPath;
+        //        TestSettings.Options.DriversPath = _driversPath;
+        //    }
+        //}
 
         #region Helper Methods
         private string TakeScreenshot(WebClient client, ICommandResult command)
@@ -77,26 +77,27 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
         [TestMethod]
         public void Regression_Grid_SwitchView_GetItems_Sort_SearchRecord_HighlightRecord_OpenRecord()
         {
-            _testContext.WriteLine("Starting test " + TestContext.TestName);
+            
+            TestContext.WriteLine("Starting test " + TestContext.TestName);
             Trace.TraceInformation("Starting test " + TestContext.TestName);
             var telemetry = new Microsoft.ApplicationInsights.TelemetryClient { InstrumentationKey = _azureKey };
-            _testContext.WriteLine("Implemented TelemetryClient");
+            TestContext.WriteLine("Implemented TelemetryClient");
             telemetry.Context.Operation.Id = Guid.NewGuid().ToString();
-            _testContext.WriteLine("OperationId :" + telemetry.Context.Operation.Id);
+            TestContext.WriteLine("OperationId :" + telemetry.Context.Operation.Id);
             telemetry.Context.Operation.ParentId = _sessionId;
-            _testContext.WriteLine("SessionId :" + telemetry.Context.Operation.ParentId);
+            TestContext.WriteLine("SessionId :" + telemetry.Context.Operation.ParentId);
             telemetry.Context.GlobalProperties.Add("Test", TestContext.TestName);
-            _testContext.WriteLine("Added Test Global Property");
+            TestContext.WriteLine("Added Test Global Property");
             var client = new WebClient(TestSettings.Options);
-            _testContext.WriteLine("WebClient Instance Created.");
+            TestContext.WriteLine("WebClient Instance Created.");
             var xrmApp = new XrmApp(client);
-            _testContext.WriteLine("XrmApp Instance Created.");
+            TestContext.WriteLine("XrmApp Instance Created.");
             try
             {
-                _testContext.WriteLine("Login Started");
+                TestContext.WriteLine("Login Started");
                 telemetry.TrackTrace("Login Started");
                 xrmApp.OnlineLogin.Login(_xrmUri, _username, _password, _mfaSecretKey);
-                _testContext.WriteLine("Login Completed");
+                TestContext.WriteLine("Login Completed");
                 telemetry.TrackTrace("Login Completed");
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
                 //xrmApp.Navigation.OpenApp(AppName.Sales);
@@ -269,39 +270,40 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
                 //xrmApp.Navigation.OpenApp(AppName.Sales);
 
-                telemetry.TrackTrace("OpenAbout Started");
-                xrmApp.Navigation.OpenAbout();
-                telemetry.TrackTrace("OpenAbout Completed");
-                TakeScreenshot(client, xrmApp.CommandResults.Last());
-                xrmApp.Dialogs.ClickOk();
+                //telemetry.TrackTrace("OpenAbout Started");
+                //xrmApp.Navigation.OpenAbout();
+                //telemetry.TrackTrace("OpenAbout Completed");
+                //TakeScreenshot(client, xrmApp.CommandResults.Last());
+                //xrmApp.Dialogs.ClickOk();
 
                 telemetry.TrackTrace("OpenSubArea Started");
-                xrmApp.Navigation.OpenSubArea("Sales", "Accounts");
+                xrmApp.Navigation.OpenSubArea("App Insights", "Test Harnesses");
                 telemetry.TrackTrace("OpenSubArea Completed");
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
 
-                telemetry.TrackTrace("SwitchView Started");
-                xrmApp.Grid.SwitchView("All Accounts");
-                telemetry.TrackTrace("SwitchView Completed");
-                TakeScreenshot(client, xrmApp.CommandResults.Last());
+                //telemetry.TrackTrace("SwitchView Started");
+                //xrmApp.Grid.SwitchView("All Accounts");
+                //telemetry.TrackTrace("SwitchView Completed");
+                //TakeScreenshot(client, xrmApp.CommandResults.Last());
 
-                telemetry.TrackTrace("GetGridControl Started");
-                var gridHtml = xrmApp.Grid.GetGridControl();
-                WriteSource("GRID_", gridHtml);
-                telemetry.TrackTrace("GetGridControl Completed");
-
-                telemetry.TrackTrace("Search Started");
-                xrmApp.Grid.Search("Contoso");
-                telemetry.TrackTrace("Search Completed");
-                TakeScreenshot(client, xrmApp.CommandResults.Last());
+                //telemetry.TrackTrace("Search Started");
+                //xrmApp.Grid.Search("Contoso");
+                //telemetry.TrackTrace("Search Completed");
+                //TakeScreenshot(client, xrmApp.CommandResults.Last());
 
                 telemetry.TrackTrace("OpenRecord Started");
                 xrmApp.Grid.OpenRecord(0);
                 telemetry.TrackTrace("OpenRecord Completed");
                 TakeScreenshot(client, xrmApp.CommandResults.Last());
-                #region Boolean
+                #region MultiValueOptionSet
                 telemetry.TrackTrace("GetValue-Text Started");
-                xrmApp.Entity.GetValue("telephone1");
+                MultiValueOptionSet pfe_multiselectoptionset = new MultiValueOptionSet()
+                {
+                    Name = "pfe_multiselectoptionset",
+                    Values = new string[] { "Allowed", "Not Allowed" }
+                };
+                 xrmApp.Entity.SetValue(pfe_multiselectoptionset);
+                var result = xrmApp.Entity.GetValue("pfe_multiselectoptionset");
                 telemetry.TrackTrace("GetValue-Text Completed");
 
                 telemetry.TrackTrace("SetValue-Text Started");

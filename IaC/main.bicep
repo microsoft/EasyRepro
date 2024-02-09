@@ -50,6 +50,14 @@ module appInsights 'modules/appInsights.bicep' = {
   }
 }
 
+module openAi 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
+  name: 'alyousse-openai'
+  location: 'eastus'
+  sku: {
+    value: 'S0'
+  }
+}
+
 module acrResource 'modules/containerRegistry.bicep' = {
   name: 'alyousse-containerRegistry'
   params: {

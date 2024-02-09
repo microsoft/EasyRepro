@@ -1065,6 +1065,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         internal BrowserCommandResult<string> EntityGetValue(string field)
         {
+            Trace.TraceInformation("Entered Entity.EntityGetValue");
             return _client.Execute(_client.GetOptions($"Get Value"), driver =>
             {
                 string text = string.Empty;
@@ -1072,6 +1073,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 if (driver.FindElements(this._entityReference.TextFieldContainer.Replace("[NAME]", field) + "//input").Count > 0)
                 {
+                    Trace.TraceInformation("Entity.EntityGetValue: Found input control");
+                    var inputSelector = string.Empty;
+                    if(driver.HasElement(this._entityReference.TextFieldContainer.Replace("[NAME]", field) + "//div[contains(@data-lp-id,'MultiSelectPicklist')]"))
+                    {
+                        Trace.TraceInformation("Entity.EntityGetValue: Found MultiSelectOptionSet control");
+                        inputSelector = this._entityReference.TextFieldContainer.Replace("[NAME]", field) + "//ul[contains(@class,'selecteditems')]";
+                        text = driver.FindElements(inputSelector).Select(x => x.Text).ToString() ?? string.Empty;
+                    }
+
                     var input = driver.FindElement(this._entityReference.TextFieldContainer.Replace("[NAME]", field) + "//input");
                     if (input != null)
                     {
@@ -1088,6 +1098,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 }
                 else if (driver.FindElements(this._entityReference.TextFieldContainer.Replace("[NAME]", field) + "//textarea").Count > 0)
                 {
+                    Trace.TraceInformation("Entity.EntityGetValue: Found textarea control");
                     text = driver.FindElement(this._entityReference.TextFieldContainer.Replace("[NAME]", field) + "//textarea").GetAttribute(_client, "value");
                 }
                 else

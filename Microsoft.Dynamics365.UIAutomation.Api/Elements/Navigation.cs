@@ -408,6 +408,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
         public BrowserCommandResult<bool> OpenSubArea(string area, string subarea)
         {
+            Trace.TraceInformation("Entered Navigation.OpenSubArea");
             return _client.Execute(_client.GetOptions("Open Sub Area"), driver =>
             {
                 //If the subarea is already in the left hand nav, click it
@@ -566,6 +567,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 return result;
             });
         }
+
         public Dictionary<string, IElement> OpenMenuFallback(string area, int thinkTime = Constants.DefaultThinkTime)
         {
             return _client.Execute(_client.GetOptions("Open Menu"), driver =>
@@ -648,6 +650,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 throw new InvalidOperationException($"No command with data-id: {dataId} exists inside of the command menu {command}");
             });
         }
+
+        private void CloseMenu(IWebBrowser driver)
+        {
+            Trace.TraceInformation("Entered Navigation.CloseMenu");
+            if (driver.HasElement(_client.ElementMapper.NavigationReference.AreaMenu))
+            {
+                driver.FindElement(_client.ElementMapper.NavigationReference.AreaMenu).Click(_client);
+            }
+        }
         private bool TryOpenArea(string area)
         {
             area = area.ToLowerString();
@@ -667,12 +678,14 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
         public Dictionary<string, IElement> GetSubAreaMenuItems(IWebBrowser driver)
         {
+            Trace.TraceInformation("Entered Navigation.GetSubAreaMenuItems");
             var dictionary = new Dictionary<string, IElement>();
 
             //Sitemap without enableunifiedinterfaceshellrefresh
             var hasPinnedSitemapEntity = driver.HasElement(_client.ElementMapper.NavigationReference.PinnedSitemapEntity);
             if (!hasPinnedSitemapEntity)
             {
+                Trace.TraceInformation("Navigation.GetSubAreaMenuItems: Close SiteMap launcher");
                 // Close SiteMap launcher since it is open
                 var xpathToLauncherCloseButton = _client.ElementMapper.NavigationReference.SiteMapLauncherCloseButton;
                 driver.ClickWhenAvailable(xpathToLauncherCloseButton);
@@ -681,10 +694,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 var menuContainer = driver.WaitUntilAvailable(_client.ElementMapper.NavigationReference.SubAreaContainer);
 
+                Trace.TraceInformation("Navigation.GetSubAreaMenuItems: Find sub items");
                 var subItems = driver.FindElements(menuContainer.Locator + "//li");
 
                 foreach (var subItem in subItems)
                 {
+                    Trace.TraceInformation("Navigation.GetSubAreaMenuItems: Searching subitem: " + subItem.Text);
                     // Check 'Id' attribute, NULL value == Group Header
                     var id = subItem.GetAttribute(_client, "id");
                     if (string.IsNullOrEmpty(id))
@@ -749,12 +764,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
         private bool TryOpenSubArea(IWebBrowser driver, string subarea)
         {
+            Trace.TraceInformation("Entered Navigation.TryOpenSubArea");
             subarea = subarea.ToLowerString();
             var navSubAreas = GetSubAreaMenuItems(driver);
 
             var found = navSubAreas.TryGetValue(subarea, out var IElement);
             if (found)
             {
+                Trace.TraceInformation("Navigation.TryOpenSubArea: Found subarea and attempting to click.");
+                CloseMenu(driver);
                 var strSelected = IElement.GetAttribute(_client,"aria-selected");
                 bool.TryParse(strSelected, out var selected);
                 if (!selected)
