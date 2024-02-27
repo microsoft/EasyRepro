@@ -7,6 +7,7 @@ using System;
 using Microsoft.Dynamics365.UIAutomation.Api.DTO;
 using OpenQA.Selenium.IE;
 using Keys = Microsoft.Dynamics365.UIAutomation.Browser.Keys;
+using System.Diagnostics;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
@@ -20,6 +21,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string ReadOnly = ".//*[@aria-readonly]";
             public static string Required = ".//*[@aria-required]";
             public static string RequiredIcon = ".//div[contains(@data-id, 'required-icon') or contains(@id, 'required-icon')]";
+
+            public static string LookupItemLocator = "data-id";
+            public static string LookupItemLocatorValue = "LookupResults";
+            public static string MultiValueOptionSetLocator = "class";
+            public static string MultiValueOptionSetLocatorValue = "msos-input";
         }
         //Constructors
         public Field(IElement containerIElement)
@@ -163,11 +169,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         internal void SetInputValue(IWebBrowser driver, IElement input, string value, TimeSpan? thinktime = null)
         {
+            Trace.TraceInformation("Field.SetInputValue initiated.");
             input.Clear(_client, input.Locator);
             input.Click(_client);
             //input.SendKeys(_client, new string[] { Keys.Control, "a" });
             //input.SendKeys(_client, new string[] { Keys.Control + "a" });
             //input.SendKeys(_client, new string[] { Keys.Backspace });
+
             input.SetValue(_client, value);
             //driver.Wait();
 
@@ -210,6 +218,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <example>xrmApp.Entity.SetValue("firstname", "Test");</example>
         internal BrowserCommandResult<bool> SetValue(WebClient client, string field, string value, FormContextType formContextType = FormContextType.Entity)
         {
+            Trace.TraceInformation("Field.SetValue initiated with field " + field);
             return client.Execute(client.GetOptions("Set Value"), driver =>
             {
                 IElement fieldContainer = null;
@@ -222,6 +231,29 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     found = client.Browser.Browser.HasElement(fieldContainer.Locator + "//textarea");
 
                 input = client.Browser.Browser.FindElement(fieldContainer.Locator + "//input");
+                if (!found && input.IsAvailable)
+                {
+                    //determine type of control
+                    if (input.GetAttribute(_client, FieldReference.MultiValueOptionSetLocator) == FieldReference.MultiValueOptionSetLocatorValue)
+                    {
+                        Trace.TraceInformation("Field.SetValue: Converting to MultiValueOptionSet.");
+                        MultiValueOptionSet multiValueOptionSet = new MultiValueOptionSet() {Name = field };
+                        multiValueOptionSet.Values = new string[] {value};
+                        multiValueOptionSet.SetValue(client, multiValueOptionSet, formContextType);
+                        return true;
+                    }
+                    if (input.GetAttribute(_client, FieldReference.LookupItemLocator).Contains(FieldReference.LookupItemLocatorValue))
+                    {
+                        Trace.TraceInformation("Field.SetValue: Converting to LookupItem.");
+                        LookupItem lookup = new LookupItem();
+                        lookup.Name = field;
+                        lookup.Value = value;
+                        Lookup lookup1 = new Lookup(client);
+                        lookup1.SetValue(lookup, formContextType);
+                        return true;
+                    }
+                    found = true;
+                }
 
                 if (!found)
                     throw new NoSuchElementException($"Field with name {field} does not exist.");

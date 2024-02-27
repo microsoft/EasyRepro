@@ -201,7 +201,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
         public void SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
-            MultiValueOptionSet.SetValue(_client, option, FormContextType.QuickCreate, removeExistingValues);
+            option.SetValue(_client, option, FormContextType.QuickCreate, removeExistingValues);
         }
 
         /// <summary>

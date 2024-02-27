@@ -730,7 +730,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
         public void SetValue(MultiValueOptionSet option, bool removeExistingValues = false)
         {
-            MultiValueOptionSet.SetValue(_client, option, FormContextType.Entity, removeExistingValues);
+            option.SetValue(_client, option, FormContextType.Entity, removeExistingValues);
         }
 
         /// <summary>
@@ -1804,7 +1804,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             {
                 TryExpandHeaderFlyout(driver);
 
-                MultiValueOptionSet.SetValue(_client, control, FormContextType.Header);
+                control.SetValue(_client, control, FormContextType.Header);
 
                 TryCloseHeaderFlyout(driver);
                 return true;

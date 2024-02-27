@@ -257,6 +257,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             var xpathDeleteExistingValues = _client.ElementMapper.EntityReference.LookupFieldDeleteExistingValue.Replace("[NAME]", controlName);
             var existingValues = driver.FindElements(fieldContainer.Locator + xpathDeleteExistingValues);
 
+            if (driver.HasElement(fieldContainer.Locator + xpathDeleteExistingValues))
+            {
+                Trace.TraceInformation("Lookup.TryRemoveLookupValue: Existing values found for lookup " + control.Name);
+            }
+
             var xpathToExpandButton = _client.ElementMapper.EntityReference.LookupFieldExpandCollapseButton.Replace("[NAME]", controlName);
             bool success = driver.HasElement(fieldContainer.Locator + xpathToExpandButton);
             var expandButton = driver.FindElement(fieldContainer.Locator + xpathToExpandButton);

@@ -35,7 +35,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be set/removed</param>
         /// <param name="removeExistingValues">False - Values will be set. True - Values will be removed</param>
         /// <returns>True on success</returns>
-        internal static BrowserCommandResult<bool> SetValue(WebClient client, MultiValueOptionSet option, FormContextType formContextType = FormContextType.Entity, bool removeExistingValues = false)
+        internal BrowserCommandResult<bool> SetValue(WebClient client, MultiValueOptionSet option, FormContextType formContextType = FormContextType.Entity, bool removeExistingValues = false)
         {
             return client.Execute(client.GetOptions($"Set MultiValueOptionSet Value: {option.Name}"), driver =>
             {
@@ -56,7 +56,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// </summary>
         /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be removed</param>
         /// <returns></returns>
-        internal static BrowserCommandResult<bool> RemoveMultiOptions(WebClient client, MultiValueOptionSet option, FormContextType formContextType)
+        internal BrowserCommandResult<bool> RemoveMultiOptions(WebClient client, MultiValueOptionSet option, FormContextType formContextType)
         {
             return client.Execute(client.GetOptions($"Remove Multi Select Value: {option.Name}"), driver =>
             {
@@ -116,78 +116,78 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 return true;
             });
         }
-            /// <summary>
-            /// Sets the value from the multselect type control
-            /// </summary>
-            /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be set</param>
-            /// <returns></returns>
-            public static BrowserCommandResult<bool> AddMultiOptions(WebClient client, MultiValueOptionSet option, FormContextType formContextType)
+        /// <summary>
+        /// Sets the value from the multselect type control
+        /// </summary>
+        /// <param name="option">Object of type MultiValueOptionSet containing name of the Field and the values to be set</param>
+        /// <returns></returns>
+        public static BrowserCommandResult<bool> AddMultiOptions(WebClient client, MultiValueOptionSet option, FormContextType formContextType)
+        {
+            Trace.TraceInformation("Entered into MultiValueOptionSet.AddMultiOptions with FormContextType: " + formContextType + " and MultiValueOptionSet: " + option.Name);
+            return client.Execute(client.GetOptions($"Add Multi Select Value: {option.Name}"), driver =>
             {
-                Trace.TraceInformation("Entered into MultiValueOptionSet.AddMultiOptions with FormContextType: " + formContextType + " and MultiValueOptionSet: " + option.Name);
-                return client.Execute(client.GetOptions($"Add Multi Select Value: {option.Name}"), driver =>
+                IElement fieldContainer = null;
+                MultiSelect multiSelect = new MultiSelect(client.Configuration);
+                if (formContextType == FormContextType.QuickCreate)
                 {
-                    IElement fieldContainer = null;
-                    MultiSelect multiSelect = new MultiSelect(client.Configuration);
-                    if (formContextType == FormContextType.QuickCreate)
-                    {
-                        // Initialize the quick create form context
-                        // If this is not done -- IElement input will go to the main form due to new flyout design
-                        var formContext = driver.WaitUntilAvailable(client.ElementMapper.QuickCreateReference.QuickCreateFormContext);
-                        fieldContainer = driver.WaitUntilAvailable(formContext.Locator + multiSelect.DivContainer.Replace("[NAME]", option.Name));
-                    }
-                    else if (formContextType == FormContextType.Entity)
-                    {
-                        // Initialize the entity form context
-                        var formContext = driver.WaitUntilAvailable(_entityReference.FormContext);
-                        fieldContainer = driver.WaitUntilAvailable(formContext.Locator + multiSelect.DivContainer.Replace("[NAME]", option.Name));
-                    }
-                    else if (formContextType == FormContextType.BusinessProcessFlow)
-                    {
-                        // Initialize the Business Process Flow context
-                        var formContext = driver.WaitUntilAvailable(client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext);
-                        fieldContainer = driver.WaitUntilAvailable(formContext.Locator + multiSelect.DivContainer.Replace("[NAME]", option.Name));
-                    }
-                    else if (formContextType == FormContextType.Header)
-                    {
-                        // Initialize the Header context
-                        var formContext = driver.WaitUntilAvailable(_entityReference.HeaderContext);
-                        fieldContainer = driver.WaitUntilAvailable(formContext.Locator + multiSelect.DivContainer.Replace("[NAME]", option.Name));
-                    }
-                    else if (formContextType == FormContextType.Dialog)
-                    {
-                        // Initialize the Header context
-                        var formContext = driver.WaitUntilAvailable(client.ElementMapper.DialogsReference.DialogContext);
-                        fieldContainer = driver.WaitUntilAvailable(formContext.Locator + client.ElementMapper.DialogsReference.DialogContext.Replace("[NAME]", option.Name));
-                    }
+                    // Initialize the quick create form context
+                    // If this is not done -- IElement input will go to the main form due to new flyout design
+                    var formContext = driver.WaitUntilAvailable(client.ElementMapper.QuickCreateReference.QuickCreateFormContext);
+                    fieldContainer = driver.WaitUntilAvailable(formContext.Locator + multiSelect.DivContainer.Replace("[NAME]", option.Name));
+                }
+                else if (formContextType == FormContextType.Entity)
+                {
+                    // Initialize the entity form context
+                    var formContext = driver.WaitUntilAvailable(_entityReference.FormContext);
+                    fieldContainer = driver.WaitUntilAvailable(formContext.Locator + multiSelect.DivContainer.Replace("[NAME]", option.Name));
+                }
+                else if (formContextType == FormContextType.BusinessProcessFlow)
+                {
+                    // Initialize the Business Process Flow context
+                    var formContext = driver.WaitUntilAvailable(client.ElementMapper.BusinessProcessFlowReference.BusinessProcessFlowFormContext);
+                    fieldContainer = driver.WaitUntilAvailable(formContext.Locator + multiSelect.DivContainer.Replace("[NAME]", option.Name));
+                }
+                else if (formContextType == FormContextType.Header)
+                {
+                    // Initialize the Header context
+                    var formContext = driver.WaitUntilAvailable(_entityReference.HeaderContext);
+                    fieldContainer = driver.WaitUntilAvailable(formContext.Locator + multiSelect.DivContainer.Replace("[NAME]", option.Name));
+                }
+                else if (formContextType == FormContextType.Dialog)
+                {
+                    // Initialize the Header context
+                    var formContext = driver.WaitUntilAvailable(client.ElementMapper.DialogsReference.DialogContext);
+                    fieldContainer = driver.WaitUntilAvailable(formContext.Locator + client.ElementMapper.DialogsReference.DialogContext.Replace("[NAME]", option.Name));
+                }
 
-                    Trace.TraceInformation("Locating MultiValueOptionSet input");
-                    var inputXPath = multiSelect.InputSearch;
-                    driver.FindElement(fieldContainer.Locator + inputXPath).SendKeys(client, new string[] { string.Empty });
+                Trace.TraceInformation("Locating MultiValueOptionSet input");
+                var inputXPath = multiSelect.InputSearch;
+                driver.FindElement(fieldContainer.Locator + inputXPath).SendKeys(client, new string[] { string.Empty });
 
-                    Trace.TraceInformation("Locating MultiValueOptionSet flyout");
-                    var flyoutCaretXPath = multiSelect.FlyoutCaret;
-                    client.Browser.Browser.FindElement(fieldContainer.Locator + flyoutCaretXPath).Click(client);
+                Trace.TraceInformation("Locating MultiValueOptionSet flyout");
+                var flyoutCaretXPath = multiSelect.FlyoutCaret;
+                client.Browser.Browser.FindElement(fieldContainer.Locator + flyoutCaretXPath).Click(client);
 
-                    foreach (var optionValue in option.Values)
+                foreach (var optionValue in option.Values)
+                {
+                    Trace.TraceInformation("Locating option value: " + optionValue);
+                    var flyoutOptionXPath = multiSelect.FlyoutOption.Replace("[NAME]", optionValue);
+                    if (driver.HasElement(fieldContainer.Locator + flyoutOptionXPath))
                     {
-                        Trace.TraceInformation("Locating option value: " + optionValue);
-                        var flyoutOptionXPath = multiSelect.FlyoutOption.Replace("[NAME]", optionValue);
-                        if (driver.HasElement(fieldContainer.Locator + flyoutOptionXPath))
+                        var flyoutOption = driver.FindElement(fieldContainer.Locator + flyoutOptionXPath);
+                        var ariaSelected = flyoutOption.GetAttribute(client, "aria-selected");
+                        var selected = !string.IsNullOrEmpty(ariaSelected) && bool.Parse(ariaSelected);
+
+                        if (!selected)
                         {
-                            var flyoutOption = driver.FindElement(fieldContainer.Locator + flyoutOptionXPath);
-                            var ariaSelected = flyoutOption.GetAttribute(client, "aria-selected");
-                            var selected = !string.IsNullOrEmpty(ariaSelected) && bool.Parse(ariaSelected);
-
-                            if (!selected)
-                            {
-                                flyoutOption.Click(client);
-                            }
+                            flyoutOption.Click(client);
                         }
                     }
+                }
 
-                    return true;
-                });
-            }
+                return true;
+            });
+        }
         }
     
 

@@ -181,7 +181,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="field">MultiValueOptionSet with the schema name of the field to retrieve</param>
         public void SetValue(WebClient client,MultiValueOptionSet option, bool removeExistingValues = false)
         {
-            MultiValueOptionSet.SetValue(client, option, FormContextType.BusinessProcessFlow, removeExistingValues);
+            option.SetValue(client, option, FormContextType.BusinessProcessFlow, removeExistingValues);
         }
 
         /// <summary>
