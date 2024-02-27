@@ -43,6 +43,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             private string _SearchButton = "//*[@id=\"searchLauncher\"]/button";
             private string _Search = "//*[@id=\"categorizedSearchInputAndButton\"]";
             private string _QuickLaunchActivities = "//button[contains(@data-id, 'quickCreateMenuButton_Activities')]";
+            private string _QuickLaunchActivitiesBack = "//li[@title='Back' and @role='menuitem']";
             private string _QuickLaunchMenu = "//div[contains(@data-id,'quick-launch-bar')]";
             private string _QuickLaunchButton = "//li[contains(@title, '[NAME]')]";
             private string _QuickCreateButton = "//button[contains(@data-id,'quickCreateLauncher')]";
@@ -80,6 +81,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public string Search { get => _Search; set { _Search = value; } }
 
             public string QuickLaunchActivities { get => _QuickLaunchActivities; set { _QuickLaunchActivities = value; } }
+            public string QuickLaunchActivitiesBack { get => _QuickLaunchActivitiesBack; set { _QuickLaunchActivitiesBack = value; } }
             public string QuickLaunchMenu { get => _QuickLaunchMenu; set { _QuickLaunchMenu = value; } }
             public string QuickLaunchButton { get => _QuickLaunchButton; set { _QuickLaunchButton = value; } }
             public string QuickCreateButton { get => _QuickCreateButton; set { _QuickCreateButton = value; } }
@@ -195,10 +197,12 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
         public BrowserCommandResult<bool> QuickCreate(string entityName, int thinkTime = Constants.DefaultThinkTime)
         {
+            Trace.TraceInformation("Navigation.QuickCreate initated");
             _client.ThinkTime(thinkTime);
 
             return _client.Execute(_client.GetOptions($"Quick Create: {entityName}"), driver =>
             {
+                _client.CloseTeachingBubbles(driver, 10000);
                 //Click the + button in the ribbon
                 var quickCreateButton = driver.FindElement(_client.ElementMapper.NavigationReference.QuickCreateButton);
                 quickCreateButton.Click(_client);
@@ -209,16 +213,34 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 var entitybutton = entityMenuItems.FirstOrDefault(e => e.Text.Contains(entityName, StringComparison.OrdinalIgnoreCase));
 
                 //Text could be in Activities. Expand and verify
+                Trace.TraceInformation("Navigation.QuickCreate: Open Quick Create Acitvities.");
                 if (driver.HasElement(_client.ElementMapper.NavigationReference.QuickLaunchActivities))
                 {
+                    _client.CloseTeachingBubbles(driver);
                     var activityExpander = driver.FindElement(_client.ElementMapper.NavigationReference.QuickLaunchActivities);
                     activityExpander.Click(_client);
 
-                    if (driver.HasElement("//button[@data-id=\"quickCreateMenuButton_[NAME]\"]".Replace("[NAME]", entityName)))
+                    if (driver.HasElement("//button[@data-id=\"quickCreateMenuButton_[NAME]\" and @role='menuitem']".Replace("[NAME]", entityName)))
                     {
-                        driver.FindElement("//button[@data-id=\"quickCreateMenuButton_[NAME]\"]".Replace("[NAME]", entityName)).Click(_client);
+                        Trace.TraceInformation("Navigation.QuickCreate: Quick Create Acitvities contains button.");
+                        driver.FindElement("//button[@data-id=\"quickCreateMenuButton_[NAME]\" and @role='menuitem']".Replace("[NAME]", entityName)).Click(_client);
+                        return true;
                     }
-                    return true;
+                    else
+                    {
+                        //Close Activities
+                        if (driver.HasElement(_client.ElementMapper.NavigationReference.QuickLaunchActivitiesBack))
+                        {
+                            Trace.TraceInformation("Navigation.QuickCreate: Quick Create Acitvities back clicked.");
+                            Thread.Sleep(5000);
+                            driver.FindElement(_client.ElementMapper.NavigationReference.QuickLaunchActivitiesBack + "//span").Click(_client);
+
+                            Trace.TraceInformation("Navigation.QuickCreate: Quick Create Acitvities back clicked. Waiting for 5 seconds.");
+                            Thread.Sleep(5000);
+                        }
+                        
+                    }
+                    
                 }
 
                 if (entitybutton == null)

@@ -82,12 +82,20 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 }
             }
         }
-        public void CloseTeachingBubbles(IWebBrowser driver)
+        public void CloseTeachingBubbles(IWebBrowser driver, int? timeToWait = 0)
         {
-            if (driver.HasElement("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' ]"))
+            Thread.Sleep(timeToWait.Value);
+            bool teachingBubblePresent = false;
+            Trace.TraceInformation("WebClient.CloseTeachingBubbles initated");
+            if (driver.HasElement("//div[contains(@class,'ms-TeachingBubble')]"))
+            {
+                teachingBubblePresent = true;
+                Trace.TraceInformation("WebClient.CloseTeachingBubbles - found teaching bubble.");
+            }
+            if (driver.HasElement("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable='true']"))
             {
                 Trace.WriteLine(String.Format("Found {0} Clickable Teaching Bubbles.", driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' and @aria-label='Dismiss']").Count));
-                foreach (var item in driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable= 'true' ]"))
+                foreach (var item in driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton') and @data-is-focusable='true']"))
                 {
                     try
                     {
@@ -101,6 +109,24 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     
                 }
             }
+            else
+            {
+                Trace.TraceInformation("WebClient.CloseTeachingBubbles - found teaching bubble but not the close button.");
+                foreach (var item in driver.FindElements("//button[contains(@class,'ms-TeachingBubble-closebutton')]"))
+                {
+                    try
+                    {
+                        item.Click(this);
+                    }
+                    catch (Exception)
+                    {
+
+                        //Teaching bubbles can disappear so do not pass exception.
+                    }
+
+                }
+            }
+            if (teachingBubblePresent) this.CloseTeachingBubbles(driver);
         }
         #endregion
 

@@ -253,6 +253,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             var controlName = control.Name;
             fieldContainer.Hover(_client, fieldContainer.Locator);
 
+            Trace.TraceInformation("Lookup.TryRemoveLookupValue: Look for existing values.");
             var xpathDeleteExistingValues = _client.ElementMapper.EntityReference.LookupFieldDeleteExistingValue.Replace("[NAME]", controlName);
             var existingValues = driver.FindElements(fieldContainer.Locator + xpathDeleteExistingValues);
 
@@ -261,6 +262,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             var expandButton = driver.FindElement(fieldContainer.Locator + xpathToExpandButton);
             if (success)
             {
+                Trace.TraceInformation("Lookup.TryRemoveLookupValue: Click expand button.");
                 expandButton.Click(_client,true);
 
                 var count = existingValues.Count;
@@ -276,6 +278,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
             if (removeAll)
             {
+                Trace.TraceInformation("Lookup.TryRemoveLookupValue: Remove all selected items.");
                 // Removes all selected items
 
                 while (existingValues.Count > 0)

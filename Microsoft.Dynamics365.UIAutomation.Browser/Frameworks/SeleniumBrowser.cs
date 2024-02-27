@@ -140,7 +140,13 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public bool HasElement(string selector)
         {
             Trace.TraceInformation("[Selenium] Browser has element initated. XPath: " + selector);
-            return _driver.HasElement(By.XPath(selector));
+            if (_driver.HasElement(By.XPath(selector))){
+                if (_driver.FindElement(By.XPath(selector)).Displayed)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         #endregion
 
@@ -240,6 +246,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         #region SwitchFrame
         public void SwitchToFrame(string locator)
         {
+            Trace.TraceInformation("[Selenium] Browser switch frame initated. XPath: " + locator);
             if (int.TryParse(locator, out var frame))
             {
                 if (frame == 0) { _driver.SwitchTo().ParentFrame(); }
@@ -285,8 +292,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
             }
             catch (Exception ex)
             {
-
-                throw new Exception(exceptionMessage);
+                return false;
+                //throw new Exception(exceptionMessage);
             }
         }
         #endregion
