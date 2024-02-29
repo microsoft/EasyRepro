@@ -18,7 +18,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         void Navigate(string url);
         void SendKeys(string locator, string[] keys);
         void SendKey(string locator, string key);
-        void SwitchToFrame(string locator);
+        void SwitchToFrame(string locator, IElement? frameElement=null);
         void TakeWindowScreenShot(string fileName, FileFormat fileFormat);
         //bool TryFindElement(string selector, out Element element);
         void Wait(TimeSpan? timeout = null);

@@ -1,5 +1,5 @@
 # Overview #
-The purpose of this library is to provide Dynamics customers the ability to facilitate automated UI testing for their projects. These API's provide an easy to use set of commands that make setting up UI testing quick and easy. The functionality provided covers the core CRM commands that end users would perform on a typical workday and working to extend that coverage to more functionality.
+The purpose of this library is to provide Dynamics customers the ability to facilitate automated UI testing for their projects. These API's provide an easy to use set of commands that make setting up UI testing quick and easy. The functionality provided covers the core Dynamics 365 commands that end users would perform on a typical workday and working to extend that coverage to more functionality.
 
 ## Breaking Changes from earlier versions of Easy Repro
 The impact to all tests is extremely minimal. In the case there is a potential breaking change, please review the section below.
@@ -20,7 +20,7 @@ Windows 11, Windows 10 , Windows 7, Windows 8, Windows 8.1, Windows Server 2008,
 #### Supported Visual studio 
 Microsoft Visual Studio 2015, Microsoft Visual Studio 2017, Microsoft Visual Studio 2019, Microsoft Visual Studio 2022
 
-### CRM Versions
+### Dynamics 365 Versions
 Easy Repro supports the latest version of Microsoft Dynamics 365 Customer Engagement.
 
 #### Selenium Webdriver & Support
@@ -32,8 +32,16 @@ Selenium is a set of different software tools each with a different approach to 
 | Selenium.WebDriver| v4.8  | January 23, 2023 |
 | Selenium.Support  | v4.8  | January 23, 2023 |
 
+#### Playwright Webdriver & Support
+Playwright enables reliable end-to-end testing for modern web apps. It is built to enable cross-browser web automation that is ever-green, capable, reliable and fast. Learn more at https://playwright.dev/dotnet/.
+
+
+| File Name         | Version | Release date   |
+| ------------------|---------|----------------|
+| Microsoft.Playwright| v1.40.0  | November 21, 2023 |
+
 ## Coverage #
-### CRM Functionality Covered
+### Dynamics 365 Functionality Covered
 - Activity Record Wall
 - Business Process Flow
 - Charts
@@ -48,10 +56,11 @@ Selenium is a set of different software tools each with a different approach to 
 - Notifications
 - Performance Center
 - Quick Create
+- Rich Text Editor
 - Run Workflows
 - Run Reports
 
-### CRM Functionality Not Covered
+### Dynamics 365 Functionality Not Covered
 - Settings Area  (Administration)
 - Customization 
 - Advanced Find Query execution(Open Advanced Find is available)
@@ -70,7 +79,7 @@ The Sample project should have NUGET packages added and you just need to build t
 
 #### Run the Sample Project
 
-Change the keys in your `app.config` below to match your environment. Open the Test explorer window. Right click and run one test to ensure everything works. Trying the `CreateAccount` test under `Microsoft.Dynamics365.UIAutomation.Sample.Web` is a good start.
+Change the keys in your `app.config` below to match your environment. Open the Test explorer window. Right click and run one test to ensure everything works. Trying the `CreateAccount` test under `Microsoft.Dynamics365.UIAutomation.Sample` is a good start.
 
 ```cs
 <add key="OnlineUsername" value="name@name.onmicrosoft.com" />

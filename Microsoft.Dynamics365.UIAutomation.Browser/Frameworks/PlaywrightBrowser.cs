@@ -105,7 +105,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
 
         #region SwitchToFrame
 
-        public void SwitchToFrame(string name)
+        public void SwitchToFrame(string name, IElement? frameElement = null)
         {
             _page.Frame(name).WaitForLoadStateAsync();
         }

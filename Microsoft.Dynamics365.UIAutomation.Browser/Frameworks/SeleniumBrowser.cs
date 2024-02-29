@@ -79,11 +79,11 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         public void SendKeys(string selector, string[] keys)
         {
             //GetElement(selector).SendKeys(keys.ToString());
-
+            Trace.TraceInformation("[Selenium] Browser send keys initated. XPath: " + selector + ". Keys: " + string.Join("\n", keys));
             Actions action = new Actions(_driver);
             //action.KeyDown(Keys.Control).SendKeys("S").Perform();
             int keyLength = keys.Length - 1;
-            for (int x = 0; x < keyLength; x++)
+            for (int x = 0; x <= keyLength; x++)
             {
                 action.KeyDown(keys[x].Select(t => $"U+{Convert.ToUInt16(t):X4} ").FirstOrDefault());
             }
@@ -244,9 +244,16 @@ namespace Microsoft.Dynamics365.UIAutomation.Browser
         #endregion
 
         #region SwitchFrame
-        public void SwitchToFrame(string locator)
+        public void SwitchToFrame(string locator, IElement? frameElement=null)
         {
             Trace.TraceInformation("[Selenium] Browser switch frame initated. XPath: " + locator);
+            if (frameElement != null)
+            {
+                
+                
+                _driver.SwitchTo().Frame(_driver.FindElement(By.XPath(frameElement.Locator)));
+                return;
+            }
             if (int.TryParse(locator, out var frame))
             {
                 if (frame == 0) { _driver.SwitchTo().ParentFrame(); }

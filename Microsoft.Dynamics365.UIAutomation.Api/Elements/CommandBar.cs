@@ -3,6 +3,7 @@
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
@@ -67,6 +68,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="subSecondName">Name of button on submenu (3rd level) to click</param>
         public BrowserCommandResult<bool> ClickCommand(string name, string subname = null, string subSecondName = null, int thinkTime = Constants.DefaultThinkTime)
         {
+            Trace.TraceInformation("CommandBar.ClickCommand for command " + name);
             return _client.Execute(_client.GetOptions($"Click Command"), driver =>
             {
                 // Find the button in the CommandBar
@@ -74,6 +76,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 // Checking if any dialog is active
                 if (driver.HasElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext)))
                 {
+                    Trace.TraceInformation("CommandBar.ClickCommand: Found in Dialog.");
                     var dialogContainer = driver.FindElement(string.Format(_client.ElementMapper.DialogsReference.DialogContext));
                     ribbon = driver.WaitUntilAvailable(_client.ElementMapper.DialogsReference.DialogContext + _client.ElementMapper.CommandBarReference.Container);
                 }
@@ -95,6 +98,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 
                 if (driver.HasElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                 {
+                    Trace.TraceInformation("CommandBar.ClickCommand: Found in SubGrid.");
                     var command = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
                     command.Click(_client);
                     driver.Wait();
@@ -104,6 +108,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     //Is the button in More Commands?
                     if (driver.HasElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton))
                     {
+                        Trace.TraceInformation("CommandBar.ClickCommand: Searching in RelatedGrid.");
                         // Click More Commands
                         var moreCommands = driver.FindElement(_client.ElementMapper.RelatedGridReference.CommandBarOverflowButton);
                         moreCommands.Click(_client);
@@ -113,6 +118,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         var flyOutMenu = driver.WaitUntilAvailable(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList);
                         if (driver.HasElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                         {
+                            Trace.TraceInformation("CommandBar.ClickCommand: Found in RelatedGrid.");
                             var overflowCommand = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
                             overflowCommand.Click(_client);
                             driver.Wait();
@@ -122,6 +128,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
                     else if (driver.HasElement(_client.ElementMapper.EntityReference.MoreCommands))
                     {
+                        Trace.TraceInformation("CommandBar.ClickCommand: Searching in MoreCommands.");
                         var moreCommands = driver.FindElement(_client.ElementMapper.EntityReference.MoreCommands);
                         moreCommands.Click(_client);
                         driver.Wait();
@@ -130,6 +137,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         var flyOutMenu = driver.WaitUntilAvailable(_client.ElementMapper.RelatedGridReference.CommandBarFlyoutButtonList); ;
                         if (driver.HasElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name)))
                         {
+                            Trace.TraceInformation("CommandBar.ClickCommand: Found in MoreCommands.");
                             var overflowCommand = driver.FindElement(_client.ElementMapper.SubGridReference.SubGridCommandLabel.Replace("[NAME]", name));
                             overflowCommand.Click(_client);
                             driver.Wait();
@@ -143,6 +151,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 if (!string.IsNullOrEmpty(subname))
                 {
+                    Trace.TraceInformation("CommandBar.ClickCommand: Searching SubCommands in MoreCommands.");
                     var submenu = driver.WaitUntilAvailable(_client.ElementMapper.CommandBarReference.MoreCommandsMenu);
 
 

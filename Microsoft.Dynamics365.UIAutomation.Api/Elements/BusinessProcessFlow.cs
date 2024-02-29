@@ -3,6 +3,7 @@
 using Microsoft.Dynamics365.UIAutomation.Api.DTO;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
+using System.Diagnostics;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
@@ -20,6 +21,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             private string _BusinessProcessFlowFieldName = "//input[contains(@id,'[NAME]')]";
             private string _BusinessProcessFlowFormContext = "//div[contains(@id, \'ProcessStageControl-processHeaderStageFlyoutInnerContainer\')]";
             private string _TextFieldContainer = ".//div[contains(@data-lp-id, \'header_process_[NAME]\')]";
+            private string _LookupFieldContainer = ".//div[contains(@data-lp-id, \'header_process_[NAME]\')]//div[@role='presentation']";
             private string _FieldSectionItemContainer = ".//div[contains(@id, \'header_process_[NAME]-FieldSectionItemContainer\')]";
             private string _TextFieldLabel = "//label[contains(@id, \'header_process_[NAME]-field-label\')]";
             private string _BooleanFieldContainer = ".//div[contains(@data-id, \'header_process_[NAME].fieldControl-checkbox-container\')]";
@@ -37,6 +39,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public string BusinessProcessFlowFieldName { get => _BusinessProcessFlowFieldName; set { _BusinessProcessFlowFieldName = value; } }
             public string BusinessProcessFlowFormContext { get => _BusinessProcessFlowFormContext; set { _BusinessProcessFlowFormContext = value; } }
             public string TextFieldContainer { get => _TextFieldContainer; set { _TextFieldContainer = value; } }
+            public string LookupFieldContainer { get => _LookupFieldContainer; set { _LookupFieldContainer = value; } }
             public string FieldSectionItemContainer { get => _FieldSectionItemContainer; set { _FieldSectionItemContainer = value; } }
             public string TextFieldLabel { get => _TextFieldLabel; set { _TextFieldLabel = value; } }
             public string BooleanFieldContainer { get => _BooleanFieldContainer; set { _BooleanFieldContainer = value; } }
@@ -77,8 +80,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="field">LookupItem with the schema name of the field to retrieve</param>
         public string GetValue(LookupItem field)
         {
-            Entity entity = new Entity(_client);
-            return entity.GetValue(field);
+            return this.BPFGetValue(field);
         }
 
         /// <summary>
@@ -232,6 +234,41 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 }
 
                 return returnField;
+            });
+        }
+
+        /// <summary>
+        /// Gets value of lookup
+        /// </summary>
+        /// <param name="lookup"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        internal BrowserCommandResult<string> BPFGetValue(LookupItem lookup)
+        {
+            return _client.Execute(_client.GetOptions($"Get BPF Value"), driver =>
+            {
+                string rtnValue = String.Empty;
+                var fieldContainer = driver.WaitUntilAvailable(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", lookup.Name));
+                //".//div[contains(@data-lp-id, \'header_process_[NAME]\')]";
+                if (driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.LookupFieldContainer.Replace("[NAME]", lookup.Name)).Count > 0)
+                {
+                    var input = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.LookupFieldContainer.Replace("[NAME]", lookup.Name));
+                    if (input != null)
+                    {
+                        rtnValue = input.GetAttribute(_client, "title");
+                    }
+                }
+                else if (driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", lookup.Name) + "//textarea").Count > 0)
+                {
+                    var textarea = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.TextFieldContainer.Replace("[NAME]", lookup.Name) + "//textarea");
+                    rtnValue = textarea.Text;
+                }
+                else
+                {
+                    throw new Exception($"Lookup with name {lookup.Name} does not exist.");
+                }
+
+                return rtnValue;
             });
         }
 
@@ -399,6 +436,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         internal BrowserCommandResult<bool> BPFNextStage(string stageName, Field businessProcessFlowField = null, int thinkTime = Constants.DefaultThinkTime)
         {
+            Trace.TraceInformation("BusinessProcessFlow.BPFNextStage inititaed.");
             _client.ThinkTime(thinkTime);
 
             return _client.Execute(_client.GetOptions($"Next Stage"), driver =>
@@ -411,7 +449,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
                 foreach (var processStage in processStages)
                 {
-                    var divs = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage + "//div");
+                    var divs = driver.FindElements(_client.ElementMapper.BusinessProcessFlowReference.NextStage + "//div[contains(@data-id, 'processHeaderStageName')]");
 
                     //Click the Label of the Process Stage if found
                     foreach (var div in divs)
@@ -443,7 +481,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                     }
 
                     //Click the Next Stage Button
-                    var nextButton = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.Flyout + _client.ElementMapper.BusinessProcessFlowReference.NextStageButton);
+                    var nextButton = driver.FindElement(_client.ElementMapper.BusinessProcessFlowReference.NextStageButton);
                     nextButton.Click(_client);
                 }
 

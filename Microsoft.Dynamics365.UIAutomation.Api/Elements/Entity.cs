@@ -930,14 +930,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         /// <param name="thinkTime"></param>
         public BrowserCommandResult<bool> Save(int thinkTime = Constants.DefaultThinkTime)
         {
+            Trace.TraceInformation("Entity.Save inititated.");
             _client.ThinkTime(thinkTime);
 
             return _client.Execute(_client.GetOptions($"Save"), driver =>
             {
-                
-
-                driver.SendKeys(_client.ElementMapper.EntityReference.Form, new string[] { Keys.Control, "S" });
-
+                if (driver.HasElement(_client.ElementMapper.EntityReference.Save))
+                {
+                    driver.FindElement(_client.ElementMapper.EntityReference.Save).Click(_client);
+                }
                 Dialogs dialogs = new Dialogs(_client);
                 dialogs.HandleSaveDialog();
                 driver.Wait();
@@ -1154,11 +1155,15 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         private string[] TryGetValue(IElement fieldContainer, LookupItem[] controls)
         {
+            Trace.TraceInformation("Entity.TryGetValue initiated for fieldContainer " + fieldContainer.Locator);
             var controlName = controls.First().Name;
             var xpathToExistingValues = _client.ElementMapper.EntityReference.LookupFieldExistingValue.Replace("[NAME]", controlName);
             var existingValues = _client.Browser.Browser.FindElements(fieldContainer.Locator + xpathToExistingValues);
 
             var xpathToExpandButton = this._entityReference.LookupFieldExpandCollapseButton.Replace("[NAME]", controlName);
+            //".//button[contains(@data-id,'[NAME].fieldControl-LookupResultsDropdown_[NAME]_expandCollapse')]/descendant::label[not(text()='+0')]"
+
+            //Good: header_process_parentcontactid.fieldControl-LookupResultsDropdown_parentcontactid_InputSearch
             bool expandButtonFound = _client.Browser.Browser.HasElement(fieldContainer.Locator + xpathToExpandButton);
             if (expandButtonFound)
             {

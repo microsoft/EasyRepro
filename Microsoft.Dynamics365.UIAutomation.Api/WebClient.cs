@@ -198,16 +198,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         internal void ThinkTime(int milliseconds)
         {
+            Trace.TraceInformation("WebClient.ThinkTime initated.");
             Browser.ThinkTime(milliseconds);
         }
 
         internal void ThinkTime(TimeSpan timespan)
         {
+            Trace.TraceInformation("WebClient.ThinkTime initated.");
             ThinkTime((int)timespan.TotalMilliseconds);
         }
 
         public void Dispose()
         {
+            Trace.TraceInformation("WebClient.Dispose initated.");
             Browser.Dispose();
         }
     }

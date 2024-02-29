@@ -1,4 +1,5 @@
-﻿using Microsoft.Dynamics365.UIAutomation.Api.UCI;
+﻿using Microsoft.Dynamics365.UIAutomation.Api.Controls;
+using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 {
     public class ElementMapper
     {
+        #region elements
         public Lookup.AdvancedLookupReference AdvancedLookupReference;
         public Navigation.ApplicationReference ApplicationReference;
         public BusinessProcessFlow.BusinessProcessFlowReference BusinessProcessFlowReference;
@@ -29,7 +31,23 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         public RelatedGrid.RelatedReference RelatedGridReference;
         public SubGrid.SubGridReference SubGridReference;
         public Timeline.TimelineReference TimelineReference;
+        #endregion
+        #region controls
+        public RichTextEditor.RichTextEditorReference RichTextEditorReference;
+        #endregion
         public ElementMapper(IConfiguration config)
+        {
+            MapControls(config);
+            MapElements(config);
+        }
+
+        private void MapControls(IConfiguration config)
+        {
+            RichTextEditorReference = new RichTextEditor.RichTextEditorReference();
+            config.GetSection(RichTextEditor.RichTextEditorReference.RichTextEditor).Bind(RichTextEditorReference);
+        }
+
+        private void MapElements(IConfiguration config)
         {
             ApplicationReference = new Navigation.ApplicationReference();
             config.GetSection(Navigation.ApplicationReference.Application).Bind(ApplicationReference);

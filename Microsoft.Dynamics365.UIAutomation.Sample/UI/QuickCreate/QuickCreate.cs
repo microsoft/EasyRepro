@@ -36,6 +36,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Sample
             }
         }
 
+        [TestCategory("MicrosoftInternal")]
         [TestCategory("Regression")]
         [TestCategory("SetValue")]
         [TestCategory("QuickCreate")]

@@ -285,7 +285,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             _client.Browser.SwitchToDefaultContent();
         }
 
-        private void SwitchToMainFrame()
+        internal void SwitchToMainFrame()
         {
             //driver.WaitForPageToLoad();
             //driver.SwitchTo().Frame(0);

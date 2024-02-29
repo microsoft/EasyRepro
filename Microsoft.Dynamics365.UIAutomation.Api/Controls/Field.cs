@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-using OpenQA.Selenium;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using Microsoft.Dynamics365.UIAutomation.Api.DTO;
-using OpenQA.Selenium.IE;
 using Keys = Microsoft.Dynamics365.UIAutomation.Browser.Keys;
 using System.Diagnostics;
+using Microsoft.Dynamics365.UIAutomation.Api.Controls;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
@@ -26,6 +25,8 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
             public static string LookupItemLocatorValue = "LookupResults";
             public static string MultiValueOptionSetLocator = "class";
             public static string MultiValueOptionSetLocatorValue = "msos-input";
+            public static string RichTextEditorLocator = "class";
+            public static string RichTextEditorLocatorValue = "fullPageContentEditorFrame";
         }
         //Constructors
         public Field(IElement containerIElement)
@@ -224,17 +225,28 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                 IElement fieldContainer = null;
                 fieldContainer = client.ValidateFormContext(driver, formContextType, field, fieldContainer);
 
-                IElement input;
-                bool found = client.Browser.Browser.HasElement(fieldContainer.Locator + "//input");
-                input = client.Browser.Browser.FindElement(fieldContainer.Locator + "//input");
+                IElement input=null;
+                bool found = driver.HasElement(fieldContainer.Locator + "//input");
+                //input = client.Browser.Browser.FindElement(fieldContainer.Locator + "//input");
                 if (!found)
-                    found = client.Browser.Browser.HasElement(fieldContainer.Locator + "//textarea");
+                {
+                    found = driver.HasElement(fieldContainer.Locator + "//textarea");
+                    if (!found)
+                    {
+                        if (driver.HasElement(fieldContainer.Locator + "//iframe"))
+                        {
+                            input = driver.FindElement(fieldContainer.Locator + "//iframe");
+                        }
 
-                input = client.Browser.Browser.FindElement(fieldContainer.Locator + "//input");
-                if (!found && input.IsAvailable)
+                    }
+                }
+                else
+                    input = driver.FindElement(fieldContainer.Locator + "//input");
+
+                if (!found && input !=null && input.IsAvailable)
                 {
                     //determine type of control
-                    if (input.GetAttribute(_client, FieldReference.MultiValueOptionSetLocator) == FieldReference.MultiValueOptionSetLocatorValue)
+                    if (input.HasAttribute(_client, FieldReference.MultiValueOptionSetLocator) && input.GetAttribute(_client, FieldReference.MultiValueOptionSetLocator) == FieldReference.MultiValueOptionSetLocatorValue)
                     {
                         Trace.TraceInformation("Field.SetValue: Converting to MultiValueOptionSet.");
                         MultiValueOptionSet multiValueOptionSet = new MultiValueOptionSet() {Name = field };
@@ -242,7 +254,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         multiValueOptionSet.SetValue(client, multiValueOptionSet, formContextType);
                         return true;
                     }
-                    if (input.GetAttribute(_client, FieldReference.LookupItemLocator).Contains(FieldReference.LookupItemLocatorValue))
+                    if (input.HasAttribute(_client, FieldReference.LookupItemLocator) && input.GetAttribute(_client, FieldReference.LookupItemLocator).Contains(FieldReference.LookupItemLocatorValue))
                     {
                         Trace.TraceInformation("Field.SetValue: Converting to LookupItem.");
                         LookupItem lookup = new LookupItem();
@@ -252,11 +264,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
                         lookup1.SetValue(lookup, formContextType);
                         return true;
                     }
+                    if (input.GetAttribute(_client, FieldReference.RichTextEditorLocator).Contains(FieldReference.RichTextEditorLocatorValue))
+                    {
+                        Trace.TraceInformation("Field.SetValue: Converting to RichTextEditorControl.");
+                        RichTextEditor rteControl = new RichTextEditor(field);
+                        rteControl.SetValue(client, value);
+                        driver.SwitchToFrame("0");
+                        return true;
+                    }
                     found = true;
                 }
 
                 if (!found)
-                    throw new NoSuchElementException($"Field with name {field} does not exist.");
+                    throw new KeyNotFoundException($"Field with name {field} does not exist.");
 
                 SetInputValue(driver, input, value);
 

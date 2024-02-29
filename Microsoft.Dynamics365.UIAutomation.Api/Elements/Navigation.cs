@@ -294,6 +294,7 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
         }
         public BrowserCommandResult<bool> OpenApp(string appName, int thinkTime = Constants.DefaultThinkTime)
         {
+            Trace.TraceInformation("Navigation.OpenApp initiated for app " + appName);
             _client.ThinkTime(thinkTime);
 
             return _client.Execute(_client.GetOptions($"Open App {appName}"), driver =>

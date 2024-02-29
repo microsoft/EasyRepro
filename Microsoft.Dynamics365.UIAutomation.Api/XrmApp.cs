@@ -5,6 +5,7 @@ using Microsoft.Dynamics365.UIAutomation.Api.UCI;
 using Microsoft.Dynamics365.UIAutomation.Browser;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Microsoft.Dynamics365.UIAutomation.Api
 {
@@ -51,16 +52,19 @@ namespace Microsoft.Dynamics365.UIAutomation.Api
 
         public void ThinkTime(int milliseconds)
         {
+            Trace.TraceInformation("XrmApp.ThinkTime initiated.");
             _client.ThinkTime(milliseconds);
         }
         public void ThinkTime(TimeSpan timespan)
         {
+            Trace.TraceInformation("XrmApp.ThinkTime initiated.");
             _client.ThinkTime((int)timespan.TotalMilliseconds);
         }
 
         public void Dispose()
         {
-            _client?.Dispose();
+            Trace.TraceInformation("XrmApp.Dispose initiated.");
+            _client.Dispose();
         }
     }
 }
