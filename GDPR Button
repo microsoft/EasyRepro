@@ -1,0 +1,19 @@
+final class TCGDirPartyNameHistory_Extension
+{
+    public void clicked()
+    {
+        next clicked();
+        if (Box::yesNo("You are about to delete a record in Name History Line. Delete record?", DialogButton::No) == DialogButton::Yes)
+        {
+            DirPersonName  dirPersonName  = this.formRun().datasource(formDataSourceStr(DirPartyNameHistory,DirPersonName)).cursor();
+            if(dirPersonName.RecId)
+                {
+                    ttsbegin;
+                    dirPersonName.selectForUpdate(true);
+                    dirPersonName.doDelete();
+                    ttscommit;
+                }
+        }
+    }
+
+}
