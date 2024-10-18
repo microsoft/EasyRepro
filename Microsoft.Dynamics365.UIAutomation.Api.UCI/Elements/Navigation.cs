@@ -55,6 +55,17 @@ namespace Microsoft.Dynamics365.UIAutomation.Api.UCI
         }
 
         /// <summary>
+        /// Opens the Customer Service Workspace sub area in the unified client
+        /// </summary>
+        /// <param name="area">Name of the area</param>
+        /// /// <param name="subarea">Name of the subarea</param>
+        public void OpenSubAreaCSW(string area, string subarea)
+        {
+            _client.OpenSubArea(area);
+            _client.OpenSubArea(subarea);
+        }
+
+        /// <summary>
         /// Opens a sub area in the unified client
         /// </summary>
         /// <param name="area">Name of the area</param>
